@@ -4,7 +4,7 @@ import { apply, contact, portal } from '@/lib/saas-links';
 export default function Footer() {
   return (
     <footer className="bg-ink-section">
-      <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-5 gap-10">
+      <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-7 gap-10">
         <div className="col-span-2">
           <div className="flex items-center gap-3">
             <div className="logo-mark">
@@ -40,8 +40,35 @@ export default function Footer() {
         </div>
 
         <div>
+          <div className="eyebrow opacity-60 text-current">Charlotte Services</div>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li><Link href="/charlotte/nemt-rides" className="hover:text-[color:var(--gold-warm)]">NEMT rides</Link></li>
+            <li><Link href="/charlotte/dialysis-transport" className="hover:text-[color:var(--gold-warm)]">Dialysis transport</Link></li>
+            <li><Link href="/charlotte/wheelchair-transport" className="hover:text-[color:var(--gold-warm)]">Wheelchair transport</Link></li>
+            <li><Link href="/charlotte/post-surgery-transport" className="hover:text-[color:var(--gold-warm)]">Post-surgery transport</Link></li>
+            <li><Link href="/charlotte/veteran-transport" className="hover:text-[color:var(--gold-warm)]">Veteran transport</Link></li>
+            <li><Link href="/charlotte/concierge-medical-transport" className="hover:text-[color:var(--gold-warm)]">Concierge transport</Link></li>
+            <li><Link href="/charlotte/family-medical-rides" className="hover:text-[color:var(--gold-warm)]">Book for a loved one</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <div className="eyebrow opacity-60 text-current">Pet Transport</div>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li><Link href="/charlotte/pet-transport" className="hover:text-[color:var(--gold-warm)]">Pet transport</Link></li>
+            <li><Link href="/charlotte/vet-appointment-rides" className="hover:text-[color:var(--gold-warm)]">Vet appointment rides</Link></li>
+            <li><Link href="/charlotte/post-surgery-pet-transport" className="hover:text-[color:var(--gold-warm)]">Post-surgery pet pickup</Link></li>
+            <li><Link href="/charlotte/calm-pet-transport" className="hover:text-[color:var(--gold-warm)]">Calm pet transport</Link></li>
+            <li><Link href="/charlotte/dog-grooming-pickup" className="hover:text-[color:var(--gold-warm)]">Grooming pickup</Link></li>
+            <li><Link href="/charlotte/pet-boarding-transport" className="hover:text-[color:var(--gold-warm)]">Boarding transport</Link></li>
+            <li><Link href="/partners/veterinary" className="hover:text-[color:var(--gold-warm)]">For vet clinics</Link></li>
+          </ul>
+        </div>
+
+        <div>
           <div className="eyebrow opacity-60 text-current">Partners</div>
           <ul className="mt-3 space-y-2 text-sm">
+            <li><Link href="/partners" className="hover:text-[color:var(--gold-warm)]">Partner with Tassy</Link></li>
             <li><a href={apply.facility} className="hover:text-[color:var(--gold-warm)]">Facility partners</a></li>
             <li><a href={apply.salesRep} className="hover:text-[color:var(--gold-warm)]">Become a sales rep</a></li>
             <li><a href={apply.driver} className="hover:text-[color:var(--gold-warm)]">Drive with Tassy</a></li>

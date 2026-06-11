@@ -1,13 +1,38 @@
 import Link from 'next/link';
-import { ArrowRight, Phone } from 'lucide-react';
+import { ArrowRight, ChevronDown, Phone } from 'lucide-react';
 import { portal, contact, book } from '@/lib/saas-links';
 
 const nav = [
-  { href: '/#services', label: 'Services' },
   { href: '/#how', label: 'How it works' },
-  { href: '/#facilities', label: 'For Facilities' },
+  { href: '/partners', label: 'Partners' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/#founder', label: 'About' },
+];
+
+const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label: string }> }> = [
+  {
+    heading: 'Medical transport',
+    links: [
+      { href: '/charlotte/nemt-rides', label: 'NEMT rides' },
+      { href: '/charlotte/dialysis-transport', label: 'Dialysis transport' },
+      { href: '/charlotte/wheelchair-transport', label: 'Wheelchair transport' },
+      { href: '/charlotte/post-surgery-transport', label: 'Post-surgery transport' },
+      { href: '/charlotte/veteran-transport', label: 'Veteran transport' },
+      { href: '/charlotte/concierge-medical-transport', label: 'Concierge transport' },
+      { href: '/charlotte/family-medical-rides', label: 'Book for a loved one' },
+    ],
+  },
+  {
+    heading: 'Winnie Ride · Pets',
+    links: [
+      { href: '/charlotte/pet-transport', label: 'Pet transport' },
+      { href: '/charlotte/vet-appointment-rides', label: 'Vet appointment rides' },
+      { href: '/charlotte/post-surgery-pet-transport', label: 'Post-surgery pet pickup' },
+      { href: '/charlotte/calm-pet-transport', label: 'Calm pet transport' },
+      { href: '/charlotte/dog-grooming-pickup', label: 'Grooming pickup' },
+      { href: '/charlotte/pet-boarding-transport', label: 'Boarding transport' },
+    ],
+  },
 ];
 
 export default function Header() {
@@ -28,6 +53,30 @@ export default function Header() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8">
+          {/* CSS-only hover dropdown — no client JS */}
+          <div className="relative group">
+            <Link href="/#services" className="nav-link inline-flex items-center gap-1">
+              Services <ChevronDown size={13} className="mt-0.5" />
+            </Link>
+            <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 hidden group-hover:block group-focus-within:block z-40">
+              <div className="bg-surface border border-line rounded-card shadow-[0_16px_40px_-16px_rgba(27,26,23,0.25)] p-6 grid grid-cols-2 gap-8 w-[34rem]">
+                {servicesMenu.map((col) => (
+                  <div key={col.heading}>
+                    <div className="eyebrow !text-[10px]">{col.heading}</div>
+                    <ul className="mt-3 space-y-2">
+                      {col.links.map((l) => (
+                        <li key={l.href}>
+                          <Link href={l.href} className="nav-link text-sm block">
+                            {l.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
           {nav.map((n) => (
             <Link key={n.href} href={n.href} className="nav-link">
               {n.label}

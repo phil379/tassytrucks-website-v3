@@ -42,6 +42,23 @@ export const subscribe = {
   recoverElite: src('/subscribe', { product: 'recover_elite' }),
 };
 
+/**
+ * SEO landing-page deep links. Each SEO page passes its own `source` (and any
+ * wizard prefill params) so marketing attribution survives into the SaaS.
+ * Example: seoBook('nemt', { source: 'seo-dialysis', recurring: '1' })
+ */
+export const seoBook = (
+  vertical: 'nemt' | 'vip' | 'winnie' | 'renew' | 'recover',
+  params: Record<string, string>,
+) => `${SAAS_BASE}/book/${vertical}?${new URLSearchParams(params).toString()}`;
+
+/** B2B facility intake deep link with attribution. */
+export const facilityIntake = (params: Record<string, string>) =>
+  `${SAAS_BASE}/facility/intake?${new URLSearchParams(params).toString()}`;
+
+/** Winnie Ride booking deep link (MEGA_SEO_002 contract). */
+export const WINNIE_BOOK_URL = seoBook('winnie', { source: 'web' });
+
 export const apply = {
   driver: src('/driver-apply'),
   salesRep: src('/sales-rep-apply'),

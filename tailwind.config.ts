@@ -21,6 +21,9 @@ const config: Config = {
         // Aliases — keep existing vertical pages + ServicePage.tsx working
         charcoal:   '#1B1A17',
         cream:      '#FAF7F0',
+        // Winnie Ride pet-vertical accent (ADDITION — gold stays primary)
+        'winnie-sage':      '#7C9A5C',
+        'winnie-sage-soft': '#A8C088',
       },
       fontFamily: {
         sans:  ['Inter', 'system-ui', 'sans-serif'],

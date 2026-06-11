@@ -21,10 +21,43 @@ export const metadata: Metadata = {
   icons: { icon: '/favicon.ico' },
 };
 
+const localBusinessLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'Tassy Trucks',
+  description:
+    'Charlotte-based premium transportation: NEMT, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
+  url: 'https://www.tassytrucks.com',
+  telephone: '+1-704-941-8508',
+  email: 'booking@tassytrucks.com',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Charlotte',
+    addressRegion: 'NC',
+    addressCountry: 'US',
+  },
+  openingHours: 'Mo-Su 00:00-23:59',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Tassy Trucks transportation services',
+    itemListElement: [
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'NEMT — Non-Emergency Medical Transportation', url: 'https://www.tassytrucks.com/nemt' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'VIP Concierge Transport', url: 'https://www.tassytrucks.com/vip' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Winnie Ride — Pet Transportation', url: 'https://www.tassytrucks.com/winnie' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Renew — Wellness Transport', url: 'https://www.tassytrucks.com/renew' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Recover — Oncology Recovery Rides', url: 'https://www.tassytrucks.com/recover' } },
+    ],
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }}
+        />
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"

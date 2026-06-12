@@ -33,6 +33,12 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
       { href: '/charlotte/pet-boarding-transport', label: 'Boarding transport' },
     ],
   },
+  {
+    heading: 'Schools',
+    links: [
+      { href: '/school', label: 'Tassy School · Student transport' },
+    ],
+  },
 ];
 
 export default function Header() {

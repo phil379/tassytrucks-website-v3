@@ -35,6 +35,7 @@ export default function Footer() {
             <li><Link href="/winnie" className="hover:text-[color:var(--gold-warm)]">Winnie Ride</Link></li>
             <li><Link href="/renew" className="hover:text-[color:var(--gold-warm)]">Tassy Renew</Link></li>
             <li><Link href="/recover" className="hover:text-[color:var(--gold-warm)]">Tassy Recover</Link></li>
+            <li><Link href="/school" className="hover:text-[color:var(--gold-warm)]">Tassy School</Link></li>
             <li><Link href="/pricing" className="hover:text-[color:var(--gold-warm)]">Pricing</Link></li>
           </ul>
         </div>

@@ -11,6 +11,7 @@ const routes: Array<{ path: string; priority: number }> = [
   { path: '/renew', priority: 0.8 },
   { path: '/recover', priority: 0.8 },
   { path: '/pricing', priority: 0.8 },
+  { path: '/school', priority: 0.8 },
   // MEGA_SEO_001 — NEMT / VIP cluster
   { path: '/partners', priority: 0.9 },
   { path: '/charlotte/nemt-rides', priority: 0.8 },

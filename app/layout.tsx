@@ -46,6 +46,7 @@ const localBusinessLd = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Winnie Ride — Pet Transportation', url: 'https://www.tassytrucks.com/winnie' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Renew — Wellness Transport', url: 'https://www.tassytrucks.com/renew' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Recover — Oncology Recovery Rides', url: 'https://www.tassytrucks.com/recover' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy School — Alternative student transportation', url: 'https://www.tassytrucks.com/school' } },
     ],
   },
 };

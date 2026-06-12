@@ -147,7 +147,7 @@ export default function HomePage() {
             <div className="lg:col-span-2">
               <div className="eyebrow mb-3">What we move</div>
               <h2 className="h-section">
-                One platform.<br />Five lines of care.
+                One platform.<br />Six lines of care.
               </h2>
             </div>
             <p className="ink-soft text-lg">

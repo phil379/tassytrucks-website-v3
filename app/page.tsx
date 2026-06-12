@@ -2,7 +2,19 @@ import Link from 'next/link';
 import { ArrowRight, Check, Phone } from 'lucide-react';
 import { book, contact, apply } from '@/lib/saas-links';
 
-const verticals = [
+type Vertical = {
+  slug: string;
+  name: string;
+  blurb: string;
+  bullets: string[];
+  cta: string;
+  /** Booking deep-link. Omitted for capability-only lines (School has no booking flow). */
+  bookHref?: string;
+  /** Monogram override — default is first letter of name. */
+  monogram?: string;
+};
+
+const verticals: Vertical[] = [
   {
     slug: '/nemt', name: 'NEMT',
     blurb: 'Non-emergency medical transport for dialysis, recurring appointments, doctor visits, and Medicaid-covered care.',
@@ -37,6 +49,15 @@ const verticals = [
     bullets: ['CNA / LPN drivers', 'Recovery amenity kit'],
     cta: 'Book Recovery transport',
     bookHref: book.recover,
+  },
+  {
+    slug: '/school', name: 'Tassy School', monogram: 'S',
+    blurb: 'Alternative student transportation since 2022 — originally with Alternative School Transportation, continuing today with EverDriven Technologies after their 2023 rebrand. Special needs, McKinney-Vento, foster youth, and at-risk student routes.',
+    bullets: [
+      'Subcontractor since 2022 · EverDriven Technologies (formerly Alternative School Transportation)',
+      '5 metros: Charlotte NC · High Point NC · Spartanburg SC · Rock Hill SC · Cincinnati OH',
+    ],
+    cta: 'Our school transport story',
   },
 ];
 
@@ -155,12 +176,12 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {verticals.map((v) => (
               <Link key={v.slug} href={v.slug} className="card-tile group">
                 <div className="w-12 h-12 rounded-xl bg-ink flex items-center justify-center mb-6">
                   <span className="serif text-[color:var(--gold-warm)] text-xl font-bold">
-                    {v.name.charAt(0)}
+                    {v.monogram ?? v.name.charAt(0)}
                   </span>
                 </div>
                 <div className="eyebrow">Service line</div>

@@ -25,7 +25,7 @@ export default function PetBoardingTransportPage() {
       trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
       h1="Pet Boarding Pickup & Drop-Off in Charlotte — Kennel Runs Scheduled Around Your Flights"
       heroSubtitle="We take your dog or cat to the boarding facility before you fly and bring them home when you land — no favors to ask, no second car to coordinate."
-      quickAnswer="Winnie Ride by Tassy Trucks is a pet boarding pickup service covering Charlotte and Mecklenburg County. We handle home-to-kennel drop-offs, boarding-to-home returns, and daily daycare runs, scheduled around your travel. Every trip is vaccine-verified with a photo at pickup — call (704) 941-8508, where dispatch answers 24/7."
+      quickAnswer="Winnie Ride by Tassy Transportation is a pet boarding pickup service covering Charlotte and Mecklenburg County. We handle home-to-kennel drop-offs, boarding-to-home returns, and daily daycare runs, scheduled around your travel. Every trip is vaccine-verified with a photo at pickup — call (704) 941-8508, where dispatch answers 24/7."
       ctaText="Schedule boarding transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -44,7 +44,7 @@ export default function PetBoardingTransportPage() {
               </p>
               <p>
                 Winnie Ride closes that gap. We&rsquo;re the pet-transport
-                division of Tassy Trucks — a Charlotte-based, Service-Disabled
+                division of Tassy Transportation — a Charlotte-based, Service-Disabled
                 Veteran-Owned Small Business (SDVOSB) operating under USDOT
                 #3104152 and MC #79222 — and boarding runs are one of the most
                 common trips we drive. Your dog gets to the facility on time, you

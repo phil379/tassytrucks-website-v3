@@ -7,20 +7,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // EXACT palette from live deploy (tassytrucks-landing-deploy/index.html)
-      // + back-compat aliases used by ServicePage.tsx and vertical pages
+      // FIX_PROD_007 — flipped to the SaaS dark theme. `ink`/`charcoal` stay the dark
+      // color (#1B1A17) because they back `bg-ink`/`bg-charcoal` dark bands + dark
+      // text-on-gold; `bg`/`cream` are the dark canvas; `cream-text` is the light text
+      // (text-ink/text-cream usages were swept to text-cream-text).
       colors: {
-        bg:         '#FAF7F0',
-        ink:        '#1B1A17',
-        'ink-soft': '#444239',
-        'ink-mute': '#76736B',
+        bg:         '#0d1117',
+        ink:        '#1B1A17',                  // dark surface / on-gold text (unchanged)
+        'ink-soft': 'rgba(244,239,224,0.72)',
+        'ink-mute': 'rgba(244,239,224,0.5)',
         gold:       '#C8932E',
         'gold-warm':'#E5A93B',
-        line:       '#E8E1D1',
-        surface:    '#FFFFFF',
+        line:       'rgba(244,239,224,0.12)',
+        surface:    '#161b22',
         // Aliases — keep existing vertical pages + ServicePage.tsx working
-        charcoal:   '#1B1A17',
-        cream:      '#FAF7F0',
+        charcoal:   '#1B1A17',                  // dark surface / on-gold text (unchanged)
+        cream:      '#0d1117',                  // canvas (bg-cream → dark)
+        'cream-text': '#F4EFE0',                // light text on dark (text-cream-text)
         // Winnie Ride pet-vertical accent (ADDITION — gold stays primary)
         'winnie-sage':      '#7C9A5C',
         'winnie-sage-soft': '#A8C088',

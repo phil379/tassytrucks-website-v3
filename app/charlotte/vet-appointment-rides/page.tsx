@@ -56,7 +56,7 @@ export default function VetAppointmentRidesPage() {
                 <a href="/charlotte/pet-transport" className={linkCls}>
                   professional pet transport
                 </a>{' '}
-                from Tassy Trucks, a veteran-owned, Charlotte-based company
+                from Tassy Transportation, a veteran-owned, Charlotte-based company
                 operating under USDOT #3104152 — not a stranger from an app with a
                 towel on the back seat.
               </p>
@@ -196,7 +196,7 @@ export default function VetAppointmentRidesPage() {
         },
         {
           q: 'Who is actually driving my pet?',
-          a: 'A Tassy Trucks driver trained on carrier handling and sedation-aware protocols, in a climate-controlled company vehicle. We are not a marketplace — the company you book with is the company that drives, and a signed liability waiver covers every trip.',
+          a: 'A Tassy Transportation driver trained on carrier handling and sedation-aware protocols, in a climate-controlled company vehicle. We are not a marketplace — the company you book with is the company that drives, and a signed liability waiver covers every trip.',
         },
         {
           q: 'What if the vet keeps my pet longer than expected?',

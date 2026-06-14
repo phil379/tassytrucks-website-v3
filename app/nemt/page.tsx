@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { book, apply } from '@/lib/saas-links';
+import { book, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
   title: 'NEMT — Charlotte medical transport',
@@ -33,9 +33,9 @@ export default function NemtPage() {
       ]}
       partnerCta={{
         title: "Are you a hospital, dialysis center, or managed-care plan?",
-        body: 'We onboard facility partners with a dedicated portal, contract-rate cards, and dispatch SLAs. Talk to us about adding Tassy to your transport network.',
-        href: apply.facility,
-        label: 'Request facility partnership',
+        body: 'Get your facility on Tassy in 60 seconds — no credit card. Create a provisional account, add your roster, and a coordinator calls within 24 hours to activate dispatch.',
+        href: facilitySignup('hospital'),
+        label: 'Get started · no credit card',
       }}
     />
   );

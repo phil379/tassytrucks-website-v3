@@ -2,17 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tokens 1:1 from live deploy */
+/* FIX_PROD_007 — flipped to the unified dark theme matching the SaaS /book index
+   (#0d1117 canvas · #161b22 cards · #F4EFE0 cream text · gold-warm #E5A93B accents).
+   `--ink` was used as BOTH primary text AND dark surfaces/accents; it now means TEXT
+   (cream), and `--on-gold` carries the dark text that sits on gold/cream surfaces. */
 :root {
-  --bg: #FAF7F0;
-  --ink: #1B1A17;
-  --ink-soft: #444239;
-  --ink-mute: #76736B;
+  --bg: #0d1117;                        /* dark canvas (was #FAF7F0) */
+  --ink: #F4EFE0;                       /* primary TEXT — cream on dark (was #1B1A17) */
+  --ink-soft: rgba(244,239,224,0.72);   /* secondary text (was #444239) */
+  --ink-mute: rgba(244,239,224,0.5);    /* muted text (was #76736B) */
   --gold: #C8932E;
   --gold-warm: #E5A93B;
-  --line: #E8E1D1;
-  --surface: #FFFFFF;
+  --line: rgba(244,239,224,0.12);       /* dark hairline (was #E8E1D1) */
+  --surface: #161b22;                   /* dark card surface (was #FFFFFF) */
   --cream-text: #F4EFE0;
+  --on-gold: #1B1A17;                   /* dark text that sits ON gold/cream surfaces */
+  --section: #14181f;                   /* dark band surface (was the ink section) */
 }
 
 html, body { background: var(--bg); color: var(--ink); }
@@ -44,19 +49,21 @@ body {
 
   /* Surfaces */
   .bg-cream { background: var(--bg); }
-  .bg-ink-section { background: var(--ink); color: var(--cream-text); }
+  .bg-ink-section { background: var(--section); color: var(--cream-text); }
   .border-line { border-color: var(--line); }
   .hairline { border-top: 1px solid var(--line); }
 
-  /* Buttons — match live deploy exactly */
+  /* Buttons — dark theme (FIX_PROD_007). Primary is a raised neutral surface so it
+     stays distinct from the gold accent CTA. */
   .btn-primary {
-    background: var(--ink); color: var(--cream-text);
+    background: #21262d; color: var(--cream-text);
     padding: 0.95rem 1.6rem; border-radius: 10px;
     font-weight: 500; letter-spacing: -0.01em;
+    border: 1px solid var(--line);
     transition: transform .2s ease, background .2s ease;
     display: inline-flex; align-items: center; gap: 0.6rem;
   }
-  .btn-primary:hover { background: #000; transform: translateY(-1px); }
+  .btn-primary:hover { background: #2b323b; transform: translateY(-1px); }
 
   .btn-gold {
     background: var(--gold-warm); color: var(--ink);
@@ -68,14 +75,14 @@ body {
   .btn-gold:hover { background: #D49A2E; transform: translateY(-1px); }
 
   .btn-call {
-    background: var(--surface); color: var(--ink);
+    background: transparent; color: var(--ink);
     padding: 0.95rem 1.4rem; border-radius: 10px;
     font-weight: 500; letter-spacing: -0.01em;
-    border: 1px solid var(--ink);
+    border: 1px solid var(--line);
     transition: transform .2s ease, background .2s ease, color .2s ease;
     display: inline-flex; align-items: center; gap: 0.6rem;
   }
-  .btn-call:hover { background: var(--ink); color: var(--cream-text); transform: translateY(-1px); }
+  .btn-call:hover { background: rgba(244,239,224,0.06); transform: translateY(-1px); }
 
   .btn-ghost {
     color: var(--ink); padding: 0.95rem 1.2rem;
@@ -112,7 +119,7 @@ body {
   .number-bullet {
     width: 28px; height: 28px;
     border-radius: 50%;
-    background: var(--gold-warm); color: var(--ink);
+    background: var(--gold-warm); color: var(--on-gold);
     font-weight: 700; font-size: 0.85rem;
     display: inline-flex; align-items: center; justify-content: center;
   }
@@ -147,7 +154,7 @@ body {
   .tier-card.is-popular {
     background: var(--gold-warm);
     border-color: var(--gold-warm);
-    color: var(--ink);
+    color: var(--on-gold);
   }
 
   /* Status badges */
@@ -164,7 +171,8 @@ body {
   /* Logo mark */
   .logo-mark {
     width: 40px; height: 40px;
-    background: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 10px;
     display: inline-flex; align-items: center; justify-content: center;
     padding: 7px;
@@ -181,9 +189,10 @@ body {
   opacity: 0; transform: translateY(12px);
   animation: tripCycle 12s infinite;
   padding: 0.85rem 1rem;
-  background: rgba(255,255,255,0.97);
+  background: rgba(22,27,34,0.97);
+  border: 1px solid var(--line);
   border-radius: 14px;
-  box-shadow: 0 8px 28px -8px rgba(27,26,23,0.3);
+  box-shadow: 0 8px 28px -8px rgba(0,0,0,0.5);
 }
 .trip-card:nth-child(1) { animation-delay: 0s; }
 .trip-card:nth-child(2) { animation-delay: 4s; }

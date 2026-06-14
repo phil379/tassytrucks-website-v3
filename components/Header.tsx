@@ -51,7 +51,7 @@ export default function Header() {
             <span className="serif font-bold text-[color:var(--gold-warm)] text-xl">T</span>
           </div>
           <div>
-            <div className="serif text-xl font-semibold leading-none">Tassy Trucks</div>
+            <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
             <div className="text-[10px] tracking-eyebrow uppercase ink-mute mt-1">
               Premium Transport · Veteran-Owned
             </div>

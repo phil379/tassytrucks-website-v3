@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import ServicePage from '@/components/ServicePage';
 import PawIcon from '@/components/seo/PawIcon';
-import { book, subscribe, apply } from '@/lib/saas-links';
+import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 const charlotteServices = [
   { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — vaccine checks, waivers, photos, trained drivers.' },
@@ -79,8 +79,8 @@ export default function WinniePage() {
       partnerCta={{
         title: 'Are you a vet, groomer, or daycare?',
         body: 'Add Winnie Ride to your client experience. Facility portal, contract rates, recurring scheduling, and Tassy-branded pet amenities for every client of yours.',
-        href: apply.facility,
-        label: 'Request partner portal',
+        href: facilitySignup('veterinary'),
+        label: 'Get started · no credit card',
       }}
     />
 

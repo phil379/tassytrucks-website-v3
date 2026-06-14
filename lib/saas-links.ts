@@ -17,7 +17,19 @@ export const book = {
   renew: src('/book/renew'),
   recover: src('/book/recover'),
   quick: src('/quick-book'),
+  // FIX_PROD_021 — Tassy School parent-direct subscription (FIX_PROD_008/010). The
+  // landing + the three plan-setup deep links (slugs verified live: full-year / weekly
+  // / after-school). This is the connection the marketing /school page was missing.
+  school: src('/book/school'),
+  schoolFullYear: src('/book/school/full-year/setup'),
+  schoolWeekly: src('/book/school/weekly/setup'),
+  schoolAfterSchool: src('/book/school/after-school/setup'),
 };
+
+/** FIX_PROD_020 self-serve facility magic-link signup. `?type=` is an optional hint
+ *  (hospital / veterinary / clinic / school) the signup form can read. */
+export const facilitySignup = (type?: string) =>
+  type ? `${SAAS_BASE}/facility/signup?type=${encodeURIComponent(type)}` : `${SAAS_BASE}/facility/signup`;
 
 export const subscribe = {
   // VIP CAMO-style passes

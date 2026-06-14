@@ -25,7 +25,7 @@ export default function PostSurgeryPetTransportPage() {
       trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
       h1="Post-Surgery Pet Transport in Charlotte — Safe Rides Home After Your Dog or Cat's Procedure"
       heroSubtitle="A sedation-aware driver picks your pet up from the vet, follows the discharge instructions, and brings them straight to your door — so nobody has to drive with one eye on the back seat."
-      quickAnswer="Winnie Ride by Tassy Trucks provides post-surgery pet pickup across Charlotte and Mecklenburg County. Our drivers are trained in sedation-aware handling, every pet rides secured in a carrier in a climate-controlled vehicle, and you get a photo at pickup. Call (704) 941-8508 or book online — dispatch answers 24/7."
+      quickAnswer="Winnie Ride by Tassy Transportation provides post-surgery pet pickup across Charlotte and Mecklenburg County. Our drivers are trained in sedation-aware handling, every pet rides secured in a carrier in a climate-controlled vehicle, and you get a photo at pickup. Call (704) 941-8508 or book online — dispatch answers 24/7."
       ctaText="Book a post-op pickup"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -43,7 +43,7 @@ export default function PostSurgeryPetTransportPage() {
                 that&rsquo;s not a safe setup for you or for her.
               </p>
               <p>
-                Winnie Ride is the pet-transport division of Tassy Trucks, a
+                Winnie Ride is the pet-transport division of Tassy Transportation, a
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
                 (SDVOSB) operating under USDOT #3104152 and MC #79222. We handle
                 the drive so your only job is meeting your pet at the door. We

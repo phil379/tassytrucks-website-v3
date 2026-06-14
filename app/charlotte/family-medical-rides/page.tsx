@@ -19,7 +19,7 @@ export default function FamilyMedicalRidesPage() {
       eyebrow="Family Bookings · Charlotte, North Carolina"
       h1="Book a Medical Ride for Someone Else in Charlotte — Parents, Spouses, Loved Ones"
       heroSubtitle="For the daughter in Denver and the son in D.C. coordinating Mom’s appointments in Charlotte — book the ride, get every update, and know she made it to the door."
-      quickAnswer="Yes — you can book and pay for a medical ride for someone else, even from out of town. With Tassy Trucks, you schedule the ride online or by phone, the confirmations and driver updates come to you, and a trained driver meets your loved one at their door anywhere in Charlotte or Mecklenburg County. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Yes — you can book and pay for a medical ride for someone else, even from out of town. With Tassy Transportation, you schedule the ride online or by phone, the confirmations and driver updates come to you, and a trained driver meets your loved one at their door anywhere in Charlotte or Mecklenburg County. Dispatch answers 24/7 at (704) 941-8508."
       ctaText="Book for a loved one"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -71,7 +71,7 @@ export default function FamilyMedicalRidesPage() {
                 appointment moves, your dad decides he wants to stop being
                 stubborn and use the walker — you call us, not the driver, and
                 dispatch sorts it out. One number, answered around the clock:
-                (704) 941-8508. Tassy Trucks is a Charlotte-based,
+                (704) 941-8508. Tassy Transportation is a Charlotte-based,
                 Service-Disabled Veteran-Owned Small Business operating under
                 USDOT #3104152 and MC #79222, so the company you are trusting
                 with a parent is licensed, insured, and checkable.

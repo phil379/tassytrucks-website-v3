@@ -6,7 +6,7 @@ import { seoBook } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Tassy vs Uber Health vs Lyft Healthcare — Compared',
   description:
-    'Honest comparison of Tassy Trucks, Uber Health, and Lyft Healthcare for Charlotte medical transport: wheelchair access, driver training, booking, support.',
+    'Honest comparison of Tassy Transportation, Uber Health, and Lyft Healthcare for Charlotte medical transport: wheelchair access, driver training, booking, support.',
   alternates: { canonical: '/compare/tassy-vs-uber-health-vs-lyft-healthcare' },
   openGraph: { images: ['/og-image/tassy-vs-uber-health-vs-lyft-healthcare'] },
 };
@@ -93,7 +93,7 @@ function ComparisonTable() {
             <thead>
               <tr className="text-left border-b-2 border-[color:var(--ink)]">
                 <th className="py-3 pr-4 font-semibold"> </th>
-                <th className="py-3 pr-4 font-semibold">Tassy Trucks</th>
+                <th className="py-3 pr-4 font-semibold">Tassy Transportation</th>
                 <th className="py-3 pr-4 font-semibold">Uber Health</th>
                 <th className="py-3 font-semibold">Lyft Healthcare</th>
               </tr>
@@ -120,9 +120,9 @@ export default function ComparePage() {
     <LandingPageShell
       primaryKeyword="tassy vs uber health vs lyft healthcare"
       eyebrow="Comparison · Charlotte Medical Transport"
-      h1="Tassy Trucks vs Uber Health vs Lyft Healthcare — Charlotte Medical Transport Compared"
+      h1="Tassy Transportation vs Uber Health vs Lyft Healthcare — Charlotte Medical Transport Compared"
       heroSubtitle="An honest look at when a national rideshare platform is the right call — and when a dedicated local NEMT provider is."
-      quickAnswer="Uber Health and Lyft Healthcare are strong options for low-acuity, fully ambulatory rides booked at scale by healthcare organizations. Tassy Trucks is a Charlotte-based NEMT and concierge provider built for everything those platforms aren't designed for: wheelchair securement, post-anesthesia pickups, recurring dialysis schedules, and a dispatch line a person actually answers."
+      quickAnswer="Uber Health and Lyft Healthcare are strong options for low-acuity, fully ambulatory rides booked at scale by healthcare organizations. Tassy Transportation is a Charlotte-based NEMT and concierge provider built for everything those platforms aren't designed for: wheelchair securement, post-anesthesia pickups, recurring dialysis schedules, and a dispatch line a person actually answers."
       ctaText="See if Tassy is right for you"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -141,7 +141,7 @@ export default function ComparePage() {
                 don&rsquo;t need the app — the organization books on their behalf.
               </p>
               <p>
-                Tassy Trucks is a dedicated medical transport company based in
+                Tassy Transportation is a dedicated medical transport company based in
                 Charlotte. We own our vehicles, train our drivers on patient
                 handling, and take bookings directly from patients and families as
                 well as from facilities. We are a Service-Disabled Veteran-Owned

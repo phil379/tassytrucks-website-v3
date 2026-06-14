@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { book, subscribe, apply } from '@/lib/saas-links';
+import { book, subscribe } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
   title: 'VIP Concierge — Charlotte plastic surgery & aesthetic recovery transport',

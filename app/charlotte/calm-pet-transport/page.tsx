@@ -25,7 +25,7 @@ export default function CalmPetTransportPage() {
       trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
       h1="Calm Pet Transport in Charlotte for Anxious, Fearful, and Senior Pets"
       heroSubtitle="A quiet, climate-controlled ride with a driver matched to your pet’s temperament — because a stressed pet shouldn’t have to ride in a stranger’s car."
-      quickAnswer="Calm pet transport means a quiet, climate-controlled vehicle, a driver trained on carrier handling, and a pace set by your pet rather than the clock. Winnie Ride by Tassy Trucks matches drivers to your pet's temperament across Charlotte and Mecklenburg County. You tell us your pet's triggers at booking, and the right driver shows up prepared."
+      quickAnswer="Calm pet transport means a quiet, climate-controlled vehicle, a driver trained on carrier handling, and a pace set by your pet rather than the clock. Winnie Ride by Tassy Transportation matches drivers to your pet's temperament across Charlotte and Mecklenburg County. You tell us your pet's triggers at booking, and the right driver shows up prepared."
       ctaText="Book a calm ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"

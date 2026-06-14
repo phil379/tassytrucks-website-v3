@@ -3,7 +3,7 @@ import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Veteran Medical Transport in Charlotte NC | Tassy Trucks',
+  title: 'Veteran Medical Transport in Charlotte NC | Tassy Transportation',
   description:
     'Veteran medical transport in Charlotte NC from a Service-Disabled Veteran-Owned company. Rides to VA and community care appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/veteran-transport' },
@@ -19,7 +19,7 @@ export default function VeteranTransportPage() {
       eyebrow="Veteran Transport · Charlotte, North Carolina"
       h1="Veteran Medical Transport in Charlotte — Driven by a Veteran-Owned Company"
       heroSubtitle="Scheduled rides to VA and community care appointments across the Charlotte area, from a Service-Disabled Veteran-Owned Small Business that treats every rider like one of our own."
-      quickAnswer="Tassy Trucks provides veteran medical transport across Charlotte and Mecklenburg County — scheduled, door-to-door rides to VA appointments and VA-authorized community care visits. We are a Service-Disabled Veteran-Owned Small Business (SDVOSB), so the company driving you is veteran-owned itself. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Tassy Transportation provides veteran medical transport across Charlotte and Mecklenburg County — scheduled, door-to-door rides to VA appointments and VA-authorized community care visits. We are a Service-Disabled Veteran-Owned Small Business (SDVOSB), so the company driving you is veteran-owned itself. Dispatch answers 24/7 at (704) 941-8508."
       ctaText="Book veteran transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Veteran Medical Transportation"
@@ -30,7 +30,7 @@ export default function VeteranTransportPage() {
           body: (
             <>
               <p>
-                Tassy Trucks is a certified <strong>Service-Disabled
+                Tassy Transportation is a certified <strong>Service-Disabled
                 Veteran-Owned Small Business</strong> operating under USDOT
                 #3104152 and MC #79222, based right here in Charlotte. That is
                 not a logo we added for marketing — it is who founded the
@@ -182,8 +182,8 @@ export default function VeteranTransportPage() {
           a: 'Coverage and authorization come through the VA and your case manager, not through us — we cannot authorize VA benefits ourselves. The honest answer is: it depends on your situation. Call us at (704) 941-8508, tell us what your case manager has said, and we will walk through your options, including private-pay if authorization is not available.',
         },
         {
-          q: 'Is Tassy Trucks actually veteran-owned?',
-          a: 'Yes. Tassy Trucks is a certified Service-Disabled Veteran-Owned Small Business (SDVOSB) operating under USDOT #3104152 and MC #79222. The company is veteran-founded and Charlotte-based, and medical transport is our core business.',
+          q: 'Is Tassy Transportation actually veteran-owned?',
+          a: 'Yes. Tassy Transportation is a certified Service-Disabled Veteran-Owned Small Business (SDVOSB) operating under USDOT #3104152 and MC #79222. The company is veteran-founded and Charlotte-based, and medical transport is our core business.',
         },
         {
           q: 'Can you handle recurring rides to ongoing treatment?',

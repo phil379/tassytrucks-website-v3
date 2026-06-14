@@ -3,7 +3,7 @@ import LandingPageShell from '@/components/seo/LandingPageShell';
 import { facilityIntake } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Partner With Tassy Trucks — Charlotte Medical Transport',
+  title: 'Partner With Tassy Transportation — Charlotte Medical Transport',
   description:
     'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, 24/7 dispatch, dedicated facility portal with net-30 invoicing. (704) 941-8508.',
   alternates: { canonical: '/partners' },
@@ -17,9 +17,9 @@ export default function PartnersPage() {
     <LandingPageShell
       primaryKeyword="medical transport facility partnerships charlotte nc"
       eyebrow="For Facilities · B2B Partnerships"
-      h1="Partner with Tassy Trucks — Charlotte's SDVOSB Medical Transport"
+      h1="Partner with Tassy Transportation — Charlotte's SDVOSB Medical Transport"
       heroSubtitle="A contracted transport partner for discharge planners and facility coordinators who are tired of chasing no-show rides — with one dispatch line, one portal, and one invoice."
-      quickAnswer="Tassy Trucks partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified, operate under USDOT #3104152 / MC #79222, and dispatch 24/7."
+      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified, operate under USDOT #3104152 / MC #79222, and dispatch 24/7."
       ctaText="Schedule a 15-min intro call"
       ctaHref={CTA_HREF}
       secondaryCta={{
@@ -73,7 +73,7 @@ export default function PartnersPage() {
           body: (
             <>
               <p>
-                Start with procurement. Tassy Trucks is SDVOSB certified —
+                Start with procurement. Tassy Transportation is SDVOSB certified —
                 Service-Disabled Veteran-Owned Small Business — which means a
                 contract with us counts toward your organization&rsquo;s
                 supplier-diversity goals. For hospital systems and government-adjacent

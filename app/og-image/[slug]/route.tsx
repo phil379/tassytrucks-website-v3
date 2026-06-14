@@ -62,7 +62,7 @@ export async function GET(
             T
           </div>
           <div style={{ fontSize: 30, letterSpacing: 4, textTransform: 'uppercase', opacity: 0.8 }}>
-            Tassy Trucks
+            Tassy Transportation
           </div>
         </div>
         <div style={{ fontSize: 76, fontWeight: 600, lineHeight: 1.08, maxWidth: 980 }}>

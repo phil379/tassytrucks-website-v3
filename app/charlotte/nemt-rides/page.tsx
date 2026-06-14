@@ -19,7 +19,7 @@ export default function NemtRidesPage() {
       eyebrow="NEMT · Charlotte, North Carolina"
       h1="NEMT in Charlotte, NC — Medical Rides You Can Set Your Watch By"
       heroSubtitle="Non-emergency medical transportation for Charlotte patients and the families who coordinate their care — bookable tonight, on the road tomorrow."
-      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Trucks provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with 24/7 phone dispatch at (704) 941-8508."
+      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with 24/7 phone dispatch at (704) 941-8508."
       ctaText="Book a medical ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -43,7 +43,7 @@ export default function NemtRidesPage() {
                 tired to drive home.
               </p>
               <p>
-                Tassy Trucks is a Charlotte-based, Service-Disabled Veteran-Owned
+                Tassy Transportation is a Charlotte-based, Service-Disabled Veteran-Owned
                 Small Business (SDVOSB) operating under USDOT #3104152 and MC
                 #79222. Medical transport is not a side business for us — it is the
                 core of what we do.
@@ -145,7 +145,7 @@ export default function NemtRidesPage() {
           a: 'For routine appointments, booking the day before is ideal. We accept same-day requests whenever a vehicle is available — call (704) 941-8508 and dispatch will tell you honestly whether we can make the window.',
         },
         {
-          q: 'Does Tassy Trucks accept Medicaid for NEMT rides?',
+          q: 'Does Tassy Transportation accept Medicaid for NEMT rides?',
           a: 'We serve Medicaid riders through broker and facility contracts, and private-pay riders directly. Call us with your situation and we will tell you exactly how your ride can be covered before you commit.',
         },
         {

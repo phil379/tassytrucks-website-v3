@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const localBusinessLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: 'Tassy Trucks',
+  name: 'Tassy Transportation',
   description:
     'Charlotte-based premium transportation: NEMT, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
   url: 'https://www.tassytrucks.com',
@@ -39,7 +39,7 @@ const localBusinessLd = {
   openingHours: 'Mo-Su 00:00-23:59',
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Tassy Trucks transportation services',
+    name: 'Tassy Transportation transportation services',
     itemListElement: [
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'NEMT — Non-Emergency Medical Transportation', url: 'https://www.tassytrucks.com/nemt' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'VIP Concierge Transport', url: 'https://www.tassytrucks.com/vip' } },

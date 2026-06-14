@@ -54,7 +54,7 @@ export default function LandingPageShell({
     description: quickAnswer,
     provider: {
       '@type': 'LocalBusiness',
-      name: 'Tassy Trucks',
+      name: 'Tassy Transportation',
       telephone: '+1-704-941-8508',
       email: 'booking@tassytrucks.com',
       address: { '@type': 'PostalAddress', addressLocality: 'Charlotte', addressRegion: 'NC', addressCountry: 'US' },
@@ -135,7 +135,7 @@ export default function LandingPageShell({
             )}
           </div>
           {publishedDate && (
-            <p className="mt-6 text-xs ink-mute">Published {publishedDate} · Reviewed by the Tassy Trucks team</p>
+            <p className="mt-6 text-xs ink-mute">Published {publishedDate} · Reviewed by the Tassy Transportation team</p>
           )}
         </div>
       </section>

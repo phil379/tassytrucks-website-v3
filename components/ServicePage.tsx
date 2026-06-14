@@ -65,10 +65,10 @@ export default function ServicePage({
 
       {/* TIERS (optional) */}
       {tiers && tiers.length > 0 && (
-        <section className="border-t border-charcoal/8 bg-charcoal text-cream">
+        <section className="border-t border-charcoal/8 bg-charcoal text-cream-text">
           <div className="container-x py-20">
             <div className="max-w-xl">
-              <div className="eyebrow text-cream/50">Service tiers</div>
+              <div className="eyebrow text-cream-text/50">Service tiers</div>
               <h2 className="h-section mt-3">Pick your level of care.</h2>
             </div>
 
@@ -83,13 +83,13 @@ export default function ServicePage({
                   {t.highlight && (
                     <div className="eyebrow text-charcoal/70">Most popular</div>
                   )}
-                  <h3 className={`font-serif text-2xl ${t.highlight ? '' : 'text-cream'}`}>
+                  <h3 className={`font-serif text-2xl ${t.highlight ? '' : 'text-cream-text'}`}>
                     {t.name}
                   </h3>
                   <div className="mt-3">
                     <span className="font-serif text-4xl">{t.price}</span>
                     {t.cadence && (
-                      <span className={`ml-1 text-sm ${t.highlight ? 'text-charcoal/70' : 'text-cream/60'}`}>
+                      <span className={`ml-1 text-sm ${t.highlight ? 'text-charcoal/70' : 'text-cream-text/60'}`}>
                         /{t.cadence}
                       </span>
                     )}
@@ -98,7 +98,7 @@ export default function ServicePage({
                     {t.features.map((f) => (
                       <li key={f} className="flex gap-2">
                         <Check size={16} className={`mt-0.5 shrink-0 ${t.highlight ? 'text-charcoal' : 'text-gold'}`} />
-                        <span className={t.highlight ? 'text-charcoal/90' : 'text-cream/80'}>{f}</span>
+                        <span className={t.highlight ? 'text-charcoal/90' : 'text-cream-text/80'}>{f}</span>
                       </li>
                     ))}
                   </ul>
@@ -106,8 +106,8 @@ export default function ServicePage({
                     href={t.cta.href}
                     className={`mt-6 inline-flex items-center justify-center w-full rounded-md py-2.5 font-semibold transition-colors ${
                       t.highlight
-                        ? 'bg-charcoal text-cream hover:bg-charcoal/85'
-                        : 'border border-cream/30 text-cream hover:bg-cream hover:text-charcoal'
+                        ? 'bg-charcoal text-cream-text hover:bg-charcoal/85'
+                        : 'border border-cream/30 text-cream-text hover:bg-cream hover:text-charcoal'
                     }`}
                   >
                     {t.cta.label}

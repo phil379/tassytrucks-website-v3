@@ -3,7 +3,7 @@ import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Post-Surgery Transport in Charlotte NC | Tassy Trucks',
+  title: 'Post-Surgery Transport in Charlotte NC | Tassy Transportation',
   description:
     'Post-surgery transport in Charlotte NC. A driver who walks you in, waits through your procedure, and escorts you home. 24/7 dispatch (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-transport' },
@@ -19,7 +19,7 @@ export default function PostSurgeryTransportPage() {
       eyebrow="Recovery Transport · Charlotte, North Carolina"
       h1="Post-Surgery Transport in Charlotte — A Real Person to Get You Home"
       heroSubtitle="Door-through-door rides for outpatient procedures, with a driver who walks you in, stays reachable during your procedure, and sees you safely back inside your own front door."
-      quickAnswer="Surgery centers generally will not discharge a patient who received anesthesia or sedation without a responsible adult to take them home — and a rideshare driver waiting at the curb usually does not count. Tassy Trucks provides scheduled post-surgery transport across Charlotte and Mecklenburg County: we walk you in, wait through variable discharge times, and escort you to your door. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Surgery centers generally will not discharge a patient who received anesthesia or sedation without a responsible adult to take them home — and a rideshare driver waiting at the curb usually does not count. Tassy Transportation provides scheduled post-surgery transport across Charlotte and Mecklenburg County: we walk you in, wait through variable discharge times, and escort you to your door. Dispatch answers 24/7 at (704) 941-8508."
       ctaText="Book recovery transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Post-Surgery Patient Transportation"
@@ -185,7 +185,7 @@ export default function PostSurgeryTransportPage() {
       ]}
       faqs={[
         {
-          q: 'Will the surgery center accept Tassy Trucks as my ride home?',
+          q: 'Will the surgery center accept Tassy Transportation as my ride home?',
           a: 'Policies vary by facility, so confirm with your surgery center first — some require a personal escort, while many accept a scheduled transport service with a driver who signs you out and escorts you home. Call us at (704) 941-8508 and we will coordinate directly with the facility so there are no surprises on procedure day.',
         },
         {

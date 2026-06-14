@@ -171,13 +171,13 @@ export default function PricingPage() {
       {sections.map((sec, idx) => (
         <section
           key={sec.eyebrow}
-          className={idx % 2 === 0 ? 'bg-cream' : 'bg-charcoal text-cream'}
+          className={idx % 2 === 0 ? 'bg-cream' : 'bg-charcoal text-cream-text'}
         >
           <div className="container-x py-20">
             <div className="max-w-2xl">
-              <div className={`eyebrow ${idx % 2 === 0 ? '' : 'text-cream/50'}`}>{sec.eyebrow}</div>
+              <div className={`eyebrow ${idx % 2 === 0 ? '' : 'text-cream-text/50'}`}>{sec.eyebrow}</div>
               <h2 className="h-section mt-3">{sec.title}</h2>
-              <p className={`mt-3 ${idx % 2 === 0 ? 'text-ink-muted' : 'text-cream/70'}`}>{sec.body}</p>
+              <p className={`mt-3 ${idx % 2 === 0 ? 'text-ink-muted' : 'text-cream-text/70'}`}>{sec.body}</p>
             </div>
 
             <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -190,7 +190,7 @@ export default function PricingPage() {
                       t.highlight
                         ? 'bg-gold text-charcoal border-gold'
                         : dark
-                          ? 'bg-cream/5 border-cream/10 text-cream'
+                          ? 'bg-cream/5 border-cream/10 text-cream-text'
                           : 'bg-white border-charcoal/8'
                     }`}
                   >
@@ -199,7 +199,7 @@ export default function PricingPage() {
                     )}
                     <h3 className="font-serif text-2xl">{t.name}</h3>
                     <p className={`mt-1 text-sm ${
-                      t.highlight ? 'text-charcoal/70' : dark ? 'text-cream/60' : 'text-ink-muted'
+                      t.highlight ? 'text-charcoal/70' : dark ? 'text-cream-text/60' : 'text-ink-muted'
                     }`}>
                       {t.blurb}
                     </p>
@@ -218,7 +218,7 @@ export default function PricingPage() {
                           />
                           <span className={
                             t.highlight ? 'text-charcoal/90'
-                              : dark ? 'text-cream/80' : 'text-ink-muted'
+                              : dark ? 'text-cream-text/80' : 'text-ink-muted'
                           }>{f}</span>
                         </li>
                       ))}
@@ -227,10 +227,10 @@ export default function PricingPage() {
                       href={t.cta.href}
                       className={`mt-6 inline-flex items-center justify-center w-full rounded-md py-2.5 font-semibold transition-colors ${
                         t.highlight
-                          ? 'bg-charcoal text-cream hover:bg-charcoal/85'
+                          ? 'bg-charcoal text-cream-text hover:bg-charcoal/85'
                           : dark
-                            ? 'border border-cream/30 text-cream hover:bg-cream hover:text-charcoal'
-                            : 'bg-charcoal text-cream hover:bg-gold-600 hover:text-charcoal'
+                            ? 'border border-cream/30 text-cream-text hover:bg-cream hover:text-charcoal'
+                            : 'bg-charcoal text-cream-text hover:bg-gold-600 hover:text-charcoal'
                       }`}
                     >
                       {t.cta.label}

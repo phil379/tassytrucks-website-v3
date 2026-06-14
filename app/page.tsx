@@ -254,15 +254,15 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface rounded-2xl p-6 text-ink">
+            <div className="bg-surface rounded-2xl p-6 text-cream-text">
               <div className="serif text-3xl font-semibold">&lt; 30 min</div>
               <div className="text-xs ink-mute uppercase tracking-wider mt-1">Avg. discharge pickup</div>
             </div>
-            <div className="bg-surface rounded-2xl p-6 text-ink">
+            <div className="bg-surface rounded-2xl p-6 text-cream-text">
               <div className="serif text-3xl font-semibold">98%</div>
               <div className="text-xs ink-mute uppercase tracking-wider mt-1">On-time arrival</div>
             </div>
-            <div className="bg-surface rounded-2xl p-6 col-span-2 text-ink">
+            <div className="bg-surface rounded-2xl p-6 col-span-2 text-cream-text">
               <div className="text-xs ink-mute uppercase tracking-wider mb-3">Current facility partners</div>
               <div className="flex flex-wrap gap-3 items-center">
                 <span className="pill">Atrium Health Charlotte</span>
@@ -319,7 +319,7 @@ export default function HomePage() {
               Built by a veteran.<br />Held to a higher standard.
             </h2>
             <p className="mt-6 ink-soft text-lg leading-relaxed">
-              Phil Tassy founded Tassy Trucks after years serving in the U.S. Army, where reliability
+              Phil Tassy founded Tassy Transportation after years serving in the U.S. Army, where reliability
               wasn&apos;t a feature — it was the standard. Today, Tassy is an SDVOSB-certified
               transportation company headquartered in Charlotte, North Carolina, moving the people
               who need to get somewhere — safely, on time, every time.

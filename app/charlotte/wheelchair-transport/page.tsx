@@ -19,7 +19,7 @@ export default function WheelchairTransportPage() {
       eyebrow="Wheelchair Transport · Charlotte, North Carolina"
       h1="Wheelchair Transport in Charlotte, NC — Accessible Rides, Door Through Door"
       heroSubtitle="Wheelchair-accessible vehicles with proper securement, drivers trained to assist, and dispatch that asks the right questions before the van ever rolls."
-      quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Trucks provides wheelchair-accessible transport across Charlotte and Mecklenburg County with door-through-door assistance and 24/7 dispatch at (704) 941-8508."
+      quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Transportation provides wheelchair-accessible transport across Charlotte and Mecklenburg County with door-through-door assistance and 24/7 dispatch at (704) 941-8508."
       ctaText="Book a wheelchair ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Wheelchair Accessible Transportation"
@@ -38,7 +38,7 @@ export default function WheelchairTransportPage() {
                 unless you choose to.
               </p>
               <p>
-                Tassy Trucks runs wheelchair-accessible vehicles as a core part
+                Tassy Transportation runs wheelchair-accessible vehicles as a core part
                 of our{' '}
                 <a href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   non-emergency medical transportation

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { book, subscribe, apply } from '@/lib/saas-links';
+import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
   title: 'Tassy Recover — Charlotte oncology, chemo & recovery transport',
@@ -57,8 +57,8 @@ export default function RecoverPage() {
       partnerCta={{
         title: 'Are you a cancer center, oncology practice, or discharge team?',
         body: "We're SDVOSB, HIPAA-aware, and built to integrate with your discharge workflow. Let's talk about adding Tassy Recover to your patient transport program.",
-        href: apply.facility,
-        label: 'Talk to partnerships',
+        href: facilitySignup('clinic'),
+        label: 'Get started · no credit card',
       }}
     />
   );

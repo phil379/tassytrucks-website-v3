@@ -1,9 +1,23 @@
 import Link from 'next/link';
-import { apply, contact, portal } from '@/lib/saas-links';
+import { ArrowRight } from 'lucide-react';
+import { apply, contact, portal, facilitySignup } from '@/lib/saas-links';
 
 export default function Footer() {
   return (
     <footer className="bg-ink-section">
+      {/* FIX_PROD_021 — facility self-serve CTA (FIX_PROD_020 magic-link path) */}
+      <div className="border-b border-white/10">
+        <div className="container-x py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div>
+            <div className="serif text-2xl font-semibold">Are you a clinic, vet, hospital, or school?</div>
+            <p className="mt-1 text-sm opacity-75">Get your facility on Tassy in 60 seconds — no credit card.</p>
+          </div>
+          <a href={facilitySignup()} className="btn-gold shrink-0">
+            Get started · no credit card <ArrowRight size={16} />
+          </a>
+        </div>
+      </div>
+
       <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-7 gap-10">
         <div className="col-span-2">
           <div className="flex items-center gap-3">
@@ -11,7 +25,7 @@ export default function Footer() {
               <span className="serif font-bold text-[color:var(--gold-warm)] text-xl">T</span>
             </div>
             <div>
-              <div className="serif text-xl font-semibold leading-none">Tassy Trucks</div>
+              <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
               <div className="text-[10px] tracking-eyebrow uppercase mt-1 opacity-60">
                 Premium Transport · Veteran-Owned
               </div>

@@ -40,7 +40,7 @@ export default function VeterinaryPartnersPage() {
           body: (
             <>
               <p>
-                Winnie Ride is the pet-transport vertical of Tassy Trucks, a
+                Winnie Ride is the pet-transport vertical of Tassy Transportation, a
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
                 (SDVOSB) operating under USDOT #3104152 and MC #79222. We work
                 with the full range of veterinary practices in the Charlotte

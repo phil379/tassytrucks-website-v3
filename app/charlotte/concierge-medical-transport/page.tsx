@@ -19,7 +19,7 @@ export default function ConciergeMedicalTransportPage() {
       eyebrow="VIP Concierge · Charlotte, North Carolina"
       h1="Concierge Medical Transport in Charlotte — Private, Discreet, Door to Door"
       heroSubtitle="White-glove transportation for plastic surgery, aesthetic, and med-spa patients — and anyone in Charlotte who wants their medical ride handled quietly and well."
-      quickAnswer="Concierge medical transport is private, white-glove transportation to and from medical appointments and procedures — one rider, one dedicated driver, no shared vehicles, no strangers. Tassy Trucks runs a dedicated VIP concierge service for plastic surgery, aesthetic, and med-spa patients across Charlotte and Mecklenburg County. Book online or call 24/7 dispatch at (704) 941-8508."
+      quickAnswer="Concierge medical transport is private, white-glove transportation to and from medical appointments and procedures — one rider, one dedicated driver, no shared vehicles, no strangers. Tassy Transportation runs a dedicated VIP concierge service for plastic surgery, aesthetic, and med-spa patients across Charlotte and Mecklenburg County. Book online or call 24/7 dispatch at (704) 941-8508."
       ctaText="Book concierge transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Concierge Medical Transportation"
@@ -50,7 +50,7 @@ export default function ConciergeMedicalTransportPage() {
                 <a href="/vip" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   VIP concierge service
                 </a>
-                . Tassy Trucks is a Charlotte-based, Service-Disabled
+                . Tassy Transportation is a Charlotte-based, Service-Disabled
                 Veteran-Owned Small Business operating under USDOT #3104152 and
                 MC #79222 — discretion backed by real operating authority, not
                 just a nice website.

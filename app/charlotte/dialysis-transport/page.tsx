@@ -19,7 +19,7 @@ export default function DialysisTransportPage() {
       eyebrow="Dialysis Transport · Charlotte, North Carolina"
       h1="Dialysis Transport in Charlotte — Rides That Match Your Treatment Schedule"
       heroSubtitle="Recurring, door-to-door rides for Charlotte dialysis patients — booked once as a series, with the same pickup window and a driver who knows your routine."
-      quickAnswer="Dialysis transport is scheduled, recurring transportation to and from dialysis treatment — typically three days a week, every week. Tassy Trucks books the entire Monday-Wednesday-Friday or Tuesday-Thursday-Saturday series in one call, with door-to-door service across Charlotte and Mecklenburg County and 24/7 dispatch at (704) 941-8508."
+      quickAnswer="Dialysis transport is scheduled, recurring transportation to and from dialysis treatment — typically three days a week, every week. Tassy Transportation books the entire Monday-Wednesday-Friday or Tuesday-Thursday-Saturday series in one call, with door-to-door service across Charlotte and Mecklenburg County and 24/7 dispatch at (704) 941-8508."
       ctaText="Set up recurring rides"
       ctaHref={CTA_HREF}
       schemaServiceType="Dialysis Patient Transportation"
@@ -49,7 +49,7 @@ export default function DialysisTransportPage() {
                 transport you have to manage.
               </p>
               <p>
-                Tassy Trucks is a Charlotte-based, Service-Disabled
+                Tassy Transportation is a Charlotte-based, Service-Disabled
                 Veteran-Owned Small Business (SDVOSB) operating under USDOT
                 #3104152 and MC #79222. Recurring medical rides are the core of
                 what we do, not an add-on.
@@ -181,7 +181,7 @@ export default function DialysisTransportPage() {
           a: 'Yes. If you use a wheelchair full-time, or only on treatment days when you are too tired to walk far, we will put your series in a wheelchair-accessible vehicle with proper securement. Tell dispatch when you book so the right vehicle shows up every time.',
         },
         {
-          q: 'How do dialysis centers partner with Tassy Trucks?',
+          q: 'How do dialysis centers partner with Tassy Transportation?',
           a: 'Social workers and schedulers can set up a facility partnership with portal access for booking recurring patients. Email booking@tassytrucks.com or call (704) 941-8508 and ask for facility partnerships — we serve centers across Charlotte and Mecklenburg County.',
         },
       ]}

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { book, subscribe, apply } from '@/lib/saas-links';
+import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
   title: 'Tassy Renew — Charlotte wellness, IV therapy & med-spa transport',
@@ -58,8 +58,8 @@ export default function RenewPage() {
       partnerCta={{
         title: 'Are you a med-spa, IV clinic, or wellness practice?',
         body: 'Bundle Tassy Renew with your treatment packages. Facility portal, white-label voucher codes, and patient-experience uplift built in.',
-        href: apply.facility,
-        label: 'Talk to partnerships',
+        href: facilitySignup('clinic'),
+        label: 'Get started · no credit card',
       }}
     />
   );

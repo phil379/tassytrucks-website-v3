@@ -24,22 +24,28 @@ test('6th card is Tassy School with EverDriven context', async ({ page }) => {
   await expect(card).toHaveAttribute('href', '/school');
 });
 
-test('/school loads with School in H1', async ({ page }) => {
+test('/school loads with the parent-direct hero', async ({ page }) => {
   const res = await page.goto('/school');
   expect(res?.status()).toBe(200);
-  await expect(page.locator('h1')).toContainText('School');
+  await expect(page.locator('h1')).toContainText('Daily school transport');
 });
 
-test('/school has no booking button or contact form (no-booking constraint)', async ({ page }) => {
+// FIX_PROD_021 — the no-booking constraint was REVERSED. The SaaS now ships the
+// parent-direct subscription, so /school deep-links to /book/school + the three
+// plan-setup wizards. This test guards the NEW contract.
+test('/school deep-links to the parent-direct booking wizards', async ({ page }) => {
   await page.goto('/school');
   const main = page.locator('main');
-  // No links into the SaaS booking wizards
-  expect(await main.locator('a[href*="/book/"]').count()).toBe(0);
-  expect(await main.locator('a[href*="quick-book"]').count()).toBe(0);
-  // No form elements
-  expect(await main.locator('form, input, textarea').count()).toBe(0);
-  // No "Book" button text within the page body (header's global Book a Ride is outside main)
-  expect(await main.getByRole('link', { name: /^book\b/i }).count()).toBe(0);
+  // Hero CTA + the three plan cards all link into the SaaS booking surface.
+  expect(await main.locator('a[href*="/book/school"]').count()).toBeGreaterThanOrEqual(4);
+  for (const slug of ['full-year', 'weekly', 'after-school']) {
+    expect(await main.locator(`a[href*="/book/school/${slug}/setup"]`).count()).toBeGreaterThanOrEqual(1);
+  }
+  // Every CTA carries the analytics source param.
+  const firstBook = await main.locator('a[href*="/book/school"]').first().getAttribute('href');
+  expect(firstBook).toContain('source=web');
+  // The old "we don't take direct bookings" disclaimer is gone.
+  await expect(main).not.toContainText('do not currently take direct parent bookings');
 });
 
 test('/sitemap.xml includes /school', async ({ request }) => {

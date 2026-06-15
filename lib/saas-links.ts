@@ -16,6 +16,11 @@ export const book = {
   winnie: src('/book/winnie'),
   renew: src('/book/renew'),
   recover: src('/book/recover'),
+  // FIX_PROD_024 — PUBLIC 6-service picker. THE destination for every "Book a Ride" CTA.
+  ride: src('/book'),
+  // ⚠️ /quick-book is the AUTHENTICATED admin "log a one-off for a walk-in" tool — it
+  // renders the persona sidebar/admin shell. NEVER link a public CTA here. (kept for
+  // reference only; no public CTA should use it.)
   quick: src('/quick-book'),
   // FIX_PROD_021 — Tassy School parent-direct subscription (FIX_PROD_008/010). The
   // landing + the three plan-setup deep links (slugs verified live: full-year / weekly
@@ -72,13 +77,20 @@ export const facilityIntake = (params: Record<string, string>) =>
 export const WINNIE_BOOK_URL = seoBook('winnie', { source: 'web' });
 
 export const apply = {
-  driver: src('/driver-apply'),
-  salesRep: src('/sales-rep-apply'),
-  facility: src('/facility-partners/request-access'),
+  // FIX_PROD_024 — /driver-apply + /sales-rep-apply were 404s. These now point at the
+  // PUBLIC SaaS careers lead-capture routes. /facility-partners/request-access was also a
+  // 404 → collapsed to the one facility front door, /facility/signup.
+  driver: src('/careers/driver'),
+  salesRep: src('/careers/sales-rep'),
+  facility: src('/facility/signup'),
 };
 
 export const portal = {
   login: src('/login'),
+  // FIX_PROD_024 — net-new facilities go to /facility/signup (apply.facility). EXISTING
+  // facilities sign in here (intent=facility lets /login tailor the copy). The bare
+  // /facility portal auth-walls a public visitor, so we no longer link to it directly.
+  facilityLogin: src('/login', { intent: 'facility' }),
   facility: src('/facility'),
   driver: src('/driver-app'),
   sales: src('/sales-app'),

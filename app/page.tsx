@@ -84,7 +84,7 @@ export default function HomePage() {
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href={book.quick} className="btn-gold">
+              <a href={book.ride} className="btn-gold">
                 Book a Ride <ArrowRight size={16} />
               </a>
               <a href={contact.phone} className="btn-call">
@@ -340,7 +340,7 @@ export default function HomePage() {
             Book a one-time ride, set up a subscription, or partner with us as a facility.
           </p>
           <div className="mt-8 flex justify-center gap-3 flex-wrap">
-            <a href={book.quick} className="btn-gold">Book a Ride <ArrowRight size={16} /></a>
+            <a href={book.ride} className="btn-gold">Book a Ride <ArrowRight size={16} /></a>
             <Link href="/pricing" className="btn-primary">See subscriptions</Link>
             <Link href="/#services" className="btn-ghost">Explore services</Link>
           </div>

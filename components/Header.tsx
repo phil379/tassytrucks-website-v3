@@ -100,7 +100,7 @@ export default function Header() {
           <a href={portal.login} className="btn-ghost hidden sm:inline-flex text-sm">
             Sign in
           </a>
-          <a href={book.quick} className="btn-gold text-sm">
+          <a href={book.ride} className="btn-gold text-sm">
             Book a Ride <ArrowRight size={16} />
           </a>
         </div>

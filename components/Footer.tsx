@@ -87,7 +87,7 @@ export default function Footer() {
             <li><a href={apply.facility} className="hover:text-[color:var(--gold-warm)]">Facility partners</a></li>
             <li><a href={apply.salesRep} className="hover:text-[color:var(--gold-warm)]">Become a sales rep</a></li>
             <li><a href={apply.driver} className="hover:text-[color:var(--gold-warm)]">Drive with Tassy</a></li>
-            <li><a href={portal.facility} className="hover:text-[color:var(--gold-warm)]">Facility portal</a></li>
+            <li><a href={portal.facilityLogin} className="hover:text-[color:var(--gold-warm)]">Existing facility · Sign in</a></li>
             <li><a href={portal.login} className="hover:text-[color:var(--gold-warm)]">Sign in</a></li>
           </ul>
         </div>

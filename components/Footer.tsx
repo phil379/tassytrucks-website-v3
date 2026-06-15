@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="col-span-2">
           <div className="flex items-center gap-3">
             <div className="logo-mark">
-              <span className="serif font-bold text-[color:var(--gold-warm)] text-xl">T</span>
+              <span className="serif font-bold text-[color:var(--gold)] text-xl">T</span>
             </div>
             <div>
               <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>

@@ -27,7 +27,7 @@ export async function GET(
 ) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get('title') ?? prettify(params.slug);
-  const accent = WINNIE_SLUGS.has(params.slug) ? '#7C9A5C' : '#E5A93B';
+  const accent = WINNIE_SLUGS.has(params.slug) ? '#7C9A5C' : '#C8932E'; // FIX_PROD_023 gold solid (was #E5A93B)
 
   return new ImageResponse(
     (

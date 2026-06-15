@@ -48,7 +48,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-3">
           <div className="logo-mark">
             {/* Replace with /tassy-logo.jpg once placed in public/ */}
-            <span className="serif font-bold text-[color:var(--gold-warm)] text-xl">T</span>
+            <span className="serif font-bold text-[color:var(--gold)] text-xl">T</span>
           </div>
           <div>
             <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>

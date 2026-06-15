@@ -149,7 +149,7 @@ export default function HomePage() {
             <div className="absolute -top-6 -left-6 bg-surface border border-line rounded-2xl p-4 shadow-xl animate-float-slow hidden md:block">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-ink flex items-center justify-center">
-                  <Check size={20} className="text-[color:var(--gold-warm)]" />
+                  <Check size={20} className="text-[color:var(--gold)]" />
                 </div>
                 <div>
                   <div className="text-xs ink-mute uppercase tracking-wider">Average pickup</div>
@@ -180,7 +180,7 @@ export default function HomePage() {
             {verticals.map((v) => (
               <Link key={v.slug} href={v.slug} className="card-tile group">
                 <div className="w-12 h-12 rounded-xl bg-ink flex items-center justify-center mb-6">
-                  <span className="serif text-[color:var(--gold-warm)] text-xl font-bold">
+                  <span className="serif text-[color:var(--gold)] text-xl font-bold">
                     {v.monogram ?? v.name.charAt(0)}
                   </span>
                 </div>
@@ -229,7 +229,7 @@ export default function HomePage() {
       <section id="facilities" className="bg-ink-section">
         <div className="container-x py-24 grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="eyebrow gold-warm-text mb-3">For hospitals &amp; facilities</div>
+            <div className="eyebrow gold-text mb-3">For hospitals &amp; facilities</div>
             <h2 className="h-section mb-6">
               Discharge transport shouldn&apos;t be a daily fire drill.
             </h2>
@@ -239,7 +239,7 @@ export default function HomePage() {
               billing portal, one accountable team.
             </p>
             <blockquote className="serif italic text-lg leading-relaxed mb-8 pl-4 border-l-2 opacity-90"
-                        style={{ borderColor: 'var(--gold-warm)' }}>
+                        style={{ borderColor: 'var(--gold)' }}>
               &quot;Phil&apos;s team is HIPAA-aware, professional, and I&apos;ve never had a complaint. Top-tier service.&quot;
               <footer className="text-sm not-italic mt-2 opacity-60">
                 — Dr. Kim, RN · Discharge Planner, Atrium Health

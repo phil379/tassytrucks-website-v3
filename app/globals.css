@@ -40,6 +40,10 @@ body {
     @apply text-xs uppercase tracking-eyebrow;
     color: var(--ink-mute);
   }
+  /* FIX_PROD_023 — gold-accented eyebrows. `.eyebrow` is defined after `.gold-text`,
+     so this compound rule (higher specificity) restores the gold accent the old
+     `.gold-warm-text` carried by source order. */
+  .eyebrow.gold-text { color: var(--gold); }
   .h-display {
     @apply serif text-5xl lg:text-7xl font-semibold leading-[1.02] tracking-tight2;
   }
@@ -66,13 +70,15 @@ body {
   .btn-primary:hover { background: #2b323b; transform: translateY(-1px); }
 
   .btn-gold {
-    background: var(--gold-warm); color: var(--ink);
+    /* FIX_PROD_023 — primary CTA is now TRUE gold (#C8932E); hover lightens to
+       gold-warm (#E5A93B) for clear interactive feedback. Dark on-gold text. */
+    background: var(--gold); color: var(--on-gold);
     padding: 0.95rem 1.6rem; border-radius: 10px;
     font-weight: 600; letter-spacing: -0.01em;
     transition: transform .2s ease, background .2s ease;
     display: inline-flex; align-items: center; gap: 0.6rem;
   }
-  .btn-gold:hover { background: #D49A2E; transform: translateY(-1px); }
+  .btn-gold:hover { background: var(--gold-warm); transform: translateY(-1px); }
 
   .btn-call {
     background: transparent; color: var(--ink);
@@ -119,7 +125,7 @@ body {
   .number-bullet {
     width: 28px; height: 28px;
     border-radius: 50%;
-    background: var(--gold-warm); color: var(--on-gold);
+    background: var(--gold); color: var(--on-gold);
     font-weight: 700; font-size: 0.85rem;
     display: inline-flex; align-items: center; justify-content: center;
   }
@@ -152,8 +158,8 @@ body {
     box-shadow: 0 12px 32px -16px rgba(27,26,23,0.18);
   }
   .tier-card.is-popular {
-    background: var(--gold-warm);
-    border-color: var(--gold-warm);
+    background: var(--gold);
+    border-color: var(--gold);
     color: var(--on-gold);
   }
 
@@ -179,7 +185,7 @@ body {
   }
 
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #2EA868; display: inline-block; }
-  .quote-mark { font-family: 'Newsreader', serif; font-size: 6rem; line-height: 1; color: var(--gold-warm); }
+  .quote-mark { font-family: 'Newsreader', serif; font-size: 6rem; line-height: 1; color: var(--gold); }
 }
 
 /* Live trip rotator (hero) */

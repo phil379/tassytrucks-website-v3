@@ -83,9 +83,9 @@ export default function SchoolPage() {
       {/* HERO — parent-direct, the product that actually ships now */}
       <section className="border-b border-line">
         <div className="container-x py-16 lg:py-24">
-          <div className="eyebrow gold-warm-text">Service line · Now booking for 2026–2027</div>
+          <div className="eyebrow gold-text">Service line · Now booking for 2026–2027</div>
           <h1 className="h-display mt-4 max-w-3xl">
-            Daily school transport. <span className="serif italic gold-warm-text">Committed.</span> Trusted.
+            Daily school transport. <span className="serif italic gold-text">Committed.</span> Trusted.
           </h1>
           <p className="mt-5 text-xl lg:text-2xl ink-soft serif max-w-2xl">
             The same trusted driver, every school day. Parents commit to one of three plans —
@@ -115,7 +115,7 @@ export default function SchoolPage() {
                 <ul className="mt-5 space-y-2 text-sm flex-1">
                   {p.features.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <Check size={16} className="mt-0.5 shrink-0" style={{ color: p.highlight ? '#1B1A17' : 'var(--gold-warm)' }} />
+                      <Check size={16} className="mt-0.5 shrink-0" style={{ color: p.highlight ? '#1B1A17' : 'var(--gold)' }} />
                       <span style={p.highlight ? { color: 'rgba(27,26,23,0.9)' } : undefined}>{f}</span>
                     </li>
                   ))}
@@ -129,7 +129,7 @@ export default function SchoolPage() {
                   className="mt-5 inline-flex items-center justify-center w-full rounded-md py-2.5 font-semibold transition-colors"
                   style={p.highlight
                     ? { background: '#1B1A17', color: '#F4EFE0' }
-                    : { background: 'var(--gold-warm)', color: '#1B1A17' }}
+                    : { background: 'var(--gold)', color: '#1B1A17' }}
                 >
                   Get started <ArrowRight size={16} className="ml-1.5" />
                 </a>

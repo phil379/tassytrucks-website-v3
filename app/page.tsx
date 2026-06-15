@@ -16,10 +16,10 @@ type Vertical = {
 
 const verticals: Vertical[] = [
   {
-    slug: '/nemt', name: 'NEMT',
+    slug: '/nemt', name: 'Tassy Care', monogram: 'C',
     blurb: 'Non-emergency medical transport for dialysis, recurring appointments, doctor visits, and Medicaid-covered care.',
     bullets: ['ADA compliant', 'Broker partners accepted'],
-    cta: 'Book NEMT trip',
+    cta: 'Book Tassy Care trip',
     bookHref: book.nemt,
   },
   {
@@ -37,21 +37,21 @@ const verticals: Vertical[] = [
     bookHref: book.winnie,
   },
   {
-    slug: '/renew', name: 'Tassy Renew',
+    slug: '/renew', name: 'Tassy Wellness', monogram: 'W',
     blurb: 'Wellness transport — IV therapy, med-spa, cosmetic dental, rejuvenation. Hydration kit on every ride.',
     bullets: ['Premium fleet', 'Med-spa partnerships'],
-    cta: 'Book a Renew trip',
+    cta: 'Book a Wellness trip',
     bookHref: book.renew,
   },
   {
-    slug: '/recover', name: 'Tassy Recover',
+    slug: '/recover', name: 'Tassy Guardian', monogram: 'G',
     blurb: 'Oncology, chemo, radiation, hospital discharge. CNA / LPN trained drivers. Quiet, equipped cabin.',
     bullets: ['CNA / LPN drivers', 'Recovery amenity kit'],
-    cta: 'Book Recovery transport',
+    cta: 'Book Guardian transport',
     bookHref: book.recover,
   },
   {
-    slug: '/school', name: 'Tassy School', monogram: 'S',
+    slug: '/school', name: 'Tassy Scholar', monogram: 'S',
     blurb: 'Alternative student transportation since 2022 — originally with Alternative School Transportation, continuing today with EverDriven Technologies after their 2023 rebrand. Special needs, McKinney-Vento, foster youth, and at-risk student routes.',
     bullets: [
       'Subcontractor since 2022 · EverDriven Technologies (formerly Alternative School Transportation)',
@@ -136,7 +136,7 @@ export default function HomePage() {
                   </div>
                   <div className="trip-card">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">NEMT Dialysis Pickup</span>
+                      <span className="text-xs font-semibold">Tassy Care Dialysis Pickup</span>
                       <span className="status-badge status-completed">● Completed</span>
                     </div>
                     <div className="text-xs ink-mute">Atrium Health · &quot;Outstanding service!&quot; ★★★★★</div>
@@ -234,7 +234,7 @@ export default function HomePage() {
               Discharge transport shouldn&apos;t be a daily fire drill.
             </h2>
             <p className="text-lg leading-relaxed mb-6 opacity-75">
-              Tassy partners with hospitals across the Carolinas to handle every NEMT, every
+              Tassy partners with hospitals across the Carolinas to handle every Tassy Care trip, every
               discharge, every recurring patient transport — under one master contract, one
               billing portal, one accountable team.
             </p>

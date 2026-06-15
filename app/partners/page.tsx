@@ -50,7 +50,7 @@ export default function PartnersPage() {
                 leaving chemotherapy is not a typical passenger, and that the ride
                 home is part of the care experience, not an afterthought. Our{' '}
                 <a href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
-                  Tassy Recover
+                  Tassy Guardian
                 </a>{' '}
                 vertical was built specifically around that reality.
               </p>
@@ -247,7 +247,7 @@ export default function PartnersPage() {
         },
       ]}
       relatedLinks={[
-        { label: 'NEMT rides', href: '/charlotte/nemt-rides' },
+        { label: 'Tassy Care rides', href: '/charlotte/nemt-rides' },
         { label: 'Dialysis transport', href: '/charlotte/dialysis-transport' },
         { label: 'Veteran transport', href: '/charlotte/veteran-transport' },
         { label: 'Veterinary partnerships', href: '/partners/veterinary' },

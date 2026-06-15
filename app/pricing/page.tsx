@@ -6,7 +6,7 @@ import { subscribe, book } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Pricing — Tassy subscriptions & per-service tiers',
   description:
-    'VIP, Winnie Ride, Tassy Renew, and Tassy Recover subscription tiers + per-service pricing. Charlotte premium transport from $39/mo.',
+    'VIP, Winnie Ride, Tassy Wellness, and Tassy Guardian subscription tiers + per-service pricing. Charlotte premium transport from $39/mo.',
 };
 
 type Tier = {
@@ -99,25 +99,25 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
     ],
   },
   {
-    eyebrow: 'Tassy Renew — Wellness',
+    eyebrow: 'Tassy Wellness — Wellness',
     title: 'For IV therapy + med-spa regulars',
     body: 'Hydration kit + premium fleet every ride.',
     tiers: [
       {
-        name: 'Renew Essential', price: '$149', cadence: 'mo',
+        name: 'Wellness Essential', price: '$149', cadence: 'mo',
         blurb: 'Casual wellness routine.',
         features: ['2 rides included', 'Hydration kit', 'Premium sedan', 'Same-day booking'],
         cta: { label: 'Subscribe', href: subscribe.renewEssential },
       },
       {
-        name: 'Renew Signature', price: '$295', cadence: 'mo',
+        name: 'Wellness Signature', price: '$295', cadence: 'mo',
         blurb: 'Weekly med-spa habit.',
         features: ['4 rides included', 'Premium SUV option', 'Aromatherapy add-on', 'Priority booking'],
         cta: { label: 'Subscribe', href: subscribe.renewSignature },
         highlight: true,
       },
       {
-        name: 'Renew Elite', price: '$495', cadence: 'mo',
+        name: 'Wellness Elite', price: '$495', cadence: 'mo',
         blurb: 'High-frequency / longevity-focused.',
         features: ['Unlimited rides', 'Luxury fleet', 'Spa-day add-on', 'Dedicated coordinator'],
         cta: { label: 'Subscribe', href: subscribe.renewElite },
@@ -125,25 +125,25 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
     ],
   },
   {
-    eyebrow: 'Tassy Recover — Oncology',
+    eyebrow: 'Tassy Guardian — Oncology',
     title: 'For chemo, radiation, recovery programs',
     body: 'CNA / LPN-trained drivers. Quiet cabin. Family-grade care.',
     tiers: [
       {
-        name: 'Recover Essential', price: '$185', cadence: 'ride',
+        name: 'Guardian Essential', price: '$185', cadence: 'ride',
         blurb: 'Single recovery ride.',
         features: ['CNA driver', 'Recovery kit', 'Door-through-door', 'Family notification'],
         cta: { label: 'Book ride', href: book.recover },
       },
       {
-        name: 'Recover Signature', price: '$595', cadence: 'mo',
+        name: 'Guardian Signature', price: '$595', cadence: 'mo',
         blurb: 'Active treatment program.',
         features: ['4 rides/mo', 'LPN driver option', 'Premium amenities', 'Coordinator support'],
         cta: { label: 'Subscribe', href: subscribe.recoverSignature },
         highlight: true,
       },
       {
-        name: 'Recover Elite', price: '$1,295', cadence: 'mo',
+        name: 'Guardian Elite', price: '$1,295', cadence: 'mo',
         blurb: 'Intensive treatment / family caregiver.',
         features: ['Unlimited rides', 'Dedicated LPN driver', 'Caregiver companion', 'Full coordination'],
         cta: { label: 'Subscribe', href: subscribe.recoverElite },
@@ -249,12 +249,12 @@ export default function PricingPage() {
           <div className="eyebrow">Don&apos;t want to subscribe?</div>
           <h2 className="h-section mt-3">Pay per ride — no commitment.</h2>
           <p className="mt-4 text-ink-muted max-w-2xl mx-auto">
-            All five service lines work à la carte. VIP Concierge has four flat tiers from $185–$695. NEMT
-            is Medicaid-covered for eligible patients or flat-rate private. Winnie/Renew/Recover priced per ride.
+            All five service lines work à la carte. VIP Concierge has four flat tiers from $185–$695. Tassy Care
+            is Medicaid-covered for eligible patients or flat-rate private. Winnie/Wellness/Guardian priced per ride.
           </p>
           <div className="mt-8 flex justify-center gap-3 flex-wrap">
             <Link href="/vip" className="btn-gold">VIP tiers <ArrowRight size={16} /></Link>
-            <Link href="/nemt" className="btn-ghost">NEMT details</Link>
+            <Link href="/nemt" className="btn-ghost">Tassy Care details</Link>
             <Link href="/winnie" className="btn-ghost">Winnie pricing</Link>
           </div>
         </div>

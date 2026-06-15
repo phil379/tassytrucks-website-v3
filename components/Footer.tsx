@@ -44,12 +44,12 @@ export default function Footer() {
         <div>
           <div className="eyebrow opacity-60 text-current">Services</div>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/nemt" className="hover:text-[color:var(--gold-warm)]">NEMT</Link></li>
+            <li><Link href="/nemt" className="hover:text-[color:var(--gold-warm)]">Tassy Care</Link></li>
             <li><Link href="/vip" className="hover:text-[color:var(--gold-warm)]">VIP Concierge</Link></li>
             <li><Link href="/winnie" className="hover:text-[color:var(--gold-warm)]">Winnie Ride</Link></li>
-            <li><Link href="/renew" className="hover:text-[color:var(--gold-warm)]">Tassy Renew</Link></li>
-            <li><Link href="/recover" className="hover:text-[color:var(--gold-warm)]">Tassy Recover</Link></li>
-            <li><Link href="/school" className="hover:text-[color:var(--gold-warm)]">Tassy School</Link></li>
+            <li><Link href="/renew" className="hover:text-[color:var(--gold-warm)]">Tassy Wellness</Link></li>
+            <li><Link href="/recover" className="hover:text-[color:var(--gold-warm)]">Tassy Guardian</Link></li>
+            <li><Link href="/school" className="hover:text-[color:var(--gold-warm)]">Tassy Scholar</Link></li>
             <li><Link href="/pricing" className="hover:text-[color:var(--gold-warm)]">Pricing</Link></li>
           </ul>
         </div>
@@ -57,7 +57,7 @@ export default function Footer() {
         <div>
           <div className="eyebrow opacity-60 text-current">Charlotte Services</div>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><Link href="/charlotte/nemt-rides" className="hover:text-[color:var(--gold-warm)]">NEMT rides</Link></li>
+            <li><Link href="/charlotte/nemt-rides" className="hover:text-[color:var(--gold-warm)]">Tassy Care rides</Link></li>
             <li><Link href="/charlotte/dialysis-transport" className="hover:text-[color:var(--gold-warm)]">Dialysis transport</Link></li>
             <li><Link href="/charlotte/wheelchair-transport" className="hover:text-[color:var(--gold-warm)]">Wheelchair transport</Link></li>
             <li><Link href="/charlotte/post-surgery-transport" className="hover:text-[color:var(--gold-warm)]">Post-surgery transport</Link></li>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: '%s · Tassy',
   },
   description:
-    'Charlotte-based premium transportation: NEMT, VIP concierge for plastic surgery & wellness, pet transport, and oncology recovery rides. SDVOSB certified.',
+    'Charlotte-based premium transportation: Tassy Care, VIP concierge for plastic surgery & wellness, pet transport, and oncology recovery rides. SDVOSB certified.',
   metadataBase: new URL('https://www.tassytrucks.com'),
   openGraph: {
     type: 'website',
@@ -26,7 +26,7 @@ const localBusinessLd = {
   '@type': 'LocalBusiness',
   name: 'Tassy Transportation',
   description:
-    'Charlotte-based premium transportation: NEMT, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
+    'Charlotte-based premium transportation: Tassy Care, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
   url: 'https://www.tassytrucks.com',
   telephone: '+1-704-941-8508',
   email: 'booking@tassytrucks.com',
@@ -41,12 +41,12 @@ const localBusinessLd = {
     '@type': 'OfferCatalog',
     name: 'Tassy Transportation transportation services',
     itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'NEMT — Non-Emergency Medical Transportation', url: 'https://www.tassytrucks.com/nemt' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Care — Non-Emergency Medical Transportation', url: 'https://www.tassytrucks.com/nemt' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'VIP Concierge Transport', url: 'https://www.tassytrucks.com/vip' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Winnie Ride — Pet Transportation', url: 'https://www.tassytrucks.com/winnie' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Renew — Wellness Transport', url: 'https://www.tassytrucks.com/renew' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Recover — Oncology Recovery Rides', url: 'https://www.tassytrucks.com/recover' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy School — Alternative student transportation', url: 'https://www.tassytrucks.com/school' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Wellness — Wellness Transport', url: 'https://www.tassytrucks.com/renew' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Guardian — Oncology Recovery Rides', url: 'https://www.tassytrucks.com/recover' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Scholar — Alternative student transportation', url: 'https://www.tassytrucks.com/school' } },
     ],
   },
 };

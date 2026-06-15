@@ -4,7 +4,7 @@ import { ArrowRight, Phone, Check } from 'lucide-react';
 import { book, contact } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy School — Daily Student Transport, Committed & Trusted',
+  title: 'Tassy Scholar — Daily Student Transport, Committed & Trusted',
   description:
     'Parent-direct school transport across Charlotte: pick one of three plans (Full Year, Weekly Pattern, After-School) and ride with the same trusted driver every school day. District + EverDriven partnerships continue.',
   alternates: { canonical: '/school' },
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const serviceLd = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'Tassy School — Student Transportation',
+  name: 'Tassy Scholar — Student Transportation',
   serviceType: 'School Transportation',
   description:
     'Parent-direct daily school transport with a committed schedule and the same trusted driver. Also operates alternative student routes as an EverDriven Technologies subcontractor.',
@@ -164,7 +164,7 @@ export default function SchoolPage() {
           <div className="container-x py-14 lg:py-16">
             <div className="h-1 w-12 bg-gold mb-5" />
             <h2 className="serif text-3xl lg:text-4xl font-semibold tracking-tight2 max-w-3xl">
-              Learn more about Tassy School
+              Learn more about Tassy Scholar
             </h2>
             <div className="mt-5 max-w-3xl space-y-4 text-base leading-relaxed ink-soft">
               <p>
@@ -207,7 +207,7 @@ export default function SchoolPage() {
       {/* AUDIENCE SPLIT — the footer correction */}
       <section className="bg-ink-section border-t border-line">
         <div className="container-x py-16 text-center">
-          <h2 className="serif text-3xl lg:text-4xl font-semibold tracking-tight2">Two ways to ride with Tassy School</h2>
+          <h2 className="serif text-3xl lg:text-4xl font-semibold tracking-tight2">Two ways to ride with Tassy Scholar</h2>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto text-left">
             <div className="rounded-2xl border border-white/10 p-6" style={{ background: 'rgba(244,239,224,0.04)' }}>
               <div className="eyebrow opacity-70 text-current">For parents</div>

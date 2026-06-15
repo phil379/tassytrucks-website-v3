@@ -111,7 +111,7 @@ export default function ConciergeMedicalTransportPage() {
                 away. Med-spas and wellness studios can also route clients
                 through{' '}
                 <a href="/renew" className="underline decoration-[color:var(--gold)] underline-offset-2">
-                  Tassy Renew
+                  Tassy Wellness
                 </a>
                 , our wellness transport vertical.
               </p>
@@ -185,7 +185,7 @@ export default function ConciergeMedicalTransportPage() {
       ]}
       relatedLinks={[
         { label: 'VIP concierge service', href: '/vip' },
-        { label: 'Tassy Renew wellness transport', href: '/renew' },
+        { label: 'Tassy Wellness wellness transport', href: '/renew' },
         { label: 'Post-surgery transport', href: '/charlotte/post-surgery-transport' },
         { label: 'NEMT in Charlotte', href: '/charlotte/nemt-rides' },
         { label: 'Pricing', href: '/pricing' },

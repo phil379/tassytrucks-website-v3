@@ -13,7 +13,7 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
   {
     heading: 'Medical transport',
     links: [
-      { href: '/charlotte/nemt-rides', label: 'NEMT rides' },
+      { href: '/charlotte/nemt-rides', label: 'Tassy Care rides' },
       { href: '/charlotte/dialysis-transport', label: 'Dialysis transport' },
       { href: '/charlotte/wheelchair-transport', label: 'Wheelchair transport' },
       { href: '/charlotte/post-surgery-transport', label: 'Post-surgery transport' },
@@ -36,7 +36,7 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
   {
     heading: 'Schools',
     links: [
-      { href: '/school', label: 'Tassy School · Student transport' },
+      { href: '/school', label: 'Tassy Scholar · Student transport' },
     ],
   },
 ];

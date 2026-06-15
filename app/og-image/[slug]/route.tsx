@@ -15,7 +15,16 @@ const WINNIE_SLUGS = new Set([
   'winnie',
 ]);
 
+// Brand display names override per-word capitalization for whole slugs.
+const BRAND_NAMES: Record<string, string> = {
+  nemt: 'Tassy Care',
+  renew: 'Tassy Wellness',
+  recover: 'Tassy Guardian',
+  school: 'Tassy Scholar',
+};
+
 const prettify = (slug: string) =>
+  BRAND_NAMES[slug] ??
   slug
     .split('-')
     .map((w) => (w === 'nemt' ? 'NEMT' : w === 'vs' ? 'vs' : w.charAt(0).toUpperCase() + w.slice(1)))

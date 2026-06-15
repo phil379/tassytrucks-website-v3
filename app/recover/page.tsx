@@ -3,7 +3,7 @@ import ServicePage from '@/components/ServicePage';
 import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Recover — Charlotte oncology, chemo & recovery transport',
+  title: 'Tassy Guardian — Charlotte oncology, chemo & recovery transport',
   description:
     'CNA/LPN driver model for oncology, chemo, radiation, and hospital discharge transport. Quiet cabin, recovery amenities, dignity-first care.',
 };
@@ -14,7 +14,7 @@ export default function RecoverPage() {
       eyebrow="Oncology · Chemo + Radiation + Discharge"
       title="Recovery transport with the dignity it deserves."
       tagline="CNA/LPN drivers. Quiet cabin. Family-grade care."
-      description="Tassy Recover is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA or LPN trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
+      description="Tassy Guardian is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA or LPN trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
       bookHref={book.recover}
       bookLabel="Book recovery transport"
       highlights={[
@@ -33,13 +33,13 @@ export default function RecoverPage() {
       ]}
       tiers={[
         {
-          name: 'Recover Essential',
+          name: 'Guardian Essential',
           price: '$185',
           features: ['Single ride', 'Recovery kit', 'CNA driver', 'Door-through-door'],
           cta: { label: 'Book Essential', href: book.recover },
         },
         {
-          name: 'Recover Signature',
+          name: 'Guardian Signature',
           price: '$595',
           cadence: 'mo',
           features: ['4 rides/mo', 'LPN driver option', 'Premium amenities', 'Family notifications'],
@@ -47,7 +47,7 @@ export default function RecoverPage() {
           highlight: true,
         },
         {
-          name: 'Recover Elite',
+          name: 'Guardian Elite',
           price: '$1,295',
           cadence: 'mo',
           features: ['Unlimited rides', 'Dedicated LPN driver', 'Caregiver companion', 'Full coordination'],
@@ -56,7 +56,7 @@ export default function RecoverPage() {
       ]}
       partnerCta={{
         title: 'Are you a cancer center, oncology practice, or discharge team?',
-        body: "We're SDVOSB, HIPAA-aware, and built to integrate with your discharge workflow. Let's talk about adding Tassy Recover to your patient transport program.",
+        body: "We're SDVOSB, HIPAA-aware, and built to integrate with your discharge workflow. Let's talk about adding Tassy Guardian to your patient transport program.",
         href: facilitySignup('clinic'),
         label: 'Get started · no credit card',
       }}

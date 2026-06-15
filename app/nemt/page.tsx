@@ -3,7 +3,7 @@ import ServicePage from '@/components/ServicePage';
 import { book, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'NEMT — Charlotte medical transport',
+  title: 'Tassy Care — Charlotte medical transport',
   description:
     'Non-emergency medical transport in Charlotte NC. Dialysis, oncology, post-discharge. Medicaid + managed care contracts. SDVOSB-certified.',
 };
@@ -12,9 +12,9 @@ export default function NemtPage() {
   return (
     <ServicePage
       eyebrow="Medical Transport · Contracted"
-      title="NEMT, done right."
+      title="Tassy Care, done right."
       tagline="Dialysis. Oncology. Post-discharge. We show up — every time."
-      description="Non-Emergency Medical Transportation is Tassy's backbone. We hold contracts with Medicaid managed-care organizations, hospital discharge teams, and dialysis networks across the Charlotte metro. Drivers trained in patient handling. Vehicles equipped for ambulatory, wheelchair, and stretcher service."
+      description="Tassy Care — non-emergency medical transport (NEMT) — is Tassy's backbone. We hold contracts with Medicaid managed-care organizations, hospital discharge teams, and dialysis networks across the Charlotte metro. Drivers trained in patient handling. Vehicles equipped for ambulatory, wheelchair, and stretcher service."
       bookHref={book.nemt}
       bookLabel="Book a medical ride"
       highlights={[

@@ -132,7 +132,7 @@ export default function PostSurgeryTransportPage() {
                   transport or at home, follow their guidance — and for
                   patients in ongoing treatment, ask us about{' '}
                   <a href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
-                    Tassy Recover
+                    Tassy Guardian
                   </a>
                   , our oncology-focused transport program.
                 </p>
@@ -202,12 +202,12 @@ export default function PostSurgeryTransportPage() {
         },
         {
           q: 'Do you provide medical care during the ride?',
-          a: 'No — our drivers provide courtesy assistance such as a steady arm, help with steps and doors, and carrying your belongings, but they are not medical providers. If your care team says you need clinical supervision in transit, follow their instructions; for patients in ongoing treatment, ask us about the Tassy Recover program.',
+          a: 'No — our drivers provide courtesy assistance such as a steady arm, help with steps and doors, and carrying your belongings, but they are not medical providers. If your care team says you need clinical supervision in transit, follow their instructions; for patients in ongoing treatment, ask us about the Tassy Guardian program.',
         },
       ]}
       relatedLinks={[
         { label: 'VIP concierge transport', href: '/vip' },
-        { label: 'Tassy Recover (oncology)', href: '/recover' },
+        { label: 'Tassy Guardian (oncology)', href: '/recover' },
         { label: 'NEMT in Charlotte', href: '/charlotte/nemt-rides' },
         { label: 'Concierge medical transport', href: '/charlotte/concierge-medical-transport' },
         { label: 'Pricing', href: '/pricing' },

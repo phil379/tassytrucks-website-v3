@@ -82,6 +82,9 @@ export const apply = {
   // 404 → collapsed to the one facility front door, /facility/signup.
   driver: src('/careers/driver'),
   salesRep: src('/careers/sales-rep'),
+  // FIX_PROD_025 — companion (VIP Concierge) + CNA (Tassy Recover) hiring funnels.
+  companion: src('/careers/companion'),
+  cna: src('/careers/cna'),
   facility: src('/facility/signup'),
 };
 

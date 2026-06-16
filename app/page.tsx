@@ -45,8 +45,8 @@ const verticals: Vertical[] = [
   },
   {
     slug: '/recover', name: 'Tassy Guardian', monogram: 'G',
-    blurb: 'Oncology, chemo, radiation, hospital discharge. CNA / LPN trained drivers. Quiet, equipped cabin.',
-    bullets: ['CNA / LPN drivers', 'Recovery amenity kit'],
+    blurb: 'Oncology, chemo, radiation, hospital discharge. CNA-trained drivers. Quiet, equipped cabin.',
+    bullets: ['CNA-trained drivers', 'Recovery amenity kit'],
     cta: 'Book Guardian transport',
     bookHref: book.recover,
   },

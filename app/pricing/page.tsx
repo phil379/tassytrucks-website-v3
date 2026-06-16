@@ -127,7 +127,7 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
   {
     eyebrow: 'Tassy Guardian — Oncology',
     title: 'For chemo, radiation, recovery programs',
-    body: 'CNA / LPN-trained drivers. Quiet cabin. Family-grade care.',
+    body: 'CNA-trained drivers. Quiet cabin. Family-grade care.',
     tiers: [
       {
         name: 'Guardian Essential', price: '$185', cadence: 'ride',
@@ -138,14 +138,14 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
       {
         name: 'Guardian Signature', price: '$595', cadence: 'mo',
         blurb: 'Active treatment program.',
-        features: ['4 rides/mo', 'LPN driver option', 'Premium amenities', 'Coordinator support'],
+        features: ['4 rides/mo', 'CNA driver option', 'Premium amenities', 'Coordinator support'],
         cta: { label: 'Subscribe', href: subscribe.recoverSignature },
         highlight: true,
       },
       {
         name: 'Guardian Elite', price: '$1,295', cadence: 'mo',
         blurb: 'Intensive treatment / family caregiver.',
-        features: ['Unlimited rides', 'Dedicated LPN driver', 'Caregiver companion', 'Full coordination'],
+        features: ['Unlimited rides', 'Dedicated CNA driver', 'Caregiver companion', 'Full coordination'],
         cta: { label: 'Subscribe', href: subscribe.recoverElite },
       },
     ],
@@ -191,7 +191,10 @@ export default function PricingPage() {
                         ? 'bg-gold text-charcoal border-gold'
                         : dark
                           ? 'bg-cream/5 border-cream/10 text-cream-text'
-                          : 'bg-white border-charcoal/8'
+                          // FIX_PROD_034 — on the dark "cream"-token canvas the old
+                          // bg-white siblings inherited the light default text → near-invisible.
+                          // Option A: cream surface + explicit dark text + gold border.
+                          : 'bg-[#F4EFE0] text-[#1B1A17] border-gold/40'
                     }`}
                   >
                     {t.highlight && (
@@ -199,12 +202,12 @@ export default function PricingPage() {
                     )}
                     <h3 className="font-serif text-2xl">{t.name}</h3>
                     <p className={`mt-1 text-sm ${
-                      t.highlight ? 'text-charcoal/70' : dark ? 'text-cream-text/60' : 'text-ink-muted'
+                      t.highlight ? 'text-charcoal/70' : dark ? 'text-cream-text/60' : 'text-[#444239]'
                     }`}>
                       {t.blurb}
                     </p>
                     <div className="mt-4">
-                      <span className="font-serif text-4xl">{t.price}</span>
+                      <span className={`font-serif text-4xl ${t.highlight ? '' : 'text-gold'}`}>{t.price}</span>
                       {t.cadence && <span className="ml-1 text-sm opacity-70">/{t.cadence}</span>}
                     </div>
                     <ul className="mt-6 space-y-2 text-sm">
@@ -218,7 +221,7 @@ export default function PricingPage() {
                           />
                           <span className={
                             t.highlight ? 'text-charcoal/90'
-                              : dark ? 'text-cream-text/80' : 'text-ink-muted'
+                              : dark ? 'text-cream-text/80' : 'text-[#444239]'
                           }>{f}</span>
                         </li>
                       ))}

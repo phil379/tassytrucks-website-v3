@@ -5,7 +5,7 @@ import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Tassy Guardian — Charlotte oncology, chemo & recovery transport',
   description:
-    'CNA/LPN driver model for oncology, chemo, radiation, and hospital discharge transport. Quiet cabin, recovery amenities, dignity-first care.',
+    'CNA-trained driver model for oncology, chemo, radiation, and hospital discharge transport. Quiet cabin, recovery amenities, dignity-first care.',
 };
 
 export default function RecoverPage() {
@@ -13,14 +13,14 @@ export default function RecoverPage() {
     <ServicePage
       eyebrow="Oncology · Chemo + Radiation + Discharge"
       title="Recovery transport with the dignity it deserves."
-      tagline="CNA/LPN drivers. Quiet cabin. Family-grade care."
-      description="Tassy Guardian is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA or LPN trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
+      tagline="CNA-trained drivers. Quiet cabin. Family-grade care."
+      description="Tassy Guardian is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA-trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
       bookHref={book.recover}
       bookLabel="Book recovery transport"
       highlights={[
         {
-          title: 'CNA / LPN drivers',
-          body: 'Drivers credentialed at the CNA or LPN level. They know how to help a patient who feels nauseous, weak, or in pain — without being intrusive.',
+          title: 'CNA-trained drivers',
+          body: 'Drivers credentialed at the CNA level. They know how to help a patient who feels nauseous, weak, or in pain — without being intrusive.',
         },
         {
           title: 'Quiet, equipped cabin',
@@ -42,7 +42,7 @@ export default function RecoverPage() {
           name: 'Guardian Signature',
           price: '$595',
           cadence: 'mo',
-          features: ['4 rides/mo', 'LPN driver option', 'Premium amenities', 'Family notifications'],
+          features: ['4 rides/mo', 'CNA driver option', 'Premium amenities', 'Family notifications'],
           cta: { label: 'Subscribe Signature', href: subscribe.recoverSignature },
           highlight: true,
         },
@@ -50,7 +50,7 @@ export default function RecoverPage() {
           name: 'Guardian Elite',
           price: '$1,295',
           cadence: 'mo',
-          features: ['Unlimited rides', 'Dedicated LPN driver', 'Caregiver companion', 'Full coordination'],
+          features: ['Unlimited rides', 'Dedicated CNA driver', 'Caregiver companion', 'Full coordination'],
           cta: { label: 'Subscribe Elite', href: subscribe.recoverElite },
         },
       ]}

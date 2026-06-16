@@ -193,8 +193,8 @@ export default function PricingPage() {
                           ? 'bg-cream/5 border-cream/10 text-cream-text'
                           // FIX_PROD_034 — on the dark "cream"-token canvas the old
                           // bg-white siblings inherited the light default text → near-invisible.
-                          // Option A: cream surface + explicit dark text + gold border.
-                          : 'bg-[#F4EFE0] text-[#1B1A17] border-gold/40'
+                          // Option A (LOCKED): cream surface + charcoal text + subtle gold border.
+                          : 'bg-[#F4EFE0] text-[#1B1A17] border-[#C8932E]/30'
                     }`}
                   >
                     {t.highlight && (
@@ -207,7 +207,7 @@ export default function PricingPage() {
                       {t.blurb}
                     </p>
                     <div className="mt-4">
-                      <span className={`font-serif text-4xl ${t.highlight ? '' : 'text-gold'}`}>{t.price}</span>
+                      <span className={`font-serif text-4xl ${t.highlight ? '' : 'italic text-[#C8932E]'}`}>{t.price}</span>
                       {t.cadence && <span className="ml-1 text-sm opacity-70">/{t.cadence}</span>}
                     </div>
                     <ul className="mt-6 space-y-2 text-sm">
@@ -233,7 +233,8 @@ export default function PricingPage() {
                           ? 'bg-charcoal text-cream-text hover:bg-charcoal/85'
                           : dark
                             ? 'border border-cream/30 text-cream-text hover:bg-cream hover:text-charcoal'
-                            : 'bg-charcoal text-cream-text hover:bg-gold-600 hover:text-charcoal'
+                            // FIX_PROD_034 (LOCKED Option A) — gold CTA accent on the cream sibling.
+                            : 'bg-[#C8932E] text-[#1B1A17] hover:bg-[#E5A93B]'
                       }`}
                     >
                       {t.cta.label}

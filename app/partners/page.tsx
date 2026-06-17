@@ -24,7 +24,7 @@ export default function PartnersPage() {
       ctaHref={CTA_HREF}
       secondaryCta={{
         label: 'Email us',
-        href: 'mailto:booking@tassytrucks.com?subject=Facility%20partnership%20inquiry',
+        href: 'mailto:book@tassytrucks.com?subject=Facility%20partnership%20inquiry',
       }}
       schemaServiceType="Non-Emergency Medical Transportation"
       sections={[

@@ -56,7 +56,7 @@ export default function LandingPageShell({
       '@type': 'LocalBusiness',
       name: 'Tassy Transportation',
       telephone: '+1-704-941-8508',
-      email: 'booking@tassytrucks.com',
+      email: 'book@tassytrucks.com',
       address: { '@type': 'PostalAddress', addressLocality: 'Charlotte', addressRegion: 'NC', addressCountry: 'US' },
     },
     areaServed: [
@@ -184,7 +184,7 @@ export default function LandingPageShell({
             </li>
             <li>
               <a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)] opacity-85">
-                booking@tassytrucks.com
+                book@tassytrucks.com
               </a>
             </li>
           </ul>

@@ -135,8 +135,8 @@ export default function PetBoardingTransportPage() {
                   partnership page
                 </a>{' '}
                 or email{' '}
-                <a href="mailto:booking@tassytrucks.com" className={linkCls}>
-                  booking@tassytrucks.com
+                <a href="mailto:book@tassytrucks.com" className={linkCls}>
+                  book@tassytrucks.com
                 </a>{' '}
                 and we&rsquo;ll set up a conversation.
               </p>
@@ -182,7 +182,7 @@ export default function PetBoardingTransportPage() {
         },
         {
           q: 'How do boarding facilities partner with Winnie Ride?',
-          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with net-30 invoicing. Start at our veterinary partnership page or email booking@tassytrucks.com.',
+          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with net-30 invoicing. Start at our veterinary partnership page or email book@tassytrucks.com.',
         },
       ]}
       relatedLinks={[

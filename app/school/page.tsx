@@ -22,7 +22,7 @@ const serviceLd = {
     '@type': 'LocalBusiness',
     name: 'Tassy Transportation',
     telephone: '+1-704-941-8508',
-    email: 'booking@tassytrucks.com',
+    email: 'book@tassytrucks.com',
     address: { '@type': 'PostalAddress', addressLocality: 'Charlotte', addressRegion: 'NC', addressCountry: 'US' },
   },
   areaServed: ['Charlotte NC', 'High Point NC', 'Spartanburg SC', 'Rock Hill SC', 'Cincinnati OH'],
@@ -218,7 +218,7 @@ export default function SchoolPage() {
               <div className="eyebrow opacity-70 text-current">For districts & EverDriven partners</div>
               <p className="mt-2 text-sm opacity-85 leading-relaxed">Coordinating routes or alternative student transport? Reach our team directly.</p>
               <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                <a href={contact.bookingEmail} className="underline underline-offset-2 hover:text-[color:var(--gold-warm)]">booking@tassytrucks.com</a>
+                <a href={contact.bookingEmail} className="underline underline-offset-2 hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a>
                 <a href={contact.phone} className="underline underline-offset-2 hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a>
               </div>
             </div>

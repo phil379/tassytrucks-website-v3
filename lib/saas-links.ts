@@ -100,7 +100,7 @@ export const portal = {
 };
 
 export const contact = {
-  bookingEmail: 'mailto:booking@tassytrucks.com',
+  bookingEmail: 'mailto:book@tassytrucks.com',
   salesEmail: 'mailto:partners@tassytrucks.com',
   phone: 'tel:+17049418508', // (704) 941-8508 — Charlotte main line
   phoneDisplay: '(704) 941-8508',

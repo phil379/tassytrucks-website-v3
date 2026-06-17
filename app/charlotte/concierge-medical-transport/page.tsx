@@ -168,7 +168,7 @@ export default function ConciergeMedicalTransportPage() {
         },
         {
           q: 'Can my surgeon’s office or patient coordinator book the ride for me?',
-          a: 'Yes, and many do. Coordinators can book by phone at (704) 941-8508 or by email at booking@tassytrucks.com, and we confirm the pickup window directly with the front desk. Practices that send patients regularly can set up a facility partnership.',
+          a: 'Yes, and many do. Coordinators can book by phone at (704) 941-8508 or by email at book@tassytrucks.com, and we confirm the pickup window directly with the front desk. Practices that send patients regularly can set up a facility partnership.',
         },
         {
           q: 'Will the driver wait during my procedure or appointment?',

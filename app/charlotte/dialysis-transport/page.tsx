@@ -141,7 +141,7 @@ export default function DialysisTransportPage() {
                 <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
                 </a>{' '}
-                explains how to set that up, or email booking@tassytrucks.com
+                explains how to set that up, or email book@tassytrucks.com
                 and we will walk you through it.
               </p>
             </>
@@ -182,7 +182,7 @@ export default function DialysisTransportPage() {
         },
         {
           q: 'How do dialysis centers partner with Tassy Transportation?',
-          a: 'Social workers and schedulers can set up a facility partnership with portal access for booking recurring patients. Email booking@tassytrucks.com or call (704) 941-8508 and ask for facility partnerships — we serve centers across Charlotte and Mecklenburg County.',
+          a: 'Social workers and schedulers can set up a facility partnership with portal access for booking recurring patients. Email book@tassytrucks.com or call (704) 941-8508 and ask for facility partnerships — we serve centers across Charlotte and Mecklenburg County.',
         },
       ]}
       relatedLinks={[

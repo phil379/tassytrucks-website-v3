@@ -152,7 +152,7 @@ export default function FamilyMedicalRidesPage() {
                 Payment is handled by you at booking, so there is nothing for
                 your loved one to pay or sign at pickup. Costs are quoted
                 up-front — no surprises on either end of the trip. You can
-                also reach us anytime at booking@tassytrucks.com.
+                also reach us anytime at book@tassytrucks.com.
               </p>
             </>
           ),

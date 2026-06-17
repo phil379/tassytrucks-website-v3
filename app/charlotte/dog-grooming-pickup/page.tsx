@@ -138,8 +138,8 @@ export default function DogGroomingPickupPage() {
                 you can offer the moment they hesitate — and gives you a way to
                 fill last-minute cancellations with clients who want the slot but
                 can&rsquo;t make the drive. Email{' '}
-                <a href="mailto:booking@tassytrucks.com" className={linkCls}>
-                  booking@tassytrucks.com
+                <a href="mailto:book@tassytrucks.com" className={linkCls}>
+                  book@tassytrucks.com
                 </a>{' '}
                 and we will set it up.
               </p>

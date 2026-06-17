@@ -148,8 +148,8 @@ export default function VeteranTransportPage() {
                   facility partnership page
                 </a>{' '}
                 explains how a standing arrangement works, or email{' '}
-                <a href="mailto:booking@tassytrucks.com" className="underline decoration-[color:var(--gold)] underline-offset-2">
-                  booking@tassytrucks.com
+                <a href="mailto:book@tassytrucks.com" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                  book@tassytrucks.com
                 </a>{' '}
                 and we will set up a call.
               </p>
@@ -195,7 +195,7 @@ export default function VeteranTransportPage() {
         },
         {
           q: 'Can a family member or case manager book on my behalf?',
-          a: 'Absolutely. Family members and care coordinators book for veterans every day. The person booking gets the confirmation and driver updates; the veteran gets the ride. Call (704) 941-8508 or email booking@tassytrucks.com to set it up.',
+          a: 'Absolutely. Family members and care coordinators book for veterans every day. The person booking gets the confirmation and driver updates; the veteran gets the ride. Call (704) 941-8508 or email book@tassytrucks.com to set it up.',
         },
       ]}
       relatedLinks={[

@@ -31,7 +31,7 @@ export default function VeterinaryPartnersPage() {
       ctaHref={CTA_HREF}
       secondaryCta={{
         label: 'Email us',
-        href: 'mailto:booking@tassytrucks.com?subject=Veterinary%20partnership%20inquiry',
+        href: 'mailto:book@tassytrucks.com?subject=Veterinary%20partnership%20inquiry',
       }}
       schemaServiceType="Pet Transportation"
       sections={[

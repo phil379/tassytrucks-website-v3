@@ -98,7 +98,7 @@ export default function Footer() {
           <div className="eyebrow opacity-60 text-current">Contact</div>
           <ul className="mt-3 space-y-2 text-sm">
             <li><a href={contact.phone} className="hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a></li>
-            <li><a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)]">booking@tassytrucks.com</a></li>
+            <li><a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a></li>
             <li><a href={contact.salesEmail} className="hover:text-[color:var(--gold-warm)]">partners@tassytrucks.com</a></li>
             <li className="opacity-60 pt-2">Charlotte, NC</li>
           </ul>

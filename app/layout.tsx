@@ -37,7 +37,7 @@ const localBusinessLd = {
     'Charlotte-based premium transportation: Tassy Care, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
   url: 'https://www.tassytrucks.com',
   telephone: '+1-704-941-8508',
-  email: 'booking@tassytrucks.com',
+  email: 'book@tassytrucks.com',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Charlotte',

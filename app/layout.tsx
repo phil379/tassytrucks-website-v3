@@ -15,10 +15,18 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Tassy',
     url: 'https://www.tassytrucks.com',
-    images: ['/og-default.jpg'],
+    images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }], // FIX_PROD_038 — real Tassy og-image
   },
-  twitter: { card: 'summary_large_image' },
-  icons: { icon: '/favicon.ico' },
+  twitter: { card: 'summary_large_image', images: ['/brand/og-image.png'] },
+  // FIX_PROD_038 — real Tassy favicons (public/brand/).
+  icons: {
+    icon: [
+      { url: '/brand/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/logo-mark.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/brand/apple-touch-icon.png',
+  },
 };
 
 const localBusinessLd = {

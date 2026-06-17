@@ -46,10 +46,8 @@ export default function Header() {
     <header className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
       <div className="container-x py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <div className="logo-mark">
-            {/* Replace with /tassy-logo.jpg once placed in public/ */}
-            <span className="serif font-bold text-[color:var(--gold)] text-xl">T</span>
-          </div>
+          {/* FIX_PROD_038 — real Tassy logo (cream, for the dark header). */}
+          <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-11 w-11 shrink-0" />
           <div>
             <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
             <div className="text-[10px] tracking-eyebrow uppercase ink-mute mt-1">

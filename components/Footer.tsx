@@ -21,9 +21,8 @@ export default function Footer() {
       <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-7 gap-10">
         <div className="col-span-2">
           <div className="flex items-center gap-3">
-            <div className="logo-mark">
-              <span className="serif font-bold text-[color:var(--gold)] text-xl">T</span>
-            </div>
+            {/* FIX_PROD_038 — real Tassy logo (cream, for the dark footer). */}
+            <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-10 w-10 shrink-0" />
             <div>
               <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
               <div className="text-[10px] tracking-eyebrow uppercase mt-1 opacity-60">

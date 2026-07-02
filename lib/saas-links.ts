@@ -69,9 +69,12 @@ export const seoBook = (
   params: Record<string, string>,
 ) => `${SAAS_BASE}/book/${vertical}?${new URLSearchParams(params).toString()}`;
 
-/** B2B facility intake deep link with attribution. */
+/** B2B facility intake deep link with attribution.
+ *  MEGA_TASSY_PUBLISH_READY (2026-07-02): /facility/intake now 307s to /facility/signup
+ *  on the SaaS and DROPS the query string → point straight at signup so
+ *  source/type attribution survives. */
 export const facilityIntake = (params: Record<string, string>) =>
-  `${SAAS_BASE}/facility/intake?${new URLSearchParams(params).toString()}`;
+  `${SAAS_BASE}/facility/signup?${new URLSearchParams(params).toString()}`;
 
 /** Winnie Ride booking deep link (MEGA_SEO_002 contract). */
 export const WINNIE_BOOK_URL = seoBook('winnie', { source: 'web' });
@@ -95,8 +98,10 @@ export const portal = {
   // /facility portal auth-walls a public visitor, so we no longer link to it directly.
   facilityLogin: src('/login', { intent: 'facility' }),
   facility: src('/facility'),
-  driver: src('/driver-app'),
-  sales: src('/sales-app'),
+  // MEGA_TASSY_PUBLISH_READY (2026-07-02): /driver-app + /sales-app were 404s on the
+  // SaaS. Real persona hubs are /driver and /sales (verified 200 live).
+  driver: src('/driver'),
+  sales: src('/sales'),
 };
 
 export const contact = {

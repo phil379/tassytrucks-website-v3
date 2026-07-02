@@ -21,6 +21,10 @@ const BRAND_NAMES: Record<string, string> = {
   renew: 'Tassy Wellness',
   recover: 'Tassy Guardian',
   school: 'Tassy Scholar',
+  // MEGA_TASSY_PUBLISH_READY — service-page OG slugs
+  vip: 'VIP Concierge',
+  winnie: 'Winnie Ride',
+  pricing: 'Pricing & Subscriptions',
 };
 
 const prettify = (slug: string) =>

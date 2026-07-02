@@ -3,9 +3,11 @@ import ServicePage from '@/components/ServicePage';
 import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Guardian — Charlotte oncology, chemo & recovery transport',
+  title: 'Tassy Guardian — oncology & recovery transport',
   description:
-    'CNA-trained driver model for oncology, chemo, radiation, and hospital discharge transport. Quiet cabin, recovery amenities, dignity-first care.',
+    'CNA-trained drivers for oncology, chemo, radiation, and hospital-discharge transport in Charlotte NC. Quiet cabin, recovery amenities, dignity-first care.',
+  alternates: { canonical: '/recover' },
+  openGraph: { url: '/recover', images: ['/og-image/recover'] },
 };
 
 export default function RecoverPage() {

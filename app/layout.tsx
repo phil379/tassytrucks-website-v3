@@ -38,6 +38,14 @@ const localBusinessLd = {
   url: 'https://www.tassytrucks.com',
   telephone: '+1-704-941-8508',
   email: 'book@tassytrucks.com',
+  // MEGA_TASSY_PUBLISH_READY — operating authority + certification + motto
+  slogan: 'We Transport With Care',
+  identifier: [
+    { '@type': 'PropertyValue', propertyID: 'USDOT', value: '3104152' },
+    { '@type': 'PropertyValue', propertyID: 'MC', value: '79222' },
+  ],
+  hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
+  image: 'https://www.tassytrucks.com/brand/og-image.png',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Charlotte',

@@ -3,9 +3,11 @@ import ServicePage from '@/components/ServicePage';
 import { book, subscribe } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'VIP Concierge — Charlotte plastic surgery & aesthetic recovery transport',
+  title: 'VIP Concierge — plastic surgery recovery rides',
   description:
-    "Charlotte's premium aesthetic-recovery transport: post-op plastic surgery, IV therapy, cosmetic dental, med-spa. Four tiers from $185 to $695. Branded amenities, total discretion.",
+    "Charlotte's premium aesthetic-recovery transport: post-op plastic surgery, IV therapy, cosmetic dental, med-spa. Four tiers from $185. Total discretion.",
+  alternates: { canonical: '/vip' },
+  openGraph: { url: '/vip', images: ['/og-image/vip'] },
 };
 
 export default function VipPage() {

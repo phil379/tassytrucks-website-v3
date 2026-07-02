@@ -16,9 +16,11 @@ const charlotteServices = [
 ];
 
 export const metadata: Metadata = {
-  title: 'Winnie Ride — Charlotte pet transport for vet, grooming, & travel',
+  title: 'Winnie Ride — Charlotte pet transport',
   description:
     'Climate-controlled pet transport for vet visits, grooming, daycare, and airport. Carriers, harnesses, calming spray included. Three subscription tiers from $39/mo.',
+  alternates: { canonical: '/winnie' },
+  openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
 };
 
 export default function WinniePage() {

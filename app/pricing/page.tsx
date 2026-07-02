@@ -6,7 +6,9 @@ import { subscribe, book } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Pricing — Tassy subscriptions & per-service tiers',
   description:
-    'VIP, Winnie Ride, Tassy Wellness, and Tassy Guardian subscription tiers + per-service pricing. Charlotte premium transport from $39/mo.',
+    'VIP Concierge, Winnie Ride, Tassy Wellness, and Tassy Guardian subscription tiers plus per-ride pricing. Charlotte premium transport from $39/mo.',
+  alternates: { canonical: '/pricing' },
+  openGraph: { url: '/pricing', images: ['/og-image/pricing'] },
 };
 
 type Tier = {

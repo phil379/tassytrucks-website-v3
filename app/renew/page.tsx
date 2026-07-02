@@ -3,9 +3,11 @@ import ServicePage from '@/components/ServicePage';
 import { book, subscribe, facilitySignup } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Wellness — Charlotte wellness, IV therapy & med-spa transport',
+  title: 'Tassy Wellness — IV therapy & med-spa rides',
   description:
-    'Premium transport for IV therapy clinics, med-spas, and rejuvenation appointments. Hydration kit included. Wellness-tier subscriptions available.',
+    'Premium Charlotte transport for IV therapy clinics, med-spas, and rejuvenation appointments. Hydration kit on every ride. Wellness subscriptions from $149/mo.',
+  alternates: { canonical: '/renew' },
+  openGraph: { url: '/renew', images: ['/og-image/renew'] },
 };
 
 export default function RenewPage() {

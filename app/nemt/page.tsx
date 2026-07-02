@@ -5,7 +5,9 @@ import { book, facilitySignup } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Tassy Care — Charlotte medical transport',
   description:
-    'Non-emergency medical transport in Charlotte NC. Dialysis, oncology, post-discharge. Medicaid + managed care contracts. SDVOSB-certified.',
+    'Non-emergency medical transport in Charlotte NC. Dialysis, oncology, post-discharge. Medicaid + managed care contracts. SDVOSB-certified. (704) 941-8508.',
+  alternates: { canonical: '/nemt' },
+  openGraph: { url: '/nemt', images: ['/og-image/nemt'] },
 };
 
 export default function NemtPage() {

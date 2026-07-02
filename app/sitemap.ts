@@ -32,6 +32,10 @@ const routes: Array<{ path: string; priority: number }> = [
   { path: '/charlotte/calm-pet-transport', priority: 0.8 },
   { path: '/charlotte/dog-grooming-pickup', priority: 0.7 },
   { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', priority: 0.7 },
+  // MEGA_TASSY_PUBLISH_READY — legal / trust pages (were footer 404s)
+  { path: '/privacy', priority: 0.3 },
+  { path: '/terms', priority: 0.3 },
+  { path: '/accessibility', priority: 0.3 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

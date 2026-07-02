@@ -45,6 +45,10 @@ export default function ServicePage({
             </a>
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
+          {/* MEGA_TASSY_PUBLISH_READY — brand motto on every service-line hero */}
+          <p className="mt-8 serif italic text-lg ink-soft">
+            We Transport With Care<span className="gold-text">.</span>
+          </p>
         </div>
       </section>
 

@@ -1,6 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Check, Phone } from 'lucide-react';
 import { book, contact, apply } from '@/lib/saas-links';
+
+// MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+  openGraph: {
+    url: '/',
+    images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }],
+  },
+};
 
 type Vertical = {
   slug: string;
@@ -309,9 +319,13 @@ export default function HomePage() {
       {/* ───────────── FOUNDER ───────────── */}
       <section id="founder" className="bg-surface border-y border-line">
         <div className="container-x py-24 grid lg:grid-cols-2 gap-14 items-center">
-          <div className="aspect-square rounded-tile bg-ink/5 border border-line flex items-center justify-center text-ink-mute">
-            {/* Place /tassy-founder.png in public/ to render the portrait */}
-            <span className="text-sm">Founder portrait — drop tassy-founder.png in /public</span>
+          <div className="aspect-square rounded-tile border border-line overflow-hidden">
+            {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png) */}
+            <img
+              src="/tassy-founder.png"
+              alt="Phil Tassy · Founder · Tassy Transportation"
+              className="w-full h-full object-cover object-top"
+            />
           </div>
           <div>
             <div className="eyebrow mb-3">The founder</div>

@@ -4,11 +4,11 @@ import { ArrowRight, Phone, Check } from 'lucide-react';
 import { book, contact } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Scholar — Daily Student Transport, Committed & Trusted',
+  title: 'Tassy Scholar — daily student transport',
   description:
-    'Parent-direct school transport across Charlotte: pick one of three plans (Full Year, Weekly Pattern, After-School) and ride with the same trusted driver every school day. District + EverDriven partnerships continue.',
+    'Parent-direct school transport across Charlotte: pick one of three plans (Full Year, Weekly, After-School) and ride with the same trusted driver every school day.',
   alternates: { canonical: '/school' },
-  openGraph: { images: ['/og-image/school'] },
+  openGraph: { url: '/school', images: ['/og-image/school'] },
 };
 
 const serviceLd = {
@@ -95,6 +95,10 @@ export default function SchoolPage() {
             <a href={book.school} className="btn-gold">Choose your plan <ArrowRight size={16} /></a>
             <a href={contact.phone} className="btn-call"><Phone size={15} /> Call {contact.phoneDisplay}</a>
           </div>
+          {/* MEGA_TASSY_PUBLISH_READY — brand motto on every service-line hero */}
+          <p className="mt-8 serif italic text-lg ink-soft">
+            We Transport With Care<span className="gold-text">.</span>
+          </p>
         </div>
       </section>
 

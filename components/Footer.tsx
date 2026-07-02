@@ -34,6 +34,10 @@ export default function Footer() {
             From hospital discharges to post-procedure concierge transport, Tassy moves the
             people who matter to you with discretion, dignity, and Army-grade reliability.
           </p>
+          {/* MEGA_TASSY_PUBLISH_READY — brand motto */}
+          <p className="mt-4 serif italic text-base" style={{ color: 'var(--gold)' }}>
+            We Transport With Care.
+          </p>
           <div className="mt-6 text-xs opacity-60 space-y-1">
             <div>USDOT #3104152 · MC #79222</div>
             <div>SDVOSB Certified · Charlotte, North Carolina</div>

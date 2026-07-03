@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { apply, contact, portal } from '@/lib/saas-links';
+import { apply, contact } from '@/lib/saas-links';
 
 // FIX_PROD_131 — footer de-cluttered: 7 columns (~33 SEO-stuffed links) + a
 // redundant facility banner → brand + 4 focused columns. The facility banner was
@@ -69,7 +69,11 @@ export default function Footer() {
           <ul className="mt-3 space-y-2 text-sm">
             <li><a href={apply.facility} className="hover:text-[color:var(--gold-warm)]">Facility partners</a></li>
             <li><Link href="/partners" className="hover:text-[color:var(--gold-warm)]">Partner with Tassy</Link></li>
-            <li><a href={portal.facilityLogin} className="hover:text-[color:var(--gold-warm)]">Existing facility</a></li>
+            {/* FIX_PROD_142 (SECURITY) — removed the "Existing facility" shortcut: it linked
+                straight to the SaaS login (portal.facilityLogin → /login?intent=facility),
+                exposing an internal admin surface as a public, crawl-indexable marketing link.
+                Onboarded facilities already have their credentials + the app URL; the marketing
+                site must not advertise the login. */}
           </ul>
         </div>
 

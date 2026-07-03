@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, ChevronDown, Phone, Menu, X } from 'lucide-react';
-import { portal, contact, book } from '@/lib/saas-links';
+import { contact, book } from '@/lib/saas-links';
 
 // FIX_PROD_131 — nav trimmed 8→6 visible items: "How it works" moved into the
 // Services dropdown (below) so the top bar stays calm.
@@ -117,9 +117,10 @@ export default function Header() {
           >
             <Phone size={14} /> {contact.phoneDisplay}
           </a>
-          <a href={portal.login} className="btn-ghost hidden sm:inline-flex text-sm">
-            Sign in
-          </a>
+          {/* FIX_PROD_142 (SECURITY) — removed the "Sign in" link. It pointed at the SaaS
+              login (portal.login → /login), a public discoverable link into an internal
+              admin surface. Existing users have the app URL; the marketing site funnels
+              to booking, not the backend login. */}
           <a href={book.ride} className="btn-gold text-sm">
             Book a Ride <ArrowRight size={16} />
           </a>
@@ -160,11 +161,12 @@ export default function Header() {
                   </Link>
                 ))}
               </div>
+              {/* FIX_PROD_142 (SECURITY) — mobile menu no longer carries a "Sign in"
+                  link to the SaaS login; only the public dispatch phone remains. */}
               <div className="border-t border-line pt-4 mt-4 flex flex-col gap-3">
                 <a href={contact.phone} className="nav-link inline-flex items-center gap-2 text-sm">
                   <Phone size={15} /> {contact.phoneDisplay}
                 </a>
-                <a href={portal.login} className="btn-ghost text-sm justify-center">Sign in</a>
               </div>
             </div>
           </details>

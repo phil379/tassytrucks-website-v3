@@ -91,11 +91,17 @@ export const apply = {
   facility: src('/facility/signup'),
 };
 
+// ⚠️ FIX_PROD_142 (SECURITY) — DO NOT render `portal.login` / `portal.facilityLogin`
+// (or any /login deep-link) from a public marketing surface (Header/Footer/CTA/body).
+// A public, crawl-indexable link to the SaaS login exposes an internal admin/facility
+// entry point. Onboarded users already have the app URL. These are kept only for
+// non-public/internal use; the marketing funnel points at booking + /facility/signup.
 export const portal = {
   login: src('/login'),
   // FIX_PROD_024 — net-new facilities go to /facility/signup (apply.facility). EXISTING
   // facilities sign in here (intent=facility lets /login tailor the copy). The bare
   // /facility portal auth-walls a public visitor, so we no longer link to it directly.
+  // FIX_PROD_142 — no longer linked from any marketing surface (security).
   facilityLogin: src('/login', { intent: 'facility' }),
   facility: src('/facility'),
   // MEGA_TASSY_PUBLISH_READY (2026-07-02): /driver-app + /sales-app were 404s on the

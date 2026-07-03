@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Dialysis Transport in Charlotte NC — Recurring Rides | Tassy',
+  title: 'Dialysis Transport in Charlotte NC',
   description:
     'Recurring dialysis rides in Charlotte NC — M-W-F or T-Th-Sa schedules, door-to-door, wheelchair accessible. Veteran-owned. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/dialysis-transport' },
-  openGraph: { images: ['/og-image/dialysis-transport'] },
+  openGraph: { url: '/charlotte/dialysis-transport', images: ['/og-image/dialysis-transport'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-dialysis', recurring: '1' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-dialysis', recurring: '1' });
 export default function DialysisTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/dialysis-transport"
       primaryKeyword="dialysis transport charlotte"
       eyebrow="Dialysis Transport · Charlotte, North Carolina"
       h1="Dialysis Transport in Charlotte — Rides That Match Your Treatment Schedule"
@@ -35,9 +37,9 @@ export default function DialysisTransportPage() {
                 real — rescheduling is hard, and skipping is not an option your
                 care team wants on the table. That is why dialysis transport is
                 its own discipline inside{' '}
-                <a href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   non-emergency medical transportation
-                </a>
+                </Link>
                 , not just another trip on the schedule.
               </p>
               <p>
@@ -80,9 +82,9 @@ export default function DialysisTransportPage() {
               <p>
                 Recurring riders also get pricing that reflects the commitment.
                 See our{' '}
-                <a href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   pricing page
-                </a>{' '}
+                </Link>{' '}
                 or ask dispatch to quote your exact route.
               </p>
             </>
@@ -112,9 +114,9 @@ export default function DialysisTransportPage() {
                 Riders who use a wheelchair full-time or on tired days ride in
                 our wheelchair-accessible vehicles with proper securement —
                 details on our{' '}
-                <a href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -138,9 +140,9 @@ export default function DialysisTransportPage() {
                 work with facility coordinators across Mecklenburg County
                 through direct partnerships and a booking portal built for
                 recurring patients. Our{' '}
-                <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
-                </a>{' '}
+                </Link>{' '}
                 explains how to set that up, or email book@tassytrucks.com
                 and we will walk you through it.
               </p>

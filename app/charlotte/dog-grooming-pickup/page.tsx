@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Dog grooming pickup and drop-off in Charlotte NC. Same-day rides when available, recurring slots for standing appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/dog-grooming-pickup' },
-  openGraph: { images: ['/og-image/dog-grooming-pickup'] },
+  openGraph: { url: '/charlotte/dog-grooming-pickup', images: ['/og-image/dog-grooming-pickup'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-grooming' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-winnie-sage underline-offset-2';
 export default function DogGroomingPickupPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/dog-grooming-pickup"
       primaryKeyword="dog grooming pickup service"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -46,9 +48,9 @@ export default function DogGroomingPickupPage() {
                 Winnie Ride closes that gap. We pick your dog up at your door,
                 deliver him to the groomer, and bring him home freshly trimmed —
                 while you stay where you need to be. It is the same Charlotte-based{' '}
-                <a href="/charlotte/pet-transport" className={linkCls}>
+                <Link href="/charlotte/pet-transport" className={linkCls}>
                   pet transport service
-                </a>{' '}
+                </Link>{' '}
                 we run for vet visits and daycare, pointed at the one errand that
                 eats half a workday: the grooming run.
               </p>
@@ -74,9 +76,9 @@ export default function DogGroomingPickupPage() {
                 coordination with your groomer&rsquo;s front desk. Book one-way if
                 you can manage drop-off but not pickup — or the reverse. Frequent
                 riders can put the whole routine on a{' '}
-                <a href="/winnie" className={linkCls}>
+                <Link href="/winnie" className={linkCls}>
                   Winnie Ride subscription
-                </a>
+                </Link>
                 , which starts at $39/mo.
               </p>
             </>
@@ -91,9 +93,9 @@ export default function DogGroomingPickupPage() {
                 direct relationship with a veteran-owned Charlotte carrier
                 operating under USDOT #3104152, and every grooming ride follows the
                 same protocol as our medical and{' '}
-                <a href="/charlotte/pet-boarding-transport" className={linkCls}>
+                <Link href="/charlotte/pet-boarding-transport" className={linkCls}>
                   boarding transport
-                </a>{' '}
+                </Link>{' '}
                 trips. We verify core vaccines before every ride — rabies plus
                 DAPP, consistent with AVMA core vaccine guidance, which is also
                 what most Charlotte groomers require at check-in. You sign an owner
@@ -118,9 +120,9 @@ export default function DogGroomingPickupPage() {
               temperament and triggers, and we match a driver accordingly —
               unhurried handling, no blasting music, and never forcing a reluctant
               dog. That approach has its own page:{' '}
-              <a href="/charlotte/calm-pet-transport" className={linkCls}>
+              <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                 calm pet transport in Charlotte
-              </a>
+              </Link>
               . Mention anything we should know at booking and the right driver
               shows up prepared.
             </p>

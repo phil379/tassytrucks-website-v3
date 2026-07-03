@@ -31,6 +31,11 @@ export type LandingPageShellProps = {
   /** Visible published date for pages that must age honestly (compare pages). */
   publishedDate?: string;
   secondaryCta?: { label: string; href: string };
+  /** Agent D — this page's own root-relative path (e.g. "/charlotte/pet-transport").
+   *  When set, emits a 2-level BreadcrumbList (Home › this page). Kept to 2 levels
+   *  because there is no /charlotte or /compare index route to link an intermediate
+   *  crumb to. */
+  canonicalPath?: string;
 };
 
 const TRUST_BASE = ['SDVOSB Certified', 'USDOT #3104152', 'MC #79222'];
@@ -38,7 +43,7 @@ const TRUST_BASE = ['SDVOSB Certified', 'USDOT #3104152', 'MC #79222'];
 export default function LandingPageShell({
   h1, quickAnswer, sections, faqs, ctaText, ctaHref, relatedLinks,
   schemaServiceType, heroSubtitle, eyebrow, heroIcon, accent = 'gold',
-  trustExtras, beforeFaq, publishedDate, secondaryCta,
+  trustExtras, beforeFaq, publishedDate, secondaryCta, canonicalPath,
 }: LandingPageShellProps) {
   const sage = accent === 'sage';
   const trustItems = [
@@ -76,6 +81,17 @@ export default function LandingPageShell({
     })),
   };
 
+  const breadcrumbLd = canonicalPath
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.tassytrucks.com/' },
+          { '@type': 'ListItem', position: 2, name: h1, item: `https://www.tassytrucks.com${canonicalPath}` },
+        ],
+      }
+    : null;
+
   return (
     <>
       <script
@@ -86,6 +102,12 @@ export default function LandingPageShell({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
+      {breadcrumbLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        />
+      )}
 
       {/* HERO */}
       <section className="border-b border-line">

@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Post-Surgery Transport in Charlotte NC | Tassy Transportation',
+  title: 'Post-Surgery Transport in Charlotte NC',
   description:
     'Post-surgery transport in Charlotte NC. A driver who walks you in, waits through your procedure, and escorts you home. 24/7 dispatch (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-transport' },
-  openGraph: { images: ['/og-image/post-surgery-transport'] },
+  openGraph: { url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
 };
 
 const CTA_HREF = seoBook('vip', { source: 'seo-postop', tier: 'recovery' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('vip', { source: 'seo-postop', tier: 'recovery' });
 export default function PostSurgeryTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/post-surgery-transport"
       primaryKeyword="post-surgery transport"
       eyebrow="Recovery Transport · Charlotte, North Carolina"
       h1="Post-Surgery Transport in Charlotte — A Real Person to Get You Home"
@@ -38,6 +40,7 @@ export default function PostSurgeryTransportPage() {
                   href="https://www.asahq.org/madeforthismoment/preparing-for-surgery/recovery"
                   className="underline decoration-[color:var(--gold)] underline-offset-2"
                   rel="noopener"
+                  target="_blank"
                 >
                   American Society of Anesthesiologists discharge guidance
                 </a>
@@ -82,9 +85,9 @@ export default function PostSurgeryTransportPage() {
                 surgery center to confirm their discharge policy — then call us
                 at (704) 941-8508 and we will set the ride up around it. You can
                 see how our service tiers compare on the{' '}
-                <a href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   pricing page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -113,9 +116,9 @@ export default function PostSurgeryTransportPage() {
                 recovery nurse isn&rsquo;t calling a stranger. If you want a
                 higher-touch version of this — a single dedicated driver for the
                 entire day — that is our{' '}
-                <a href="/vip" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/vip" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   VIP concierge service
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -131,9 +134,9 @@ export default function PostSurgeryTransportPage() {
                   care. If your care team says you need clinical support during
                   transport or at home, follow their guidance — and for
                   patients in ongoing treatment, ask us about{' '}
-                  <a href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                  <Link href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
                     Tassy Guardian
-                  </a>
+                  </Link>
                   , our oncology-focused transport program.
                 </p>
               ),
@@ -159,9 +162,9 @@ export default function PostSurgeryTransportPage() {
                 updates; your family member gets the ride. If recovery involves
                 follow-up visits, we can set the whole series — surgery day plus
                 post-op checks — as recurring rides in one call, the same way our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   NEMT riders
-                </a>{' '}
+                </Link>{' '}
                 schedule dialysis.
               </p>
             </>

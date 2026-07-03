@@ -20,23 +20,60 @@ type Props = {
   highlights: { title: string; body: string }[];
   tiers?: Tier[];
   partnerCta?: { title: string; body: string; href: string; label: string };
+  /** Agents B + E — keyworded <h2> above the highlights grid (fixes the h1→h3
+   *  skip and gives each service page a location/service-keyworded section head). */
+  highlightsHeading?: string;
+  /** Agent D — when both are set, emit Service JSON-LD (schema.org/Service). */
+  serviceName?: string;
+  path?: string;
 };
+
+// MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent A) — objection-preemption row on
+// every service hero. Credentials only — all documentable/true (no invented
+// prices; the price objection is handled by the "See pricing" CTA).
+const TRUST_CHIPS = ['SDVOSB certified', 'USDOT #3104152', 'Licensed & insured', 'Trained drivers'];
 
 export default function ServicePage({
   eyebrow, title, tagline, description, bookHref, bookLabel = 'Book now',
   highlights, tiers, partnerCta,
+  highlightsHeading = 'Why Charlotte families choose Tassy',
+  serviceName, path,
 }: Props) {
+  const serviceLd =
+    serviceName && path
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Service',
+          name: serviceName,
+          serviceType: serviceName,
+          description,
+          provider: {
+            '@type': 'LocalBusiness',
+            name: 'Tassy Transportation',
+            telephone: '+1-704-941-8508',
+          },
+          areaServed: { '@type': 'City', name: 'Charlotte', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+          url: `https://www.tassytrucks.com${path}`,
+        }
+      : null;
+
   return (
     <>
+      {serviceLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+        />
+      )}
       {/* HERO */}
       <section className="border-b border-charcoal/8">
         <div className="container-x py-20 lg:py-28">
           <div className="eyebrow">{eyebrow}</div>
           <h1 className="h-display mt-4 max-w-3xl">{title}</h1>
-          <p className="mt-5 text-2xl text-ink-muted font-serif max-w-2xl">
+          <p className="mt-5 text-2xl ink-soft font-serif max-w-2xl">
             {tagline}
           </p>
-          <p className="mt-6 text-base text-ink-muted max-w-2xl leading-relaxed">
+          <p className="mt-6 text-base ink-soft max-w-2xl leading-relaxed">
             {description}
           </p>
           <div className="mt-10 flex gap-3 flex-wrap">
@@ -45,6 +82,16 @@ export default function ServicePage({
             </a>
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
+          <ul className="mt-8 flex flex-wrap gap-2" aria-label="Credentials">
+            {TRUST_CHIPS.map((c) => (
+              <li
+                key={c}
+                className="inline-flex items-center gap-1.5 text-xs font-medium rounded-full border border-line bg-surface px-3 py-1.5 text-cream-text/85"
+              >
+                <Check size={13} className="text-gold shrink-0" aria-hidden="true" /> {c}
+              </li>
+            ))}
+          </ul>
           {/* MEGA_TASSY_PUBLISH_READY — brand motto on every service-line hero */}
           <p className="mt-8 serif italic text-lg ink-soft">
             We Transport With Care<span className="gold-text">.</span>
@@ -55,6 +102,7 @@ export default function ServicePage({
       {/* HIGHLIGHTS */}
       <section className="bg-cream">
         <div className="container-x py-20">
+          <h2 className="h-section mb-12 max-w-2xl">{highlightsHeading}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {highlights.map((h) => (
               <div key={h.title}>

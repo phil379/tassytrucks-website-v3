@@ -19,6 +19,9 @@ export default function RenewPage() {
       description="Tassy Wellness is the wellness-focused arm of our premium fleet. Built for the customer who's invested in their longevity — IV drips, hyperbaric, rejuvenation, and aesthetic maintenance. Every ride includes a hydration recovery kit and the same premium fleet as VIP Concierge."
       bookHref={book.renew}
       bookLabel="Book a wellness ride"
+      serviceName="Tassy Wellness — Wellness & Med-Spa Transport"
+      path="/renew"
+      highlightsHeading="Wellness & med-spa transport across Charlotte"
       highlights={[
         {
           title: 'Hydration recovery kit',

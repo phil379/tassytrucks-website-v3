@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'Terms of service for Tassy Transportation (Tassy Trucks LLC): booking, cancellations, rider responsibilities, and service standards for our Charlotte transport lines.',
+    'Terms of service for Tassy Transportation (Tassy Trucks LLC): booking, cancellations, rider responsibilities & standards for our Charlotte transport.',
   alternates: { canonical: '/terms' },
   robots: { index: true, follow: true },
 };

@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { facilityIntake } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Partner With Tassy Transportation — Charlotte Medical Transport',
+  title: 'Facility Transport Partnerships in Charlotte NC',
   description:
     'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, 24/7 dispatch, dedicated facility portal with net-30 invoicing. (704) 941-8508.',
   alternates: { canonical: '/partners' },
-  openGraph: { images: ['/og-image/partners'] },
+  openGraph: { url: '/partners', images: ['/og-image/partners'] },
 };
 
 const CTA_HREF = facilityIntake({ source: 'partners-page' });
@@ -49,9 +50,9 @@ export default function PartnersPage() {
                 Oncology practices need drivers who understand that a passenger
                 leaving chemotherapy is not a typical passenger, and that the ride
                 home is part of the care experience, not an afterthought. Our{' '}
-                <a href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Tassy Guardian
-                </a>{' '}
+                </Link>{' '}
                 vertical was built specifically around that reality.
               </p>
               <p>
@@ -59,9 +60,9 @@ export default function PartnersPage() {
                 for veterans. As a Service-Disabled Veteran-Owned Small Business,
                 veteran transport is personal for us — you can read how we handle
                 it on our{' '}
-                <a href="/charlotte/veteran-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/veteran-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   veteran transport page
-                </a>
+                </Link>
                 . If your facility coordinates care for veterans in Mecklenburg
                 County, we should talk.
               </p>
@@ -109,18 +110,18 @@ export default function PartnersPage() {
             <>
               <p>
                 The core of most facility contracts is{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   ambulatory NEMT
-                </a>{' '}
+                </Link>{' '}
                 — scheduled rides for patients who can walk with minimal
                 assistance — and wheelchair-accessible NEMT for residents and
                 patients who can&rsquo;t safely transfer to a standard seat. Both
                 run on recurring schedules when you need them to: a dialysis
                 census can be booked as a standing series rather than trip by
                 trip, which is exactly how our{' '}
-                <a href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   dialysis transport
-                </a>{' '}
+                </Link>{' '}
                 service is built.
               </p>
               <p>
@@ -134,9 +135,9 @@ export default function PartnersPage() {
                 Winnie Ride, our pet transport vertical, which gets a
                 resident&rsquo;s dog or cat to the vet and back when family
                 can&rsquo;t. Details on facility pet programs are on our{' '}
-                <a href="/partners/veterinary" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners/veterinary" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   veterinary partnerships page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -166,9 +167,9 @@ export default function PartnersPage() {
                 <li>
                   <strong>Master Service Agreement.</strong> One contract covering
                   rates, service levels, and documentation. Our{' '}
-                  <a href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                  <Link href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
                     pricing page
-                  </a>{' '}
+                  </Link>{' '}
                   shows how our rate structure works before you ever get a quote.
                 </li>
                 <li>

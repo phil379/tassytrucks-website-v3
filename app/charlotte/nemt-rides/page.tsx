@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'NEMT in Charlotte NC — Book Medical Transport | Tassy',
+  title: 'NEMT in Charlotte NC — Book Medical Transport',
   description:
     'Non-emergency medical transportation in Charlotte NC. Veteran-owned, 24/7 dispatch, ambulatory and wheelchair rides. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/nemt-rides' },
-  openGraph: { images: ['/og-image/nemt-rides'] },
+  openGraph: { url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-nemt' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-nemt' });
 export default function NemtRidesPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/nemt-rides"
       primaryKeyword="nemt charlotte nc"
       eyebrow="NEMT · Charlotte, North Carolina"
       h1="NEMT in Charlotte, NC — Medical Rides You Can Set Your Watch By"
@@ -69,9 +71,9 @@ export default function NemtRidesPage() {
                 coordinators at hospitals, skilled nursing facilities, and dialysis
                 centers across Mecklenburg County who need a transport partner that
                 shows up on time, every time. If that is you, our{' '}
-                <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
-                </a>{' '}
+                </Link>{' '}
                 explains how contracting works.
               </p>
             </>
@@ -93,9 +95,9 @@ export default function NemtRidesPage() {
                 seat. If you are not sure which you need, call us — dispatch will
                 ask a few questions and put you in the right vehicle the first time.
                 You can read more on our{' '}
-                <a href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -116,9 +118,9 @@ export default function NemtRidesPage() {
               <p>
                 Need a ride for a parent or spouse instead of yourself? That works
                 too — see{' '}
-                <a href="/charlotte/family-medical-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/family-medical-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   booking for a family member
-                </a>
+                </Link>
                 . You get the confirmation and the driver updates, they get the
                 ride.
               </p>

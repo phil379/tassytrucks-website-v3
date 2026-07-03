@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Wheelchair Transport in Charlotte NC — Book a Ride | Tassy',
+  title: 'Wheelchair Transport in Charlotte NC',
   description:
     'Wheelchair accessible transport in Charlotte NC. Securement-equipped vans, door-through-door help, companions welcome. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/wheelchair-transport' },
-  openGraph: { images: ['/og-image/wheelchair-transport'] },
+  openGraph: { url: '/charlotte/wheelchair-transport', images: ['/og-image/wheelchair-transport'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
 export default function WheelchairTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/wheelchair-transport"
       primaryKeyword="wheelchair transport charlotte nc"
       eyebrow="Wheelchair Transport · Charlotte, North Carolina"
       h1="Wheelchair Transport in Charlotte, NC — Accessible Rides, Door Through Door"
@@ -40,9 +42,9 @@ export default function WheelchairTransportPage() {
               <p>
                 Tassy Transportation runs wheelchair-accessible vehicles as a core part
                 of our{' '}
-                <a href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   non-emergency medical transportation
-                </a>{' '}
+                </Link>{' '}
                 service. We are a Charlotte-based, Service-Disabled
                 Veteran-Owned Small Business (SDVOSB) operating under USDOT
                 #3104152 and MC #79222, with dispatch answering around the
@@ -74,9 +76,9 @@ export default function WheelchairTransportPage() {
               <p>
                 Booking for a parent or spouse who uses a wheelchair? You can
                 arrange everything and receive the confirmations yourself — see{' '}
-                <a href="/charlotte/family-medical-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/family-medical-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   booking for a family member
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -102,13 +104,13 @@ export default function WheelchairTransportPage() {
                 appointments, dialysis, therapy, and family events alike, it is
                 usually the right tool. If your trips repeat on a schedule —
                 dialysis is the classic case — our{' '}
-                <a href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   dialysis transport page
-                </a>{' '}
+                </Link>{' '}
                 explains how we book recurring series, and our{' '}
-                <a href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   pricing page
-                </a>{' '}
+                </Link>{' '}
                 shows how costs work.
               </p>
             </>

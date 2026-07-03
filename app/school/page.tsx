@@ -6,7 +6,7 @@ import { book, contact } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Tassy Scholar — daily student transport',
   description:
-    'Parent-direct school transport across Charlotte: pick one of three plans (Full Year, Weekly, After-School) and ride with the same trusted driver every school day.',
+    'Parent-direct school transport across Charlotte: choose one of three plans (Full Year, Weekly, After-School) with the same trusted driver every day.',
   alternates: { canonical: '/school' },
   openGraph: { url: '/school', images: ['/og-image/school'] },
 };

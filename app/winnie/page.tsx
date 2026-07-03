@@ -18,7 +18,7 @@ const charlotteServices = [
 export const metadata: Metadata = {
   title: 'Winnie Ride — Charlotte pet transport',
   description:
-    'Climate-controlled pet transport for vet visits, grooming, daycare, and airport. Carriers, harnesses, calming spray included. Three subscription tiers from $39/mo.',
+    'Climate-controlled Charlotte pet transport for vet visits, grooming, daycare & airport. Carriers, harnesses & calming spray included. Tiers from $39/mo.',
   alternates: { canonical: '/winnie' },
   openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
 };
@@ -33,6 +33,9 @@ export default function WinniePage() {
       description="Winnie Ride is Tassy's purpose-built pet transport service. Climate-controlled vehicles, sanitized carriers, safety harnesses, vet-safe calming spray, and treats — every ride. B2C for pet parents, B2B for veterinary clinics, groomers, and daycare facilities. Subscription tiers from $39/mo."
       bookHref={book.winnie}
       bookLabel="Book a pet ride"
+      serviceName="Winnie Ride — Pet Transportation"
+      path="/winnie"
+      highlightsHeading="Charlotte pet transport, built around your pet"
       highlights={[
         {
           title: 'Vet-clinic certified',
@@ -105,7 +108,7 @@ export default function WinniePage() {
               </h3>
               <p className="mt-2 text-sm ink-mute leading-relaxed">{s.blurb}</p>
               <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#7C9A5C]">
-                Learn more <ArrowRight size={14} />
+                See what&rsquo;s included <ArrowRight size={14} />
               </span>
             </Link>
           ))}

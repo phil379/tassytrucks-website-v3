@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Book a Medical Ride for Someone Else in Charlotte | Tassy',
+  title: 'Book a Medical Ride for Someone Else in Charlotte',
   description:
     'Book and pay for a medical ride for a parent or loved one in Charlotte NC. You get the confirmations and driver updates; they get door-to-door care.',
   alternates: { canonical: '/charlotte/family-medical-rides' },
-  openGraph: { images: ['/og-image/family-medical-rides'] },
+  openGraph: { url: '/charlotte/family-medical-rides', images: ['/og-image/family-medical-rides'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-family' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-family' });
 export default function FamilyMedicalRidesPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/family-medical-rides"
       primaryKeyword="book a medical ride for someone else"
       eyebrow="Family Bookings · Charlotte, North Carolina"
       h1="Book a Medical Ride for Someone Else in Charlotte — Parents, Spouses, Loved Ones"
@@ -45,9 +47,9 @@ export default function FamilyMedicalRidesPage() {
                 Charlotte or Matthews from hundreds of miles away. This is
                 ordinary non-emergency medical transportation, the service
                 described on our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page
-                </a>
+                </Link>
                 , with the communication routed to you instead of the rider.
               </p>
             </>
@@ -97,9 +99,9 @@ export default function FamilyMedicalRidesPage() {
                 safely transfer to a standard seat, we run
                 wheelchair-accessible vehicles with proper securement; the
                 details are on our{' '}
-                <a href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
-                </a>
+                </Link>
                 . Not sure which vehicle fits? Describe their mobility honestly
                 when you book and dispatch will choose correctly the first
                 time.
@@ -122,9 +124,9 @@ export default function FamilyMedicalRidesPage() {
               <p>
                 For treatment schedules that cannot slip, like dialysis, see
                 our{' '}
-                <a href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/dialysis-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   dialysis transport page
-                </a>{' '}
+                </Link>{' '}
                 — those riders are the reason our dispatch obsesses over
                 punctuality. Recurring riders across Mecklenburg County,
                 Huntersville, Pineville, and Concord are the backbone of our

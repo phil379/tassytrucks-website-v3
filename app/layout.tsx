@@ -1,11 +1,31 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { Newsreader, Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
+// MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent C) — was a render-blocking
+// <link> to fonts.googleapis.com. next/font self-hosts (zero CLS, no
+// third-party request, no preconnect) and exposes CSS variables consumed by
+// globals.css (.serif → --font-newsreader · body → --font-inter).
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-newsreader',
+  display: 'swap',
+});
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: {
-    default: 'Tassy — Premium transport. Veteran-owned.',
+    // Agent D — keyword-front-loaded (location + services) for the homepage.
+    default: 'Charlotte Medical, Pet & Recovery Transport | Tassy',
     template: '%s · Tassy',
   },
   description:
@@ -14,7 +34,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Tassy',
-    url: 'https://www.tassytrucks.com',
+    // Agent D — the site-wide `url` was making every sub-page OG resolve to the
+    // homepage. Removed; each page sets its own openGraph.url.
     images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }], // FIX_PROD_038 — real Tassy og-image
   },
   twitter: { card: 'summary_large_image', images: ['/brand/og-image.png'] },
@@ -27,6 +48,11 @@ export const metadata: Metadata = {
     ],
     apple: '/brand/apple-touch-icon.png',
   },
+};
+
+// Agent C — mobile browser chrome matches the charcoal canvas.
+export const viewport: Viewport = {
+  themeColor: '#1B1A17',
 };
 
 const localBusinessLd = {
@@ -69,25 +95,20 @@ const localBusinessLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${newsreader.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }}
         />
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@300;400;500;600;700&display=swap"
-        />
       </head>
       <body>
+        {/* Agent E (WCAG 2.4.1) — keyboard/AT users can jump past the nav. */}
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <Header />
-        <main>{children}</main>
+        <main id="main">{children}</main>
         <Footer />
       </body>
     </html>

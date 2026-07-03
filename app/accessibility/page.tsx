@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Accessibility',
   description:
-    'Tassy Transportation accessibility commitment: ADA-compliant wheelchair vehicles, door-through-door assistance, and a website built to WCAG 2.1 AA. Charlotte, NC.',
+    'Tassy Transportation accessibility: ADA-compliant wheelchair vehicles, door-through-door assistance & a website built to WCAG 2.1 AA. Charlotte, NC.',
   alternates: { canonical: '/accessibility' },
   robots: { index: true, follow: true },
 };

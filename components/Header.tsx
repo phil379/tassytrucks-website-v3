@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, ChevronDown, Phone } from 'lucide-react';
+import { ArrowRight, ChevronDown, Phone, Menu, X } from 'lucide-react';
 import { portal, contact, book } from '@/lib/saas-links';
 
 // FIX_PROD_131 — nav trimmed 8→6 visible items: "How it works" moved into the
@@ -123,6 +123,51 @@ export default function Header() {
           <a href={book.ride} className="btn-gold text-sm">
             Book a Ride <ArrowRight size={16} />
           </a>
+
+          {/* MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agents B + E) — before this, the
+              whole nav was `hidden lg:flex`: below 1024px only the logo + "Book a
+              Ride" rendered, so Services/Pricing/Partners/About were UNREACHABLE on
+              phones & tablets. This <details> disclosure is server-only (no client
+              JS) and gives full nav parity below lg. */}
+          <details className="lg:hidden group/m relative">
+            <summary
+              className="list-none cursor-pointer inline-flex items-center justify-center h-11 w-11 rounded-md border border-line text-ink [&::-webkit-details-marker]:hidden"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={20} className="group-open/m:hidden" aria-hidden="true" />
+              <X size={20} className="hidden group-open/m:block" aria-hidden="true" />
+            </summary>
+            <div className="absolute right-0 top-full mt-3 w-[min(21rem,calc(100vw-2rem))] bg-surface border border-line rounded-card shadow-[0_16px_40px_-16px_rgba(0,0,0,0.6)] p-5 z-50 max-h-[80vh] overflow-y-auto">
+              {servicesMenu.map((col) => (
+                <div key={col.heading} className="mb-4">
+                  <div className="eyebrow !text-[10px]">{col.heading}</div>
+                  <ul className="mt-2 space-y-1.5">
+                    {col.links.map((l) => (
+                      <li key={l.href}>
+                        <Link href={l.href} className="nav-link text-sm block py-1">
+                          {l.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              <div className="border-t border-line pt-4 mt-1 space-y-1.5">
+                <Link href="/#how" className="nav-link text-sm block py-1">How it works</Link>
+                {nav.map((n) => (
+                  <Link key={n.href} href={n.href} className="nav-link text-sm block py-1">
+                    {n.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="border-t border-line pt-4 mt-4 flex flex-col gap-3">
+                <a href={contact.phone} className="nav-link inline-flex items-center gap-2 text-sm">
+                  <Phone size={15} /> {contact.phoneDisplay}
+                </a>
+                <a href={portal.login} className="btn-ghost text-sm justify-center">Sign in</a>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </header>

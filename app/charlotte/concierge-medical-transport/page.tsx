@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Concierge Medical Transport in Charlotte NC | Tassy',
+  title: 'Concierge Medical Transport in Charlotte NC',
   description:
     'Discreet, white-glove concierge medical transport in Charlotte NC for plastic surgery and aesthetic patients. Private rides, 24/7 — (704) 941-8508.',
   alternates: { canonical: '/charlotte/concierge-medical-transport' },
-  openGraph: { images: ['/og-image/concierge-medical-transport'] },
+  openGraph: { url: '/charlotte/concierge-medical-transport', images: ['/og-image/concierge-medical-transport'] },
 };
 
 const CTA_HREF = seoBook('vip', { source: 'seo-concierge' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('vip', { source: 'seo-concierge' });
 export default function ConciergeMedicalTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/concierge-medical-transport"
       primaryKeyword="concierge medical transport"
       eyebrow="VIP Concierge · Charlotte, North Carolina"
       h1="Concierge Medical Transport in Charlotte — Private, Discreet, Door to Door"
@@ -47,9 +49,9 @@ export default function ConciergeMedicalTransportPage() {
               </p>
               <p>
                 This is the heart of our{' '}
-                <a href="/vip" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/vip" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   VIP concierge service
-                </a>
+                </Link>
                 . Tassy Transportation is a Charlotte-based, Service-Disabled
                 Veteran-Owned Small Business operating under USDOT #3104152 and
                 MC #79222 — discretion backed by real operating authority, not
@@ -81,9 +83,9 @@ export default function ConciergeMedicalTransportPage() {
               </p>
               <p>
                 Recovering over several days with follow-up visits? Our{' '}
-                <a href="/charlotte/post-surgery-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/post-surgery-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   post-surgery transport page
-                </a>{' '}
+                </Link>{' '}
                 covers how we handle the full recovery window, not just day
                 one.
               </p>
@@ -110,9 +112,9 @@ export default function ConciergeMedicalTransportPage() {
                 partnerships put a dedicated transport partner one phone call
                 away. Med-spas and wellness studios can also route clients
                 through{' '}
-                <a href="/renew" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/renew" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Tassy Wellness
-                </a>
+                </Link>
                 , our wellness transport vertical.
               </p>
             </>
@@ -126,9 +128,9 @@ export default function ConciergeMedicalTransportPage() {
                 NEMT (non-emergency medical transportation) is dependable,
                 scheduled medical transport — it is what we built our company
                 on, and you can read about it on our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page
-                </a>
+                </Link>
                 . Concierge is a different tier of the same craft: the same
                 licensed, insured operation, with privacy and presentation
                 turned all the way up. Dedicated vehicle, flexible waiting,

@@ -19,6 +19,9 @@ export default function VipPage() {
       description="VIP Concierge is Tassy's signature service. Built for patients recovering from plastic surgery, cosmetic dental, IV therapy, and high-end aesthetic procedures. Four service tiers from Recovery Ride ($185) to Maximum Discretion ($695) — each with its own amenity kit, vehicle class, and driver training. Anchor partners include leading Charlotte clinics."
       bookHref={book.vip}
       bookLabel="Book a recovery ride"
+      serviceName="VIP Concierge Transport"
+      path="/vip"
+      highlightsHeading="Premium plastic-surgery recovery rides in Charlotte"
       highlights={[
         {
           title: 'Four service tiers',

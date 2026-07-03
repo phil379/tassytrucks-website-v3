@@ -19,6 +19,9 @@ export default function RecoverPage() {
       description="Tassy Guardian is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA-trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
       bookHref={book.recover}
       bookLabel="Book recovery transport"
+      serviceName="Tassy Guardian — Oncology & Recovery Transport"
+      path="/recover"
+      highlightsHeading="Oncology & recovery transport in Charlotte NC"
       highlights={[
         {
           title: 'CNA-trained drivers',

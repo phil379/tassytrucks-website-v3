@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Honest comparison of Tassy Transportation, Uber Health, and Lyft Healthcare for Charlotte medical transport: wheelchair access, driver training, booking, support.',
   alternates: { canonical: '/compare/tassy-vs-uber-health-vs-lyft-healthcare' },
-  openGraph: { images: ['/og-image/tassy-vs-uber-health-vs-lyft-healthcare'] },
+  openGraph: { url: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', images: ['/og-image/tassy-vs-uber-health-vs-lyft-healthcare'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-compare' });
@@ -92,16 +93,16 @@ function ComparisonTable() {
           <table className="w-full min-w-[640px] text-sm border-collapse">
             <thead>
               <tr className="text-left border-b-2 border-[color:var(--ink)]">
-                <th className="py-3 pr-4 font-semibold"> </th>
-                <th className="py-3 pr-4 font-semibold">Tassy Transportation</th>
-                <th className="py-3 pr-4 font-semibold">Uber Health</th>
-                <th className="py-3 font-semibold">Lyft Healthcare</th>
+                <th scope="col" className="py-3 pr-4 font-semibold"> </th>
+                <th scope="col" className="py-3 pr-4 font-semibold">Tassy Transportation</th>
+                <th scope="col" className="py-3 pr-4 font-semibold">Uber Health</th>
+                <th scope="col" className="py-3 font-semibold">Lyft Healthcare</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
                 <tr key={r.label} className="border-b border-line align-top">
-                  <td className="py-3.5 pr-4 font-medium">{r.label}</td>
+                  <th scope="row" className="py-3.5 pr-4 font-medium">{r.label}</th>
                   <td className="py-3.5 pr-4 ink-soft">{r.tassy}</td>
                   <td className="py-3.5 pr-4 ink-soft">{r.uber}</td>
                   <td className="py-3.5 ink-soft">{r.lyft}</td>
@@ -118,6 +119,7 @@ function ComparisonTable() {
 export default function ComparePage() {
   return (
     <LandingPageShell
+      canonicalPath="/compare/tassy-vs-uber-health-vs-lyft-healthcare"
       primaryKeyword="tassy vs uber health vs lyft healthcare"
       eyebrow="Comparison · Charlotte Medical Transport"
       h1="Tassy Transportation vs Uber Health vs Lyft Healthcare — Charlotte Medical Transport Compared"
@@ -147,9 +149,9 @@ export default function ComparePage() {
                 well as from facilities. We are a Service-Disabled Veteran-Owned
                 Small Business operating under USDOT #3104152 and MC #79222, serving
                 Mecklenburg County plus Matthews, Concord, and Gastonia. See our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page
-                </a>{' '}
+                </Link>{' '}
                 for the full service rundown.
               </p>
             </>
@@ -185,13 +187,13 @@ export default function ComparePage() {
                 after anesthesia — and most surgery centers will not release a
                 sedated patient to one. Our drivers do all of that as the standard
                 service, not an exception. That is the core of our{' '}
-                <a href="/charlotte/post-surgery-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/post-surgery-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   post-surgery transport
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport
-                </a>{' '}
+                </Link>{' '}
                 services.
               </p>
               <p>
@@ -201,9 +203,9 @@ export default function ComparePage() {
                 the phone at 5 a.m. when plans change. For facilities, our SDVOSB
                 certification also counts toward supplier-diversity goals, which the
                 platforms can&rsquo;t offer — details on our{' '}
-                <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   partnerships page
-                </a>
+                </Link>
                 .
               </p>
             </>

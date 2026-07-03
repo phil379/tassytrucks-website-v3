@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Partner with Winnie Ride for vaccine-verified, liability-covered pet transport to and from your Charlotte veterinary practice. Book a 15-min intro call.',
   alternates: { canonical: '/partners/veterinary' },
-  openGraph: { images: ['/og-image/veterinary'] },
+  openGraph: { url: '/partners/veterinary', images: ['/og-image/veterinary'] },
 };
 
 const CTA_HREF = facilityIntake({ source: 'vet-partners', type: 'veterinary' });
@@ -62,13 +63,13 @@ export default function VeterinaryPartnersPage() {
               <p>
                 If your practice already refers clients to our consumer
                 services, you may know us from{' '}
-                <a href="/charlotte/pet-transport" className={inlineLink}>
+                <Link href="/charlotte/pet-transport" className={inlineLink}>
                   pet transport in Charlotte
-                </a>{' '}
+                </Link>{' '}
                 or our{' '}
-                <a href="/charlotte/vet-appointment-rides" className={inlineLink}>
+                <Link href="/charlotte/vet-appointment-rides" className={inlineLink}>
                   vet appointment rides
-                </a>
+                </Link>
                 . A formal partnership simply makes that referral path easier
                 for your front desk — and better for your clients.
               </p>
@@ -89,6 +90,7 @@ export default function VeterinaryPartnersPage() {
                   href="https://www.avma.org/resources-tools/pet-owners/petcare/vaccinations"
                   className={inlineLink}
                   rel="noopener"
+                  target="_blank"
                 >
                   AVMA
                 </a>
@@ -138,12 +140,12 @@ export default function VeterinaryPartnersPage() {
                 followed, no improvising. If your discharge notes say keep the
                 patient flat and quiet, that is exactly what happens. You can
                 read more about how we handle these trips on our{' '}
-                <a
+                <Link
                   href="/charlotte/post-surgery-pet-transport"
                   className={inlineLink}
                 >
                   post-surgery pet transport page
-                </a>
+                </Link>
                 .
               </p>
               <p>
@@ -185,9 +187,9 @@ export default function VeterinaryPartnersPage() {
                 service — our facility portal supports net-30 invoicing so your
                 clinic can book on behalf of clients without handling payment at
                 the front desk. The broader program is described on our{' '}
-                <a href="/partners" className={inlineLink}>
+                <Link href="/partners" className={inlineLink}>
                   facility partnerships page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -220,9 +222,9 @@ export default function VeterinaryPartnersPage() {
                 anxious, immunocompromised, or precious to someone — which is to
                 say, when it is a veterinary patient — the service-level
                 differences matter. The full story of who we are lives on the{' '}
-                <a href="/winnie" className={inlineLink}>
+                <Link href="/winnie" className={inlineLink}>
                   Winnie Ride overview
-                </a>
+                </Link>
                 .
               </p>
             </>

@@ -23,15 +23,33 @@
 html, body { background: var(--bg); color: var(--ink); }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  /* next/font/google self-hosts these (see app/layout.tsx) — the CSS var falls
+     back to the family name / system stack if the font var isn't applied. */
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Agent E (WCAG 2.4.1) — skip-to-content link: off-screen until keyboard-focused. */
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 60;
+  background: var(--gold);
+  color: var(--on-gold);
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: top 150ms ease;
+}
+.skip-link:focus { top: 1rem; outline: 2px solid var(--ink); outline-offset: 2px; }
 
 @layer components {
   .container-x { @apply max-w-container mx-auto px-6 lg:px-10; }
 
   /* Typography */
-  .serif { font-family: 'Newsreader', Georgia, serif; font-feature-settings: "ss01" on; }
+  .serif { font-family: var(--font-newsreader), 'Newsreader', Georgia, serif; font-feature-settings: "ss01" on; }
   .ink-soft { color: var(--ink-soft); }
   .ink-mute { color: var(--ink-mute); }
   .gold-text { color: var(--gold); }
@@ -185,7 +203,7 @@ body {
   }
 
   .dot { width: 6px; height: 6px; border-radius: 50%; background: #2EA868; display: inline-block; }
-  .quote-mark { font-family: 'Newsreader', serif; font-size: 6rem; line-height: 1; color: var(--gold); }
+  .quote-mark { font-family: var(--font-newsreader), 'Newsreader', serif; font-size: 6rem; line-height: 1; color: var(--gold); }
 }
 
 /* Live trip rotator (hero) */
@@ -209,11 +227,16 @@ body {
   33%, 100% { opacity: 0; transform: translateY(-12px); }
 }
 
-/* Hero image gradient overlay (matches live deploy) */
+/* MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN — the hero visual was a HOTLINKED Unsplash
+   stock photo (LCP element depending on a third-party CDN + generic stock on the
+   flagship). Replaced with an on-brand charcoal→ink gradient + warm gold glow:
+   zero external dependency, faster LCP, premium, and dark enough for the white
+   "Live Trip Board" overlay to read. The rotating trip cards are the visual interest. */
 .hero-image {
   background-image:
-    linear-gradient(135deg, rgba(27,26,23,0.18), rgba(27,26,23,0.5)),
-    url('https://images.unsplash.com/photo-1559076610-c1e5cfb37b65?auto=format&fit=crop&w=1400&q=80');
+    radial-gradient(130% 130% at 12% 8%, rgba(200,147,46,0.24), transparent 52%),
+    radial-gradient(120% 120% at 90% 100%, rgba(200,147,46,0.10), transparent 55%),
+    linear-gradient(150deg, #2a2721 0%, #1B1A17 52%, #111008 100%);
   background-size: cover; background-position: center;
 }
 
@@ -246,4 +269,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .card-tile:hover .svc-icon { animation: none !important; }
   .svc-underline, .card-tile:hover .svc-underline { transition: none; width: 24px; }
+  /* MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent E · WCAG 2.2.2) — the auto-cycling
+     "Live Trip Board" and the floating stat card are moving content >5s with no
+     pause control. Under reduced-motion, freeze them: show one static trip card,
+     stop the float, and disable smooth scroll. */
+  .trip-card { animation: none !important; }
+  .trip-card:nth-child(1) { opacity: 1; transform: none; }
+  .trip-card:nth-child(2), .trip-card:nth-child(3) { display: none; }
+  .animate-float-slow { animation: none !important; }
+  html { scroll-behavior: auto; }
 }

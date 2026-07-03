@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Veteran Medical Transport in Charlotte NC | Tassy Transportation',
+  title: 'Veteran Medical Transport in Charlotte NC',
   description:
     'Veteran medical transport in Charlotte NC from a Service-Disabled Veteran-Owned company. Rides to VA and community care appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/veteran-transport' },
-  openGraph: { images: ['/og-image/veteran-transport'] },
+  openGraph: { url: '/charlotte/veteran-transport', images: ['/og-image/veteran-transport'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-veteran', payer: 'va' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-veteran', payer: 'va' });
 export default function VeteranTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/veteran-transport"
       primaryKeyword="veteran medical transport charlotte"
       eyebrow="Veteran Transport · Charlotte, North Carolina"
       h1="Veteran Medical Transport in Charlotte — Driven by a Veteran-Owned Company"
@@ -72,9 +74,9 @@ export default function VeteranTransportPage() {
                 at local hospitals, specialty clinics, and imaging centers
                 around town — the same kinds of trips we run every day as part
                 of our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   NEMT service in Charlotte
-                </a>
+                </Link>
                 . Wherever the VA sends you for care, we can get you there.
               </p>
             </>
@@ -111,9 +113,9 @@ export default function VeteranTransportPage() {
                 first time. Door-to-door is our standard on every trip — drivers
                 help with entryways, steps, and getting checked in, not just the
                 curb. Details on accessible vehicles are on our{' '}
-                <a href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
-                </a>
+                </Link>
                 .
               </p>
               <p>
@@ -144,9 +146,9 @@ export default function VeteranTransportPage() {
                 wheelchair-accessible trips, and we document what coordinators
                 need documented. If your organization arranges transport for
                 multiple veterans, our{' '}
-                <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
-                </a>{' '}
+                </Link>{' '}
                 explains how a standing arrangement works, or email{' '}
                 <a href="mailto:book@tassytrucks.com" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   book@tassytrucks.com
@@ -168,9 +170,9 @@ export default function VeteranTransportPage() {
               specialist in Ballantyne or University City, it is a route we
               know. For trips beyond our standard range, call dispatch and we
               will quote it case by case — see our{' '}
-              <a href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
+              <Link href="/pricing" className="underline decoration-[color:var(--gold)] underline-offset-2">
                 pricing page
-              </a>{' '}
+              </Link>{' '}
               for how fares work.
             </p>
           ),

@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'How Tassy Transportation (Tassy Trucks LLC) collects, uses, and protects your information — bookings, health-related trip details, and communications. Charlotte, NC.',
+    'How Tassy Transportation collects, uses & protects your information — bookings, health-related trip details & communications. Charlotte, NC.',
   alternates: { canonical: '/privacy' },
   robots: { index: true, follow: true },
 };

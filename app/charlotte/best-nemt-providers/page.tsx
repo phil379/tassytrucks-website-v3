@@ -1,13 +1,14 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Best NEMT Providers in Charlotte — How to Choose | Tassy',
+  title: 'Best NEMT Providers in Charlotte — How to Choose',
   description:
     'How to evaluate NEMT providers in Charlotte NC: licensing, insurance, driver training, reliability — and how Tassy Transportation measures up. (704) 941-8508.',
   alternates: { canonical: '/charlotte/best-nemt-providers' },
-  openGraph: { images: ['/og-image/best-nemt-providers'] },
+  openGraph: { url: '/charlotte/best-nemt-providers', images: ['/og-image/best-nemt-providers'] },
 };
 
 const CTA_HREF = seoBook('nemt', { source: 'seo-best' });
@@ -15,6 +16,7 @@ const CTA_HREF = seoBook('nemt', { source: 'seo-best' });
 export default function BestNemtProvidersPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/best-nemt-providers"
       primaryKeyword="best nemt providers charlotte"
       eyebrow="NEMT Buyer&rsquo;s Guide · Charlotte, North Carolina"
       h1="Best NEMT Providers in Charlotte: How to Actually Choose One"
@@ -70,9 +72,9 @@ export default function BestNemtProvidersPage() {
                 specifically how the chair is secured and what happens if the
                 accessible vehicle is already booked. You can see how we
                 approach this on our{' '}
-                <a href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -123,14 +125,14 @@ export default function BestNemtProvidersPage() {
                 Ask plainly: &ldquo;Do your own drivers and vehicles run this
                 trip, or do you contract it out?&rdquo; Facilities ask us this
                 in every contracting conversation — our{' '}
-                <a href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
-                </a>{' '}
+                </Link>{' '}
                 covers how those relationships work. And if you are weighing
                 NEMT against app-based options, our{' '}
-                <a href="/compare/tassy-vs-uber-health-vs-lyft-healthcare" className="underline decoration-[color:var(--gold)] underline-offset-2">
+                <Link href="/compare/tassy-vs-uber-health-vs-lyft-healthcare" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   comparison guide
-                </a>{' '}
+                </Link>{' '}
                 lays out the differences honestly.
               </p>
             </>

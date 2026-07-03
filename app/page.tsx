@@ -372,7 +372,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/pricing" className="btn-primary">See pricing</Link>
-              <a href={contact.bookingEmail} className="btn-call">Contact us</a>
+              <a href={contact.bookingEmail} className="btn-call">Talk to our team</a>
             </div>
           </div>
         </div>

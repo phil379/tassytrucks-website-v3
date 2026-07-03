@@ -164,7 +164,8 @@ export default function PricingPage() {
             Subscribe and save — or pay per ride.
           </h1>
           <p className="mt-5 text-lg text-ink-muted max-w-2xl">
-            Five service lines. Subscriptions for the verticals you ride often. Per-service flat tiers for VIP.
+            Six lines of care. Subscribe to the verticals you ride often, or pay per ride &mdash;
+            flat tiers for VIP Concierge, Medicaid-covered options for Tassy Care.
             Switch or cancel anytime. All Tassy-branded amenities included.
           </p>
         </div>
@@ -255,7 +256,7 @@ export default function PricingPage() {
           <div className="eyebrow">Don&apos;t want to subscribe?</div>
           <h2 className="h-section mt-3">Pay per ride — no commitment.</h2>
           <p className="mt-4 text-ink-muted max-w-2xl mx-auto">
-            All five service lines work à la carte. VIP Concierge has four flat tiers from $185–$695. Tassy Care
+            Every Tassy service works à la carte. VIP Concierge has four flat tiers from $185–$695. Tassy Care
             is Medicaid-covered for eligible patients or flat-rate private. Winnie/Wellness/Guardian priced per ride.
           </p>
           <div className="mt-8 flex justify-center gap-3 flex-wrap">

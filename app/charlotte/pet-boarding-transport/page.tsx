@@ -1,14 +1,15 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Pet Boarding Pickup & Drop-Off in Charlotte NC | Tassy',
+  title: 'Pet Boarding Pickup & Drop-Off in Charlotte NC',
   description:
     'Pet boarding pickup service in Charlotte NC. We drop your dog at the kennel before your flight and bring them home when you land. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/pet-boarding-transport' },
-  openGraph: { images: ['/og-image/pet-boarding-transport'] },
+  openGraph: { url: '/charlotte/pet-boarding-transport', images: ['/og-image/pet-boarding-transport'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-boarding' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 export default function PetBoardingTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/pet-boarding-transport"
       primaryKeyword="pet boarding pickup service"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -50,9 +52,9 @@ export default function PetBoardingTransportPage() {
                 common trips we drive. Your dog gets to the facility on time, you
                 make your flight, and nobody owes anybody a favor. For the full
                 picture of what we drive, start with our{' '}
-                <a href="/charlotte/pet-transport" className={linkCls}>
+                <Link href="/charlotte/pet-transport" className={linkCls}>
                   Charlotte pet transport page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -78,9 +80,9 @@ export default function PetBoardingTransportPage() {
                 stretch, with B2C subscriptions from $39/mo for families who run
                 these trips regularly. And if your traveling pet also needs a
                 bath before you get back, our{' '}
-                <a href="/charlotte/dog-grooming-pickup" className={linkCls}>
+                <Link href="/charlotte/dog-grooming-pickup" className={linkCls}>
                   dog grooming pickup service
-                </a>{' '}
+                </Link>{' '}
                 runs on the same model.
               </p>
             </>
@@ -106,9 +108,9 @@ export default function PetBoardingTransportPage() {
                 stops. Winnie Ride is a direct relationship with one Charlotte
                 company, not a marketplace listing — the same trained team every
                 time, and rides for nervous travelers are covered on our{' '}
-                <a href="/charlotte/vet-appointment-rides" className={linkCls}>
+                <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides page
-                </a>{' '}
+                </Link>{' '}
                 too, if your trip includes a pre-boarding checkup.
               </p>
             </>
@@ -131,9 +133,9 @@ export default function PetBoardingTransportPage() {
                 Partner facilities get access to our facility portal with net-30
                 invoicing, so transport you arrange on a client&rsquo;s behalf is
                 billed cleanly instead of handled ride by ride. Start at our{' '}
-                <a href="/partners/veterinary" className={linkCls}>
+                <Link href="/partners/veterinary" className={linkCls}>
                   partnership page
-                </a>{' '}
+                </Link>{' '}
                 or email{' '}
                 <a href="mailto:book@tassytrucks.com" className={linkCls}>
                   book@tassytrucks.com
@@ -155,9 +157,9 @@ export default function PetBoardingTransportPage() {
               County, plus Matthews, Huntersville, and Concord — and if your
               kennel sits just beyond that, call us and we&rsquo;ll quote it. For
               everything else Winnie Ride does, see the{' '}
-              <a href="/winnie" className={linkCls}>
+              <Link href="/winnie" className={linkCls}>
                 Winnie Ride overview
-              </a>
+              </Link>
               .
             </p>
           ),

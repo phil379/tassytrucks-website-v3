@@ -1,14 +1,15 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Rides to the Vet in Charlotte — Winnie Ride | Tassy',
+  title: 'Rides to the Vet in Charlotte — Winnie Ride',
   description:
     'Stuck at work during clinic hours? Winnie Ride picks up your pet, gets them to the vet, and brings them home. Charlotte NC. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/vet-appointment-rides' },
-  openGraph: { images: ['/og-image/vet-appointment-rides'] },
+  openGraph: { url: '/charlotte/vet-appointment-rides', images: ['/og-image/vet-appointment-rides'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-vet', purpose: 'vet' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 export default function VetAppointmentRidesPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/vet-appointment-rides"
       primaryKeyword="rides to the vet charlotte"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -53,9 +55,9 @@ export default function VetAppointmentRidesPage() {
                 Winnie Ride exists for exactly this gap. We pick up your pet from
                 home, get them to the clinic on time, and bring them home after —
                 you never leave your desk. It is{' '}
-                <a href="/charlotte/pet-transport" className={linkCls}>
+                <Link href="/charlotte/pet-transport" className={linkCls}>
                   professional pet transport
-                </a>{' '}
+                </Link>{' '}
                 from Tassy Transportation, a veteran-owned, Charlotte-based company
                 operating under USDOT #3104152 — not a stranger from an app with a
                 towel on the back seat.
@@ -130,14 +132,14 @@ export default function VetAppointmentRidesPage() {
                 Annual exams and vaccine boosters are the bread and butter, but vet
                 trips come in more flavors than that. If your dog or cat is coming
                 home after a procedure, our{' '}
-                <a href="/charlotte/post-surgery-pet-transport" className={linkCls}>
+                <Link href="/charlotte/post-surgery-pet-transport" className={linkCls}>
                   post-surgery pet transport
-                </a>{' '}
+                </Link>{' '}
                 handles the careful, sedation-aware ride home. If your pet panics
                 at the sight of a carrier, our{' '}
-                <a href="/charlotte/calm-pet-transport" className={linkCls}>
+                <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                   calm pet transport
-                </a>{' '}
+                </Link>{' '}
                 approach slows the whole trip down for them. We also provide
                 compassionate end-of-life transport — please call (704) 941-8508 to
                 discuss.
@@ -145,9 +147,9 @@ export default function VetAppointmentRidesPage() {
               <p>
                 Veterinary clinics: if no-shows from transportation problems are
                 eating your schedule, our{' '}
-                <a href="/partners/veterinary" className={linkCls}>
+                <Link href="/partners/veterinary" className={linkCls}>
                   veterinary partner program
-                </a>{' '}
+                </Link>{' '}
                 gives your front desk a transport option you can recommend by name.
               </p>
             </>
@@ -166,9 +168,9 @@ export default function VetAppointmentRidesPage() {
               <p>
                 If your pet has a standing rhythm of vet visits, grooming, or
                 daycare, a{' '}
-                <a href="/winnie" className={linkCls}>
+                <Link href="/winnie" className={linkCls}>
                   Winnie Ride subscription
-                </a>{' '}
+                </Link>{' '}
                 from $39/mo usually beats booking one ride at a time.
               </p>
               <p>

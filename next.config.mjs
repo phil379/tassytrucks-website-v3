@@ -2,8 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN — dropped the images.unsplash.com host:
+    // the hero no longer hotlinks Unsplash (now an on-brand CSS gradient) and no
+    // other asset references it, so the allowance was dead.
     remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'tassytrucksops.vercel.app' },
     ],
   },

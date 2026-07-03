@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Calm pet transport in Charlotte NC for anxious, fearful, and senior pets. Drivers matched to temperament, quiet climate-controlled rides. (704) 941-8508.',
   alternates: { canonical: '/charlotte/calm-pet-transport' },
-  openGraph: { images: ['/og-image/calm-pet-transport'] },
+  openGraph: { url: '/charlotte/calm-pet-transport', images: ['/og-image/calm-pet-transport'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-calm', temperament: 'anxious' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-winnie-sage underline-offset-2';
 export default function CalmPetTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/calm-pet-transport"
       primaryKeyword="calm pet transport charlotte"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -57,9 +59,9 @@ export default function CalmPetTransportPage() {
                 car with no pet handling training and no idea what your pet needs.
                 Winnie Ride is a direct relationship with a Charlotte-based,
                 veteran-owned carrier — our{' '}
-                <a href="/charlotte/pet-transport" className={linkCls}>
+                <Link href="/charlotte/pet-transport" className={linkCls}>
                   pet transport service
-                </a>{' '}
+                </Link>{' '}
                 runs on drivers trained in carrier handling and sedation-aware
                 protocols, with a signed owner liability waiver and vaccine
                 verification before every ride.
@@ -87,9 +89,9 @@ export default function CalmPetTransportPage() {
                 low-stress handling across clinics nationwide, and owners in
                 Charlotte increasingly expect that standard everywhere their pet
                 goes, including the ride to the appointment. Many of the{' '}
-                <a href="/charlotte/vet-appointment-rides" className={linkCls}>
+                <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides
-                </a>{' '}
+                </Link>{' '}
                 we run are for exactly these dogs.
               </p>
             </>
@@ -111,9 +113,9 @@ export default function CalmPetTransportPage() {
                 For families managing a senior pet&rsquo;s medical care — recheck
                 visits, lab work, or recovery after a procedure — calm transport
                 pairs naturally with our{' '}
-                <a href="/charlotte/post-surgery-pet-transport" className={linkCls}>
+                <Link href="/charlotte/post-surgery-pet-transport" className={linkCls}>
                   post-surgery pet transport
-                </a>
+                </Link>
                 , where drivers follow the discharge instructions you share at
                 booking.
               </p>
@@ -162,14 +164,14 @@ export default function CalmPetTransportPage() {
                 We ask for a 2-hour minimum lead time on routine rides, and we
                 serve all of Charlotte and Mecklenburg County plus Matthews,
                 Pineville, and Huntersville. If you ride with us regularly,{' '}
-                <a href="/winnie" className={linkCls}>
+                <Link href="/winnie" className={linkCls}>
                   Winnie Ride subscriptions
-                </a>{' '}
+                </Link>{' '}
                 start at $39/mo. Veterinary clinics looking for a calm-transport
                 partner can learn more on our{' '}
-                <a href="/partners/veterinary" className={linkCls}>
+                <Link href="/partners/veterinary" className={linkCls}>
                   veterinary partnership page
-                </a>
+                </Link>
                 .
               </p>
             </>

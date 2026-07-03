@@ -1,14 +1,15 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Post-Surgery Pet Transport Charlotte — Dog Pickup | Tassy',
+  title: 'Post-Surgery Pet Transport Charlotte — Dog Pickup',
   description:
     'Sedation-aware pet transport in Charlotte NC. Safe rides home after your dog or cat’s spay, neuter, or dental. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-pet-transport' },
-  openGraph: { images: ['/og-image/post-surgery-pet-transport'] },
+  openGraph: { url: '/charlotte/post-surgery-pet-transport', images: ['/og-image/post-surgery-pet-transport'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-postop', sedated: '1' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 export default function PostSurgeryPetTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/post-surgery-pet-transport"
       primaryKeyword="dog pickup after surgery"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -50,9 +52,9 @@ export default function PostSurgeryPetTransportPage() {
                 cover all of Charlotte and Mecklenburg County, plus Matthews,
                 Pineville, and Huntersville. For everyday trips that aren&rsquo;t
                 post-op, see our main{' '}
-                <a href="/charlotte/pet-transport" className={linkCls}>
+                <Link href="/charlotte/pet-transport" className={linkCls}>
                   Charlotte pet transport page
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -81,9 +83,9 @@ export default function PostSurgeryPetTransportPage() {
                 the core DAPP series for dogs and FVRCP for cats, consistent with
                 AVMA core-vaccine guidance. If your pet is healthy but simply
                 anxious in cars, our{' '}
-                <a href="/charlotte/calm-pet-transport" className={linkCls}>
+                <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                   calm pet transport page
-                </a>{' '}
+                </Link>{' '}
                 covers how we handle nervous riders.
               </p>
             </>
@@ -166,14 +168,14 @@ export default function PostSurgeryPetTransportPage() {
                 Routine rides need a 2-hour minimum lead time, so the moment the
                 clinic gives you a window is the moment to book. If your pet has
                 regular checkups ahead, our{' '}
-                <a href="/charlotte/vet-appointment-rides" className={linkCls}>
+                <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides
-                </a>{' '}
+                </Link>{' '}
                 handle the round trip — and clinics that want a standing transport
                 partner can start at our{' '}
-                <a href="/partners/veterinary" className={linkCls}>
+                <Link href="/partners/veterinary" className={linkCls}>
                   veterinary partnership page
-                </a>
+                </Link>
                 .
               </p>
             </>

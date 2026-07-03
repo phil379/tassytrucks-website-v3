@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Honest Charlotte pet transport comparison: vaccine checks, liability waivers, sedated pets, unaccompanied rides. Where rideshare works and where it does not.',
   alternates: { canonical: '/compare/winnie-vs-uber-pet-vs-lyft-pet' },
-  openGraph: { images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
+  openGraph: { url: '/compare/winnie-vs-uber-pet-vs-lyft-pet', images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-compare-pet' });
@@ -79,16 +80,16 @@ function ComparisonTable() {
           <table className="w-full min-w-[640px] text-sm border-collapse">
             <thead>
               <tr className="text-left border-b-2 border-[color:var(--ink)]">
-                <th className="py-3 pr-4 font-semibold"> </th>
-                <th className="py-3 pr-4 font-semibold">Winnie Ride</th>
-                <th className="py-3 pr-4 font-semibold">Uber Pet</th>
-                <th className="py-3 font-semibold">Lyft Pets</th>
+                <th scope="col" className="py-3 pr-4 font-semibold"> </th>
+                <th scope="col" className="py-3 pr-4 font-semibold">Winnie Ride</th>
+                <th scope="col" className="py-3 pr-4 font-semibold">Uber Pet</th>
+                <th scope="col" className="py-3 font-semibold">Lyft Pets</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
                 <tr key={r.label} className="border-b border-line align-top">
-                  <td className="py-3.5 pr-4 font-medium">{r.label}</td>
+                  <th scope="row" className="py-3.5 pr-4 font-medium">{r.label}</th>
                   <td className="py-3.5 pr-4 ink-soft">{r.winnie}</td>
                   <td className="py-3.5 pr-4 ink-soft">{r.uber}</td>
                   <td className="py-3.5 ink-soft">{r.lyft}</td>
@@ -105,6 +106,7 @@ function ComparisonTable() {
 export default function WinnieComparePage() {
   return (
     <LandingPageShell
+      canonicalPath="/compare/winnie-vs-uber-pet-vs-lyft-pet"
       primaryKeyword="winnie ride vs uber pet vs lyft pet"
       eyebrow="Comparison · Charlotte Pet Transport"
       heroIcon={<PawIcon />}
@@ -135,9 +137,9 @@ export default function WinnieComparePage() {
                 Trucks, is built for exactly that gap: we pick your pet up, drive
                 them where they need to go, and send you a photo at pickup so you
                 know they&rsquo;re safe. See{' '}
-                <a href="/charlotte/pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
+                <Link href="/charlotte/pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   how our pet transport works
-                </a>
+                </Link>
                 .
               </p>
             </>
@@ -174,13 +176,13 @@ export default function WinnieComparePage() {
                 liability waiver that protects both sides — the platforms have no
                 pet-specific equivalent. Our drivers are trained on carrier handling
                 and sedation-aware protocols, which matters enormously for{' '}
-                <a href="/charlotte/post-surgery-pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
+                <Link href="/charlotte/post-surgery-pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   post-surgery pickups
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a href="/charlotte/calm-pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
+                <Link href="/charlotte/calm-pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   anxious or reactive pets
-                </a>{' '}
+                </Link>{' '}
                 a rideshare driver can simply cancel on.
               </p>
               <p>
@@ -205,9 +207,9 @@ export default function WinnieComparePage() {
                 grooming appointment you can&rsquo;t make, is recovering from a
                 procedure, is anxious, reactive, or senior, or needs a standing
                 weekly ride. For veterinary clinics and boarding facilities, our{' '}
-                <a href="/partners/veterinary" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
+                <Link href="/partners/veterinary" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   partnership program
-                </a>{' '}
+                </Link>{' '}
                 adds referral codes and net-30 billing.
               </p>
             </>

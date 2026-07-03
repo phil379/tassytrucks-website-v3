@@ -1,14 +1,15 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoBook } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
-  title: 'Pet Transport in Charlotte NC — Winnie Ride | Tassy',
+  title: 'Pet Transport in Charlotte NC — Winnie Ride',
   description:
     'Professional pet transport in Charlotte NC. Vaccine-verified rides to the vet, groomer, and boarding. Veteran-owned. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/pet-transport' },
-  openGraph: { images: ['/og-image/pet-transport'] },
+  openGraph: { url: '/charlotte/pet-transport', images: ['/og-image/pet-transport'] },
 };
 
 const CTA_HREF = seoBook('winnie', { source: 'seo-pet' });
@@ -18,6 +19,7 @@ const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 export default function PetTransportPage() {
   return (
     <LandingPageShell
+      canonicalPath="/charlotte/pet-transport"
       primaryKeyword="pet transport charlotte nc"
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
@@ -121,9 +123,9 @@ export default function PetTransportPage() {
               <p>
                 <strong>Vet appointments.</strong> You are at work, the clinic
                 closes at 5, and your dog needs to be seen. Our{' '}
-                <a href="/charlotte/vet-appointment-rides" className={linkCls}>
+                <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   rides to the vet
-                </a>{' '}
+                </Link>{' '}
                 handle pickup, drop-off, clinic coordination, and the trip home —
                 without you burning PTO.
               </p>
@@ -131,32 +133,32 @@ export default function PetTransportPage() {
                 <strong>After surgery.</strong> A pet coming out of anesthesia
                 needs a quiet, careful, sedation-aware ride home. That is exactly
                 what our{' '}
-                <a href="/charlotte/post-surgery-pet-transport" className={linkCls}>
+                <Link href="/charlotte/post-surgery-pet-transport" className={linkCls}>
                   post-surgery pet transport
-                </a>{' '}
+                </Link>{' '}
                 is built for.
               </p>
               <p>
                 <strong>Boarding and daycare.</strong> Heading to the airport at 6
                 a.m.? Our{' '}
-                <a href="/charlotte/pet-boarding-transport" className={linkCls}>
+                <Link href="/charlotte/pet-boarding-transport" className={linkCls}>
                   pet boarding transport
-                </a>{' '}
+                </Link>{' '}
                 gets your dog or cat checked in — and picked up when you land.
               </p>
               <p>
                 <strong>Anxious riders.</strong> Some pets shake the moment the
                 carrier comes out. Our{' '}
-                <a href="/charlotte/calm-pet-transport" className={linkCls}>
+                <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                   calm pet transport
-                </a>{' '}
+                </Link>{' '}
                 approach slows everything down for pets who need a gentler trip.
               </p>
               <p>
                 <strong>Grooming day.</strong> With{' '}
-                <a href="/charlotte/dog-grooming-pickup" className={linkCls}>
+                <Link href="/charlotte/dog-grooming-pickup" className={linkCls}>
                   dog grooming pickup
-                </a>
+                </Link>
                 , your dog goes out scruffy and comes home fresh while you get on
                 with your day.
               </p>
@@ -177,9 +179,9 @@ export default function PetTransportPage() {
               </p>
               <p>
                 Our{' '}
-                <a href="/partners/veterinary" className={linkCls}>
+                <Link href="/partners/veterinary" className={linkCls}>
                   veterinary partner program
-                </a>{' '}
+                </Link>{' '}
                 covers how referrals, scheduling, and coordination work for
                 practices, groomers, and boarding facilities. One conversation, and
                 your clients have a transport option you can vouch for.
@@ -207,9 +209,9 @@ export default function PetTransportPage() {
               <p>
                 If your pet rides regularly — weekly grooming, recurring vet
                 visits, daycare — a{' '}
-                <a href="/winnie" className={linkCls}>
+                <Link href="/winnie" className={linkCls}>
                   Winnie Ride subscription
-                </a>{' '}
+                </Link>{' '}
                 starting at $39/mo is usually the smarter math than booking trip by
                 trip.
               </p>

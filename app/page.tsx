@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Check } from 'lucide-react';
+import {
+  ArrowRight, Check,
+  HeartPulse, Sparkles, PawPrint, Droplets, Shield, GraduationCap,
+  type LucideIcon,
+} from 'lucide-react';
 import { book, contact, apply } from '@/lib/saas-links';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
@@ -20,48 +24,50 @@ type Vertical = {
   cta: string;
   /** Booking deep-link. Omitted for capability-only lines (School has no booking flow). */
   bookHref?: string;
-  /** Monogram override — default is first letter of name. */
-  monogram?: string;
+  /** FIX_PROD_132 — semantic Lucide icon (replaces the placeholder letter chip). */
+  Icon: LucideIcon;
+  /** FIX_PROD_132 — per-service one-shot hover animation class (see globals.css). */
+  anim: string;
 };
 
 const verticals: Vertical[] = [
   {
-    slug: '/nemt', name: 'Tassy Care', monogram: 'C',
+    slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
     blurb: 'Non-emergency medical transport for dialysis, recurring appointments, doctor visits, and Medicaid-covered care.',
     bullets: ['ADA compliant', 'Broker partners accepted'],
     cta: 'Book Tassy Care trip',
     bookHref: book.nemt,
   },
   {
-    slug: '/vip', name: 'VIP Concierge',
+    slug: '/vip', name: 'VIP Concierge', Icon: Sparkles, anim: 'svc-anim--spark',
     blurb: 'Discreet, professional post-procedure transport. Driver arrives early, waits on-site, brings you home safely.',
     bullets: ['Female drivers on request', 'HIPAA-aware, judgment-free'],
     cta: 'Book VIP trip',
     bookHref: book.vip,
   },
   {
-    slug: '/winnie', name: 'Winnie Ride',
+    slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
     blurb: 'Vet visits, grooming pickups, doggy daycare runs. Trained drivers, climate-controlled vehicles, GPS tracking.',
     bullets: ['Photo + chip verification', 'Owner gets real-time updates'],
     cta: 'Book a Winnie Ride',
     bookHref: book.winnie,
   },
   {
-    slug: '/renew', name: 'Tassy Wellness', monogram: 'W',
+    slug: '/renew', name: 'Tassy Wellness', Icon: Droplets, anim: 'svc-anim--drip',
     blurb: 'Wellness transport — IV therapy, med-spa, cosmetic dental, rejuvenation. Hydration kit on every ride.',
     bullets: ['Premium fleet', 'Med-spa partnerships'],
     cta: 'Book a Wellness trip',
     bookHref: book.renew,
   },
   {
-    slug: '/recover', name: 'Tassy Guardian', monogram: 'G',
+    slug: '/recover', name: 'Tassy Guardian', Icon: Shield, anim: 'svc-anim--shield',
     blurb: 'Oncology, chemo, radiation, hospital discharge. CNA-trained drivers. Quiet, equipped cabin.',
     bullets: ['CNA-trained drivers', 'Recovery amenity kit'],
     cta: 'Book Guardian transport',
     bookHref: book.recover,
   },
   {
-    slug: '/school', name: 'Tassy Scholar', monogram: 'S',
+    slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
     blurb: 'Alternative student transportation since 2022 — originally with Alternative School Transportation, continuing today with EverDriven Technologies after their 2023 rebrand. Special needs, McKinney-Vento, foster youth, and at-risk student routes.',
     bullets: [
       'Subcontractor since 2022 · EverDriven Technologies (formerly Alternative School Transportation)',
@@ -193,11 +199,15 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {verticals.map((v) => (
               <Link key={v.slug} href={v.slug} className="card-tile group">
-                <div className="w-12 h-12 rounded-xl bg-ink flex items-center justify-center mb-6">
-                  <span className="serif text-[color:var(--gold)] text-xl font-bold">
-                    {v.monogram ?? v.name.charAt(0)}
-                  </span>
-                </div>
+                {/* FIX_PROD_132 — bare semantic icon + hairline gold accent (was a
+                    placeholder letter chip). Per-service one-shot hover animation. */}
+                <v.Icon
+                  size={32}
+                  strokeWidth={1.75}
+                  className={`text-[color:var(--gold)] svc-icon ${v.anim}`}
+                  aria-hidden="true"
+                />
+                <div className={`svc-underline mt-6 mb-6 ${v.anim}-line`} />
                 <div className="eyebrow">Service line</div>
                 <h3 className="serif text-xl font-semibold mt-1 mb-3">{v.name}</h3>
                 <p className="ink-soft text-sm leading-relaxed mb-5 flex-grow">{v.blurb}</p>

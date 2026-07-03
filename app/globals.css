@@ -216,3 +216,34 @@ body {
     url('https://images.unsplash.com/photo-1559076610-c1e5cfb37b65?auto=format&fit=crop&w=1400&q=80');
   background-size: cover; background-position: center;
 }
+
+/* ─── FIX_PROD_132 · Service-line icon system ─────────────────────────────── */
+/* Hairline gold accent under each service icon (replaces the letter-chip block). */
+.svc-underline {
+  width: 24px;
+  height: 1px;
+  background: var(--gold);
+  transition: width 200ms ease-out;
+}
+.card-tile:hover .svc-underline { width: 40px; }
+
+/* Per-service one-shot hover micro-motion (runs once, no infinite loop). */
+.svc-icon { transition: transform 200ms ease-out; transform-origin: center; will-change: transform; }
+.card-tile:hover .svc-anim--heart  { animation: svcHeart 1.4s ease-in-out; }
+.card-tile:hover .svc-anim--spark  { animation: svcSpark 800ms ease-in-out; }
+.card-tile:hover .svc-anim--paw    { animation: svcPaw 600ms ease-in-out; }
+.card-tile:hover .svc-anim--drip   { animation: svcDrip 700ms ease-in-out; }
+.card-tile:hover .svc-anim--shield { animation: svcShield 700ms ease-in-out; }
+.card-tile:hover .svc-anim--cap    { animation: svcCap 600ms ease-in-out; }
+
+@keyframes svcHeart  { 0%,100% { opacity: 0.7; } 20%,60% { opacity: 1; transform: scale(1.06); } }
+@keyframes svcSpark  { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(15deg); } }
+@keyframes svcPaw    { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-2px); } }
+@keyframes svcDrip   { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-2px); } }
+@keyframes svcShield { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes svcCap    { 0% { transform: rotate(-5deg); } 60%,100% { transform: rotate(0deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tile:hover .svc-icon { animation: none !important; }
+  .svc-underline, .card-tile:hover .svc-underline { transition: none; width: 24px; }
+}

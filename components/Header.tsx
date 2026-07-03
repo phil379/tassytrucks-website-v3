@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { ArrowRight, ChevronDown, Phone } from 'lucide-react';
 import { portal, contact, book } from '@/lib/saas-links';
 
+// FIX_PROD_131 — nav trimmed 8→6 visible items: "How it works" moved into the
+// Services dropdown (below) so the top bar stays calm.
 const nav = [
-  { href: '/#how', label: 'How it works' },
-  { href: '/partners', label: 'Partners' },
   { href: '/pricing', label: 'Pricing' },
+  { href: '/partners', label: 'Partners' },
   { href: '/#founder', label: 'About' },
 ];
 
@@ -50,8 +51,9 @@ export default function Header() {
           <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-11 w-11 shrink-0" />
           <div>
             <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
-            <div className="text-[10px] tracking-eyebrow uppercase ink-mute mt-1">
-              Premium Transport · Veteran-Owned
+            {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline */}
+            <div className="serif italic text-[11px] mt-1" style={{ color: 'var(--gold)' }}>
+              We Transport With Care.
             </div>
           </div>
         </Link>
@@ -63,21 +65,30 @@ export default function Header() {
               Services <ChevronDown size={13} className="mt-0.5" />
             </Link>
             <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 hidden group-hover:block group-focus-within:block z-40">
-              <div className="bg-surface border border-line rounded-card shadow-[0_16px_40px_-16px_rgba(27,26,23,0.25)] p-6 grid grid-cols-2 gap-8 w-[34rem]">
-                {servicesMenu.map((col) => (
-                  <div key={col.heading}>
-                    <div className="eyebrow !text-[10px]">{col.heading}</div>
-                    <ul className="mt-3 space-y-2">
-                      {col.links.map((l) => (
-                        <li key={l.href}>
-                          <Link href={l.href} className="nav-link text-sm block">
-                            {l.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+              <div className="bg-surface border border-line rounded-card shadow-[0_16px_40px_-16px_rgba(27,26,23,0.25)] p-6 w-[34rem]">
+                <div className="grid grid-cols-2 gap-8">
+                  {servicesMenu.map((col) => (
+                    <div key={col.heading}>
+                      <div className="eyebrow !text-[10px]">{col.heading}</div>
+                      <ul className="mt-3 space-y-2">
+                        {col.links.map((l) => (
+                          <li key={l.href}>
+                            <Link href={l.href} className="nav-link text-sm block">
+                              {l.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                {/* FIX_PROD_131 — "How it works" relocated here from the top nav */}
+                <Link
+                  href="/#how"
+                  className="nav-link text-sm inline-flex items-center gap-1 mt-6 pt-4 border-t border-line w-full"
+                >
+                  How it works <ChevronDown size={13} className="-rotate-90 mt-0.5" />
+                </Link>
               </div>
             </div>
           </div>

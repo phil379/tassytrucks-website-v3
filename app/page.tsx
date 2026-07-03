@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Check, Phone } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { book, contact, apply } from '@/lib/saas-links';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
@@ -83,36 +83,40 @@ export default function HomePage() {
               <span>Veteran-Owned · SDVOSB Certified · Charlotte, NC</span>
             </div>
 
+            {/* FIX_PROD_131 — motto elevated to the hero (Issue 2/6); one primary +
+                one calm secondary CTA (Issue 3); phone lives in the nav. */}
             <h1 className="h-display">
-              Reliable rides.<br />
-              <span className="serif italic font-normal gold-text">White-glove</span> care.
+              We Transport<br />
+              <span className="serif italic font-normal gold-text">With Care.</span>
             </h1>
 
             <p className="mt-7 text-lg lg:text-xl ink-soft leading-relaxed max-w-xl">
-              From hospital discharges to post-procedure concierge transport, Tassy moves the people
-              who matter to you with discretion, dignity, and Army-grade reliability.
+              Premium medical, wellness, pet, and school transport across Charlotte —
+              veteran-owned, SDVOSB certified, HIPAA-compliant.
             </p>
 
-            <div className="mt-9 flex flex-wrap gap-3">
+            <div className="mt-9 flex flex-wrap items-center gap-5">
               <a href={book.ride} className="btn-gold">
                 Book a Ride <ArrowRight size={16} />
               </a>
-              <a href={contact.phone} className="btn-call">
-                <Phone size={16} /> Call {contact.phoneDisplay}
-              </a>
+              <Link href="/#services" className="nav-link inline-flex items-center gap-1.5 text-base">
+                Explore our services <ArrowRight size={15} />
+              </Link>
             </div>
 
             <p className="mt-4 text-xs ink-mute flex items-center gap-2">
               <span className="dot" /> Dispatchers online now · Avg. response 8 min
             </p>
 
-            {/* Trust strip */}
+            {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
+                removed from the hero (those specific claims are pending Phil's
+                verification, task #222); credentials shown here are all documentable. */}
             <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
               {[
-                ['15,000+', 'Rides since 2021'],
-                ['4.9 ★',   'Google rating'],
-                ['HIPAA',   'PHI-compliant'],
                 ['SDVOSB',  'VA-eligible'],
+                ['HIPAA',   'PHI-compliant'],
+                ['USDOT',   '#3104152'],
+                ['Veteran', 'Owned & operated'],
               ].map(([num, label]) => (
                 <div key={label}>
                   <div className="serif text-3xl font-semibold">{num}</div>
@@ -293,8 +297,10 @@ export default function HomePage() {
             <h2 className="h-section">
               Trusted by Charlotte families<br />&amp; healthcare teams.
             </h2>
+            {/* FIX_PROD_131 — unverified "4.9★ / 15,000+ rides" line removed pending
+                Phil's verification (task #222); replaced with a documentable line. */}
             <p className="text-sm ink-mute mt-4">
-              4.9 ★ on Google · 15,000+ rides completed since 2021
+              Veteran-owned · SDVOSB certified · Serving Charlotte &amp; the Carolinas
             </p>
           </div>
 
@@ -351,12 +357,14 @@ export default function HomePage() {
         <div className="container-x py-24 text-center">
           <h2 className="h-section">Ready when you are.</h2>
           <p className="mt-4 ink-soft max-w-xl mx-auto">
-            Book a one-time ride, set up a subscription, or partner with us as a facility.
+            Book a one-time ride or set up a recurring subscription — upfront pricing, no surge, no booking fees.
           </p>
-          <div className="mt-8 flex justify-center gap-3 flex-wrap">
+          {/* FIX_PROD_131 — one primary + one calm secondary (was 3 equal buttons) */}
+          <div className="mt-8 flex justify-center items-center gap-5 flex-wrap">
             <a href={book.ride} className="btn-gold">Book a Ride <ArrowRight size={16} /></a>
-            <Link href="/pricing" className="btn-primary">See subscriptions</Link>
-            <Link href="/#services" className="btn-ghost">Explore services</Link>
+            <Link href="/pricing" className="nav-link inline-flex items-center gap-1.5 text-base">
+              See subscription pricing <ArrowRight size={15} />
+            </Link>
           </div>
         </div>
       </section>

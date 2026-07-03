@@ -348,11 +348,27 @@ export default function HomePage() {
             <h2 className="h-section">
               Built by a veteran.<br />Held to a higher standard.
             </h2>
-            <p className="mt-6 ink-soft text-lg leading-relaxed">
-              Phil Tassy founded Tassy Transportation after years serving in the U.S. Army, where reliability
-              wasn&apos;t a feature — it was the standard. Today, Tassy is an SDVOSB-certified
-              transportation company headquartered in Charlotte, North Carolina, moving the people
-              who need to get somewhere — safely, on time, every time.
+            {/* FIX_PROD_138 — authoritative founder bio (Phil-provided, verbatim). */}
+            <p className="mt-6 ink-soft text-lg leading-relaxed max-w-2xl">
+              Philippe &ldquo;Phil&rdquo; Tassy didn&rsquo;t take the easy road to get here &mdash; and that&rsquo;s
+              exactly what makes Tassy Transportation different.
+            </p>
+            <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
+              Born and raised in Cameroon, Phil came to the U.S. to pursue his education,
+              earning his Master&rsquo;s before enlisting in the U.S. Army. There, he spent over
+              six years mastering logistics, strategic planning, and supply chain
+              management. His story embodies what America is built on.
+            </p>
+            <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
+              Today, Phil leads Tassy Transportation in Charlotte, NC &mdash; a mission-driven
+              company providing veterans, families, and those in need with dignified,
+              reliable medical transport through NEMT, luxury private rides, and
+              specialized services. Every ride reflects our Army values: on time,
+              compliant, and caring. We partner with hospitals, VA centers, and insurance
+              brokers to serve hundreds of clients monthly.
+            </p>
+            <p className="mt-5 serif italic text-lg max-w-2xl" style={{ color: 'var(--gold)' }}>
+              Community-focused and here to serve those who need us most.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/pricing" className="btn-primary">See pricing</Link>

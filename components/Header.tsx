@@ -47,15 +47,15 @@ export default function Header() {
     <header className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
       <div className="container-x py-4 flex items-center justify-between">
         <Link href="/" aria-label="Tassy Transportation home" className="flex items-center gap-3">
-          {/* FIX_PROD_137 — enlarged (44→56→64px) + framed to rhyme with the founder
-              photo tile (same rounded-tile · border-line · overflow-hidden · object-cover).
-              Was 44px unframed on the dark header, so the mark "couldn't be seen". */}
-          <span className="block shrink-0 h-11 w-11 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-tile border border-line overflow-hidden transition-all duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
+          {/* FIX_PROD_137b — doubled again per Phil (was 44/56/64 → now 88/112/128px);
+              framed to rhyme with the founder photo tile (rounded-tile · border-line ·
+              overflow-hidden · object-cover). */}
+          <span className="block shrink-0 h-[88px] w-[88px] md:h-28 md:w-28 lg:h-32 lg:w-32 rounded-tile border border-line overflow-hidden transition-all duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
             <img
               src="/brand/logo-cream.svg"
               alt="Tassy Transportation — veteran-owned premium transport in Charlotte NC"
-              width={64}
-              height={64}
+              width={128}
+              height={128}
               className="w-full h-full object-cover"
             />
           </span>

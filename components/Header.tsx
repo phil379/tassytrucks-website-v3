@@ -46,13 +46,24 @@ export default function Header() {
   return (
     <header className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
       <div className="container-x py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          {/* FIX_PROD_038 — real Tassy logo (cream, for the dark header). */}
-          <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-11 w-11 shrink-0" />
+        <Link href="/" aria-label="Tassy Transportation home" className="flex items-center gap-3">
+          {/* FIX_PROD_137 — enlarged (44→56→64px) + framed to rhyme with the founder
+              photo tile (same rounded-tile · border-line · overflow-hidden · object-cover).
+              Was 44px unframed on the dark header, so the mark "couldn't be seen". */}
+          <span className="block shrink-0 h-11 w-11 md:h-14 md:w-14 lg:h-16 lg:w-16 rounded-tile border border-line overflow-hidden transition-all duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
+            <img
+              src="/brand/logo-cream.svg"
+              alt="Tassy Transportation — veteran-owned premium transport in Charlotte NC"
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+            />
+          </span>
           <div>
             <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
-            {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline */}
-            <div className="serif italic text-[11px] mt-1" style={{ color: 'var(--gold)' }}>
+            {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline.
+                FIX_PROD_137 — nudged up on desktop to balance the enlarged logo. */}
+            <div className="serif italic text-[11px] lg:text-[13px] mt-1" style={{ color: 'var(--gold)' }}>
               We Transport With Care.
             </div>
           </div>

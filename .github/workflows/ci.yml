@@ -38,8 +38,18 @@ jobs:
       - name: Install Playwright browser
         run: bunx playwright install --with-deps chromium
 
-      - name: Smoke suite (18 SEO routes)
+      # testDir is ./playwright, so this covers the 29-route smoke suite and the
+      # trip-request specs in playwright/request/.
+      #
+      # The two DB-backed request specs skip themselves when these secrets are
+      # absent (forks, and any run without the tassy-ops credentials). Add
+      # SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY as repository secrets to turn
+      # them on — they insert and read real rows in the tassy-ops project.
+      - name: Smoke suite (29 routes) + trip-request specs
         run: bunx playwright test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Upload failure screenshots
         if: failure()

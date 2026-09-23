@@ -15,24 +15,24 @@ type PageSpec = {
 const PAGES: PageSpec[] = [
   // MEGA_SEO_001
   { path: '/partners', h1: 'partner with tassy transportation', cta: ['facility/signup', 'source=partners-page'] },
-  { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['book/nemt', 'source=seo-nemt'] },
-  { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['book/nemt', 'source=seo-dialysis', 'recurring=1'] },
-  { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['book/vip', 'source=seo-postop', 'tier=recovery'] },
-  { path: '/charlotte/wheelchair-transport', h1: 'wheelchair transport in charlotte', cta: ['book/nemt', 'source=seo-wc', 'mobility=wheelchair'] },
-  { path: '/charlotte/veteran-transport', h1: 'veteran medical transport in charlotte', cta: ['book/nemt', 'source=seo-veteran', 'payer=va'] },
-  { path: '/charlotte/concierge-medical-transport', h1: 'concierge medical transport in charlotte', cta: ['book/vip', 'source=seo-concierge'] },
-  { path: '/charlotte/best-nemt-providers', h1: 'best nemt providers in charlotte', cta: ['book/nemt', 'source=seo-best'] },
-  { path: '/charlotte/family-medical-rides', h1: 'book a medical ride for someone else', cta: ['book/nemt', 'source=seo-family'] },
-  { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['book/nemt', 'source=seo-compare'], table: true },
+  { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['service=care', 'utm_source=seo-nemt'] },
+  { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['service=care', 'utm_source=seo-dialysis', 'recurring=1'] },
+  { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['service=recovery', 'utm_source=seo-postop', 'tier=recovery'] },
+  { path: '/charlotte/wheelchair-transport', h1: 'wheelchair transport in charlotte', cta: ['service=care', 'utm_source=seo-wc', 'mobility=wheelchair'] },
+  { path: '/charlotte/veteran-transport', h1: 'veteran medical transport in charlotte', cta: ['service=care', 'utm_source=seo-veteran', 'payer=va'] },
+  { path: '/charlotte/concierge-medical-transport', h1: 'concierge medical transport in charlotte', cta: ['service=recovery', 'utm_source=seo-concierge'] },
+  { path: '/charlotte/best-nemt-providers', h1: 'best nemt providers in charlotte', cta: ['service=care', 'utm_source=seo-best'] },
+  { path: '/charlotte/family-medical-rides', h1: 'book a medical ride for someone else', cta: ['service=care', 'utm_source=seo-family'] },
+  { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['service=care', 'utm_source=seo-compare'], table: true },
   // MEGA_SEO_002
   { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
-  { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['book/winnie', 'source=seo-pet'], winnie: true },
-  { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['book/winnie', 'source=seo-vet', 'purpose=vet'], winnie: true },
-  { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['book/winnie', 'source=seo-postop', 'sedated=1'], winnie: true },
-  { path: '/charlotte/pet-boarding-transport', h1: 'pet boarding', cta: ['book/winnie', 'source=seo-boarding'], winnie: true },
-  { path: '/charlotte/calm-pet-transport', h1: 'calm pet transport in charlotte', cta: ['book/winnie', 'source=seo-calm', 'temperament=anxious'], winnie: true },
-  { path: '/charlotte/dog-grooming-pickup', h1: 'dog grooming pickup service in charlotte', cta: ['book/winnie', 'source=seo-grooming'], winnie: true },
-  { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', h1: 'uber pet', cta: ['book/winnie', 'source=seo-compare-pet'], winnie: true, table: true },
+  { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-pet'], winnie: true },
+  { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['service=pet', 'utm_source=seo-vet', 'purpose=vet'], winnie: true },
+  { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-postop', 'sedated=1'], winnie: true },
+  { path: '/charlotte/pet-boarding-transport', h1: 'pet boarding', cta: ['service=pet', 'utm_source=seo-boarding'], winnie: true },
+  { path: '/charlotte/calm-pet-transport', h1: 'calm pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-calm', 'temperament=anxious'], winnie: true },
+  { path: '/charlotte/dog-grooming-pickup', h1: 'dog grooming pickup service in charlotte', cta: ['service=pet', 'utm_source=seo-grooming'], winnie: true },
+  { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', h1: 'uber pet', cta: ['service=pet', 'utm_source=seo-compare-pet'], winnie: true, table: true },
 ];
 
 test.beforeAll(() => {
@@ -80,7 +80,15 @@ for (const spec of PAGES) {
       const href = await page
         .locator('[data-testid="primary-cta"]')
         .getAttribute('href');
-      expect(href).toContain('https://tassytrucksops.vercel.app');
+      // Ride CTAs now point at the in-repo request pipeline. The B2B facility
+      // CTAs still deep-link into the SaaS signup, which is unchanged.
+      const isRideCta = (href ?? '').startsWith('/request');
+      const isFacilityCta = (href ?? '').includes('tassytrucksops.vercel.app/facility/signup');
+      expect(
+        isRideCta || isFacilityCta,
+        `CTA is a /request link or a facility signup link — got ${href}`,
+      ).toBe(true);
+
       for (const fragment of spec.cta) {
         expect(href, `CTA contains ${fragment}`).toContain(fragment);
       }

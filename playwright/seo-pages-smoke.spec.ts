@@ -186,3 +186,104 @@ test('internal links between new pages resolve (no 404)', async ({ page, request
     }
   }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FIX_PROD_143 — the 11 routes that had ZERO assertions.
+// The 18 specs above cover the SEO clusters; these are the service hubs, the
+// pricing page, /school and the three legal pages. Same file, same conventions
+// as PageSpec above — these pages are built from ServicePage/bespoke layouts
+// rather than LandingPageShell, so they carry no [data-testid="primary-cta"]
+// and no Service+FAQPage JSON-LD, and are asserted on what they do guarantee.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const BASE = 'https://www.tassytrucks.com';
+
+type CorePageSpec = {
+  path: string;
+  /** false for the legal pages: they carry only the global header/footer CTAs. */
+  bodyCta: boolean;
+};
+
+const CORE_PAGES: CorePageSpec[] = [
+  { path: '/', bodyCta: true },
+  { path: '/nemt', bodyCta: true },
+  { path: '/vip', bodyCta: true },
+  { path: '/winnie', bodyCta: true },
+  { path: '/renew', bodyCta: true },
+  { path: '/recover', bodyCta: true },
+  { path: '/pricing', bodyCta: true },
+  { path: '/school', bodyCta: true },
+  { path: '/privacy', bodyCta: false },
+  { path: '/terms', bodyCta: false },
+  { path: '/accessibility', bodyCta: false },
+];
+
+for (const spec of CORE_PAGES) {
+  test.describe(spec.path, () => {
+    test('core checks: status, single h1, canonical, description, CTA attribution', async ({ page }) => {
+      const res = await page.goto(spec.path);
+      expect(res?.status(), 'status 200').toBe(200);
+
+      // Exactly one h1, and it is not empty.
+      await expect(page.locator('h1'), 'exactly one h1').toHaveCount(1);
+      const h1 = (await page.locator('h1').textContent())?.trim();
+      expect(h1, 'h1 is not empty').toBeTruthy();
+
+      // Canonical is present and points at this exact route.
+      const canonical = await page
+        .locator('link[rel="canonical"]')
+        .getAttribute('href');
+      expect(canonical, 'canonical present').toBeTruthy();
+      expect(canonical, 'canonical matches route').toBe(
+        spec.path === '/' ? BASE : `${BASE}${spec.path}`,
+      );
+
+      // Non-empty meta description.
+      const desc = await page
+        .locator('meta[name="description"]')
+        .getAttribute('content');
+      expect(desc, 'meta description present').toBeTruthy();
+      expect(desc!.trim().length, 'meta description is not blank').toBeGreaterThan(0);
+
+      // Every in-body SaaS deep-link must carry marketing attribution. Header and
+      // footer are excluded: they are audited globally by scripts/audit-saas-links.ts.
+      if (spec.bodyCta) {
+        const unattributed = await page.evaluate(() => {
+          const inChrome = (el: Element) =>
+            !!el.closest('header') || !!el.closest('footer');
+          return (
+            Array.from(
+              document.querySelectorAll('a[href*="tassytrucksops.vercel.app"]'),
+            ) as HTMLAnchorElement[]
+          )
+            .filter((a) => !inChrome(a) && !a.href.includes('source='))
+            .map((a) => a.getAttribute('href') ?? '');
+        });
+        expect(unattributed, 'every in-body SaaS CTA carries source=').toEqual([]);
+
+        const ctaCount = await page
+          .locator('main a[href*="tassytrucksops.vercel.app"]')
+          .count();
+        expect(ctaCount, 'has at least one in-body SaaS CTA').toBeGreaterThan(0);
+      }
+    });
+  });
+}
+
+test('all 29 routes have a unique <title>', async ({ page }) => {
+  const paths = [...PAGES.map((p) => p.path), ...CORE_PAGES.map((p) => p.path)];
+  expect(paths.length, 'covers all 29 static routes').toBe(29);
+  expect(new Set(paths).size, 'no duplicate paths in the suite').toBe(29);
+
+  const seen = new Map<string, string>();
+  for (const p of paths) {
+    await page.goto(p);
+    const title = (await page.title()).trim();
+    expect(title, `${p} has a non-empty <title>`).toBeTruthy();
+    expect(
+      seen.has(title),
+      `duplicate <title> "${title}" on ${p} and ${seen.get(title)}`,
+    ).toBe(false);
+    seen.set(title, p);
+  }
+});

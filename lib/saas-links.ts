@@ -33,8 +33,12 @@ export const book = {
 
 /** FIX_PROD_020 self-serve facility magic-link signup. `?type=` is an optional hint
  *  (hospital / veterinary / clinic / school) the signup form can read. */
+/** FIX_PROD_143 — routed through src() so the B2B facility funnel carries the same
+ *  `source=web` attribution as every booking CTA. It previously emitted only
+ *  `?type=...`, so the four in-body facility CTAs (/nemt, /winnie, /renew, /recover)
+ *  landed unattributed. */
 export const facilitySignup = (type?: string) =>
-  type ? `${SAAS_BASE}/facility/signup?type=${encodeURIComponent(type)}` : `${SAAS_BASE}/facility/signup`;
+  type ? src('/facility/signup', { type }) : src('/facility/signup');
 
 export const subscribe = {
   // VIP CAMO-style passes

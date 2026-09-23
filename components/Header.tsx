@@ -59,7 +59,13 @@ export default function Header() {
               className="w-full h-full object-cover"
             />
           </span>
-          <div>
+          {/* FIX_PROD_143 — hidden below sm. At 375px the row needed 398px inside a
+              327px content box (logo 88 + this block 136 + right cluster 162), giving
+              every page a 48px horizontal overflow. The logo stays at Phil's
+              FIX_PROD_137b size and the Book-a-Ride CTA stays visible; the wordmark is
+              already carried by the logo alt text + the Link aria-label, and returns
+              at >=640px where it fits. */}
+          <div className="hidden sm:block">
             <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
             {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline.
                 FIX_PROD_137 — nudged up on desktop to balance the enlarged logo. */}

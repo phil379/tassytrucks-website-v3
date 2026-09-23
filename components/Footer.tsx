@@ -80,7 +80,10 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <div className="eyebrow opacity-60 text-current">Contact</div>
-          <ul className="mt-3 space-y-2 text-sm">
+          {/* FIX_PROD_143 — break-words (inherited): partners@tassytrucks.com is a
+              179px unbreakable token in a ~150px grid column at 375px, which pushed
+              the document to 386px wide. */}
+          <ul className="mt-3 space-y-2 text-sm break-words">
             <li><a href={contact.phone} className="hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a></li>
             <li><a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a></li>
             <li><a href={contact.salesEmail} className="hover:text-[color:var(--gold-warm)]">partners@tassytrucks.com</a></li>

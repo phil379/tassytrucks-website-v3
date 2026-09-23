@@ -13,10 +13,10 @@ test('heading reads Six lines of care', async ({ page }) => {
   ).toContainText('Six lines of care');
 });
 
-test('6th card is Tassy School with EverDriven context', async ({ page }) => {
+test('6th card is Tassy Scholar with EverDriven context', async ({ page }) => {
   await page.goto('/');
   const card = page.locator('#services a.card-tile').nth(5);
-  await expect(card).toContainText('Tassy School');
+  await expect(card).toContainText('Tassy Scholar');
   await expect(card).toContainText('EverDriven');
   await expect(card).toContainText('2022');
   await expect(card).toContainText('5 metros');
@@ -59,6 +59,6 @@ test('LocalBusiness JSON-LD on / includes the school offer', async ({ page }) =>
     .locator('script[type="application/ld+json"]')
     .allTextContents();
   const joined = ld.join(' ');
-  expect(joined).toContain('Tassy School — Alternative student transportation');
+  expect(joined).toContain('Tassy Scholar — Alternative student transportation');
   expect(joined).toContain('https://www.tassytrucks.com/school');
 });

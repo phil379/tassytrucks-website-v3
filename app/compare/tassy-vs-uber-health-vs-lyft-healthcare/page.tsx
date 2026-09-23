@@ -7,7 +7,7 @@ import { seoBook } from '@/lib/saas-links';
 export const metadata: Metadata = {
   title: 'Tassy vs Uber Health vs Lyft Healthcare — Compared',
   description:
-    'Honest comparison of Tassy Transportation, Uber Health, and Lyft Healthcare for Charlotte medical transport: wheelchair access, driver training, booking, support.',
+    'Honest comparison of Tassy Transportation, Uber Health, Lyft Healthcare for Charlotte medical transport: wheelchair access, driver training, booking, support.',
   alternates: { canonical: '/compare/tassy-vs-uber-health-vs-lyft-healthcare' },
   openGraph: { url: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', images: ['/og-image/tassy-vs-uber-health-vs-lyft-healthcare'] },
 };

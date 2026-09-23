@@ -14,7 +14,7 @@ type PageSpec = {
 
 const PAGES: PageSpec[] = [
   // MEGA_SEO_001
-  { path: '/partners', h1: 'partner with tassy trucks', cta: ['facility/signup', 'source=partners-page'] },
+  { path: '/partners', h1: 'partner with tassy transportation', cta: ['facility/signup', 'source=partners-page'] },
   { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['book/nemt', 'source=seo-nemt'] },
   { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['book/nemt', 'source=seo-dialysis', 'recurring=1'] },
   { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['book/vip', 'source=seo-postop', 'tier=recovery'] },

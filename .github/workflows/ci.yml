@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # 07:10 UTC daily — catches SaaS routes that break without a push here.
+    - cron: '10 7 * * *'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Blocks the merge: everything that depends only on this repo ────────
+  build:
+    name: Typecheck · Build · Smoke
+    runs-on: ubuntu-latest
+    if: github.event_name != 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Build
+        run: bun run build
+
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
+
+      - name: Smoke suite (18 SEO routes)
+        run: bunx playwright test
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots
+          path: playwright/screenshots/
+          retention-days: 7
+
+  # ── Separate job: depends on the SaaS being up, so a SaaS outage ───────
+  # ── never masks a real build failure above. ────────────────────────────
+  saas-links:
+    name: SaaS deep-link audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Audit every link in lib/saas-links.ts
+        run: bun run scripts/audit-saas-links.ts

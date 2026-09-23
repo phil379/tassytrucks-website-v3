@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "playwright test",
+    "audit:links": "bun run scripts/audit-saas-links.ts",
+    "verify": "bun run typecheck && bun run build && bun run test:smoke && bun run audit:links"
   },
   "dependencies": {
     "next": "14.2.5",

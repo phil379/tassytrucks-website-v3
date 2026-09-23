@@ -14,7 +14,7 @@ type PageSpec = {
 
 const PAGES: PageSpec[] = [
   // MEGA_SEO_001
-  { path: '/partners', h1: 'partner with tassy trucks', cta: ['facility/intake', 'source=partners-page'] },
+  { path: '/partners', h1: 'partner with tassy trucks', cta: ['facility/signup', 'source=partners-page'] },
   { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['book/nemt', 'source=seo-nemt'] },
   { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['book/nemt', 'source=seo-dialysis', 'recurring=1'] },
   { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['book/vip', 'source=seo-postop', 'tier=recovery'] },
@@ -25,7 +25,7 @@ const PAGES: PageSpec[] = [
   { path: '/charlotte/family-medical-rides', h1: 'book a medical ride for someone else', cta: ['book/nemt', 'source=seo-family'] },
   { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['book/nemt', 'source=seo-compare'], table: true },
   // MEGA_SEO_002
-  { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/intake', 'source=vet-partners', 'type=veterinary'], winnie: true },
+  { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
   { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['book/winnie', 'source=seo-pet'], winnie: true },
   { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['book/winnie', 'source=seo-vet', 'purpose=vet'], winnie: true },
   { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['book/winnie', 'source=seo-postop', 'sedated=1'], winnie: true },

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Dialysis Transport in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/dialysis-transport', images: ['/og-image/dialysis-transport'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-dialysis', recurring: '1' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-dialysis', recurring: '1' });
 
 export default function DialysisTransportPage() {
   return (

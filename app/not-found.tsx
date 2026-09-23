@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { book } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN — branded 404. Before this, an unknown
 // route rendered Next's stark default page (no header/footer/brand). Now it
@@ -24,8 +24,8 @@ export default function NotFound() {
         <Link href="/" className="btn-gold">
           Back home <ArrowRight size={16} />
         </Link>
-        <a href={book.ride} className="btn-ghost">
-          Book a ride
+        <a href={request.ride} className="btn-ghost">
+          Request a ride
         </a>
       </div>
       <p className="mt-10 serif italic text-lg ink-soft">

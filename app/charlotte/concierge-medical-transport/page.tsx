@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Concierge Medical Transport in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/concierge-medical-transport', images: ['/og-image/concierge-medical-transport'] },
 };
 
-const CTA_HREF = seoBook('vip', { source: 'seo-concierge' });
+const CTA_HREF = seoRequest('vip', { source: 'seo-concierge' });
 
 export default function ConciergeMedicalTransportPage() {
   return (
@@ -22,7 +22,7 @@ export default function ConciergeMedicalTransportPage() {
       h1="Concierge Medical Transport in Charlotte — Private, Discreet, Door to Door"
       heroSubtitle="White-glove transportation for plastic surgery, aesthetic, and med-spa patients — and anyone in Charlotte who wants their medical ride handled quietly and well."
       quickAnswer="Concierge medical transport is private, white-glove transportation to and from medical appointments and procedures — one rider, one dedicated driver, no shared vehicles, no strangers. Tassy Transportation runs a dedicated VIP concierge service for plastic surgery, aesthetic, and med-spa patients across Charlotte and Mecklenburg County. Book online or call 24/7 dispatch at (704) 941-8508."
-      ctaText="Book concierge transport"
+      ctaText="Request concierge transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Concierge Medical Transportation"
       sections={[

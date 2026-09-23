@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Dog Grooming Pickup Service in Charlotte NC | Winnie Ride',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/dog-grooming-pickup', images: ['/og-image/dog-grooming-pickup'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-grooming' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-grooming' });
 
 const linkCls = 'underline decoration-winnie-sage underline-offset-2';
 

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Post-Surgery Transport in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
 };
 
-const CTA_HREF = seoBook('vip', { source: 'seo-postop', tier: 'recovery' });
+const CTA_HREF = seoRequest('vip', { source: 'seo-postop', tier: 'recovery' });
 
 export default function PostSurgeryTransportPage() {
   return (
@@ -22,7 +22,7 @@ export default function PostSurgeryTransportPage() {
       h1="Post-Surgery Transport in Charlotte — A Real Person to Get You Home"
       heroSubtitle="Door-through-door rides for outpatient procedures, with a driver who walks you in, stays reachable during your procedure, and sees you safely back inside your own front door."
       quickAnswer="Surgery centers generally will not discharge a patient who received anesthesia or sedation without a responsible adult to take them home — and a rideshare driver waiting at the curb usually does not count. Tassy Transportation provides scheduled post-surgery transport across Charlotte and Mecklenburg County: we walk you in, wait through variable discharge times, and escort you to your door. Dispatch answers 24/7 at (704) 941-8508."
-      ctaText="Book recovery transport"
+      ctaText="Request recovery transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Post-Surgery Patient Transportation"
       sections={[

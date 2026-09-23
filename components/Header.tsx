@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, ChevronDown, Phone, Menu, X } from 'lucide-react';
-import { contact, book } from '@/lib/saas-links';
+import { contact } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 // FIX_PROD_131 — nav trimmed 8→6 visible items: "How it works" moved into the
 // Services dropdown (below) so the top bar stays calm.
@@ -20,7 +21,7 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
       { href: '/charlotte/post-surgery-transport', label: 'Post-surgery transport' },
       { href: '/charlotte/veteran-transport', label: 'Veteran transport' },
       { href: '/charlotte/concierge-medical-transport', label: 'Concierge transport' },
-      { href: '/charlotte/family-medical-rides', label: 'Book for a loved one' },
+      { href: '/charlotte/family-medical-rides', label: 'Request for a loved one' },
     ],
   },
   {
@@ -127,8 +128,8 @@ export default function Header() {
               login (portal.login → /login), a public discoverable link into an internal
               admin surface. Existing users have the app URL; the marketing site funnels
               to booking, not the backend login. */}
-          <a href={book.ride} className="btn-gold text-sm">
-            Book a Ride <ArrowRight size={16} />
+          <a href={request.ride} className="btn-gold text-sm">
+            Request a Ride <ArrowRight size={16} />
           </a>
 
           {/* MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agents B + E) — before this, the

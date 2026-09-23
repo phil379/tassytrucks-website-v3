@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Check, ArrowRight } from 'lucide-react';
-import { subscribe, book } from '@/lib/saas-links';
+import { subscribe } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Pricing — Tassy subscriptions & per-service tiers',
@@ -135,7 +136,7 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
         name: 'Guardian Essential', price: '$185', cadence: 'ride',
         blurb: 'Single recovery ride.',
         features: ['CNA driver', 'Recovery kit', 'Door-through-door', 'Family notification'],
-        cta: { label: 'Book ride', href: book.recover },
+        cta: { label: 'Request a ride', href: request.recover },
       },
       {
         name: 'Guardian Signature', price: '$595', cadence: 'mo',

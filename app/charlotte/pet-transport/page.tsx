@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Pet Transport in Charlotte NC — Winnie Ride',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/pet-transport', images: ['/og-image/pet-transport'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-pet' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-pet' });
 
 const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 
@@ -28,7 +28,7 @@ export default function PetTransportPage() {
       h1="Pet Transport in Charlotte, NC — Rides Your Dog or Cat Actually Deserves"
       heroSubtitle="Winnie Ride is door-to-door pet transport for Charlotte families — to the vet, the groomer, or boarding — run by a local company you can call, not an app you hope shows up."
       quickAnswer="Winnie Ride is the pet transport service of Tassy Transportation, a veteran-owned Charlotte company. We move your dog or cat door-to-door in climate-controlled vehicles, with vaccine verification before every ride, a signed liability waiver, and a photo sent at pickup. Book online or call (704) 941-8508 — dispatch answers 24/7."
-      ctaText="Book a pet ride"
+      ctaText="Request a pet ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       sections={[

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Calm Pet Transport in Charlotte NC | Winnie Ride',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/calm-pet-transport', images: ['/og-image/calm-pet-transport'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-calm', temperament: 'anxious' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-calm', temperament: 'anxious' });
 
 const linkCls = 'underline decoration-winnie-sage underline-offset-2';
 
@@ -28,7 +28,7 @@ export default function CalmPetTransportPage() {
       h1="Calm Pet Transport in Charlotte for Anxious, Fearful, and Senior Pets"
       heroSubtitle="A quiet, climate-controlled ride with a driver matched to your pet’s temperament — because a stressed pet shouldn’t have to ride in a stranger’s car."
       quickAnswer="Calm pet transport means a quiet, climate-controlled vehicle, a driver trained on carrier handling, and a pace set by your pet rather than the clock. Winnie Ride by Tassy Transportation matches drivers to your pet's temperament across Charlotte and Mecklenburg County. You tell us your pet's triggers at booking, and the right driver shows up prepared."
-      ctaText="Book a calm ride"
+      ctaText="Request a calm ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       sections={[

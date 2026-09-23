@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Book a Medical Ride for Someone Else in Charlotte',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/family-medical-rides', images: ['/og-image/family-medical-rides'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-family' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-family' });
 
 export default function FamilyMedicalRidesPage() {
   return (
@@ -22,7 +22,7 @@ export default function FamilyMedicalRidesPage() {
       h1="Book a Medical Ride for Someone Else in Charlotte — Parents, Spouses, Loved Ones"
       heroSubtitle="For the daughter in Denver and the son in D.C. coordinating Mom’s appointments in Charlotte — book the ride, get every update, and know she made it to the door."
       quickAnswer="Yes — you can book and pay for a medical ride for someone else, even from out of town. With Tassy Transportation, you schedule the ride online or by phone, the confirmations and driver updates come to you, and a trained driver meets your loved one at their door anywhere in Charlotte or Mecklenburg County. Dispatch answers 24/7 at (704) 941-8508."
-      ctaText="Book for a loved one"
+      ctaText="Request for a loved one"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
       sections={[

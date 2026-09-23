@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Best NEMT Providers in Charlotte — How to Choose',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/best-nemt-providers', images: ['/og-image/best-nemt-providers'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-best' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-best' });
 
 export default function BestNemtProvidersPage() {
   return (

@@ -34,7 +34,7 @@ type Props = {
 const TRUST_CHIPS = ['SDVOSB certified', 'USDOT #3104152', 'Licensed & insured', 'Trained drivers'];
 
 export default function ServicePage({
-  eyebrow, title, tagline, description, bookHref, bookLabel = 'Book now',
+  eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now',
   highlights, tiers, partnerCta,
   highlightsHeading = 'Why Charlotte families choose Tassy',
   serviceName, path,

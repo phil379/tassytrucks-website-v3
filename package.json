@@ -13,10 +13,12 @@
     "verify": "bun run typecheck && bun run build && bun run test:smoke && bun run audit:links"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.1",
+    "lucide-react": "^0.400.0",
     "next": "14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "lucide-react": "^0.400.0"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

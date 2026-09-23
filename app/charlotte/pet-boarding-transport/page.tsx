@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Pet Boarding Pickup & Drop-Off in Charlotte NC',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/pet-boarding-transport', images: ['/og-image/pet-boarding-transport'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-boarding' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-boarding' });
 
 const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 

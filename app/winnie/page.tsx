@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import ServicePage from '@/components/ServicePage';
 import PawIcon from '@/components/seo/PawIcon';
-import { book, subscribe, facilitySignup } from '@/lib/saas-links';
+import { subscribe, facilitySignup } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 const charlotteServices = [
   { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — vaccine checks, waivers, photos, trained drivers.' },
@@ -31,8 +32,8 @@ export default function WinniePage() {
       title="Premium pet transport — they ride like family."
       tagline="Climate-controlled. Carrier-equipped. Calming and clean."
       description="Winnie Ride is Tassy's purpose-built pet transport service. Climate-controlled vehicles, sanitized carriers, safety harnesses, vet-safe calming spray, and treats — every ride. B2C for pet parents, B2B for veterinary clinics, groomers, and daycare facilities. Subscription tiers from $39/mo."
-      bookHref={book.winnie}
-      bookLabel="Book a pet ride"
+      bookHref={request.winnie}
+      bookLabel="Request a pet ride"
       serviceName="Winnie Ride — Pet Transportation"
       path="/winnie"
       highlightsHeading="Charlotte pet transport, built around your pet"

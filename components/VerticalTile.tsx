@@ -31,7 +31,7 @@ export default function VerticalTile({
           Learn more
         </Link>
         <a href={bookHref} className="inline-flex items-center gap-1 text-sm font-semibold text-charcoal hover:text-gold-600">
-          Book <ArrowUpRight size={14} />
+          Request <ArrowUpRight size={14} />
         </a>
       </div>
     </div>

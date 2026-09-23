@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'NEMT in Charlotte NC — Book Medical Transport',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-nemt' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-nemt' });
 
 export default function NemtRidesPage() {
   return (
@@ -22,7 +22,7 @@ export default function NemtRidesPage() {
       h1="NEMT in Charlotte, NC — Medical Rides You Can Set Your Watch By"
       heroSubtitle="Non-emergency medical transportation for Charlotte patients and the families who coordinate their care — bookable tonight, on the road tomorrow."
       quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with 24/7 phone dispatch at (704) 941-8508."
-      ctaText="Book a medical ride"
+      ctaText="Request a medical ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
       sections={[
@@ -166,7 +166,7 @@ export default function NemtRidesPage() {
       relatedLinks={[
         { label: 'Dialysis transport', href: '/charlotte/dialysis-transport' },
         { label: 'Wheelchair transport', href: '/charlotte/wheelchair-transport' },
-        { label: 'Book for a family member', href: '/charlotte/family-medical-rides' },
+        { label: 'Request for a family member', href: '/charlotte/family-medical-rides' },
         { label: 'NEMT service overview', href: '/nemt' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'Home', href: '/' },

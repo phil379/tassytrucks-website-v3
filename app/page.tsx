@@ -5,7 +5,8 @@ import {
   HeartPulse, Sparkles, PawPrint, Droplets, Shield, GraduationCap,
   type LucideIcon,
 } from 'lucide-react';
-import { book, contact, apply } from '@/lib/saas-links';
+import { contact, apply } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
 export const metadata: Metadata = {
@@ -35,36 +36,36 @@ const verticals: Vertical[] = [
     slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
     blurb: 'Non-emergency medical transport for dialysis, recurring appointments, doctor visits, and Medicaid-covered care.',
     bullets: ['ADA compliant', 'Broker partners accepted'],
-    cta: 'Book Tassy Care trip',
-    bookHref: book.nemt,
+    cta: 'Request a Tassy Care trip',
+    bookHref: request.nemt,
   },
   {
     slug: '/vip', name: 'VIP Concierge', Icon: Sparkles, anim: 'svc-anim--spark',
     blurb: 'Discreet, professional post-procedure transport. Driver arrives early, waits on-site, brings you home safely.',
     bullets: ['Female drivers on request', 'HIPAA-aware, judgment-free'],
-    cta: 'Book VIP trip',
-    bookHref: book.vip,
+    cta: 'Request a VIP trip',
+    bookHref: request.vip,
   },
   {
     slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
     blurb: 'Vet visits, grooming pickups, doggy daycare runs. Trained drivers, climate-controlled vehicles, GPS tracking.',
     bullets: ['Photo + chip verification', 'Owner gets real-time updates'],
-    cta: 'Book a Winnie Ride',
-    bookHref: book.winnie,
+    cta: 'Request a Winnie Ride',
+    bookHref: request.winnie,
   },
   {
     slug: '/renew', name: 'Tassy Wellness', Icon: Droplets, anim: 'svc-anim--drip',
     blurb: 'Wellness transport — IV therapy, med-spa, cosmetic dental, rejuvenation. Hydration kit on every ride.',
     bullets: ['Premium fleet', 'Med-spa partnerships'],
-    cta: 'Book a Wellness trip',
-    bookHref: book.renew,
+    cta: 'Request a Wellness trip',
+    bookHref: request.renew,
   },
   {
     slug: '/recover', name: 'Tassy Guardian', Icon: Shield, anim: 'svc-anim--shield',
     blurb: 'Oncology, chemo, radiation, hospital discharge. CNA-trained drivers. Quiet, equipped cabin.',
     bullets: ['CNA-trained drivers', 'Recovery amenity kit'],
-    cta: 'Book Guardian transport',
-    bookHref: book.recover,
+    cta: 'Request Guardian transport',
+    bookHref: request.recover,
   },
   {
     slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
@@ -102,8 +103,8 @@ export default function HomePage() {
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-5">
-              <a href={book.ride} className="btn-gold">
-                Book a Ride <ArrowRight size={16} />
+              <a href={request.ride} className="btn-gold">
+                Request a Ride <ArrowRight size={16} />
               </a>
               <Link href="/#services" className="nav-link inline-flex items-center gap-1.5 text-base">
                 Explore our services <ArrowRight size={15} />
@@ -235,7 +236,7 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-10">
             {[
-              { n: 1, t: 'Book', d: 'Tell us where, when, and who. See the price upfront — no surge, no hidden fees, no booking fees.' },
+              { n: 1, t: 'Request', d: 'Tell us where, when, and who. See the price upfront — no surge, no hidden fees, no booking fees.' },
               { n: 2, t: 'Match', d: "A licensed, insured driver is assigned within minutes. You'll get their name, photo, vehicle, and ETA by text." },
               { n: 3, t: 'Travel', d: 'Track in real time. Family gets pickup & dropoff alerts. Pay only when the trip completes. Receipt by email.' },
             ].map((s) => (
@@ -383,11 +384,11 @@ export default function HomePage() {
         <div className="container-x py-24 text-center">
           <h2 className="h-section">Ready when you are.</h2>
           <p className="mt-4 ink-soft max-w-xl mx-auto">
-            Book a one-time ride or set up a recurring subscription — upfront pricing, no surge, no booking fees.
+            Request a one-time ride or set up a recurring subscription — upfront pricing, no surge, no booking fees.
           </p>
           {/* FIX_PROD_131 — one primary + one calm secondary (was 3 equal buttons) */}
           <div className="mt-8 flex justify-center items-center gap-5 flex-wrap">
-            <a href={book.ride} className="btn-gold">Book a Ride <ArrowRight size={16} /></a>
+            <a href={request.ride} className="btn-gold">Request a Ride <ArrowRight size={16} /></a>
             <Link href="/pricing" className="nav-link inline-flex items-center gap-1.5 text-base">
               See subscription pricing <ArrowRight size={15} />
             </Link>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { book, subscribe } from '@/lib/saas-links';
+import { subscribe } from '@/lib/saas-links';
+import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'VIP Concierge — plastic surgery recovery rides',
@@ -17,8 +18,8 @@ export default function VipPage() {
       title="Recovery in cashmere."
       tagline="A premium ride home from Charlotte's best surgeons & clinics."
       description="VIP Concierge is Tassy's signature service. Built for patients recovering from plastic surgery, cosmetic dental, IV therapy, and high-end aesthetic procedures. Four service tiers from Recovery Ride ($185) to Maximum Discretion ($695) — each with its own amenity kit, vehicle class, and driver training. Anchor partners include leading Charlotte clinics."
-      bookHref={book.vip}
-      bookLabel="Book a recovery ride"
+      bookHref={request.vip}
+      bookLabel="Request a recovery ride"
       serviceName="VIP Concierge Transport"
       path="/vip"
       highlightsHeading="Premium plastic-surgery recovery rides in Charlotte"
@@ -41,26 +42,26 @@ export default function VipPage() {
           name: 'Recovery Ride',
           price: '$185',
           features: ['Premium sedan', '7-item amenity kit', 'Door-to-curb', 'Same-day booking'],
-          cta: { label: 'Book Recovery', href: book.vip },
+          cta: { label: 'Request Recovery', href: request.vip },
         },
         {
           name: 'Companion Recovery',
           price: '$285',
           features: ['SUV or sedan', '13-item kit', 'Trained companion', 'Door-through-door'],
-          cta: { label: 'Book Companion', href: book.vip },
+          cta: { label: 'Request Companion', href: request.vip },
         },
         {
           name: 'Premium Recovery',
           price: '$445',
           features: ['Luxury SUV', '21-item kit', 'Cashmere blanket', 'Aromatherapy + heated pack'],
-          cta: { label: 'Book Premium', href: book.vip },
+          cta: { label: 'Request Premium', href: request.vip },
           highlight: true,
         },
         {
           name: 'Maximum Discretion',
           price: '$695',
           features: ['Black-car flagship', '27-item kit', 'Plush robe + slippers', 'Welcome candle + flowers'],
-          cta: { label: 'Book Maximum', href: book.vip },
+          cta: { label: 'Request Maximum', href: request.vip },
         },
       ]}
       partnerCta={{

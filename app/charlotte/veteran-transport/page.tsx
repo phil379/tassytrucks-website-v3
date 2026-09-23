@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Veteran Medical Transport in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/veteran-transport', images: ['/og-image/veteran-transport'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-veteran', payer: 'va' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-veteran', payer: 'va' });
 
 export default function VeteranTransportPage() {
   return (
@@ -22,7 +22,7 @@ export default function VeteranTransportPage() {
       h1="Veteran Medical Transport in Charlotte — Driven by a Veteran-Owned Company"
       heroSubtitle="Scheduled rides to VA and community care appointments across the Charlotte area, from a Service-Disabled Veteran-Owned Small Business that treats every rider like one of our own."
       quickAnswer="Tassy Transportation provides veteran medical transport across Charlotte and Mecklenburg County — scheduled, door-to-door rides to VA appointments and VA-authorized community care visits. We are a Service-Disabled Veteran-Owned Small Business (SDVOSB), so the company driving you is veteran-owned itself. Dispatch answers 24/7 at (704) 941-8508."
-      ctaText="Book veteran transport"
+      ctaText="Request veteran transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Veteran Medical Transportation"
       trustExtras={['Veteran-owned', 'Charlotte-based', '24/7 dispatch']}

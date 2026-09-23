@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Tassy vs Uber Health vs Lyft Healthcare — Compared',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', images: ['/og-image/tassy-vs-uber-health-vs-lyft-healthcare'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-compare' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-compare' });
 
 const yes = <Check size={18} className="inline text-[color:var(--gold)]" aria-label="Yes" />;
 const no = <Minus size={18} className="inline opacity-40" aria-label="No" />;

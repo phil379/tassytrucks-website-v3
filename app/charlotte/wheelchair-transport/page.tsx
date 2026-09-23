@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Wheelchair Transport in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/wheelchair-transport', images: ['/og-image/wheelchair-transport'] },
 };
 
-const CTA_HREF = seoBook('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
+const CTA_HREF = seoRequest('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
 
 export default function WheelchairTransportPage() {
   return (
@@ -22,7 +22,7 @@ export default function WheelchairTransportPage() {
       h1="Wheelchair Transport in Charlotte, NC — Accessible Rides, Door Through Door"
       heroSubtitle="Wheelchair-accessible vehicles with proper securement, drivers trained to assist, and dispatch that asks the right questions before the van ever rolls."
       quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Transportation provides wheelchair-accessible transport across Charlotte and Mecklenburg County with door-through-door assistance and 24/7 dispatch at (704) 941-8508."
-      ctaText="Book a wheelchair ride"
+      ctaText="Request a wheelchair ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Wheelchair Accessible Transportation"
       sections={[
@@ -181,7 +181,7 @@ export default function WheelchairTransportPage() {
       relatedLinks={[
         { label: 'NEMT in Charlotte', href: '/charlotte/nemt-rides' },
         { label: 'Dialysis transport', href: '/charlotte/dialysis-transport' },
-        { label: 'Book for a family member', href: '/charlotte/family-medical-rides' },
+        { label: 'Request for a family member', href: '/charlotte/family-medical-rides' },
         { label: 'NEMT service overview', href: '/nemt' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'Home', href: '/' },

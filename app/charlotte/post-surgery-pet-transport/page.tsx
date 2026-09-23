@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Post-Surgery Pet Transport Charlotte — Dog Pickup',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/post-surgery-pet-transport', images: ['/og-image/post-surgery-pet-transport'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-postop', sedated: '1' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-postop', sedated: '1' });
 
 const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 
@@ -28,7 +28,7 @@ export default function PostSurgeryPetTransportPage() {
       h1="Post-Surgery Pet Transport in Charlotte — Safe Rides Home After Your Dog or Cat's Procedure"
       heroSubtitle="A sedation-aware driver picks your pet up from the vet, follows the discharge instructions, and brings them straight to your door — so nobody has to drive with one eye on the back seat."
       quickAnswer="Winnie Ride by Tassy Transportation provides post-surgery pet pickup across Charlotte and Mecklenburg County. Our drivers are trained in sedation-aware handling, every pet rides secured in a carrier in a climate-controlled vehicle, and you get a photo at pickup. Call (704) 941-8508 or book online — dispatch answers 24/7."
-      ctaText="Book a post-op pickup"
+      ctaText="Request a post-op pickup"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       sections={[

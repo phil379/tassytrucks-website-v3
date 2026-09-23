@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoBook } from '@/lib/saas-links';
+import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Rides to the Vet in Charlotte — Winnie Ride',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/vet-appointment-rides', images: ['/og-image/vet-appointment-rides'] },
 };
 
-const CTA_HREF = seoBook('winnie', { source: 'seo-vet', purpose: 'vet' });
+const CTA_HREF = seoRequest('winnie', { source: 'seo-vet', purpose: 'vet' });
 
 const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 

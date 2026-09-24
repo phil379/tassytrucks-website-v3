@@ -92,6 +92,13 @@ export const apply = {
   // FIX_PROD_025 — companion (VIP Concierge) + CNA (Tassy Recover) hiring funnels.
   companion: src('/careers/companion'),
   cna: src('/careers/cna'),
+  /**
+   * The careers index. Temporary: the hiring reference doc puts this page on
+   * the marketing site, and it does not exist here yet — the footer's "View all
+   * careers" was a 404 on every page until this line. Delete it, and point the
+   * footer at a local route, the day /careers ships here.
+   */
+  careers: src('/careers'),
   facility: src('/facility/signup'),
 };
 

@@ -37,11 +37,14 @@ export default function Footer() {
         <div>
           <div className="eyebrow opacity-60 text-current">Services</div>
           <ul className="mt-3 space-y-2 text-sm">
+            {/* These names lagged the Recovery/Concierge split by a fortnight.
+                /vip is Tassy Concierge and /recover is Tassy Recovery — the
+                footer was still calling them VIP Concierge and Tassy Guardian,
+                which is the retired line, on every page of the site. */}
             <li><Link href="/nemt" className="hover:text-[color:var(--gold-warm)]">Tassy Care</Link></li>
-            <li><Link href="/vip" className="hover:text-[color:var(--gold-warm)]">VIP Concierge</Link></li>
+            <li><Link href="/recover" className="hover:text-[color:var(--gold-warm)]">Tassy Recovery</Link></li>
+            <li><Link href="/vip" className="hover:text-[color:var(--gold-warm)]">Tassy Concierge</Link></li>
             <li><Link href="/winnie" className="hover:text-[color:var(--gold-warm)]">Winnie Ride</Link></li>
-            <li><Link href="/renew" className="hover:text-[color:var(--gold-warm)]">Tassy Wellness</Link></li>
-            <li><Link href="/recover" className="hover:text-[color:var(--gold-warm)]">Tassy Guardian</Link></li>
             <li><Link href="/school" className="hover:text-[color:var(--gold-warm)]">Tassy Scholar</Link></li>
             <li><Link href="/pricing" className="hover:text-[color:var(--gold-warm)]">Pricing</Link></li>
           </ul>
@@ -55,10 +58,20 @@ export default function Footer() {
             <li><a href={apply.companion} className="hover:text-[color:var(--gold-warm)]">Become a companion</a></li>
             <li><a href={apply.cna} className="hover:text-[color:var(--gold-warm)]">Become a CNA</a></li>
             <li><a href={apply.salesRep} className="hover:text-[color:var(--gold-warm)]">Become a sales rep</a></li>
+            {/* A 404 on every page of the site until 2026-09-24. `/careers`
+                was never built here — the hiring reference doc specifies it as
+                a marketing page and the marketing repo does not have one. Until
+                it does, this points at the careers index that actually answers,
+                so the one link a browsing candidate clicks is not a dead end.
+                Swap it back to a local <Link href="/careers"> the day that page
+                ships. */}
             <li>
-              <Link href="/careers" className="inline-flex items-center gap-1 hover:text-[color:var(--gold-warm)]">
+              <a
+                href={apply.careers}
+                className="inline-flex items-center gap-1 hover:text-[color:var(--gold-warm)]"
+              >
                 View all careers <ArrowRight size={13} />
-              </Link>
+              </a>
             </li>
           </ul>
         </div>

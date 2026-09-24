@@ -390,3 +390,23 @@ test('/ops is not indexable', async ({ page }) => {
   const robots = await page.locator('meta[name="robots"]').getAttribute('content');
   expect(robots ?? '').toContain('noindex');
 });
+
+// ── Speed-to-lead escalation cron ────────────────────────────────────────────
+
+test('the escalation cron refuses an unauthenticated call', async ({ request }) => {
+  const res = await request.get('/api/cron/escalate-stale-requests');
+
+  // 401 when CRON_SECRET is configured, 503 when it is not. Either way the
+  // route must never run and never send an SMS for an unauthenticated caller.
+  expect([401, 503], `got ${res.status()}`).toContain(res.status());
+  const body = await res.json();
+  expect(body.ok).toBe(false);
+});
+
+test('the escalation cron rejects a wrong bearer token', async ({ request }) => {
+  const res = await request.get('/api/cron/escalate-stale-requests', {
+    headers: { authorization: 'Bearer not-the-secret' },
+  });
+  expect([401, 503]).toContain(res.status());
+  expect((await res.json()).ok).toBe(false);
+});

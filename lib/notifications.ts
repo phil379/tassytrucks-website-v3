@@ -146,6 +146,55 @@ async function notifyRequester(id: string, data: TripRequestInput): Promise<void
   });
 }
 
+/**
+ * Speed-to-lead escalation: a SECOND operator SMS for a request that is still
+ * untouched well past the window the auto-reply promised.
+ *
+ * Deliberately operator-only. The customer already got one auto-reply saying
+ * someone would be in touch within 2 hours; a second message telling them we
+ * have not managed it yet would make the silence worse, not better. This pages
+ * the operator and nobody else.
+ *
+ * Throws on failure so the caller can leave `escalated_at` NULL and retry on
+ * the next run — an SMS that never sent must not be recorded as sent.
+ */
+export async function notifyOperatorUrgent(row: {
+  id: string;
+  service_line: string;
+  contact_name: string;
+  contact_phone: string;
+  pickup_address: string;
+  dropoff_address: string;
+  requested_at: string;
+  return_trip: boolean;
+  created_at: string;
+}): Promise<void> {
+  const url = process.env.ZAPIER_SMS_WEBHOOK_URL;
+  if (!url) throw new Error('ZAPIER_SMS_WEBHOOK_URL is not set');
+
+  const waitingMinutes = Math.floor((Date.now() - Date.parse(row.created_at)) / 60000);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: row.id,
+      urgent: true,
+      reason: 'still_new',
+      waiting_minutes: waitingMinutes,
+      service: row.service_line,
+      name: row.contact_name,
+      phone: row.contact_phone,
+      pickup: row.pickup_address,
+      dropoff: row.dropoff_address,
+      when: row.requested_at,
+      return: row.return_trip ? 'y' : 'n',
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Zapier responded ${res.status}`);
+}
+
 export type NotificationOutcome = {
   operatorSms: 'sent' | 'failed' | 'skipped';
   operatorEmail: 'sent' | 'failed' | 'skipped';

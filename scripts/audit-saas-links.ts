@@ -1,42 +1,44 @@
 /**
- * Verifies every deep-link in lib/saas-links.ts against the live SaaS.
+ * Verifies the SaaS deep-links the marketing site STILL RENDERS.
  *
- * Catches the three failure modes this repo has actually shipped:
- *   1. Dead route      — FIX_PROD_024 (/driver-apply, /sales-rep-apply were 404s)
- *                        PUBLISH_READY (/driver-app, /sales-app were 404s)
- *   2. Dropped query   — /facility/intake 307'd to /facility/signup and ate the
- *                        query string, silently killing marketing attribution
+ * Rescoped after the booking CTAs moved to the in-repo /request pipeline. The
+ * booking surface (book.*, seoBook, WINNIE_BOOK_URL) is no longer rendered
+ * anywhere, so probing it was pure noise — a SaaS outage on routes nothing
+ * links to would fail CI for no reason. Those constants stay in
+ * lib/saas-links.ts, unaudited and unused, on purpose.
+ *
+ * What this still checks:
+ *   1. Dead route      — the facility, careers and subscription links the site
+ *                        does render (FIX_PROD_024 shipped 404s here twice)
+ *   2. Dropped query   — /facility/intake once 307'd and ate the query string,
+ *                        silently killing marketing attribution
  *   3. Leaked login    — FIX_PROD_142: portal.* must never be rendered publicly
+ *   4. Dead booking    — no file may re-render the book.* / seoBook /
+ *                        WINNIE_BOOK_URL surface
+ *   5. Bad service     — every /request?service=X must name a requestable line
  *
- * Run:  bun run scripts/audit-saas-links.ts
- * Exits non-zero on any failure, so CI fails the build.
+ * Checks 3-5 are static and need no network, so they run even if the SaaS is
+ * down. Run:  bun run scripts/audit-saas-links.ts
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  book, subscribe, apply, portal, seoBook,
-  facilitySignup, facilityIntake, WINNIE_BOOK_URL,
-} from '../lib/saas-links';
+import { subscribe, apply, facilitySignup, facilityIntake } from '../lib/saas-links';
+import { SERVICE_LINES } from '../lib/trip-request';
 
 const TIMEOUT_MS = 15_000;
 const ATTEMPTS = 3;
 
 type Target = { label: string; url: string };
 
-// ── every URL the marketing site can send a visitor to ──────────────────
+// ── only the SaaS URLs the marketing site still renders ─────────────────
+// portal.* is deliberately NOT probed: it must never be rendered at all, which
+// the static leak check below enforces instead.
 const targets: Target[] = [
-  ...Object.entries(book).map(([k, url]) => ({ label: `book.${k}`, url })),
   ...Object.entries(subscribe).map(([k, url]) => ({ label: `subscribe.${k}`, url })),
   ...Object.entries(apply).map(([k, url]) => ({ label: `apply.${k}`, url })),
-  ...Object.entries(portal).map(([k, url]) => ({ label: `portal.${k}`, url })),
-  { label: 'WINNIE_BOOK_URL', url: WINNIE_BOOK_URL },
   { label: 'facilitySignup()', url: facilitySignup() },
   { label: 'facilitySignup(veterinary)', url: facilitySignup('veterinary') },
   { label: 'facilityIntake(attributed)', url: facilityIntake({ source: 'ci-audit', type: 'veterinary' }) },
-  ...(['nemt', 'vip', 'winnie', 'renew', 'recover'] as const).map((v) => ({
-    label: `seoBook(${v})`,
-    url: seoBook(v, { source: 'ci-audit' }),
-  })),
 ];
 
 const fetchOnce = async (url: string) => {
@@ -53,7 +55,7 @@ const fetchOnce = async (url: string) => {
 const failures: string[] = [];
 const warnings: string[] = [];
 
-console.log(`\n🔗 Auditing ${targets.length} SaaS deep-links\n`);
+console.log(`\n🔗 Auditing ${targets.length} rendered SaaS deep-links\n`);
 
 for (const { label, url } of targets) {
   let res: Response | undefined;
@@ -115,6 +117,36 @@ if (leaks.length) {
   );
 }
 
+// ── the dead booking surface must not come back ─────────────────────────
+const sourceFiles = ['app', 'components'].flatMap(walk);
+
+const revived = sourceFiles.filter((f) =>
+  /\b(book\s*\.\s*\w+|seoBook\s*\(|WINNIE_BOOK_URL)\b/.test(stripComments(readFileSync(f, 'utf8'))),
+);
+
+if (revived.length) {
+  failures.push(
+    `A SaaS booking deep-link is rendered again — booking lives at /request now:\n    ${revived.join('\n    ')}`,
+  );
+}
+
+// ── every /request?service=X names a line a visitor can actually pick ───
+const requestable = new Set(SERVICE_LINES.map((s) => s.value));
+const badService: string[] = [];
+
+for (const f of sourceFiles) {
+  const src = stripComments(readFileSync(f, 'utf8'));
+  for (const m of src.matchAll(/service=([a-z_]+)/g)) {
+    if (!requestable.has(m[1] as never)) badService.push(`${f} → service=${m[1]}`);
+  }
+}
+
+if (badService.length) {
+  failures.push(
+    `/request link names a service that is not requestable:\n    ${badService.join('\n    ')}`,
+  );
+}
+
 // ── report ──────────────────────────────────────────────────────────────
 if (warnings.length) {
   console.log('\n⚠️  Redirects (not failures, but attribution survived):');
@@ -127,4 +159,7 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`\n✅ All ${targets.length} links reachable, attribution intact, no login leaks.\n`);
+console.log(
+  `\n✅ ${targets.length} rendered SaaS links reachable, attribution intact, ` +
+    `no login leaks, no revived booking links, all service params valid.\n`,
+);

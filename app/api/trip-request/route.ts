@@ -3,6 +3,7 @@ import { tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { parseLocalDateTime } from '@/lib/time';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -82,9 +83,14 @@ export async function POST(request: Request) {
         preferred_contact: data.preferredContact,
         pickup_address: data.pickupAddress,
         dropoff_address: data.dropoffAddress,
-        requested_at: new Date(data.requestedAt).toISOString(),
+        // Charlotte wall-clock -> UTC instant. Never `new Date(naiveString)`
+        // here: this function runs in UTC and would shift the trip 4 hours.
+        requested_at: parseLocalDateTime(data.requestedAt)!.toISOString(),
         return_trip: data.returnTrip,
-        return_at: data.returnTrip && data.returnAt ? new Date(data.returnAt).toISOString() : null,
+        return_at:
+          data.returnTrip && data.returnAt
+            ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? null)
+            : null,
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,

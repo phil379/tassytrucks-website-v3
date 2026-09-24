@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseLocalDateTimeMs, toLocalDateTimeInput } from '@/lib/time';
 
 /**
  * The Trip Request pipeline — shared contract between the client form and the
@@ -99,7 +100,7 @@ export const tripRequestSchema = z
     requestedAt: z
       .string()
       .min(1, 'Choose a date and time')
-      .refine((v) => !Number.isNaN(Date.parse(v)), 'Enter a valid date and time'),
+      .refine((v) => !Number.isNaN(parseLocalDateTimeMs(v)), 'Enter a valid date and time'),
 
     returnTrip: z.boolean().default(false),
     returnAt: z.string().optional().nullable(),
@@ -119,7 +120,8 @@ export const tripRequestSchema = z
     company: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
-    const requested = Date.parse(data.requestedAt);
+    // Charlotte wall-clock, not the server's zone. See lib/time.ts.
+    const requested = parseLocalDateTimeMs(data.requestedAt);
     if (!Number.isNaN(requested) && requested < Date.now() + MIN_LEAD_TIME_MS) {
       ctx.addIssue({
         code: 'custom',
@@ -129,9 +131,10 @@ export const tripRequestSchema = z
     }
 
     if (data.returnTrip) {
-      if (!data.returnAt || Number.isNaN(Date.parse(data.returnAt))) {
+      const returning = parseLocalDateTimeMs(data.returnAt);
+      if (!data.returnAt || Number.isNaN(returning)) {
         ctx.addIssue({ code: 'custom', path: ['returnAt'], message: 'Choose a return date and time' });
-      } else if (!Number.isNaN(requested) && Date.parse(data.returnAt) <= requested) {
+      } else if (!Number.isNaN(requested) && returning <= requested) {
         ctx.addIssue({ code: 'custom', path: ['returnAt'], message: 'The return must be after the pickup' });
       }
     }
@@ -147,13 +150,19 @@ export const tripRequestSchema = z
 
 export type TripRequestInput = z.infer<typeof tripRequestSchema>;
 
-/** Round `now` up to the next 15 minutes, +4h, as a value for <input type="datetime-local">. */
+/**
+ * Round `now` up to the next 15 minutes, +4h, as a value for
+ * <input type="datetime-local">.
+ *
+ * Rendered in Charlotte time, not the device's. A customer booking from a
+ * phone still set to Pacific would otherwise see a floor three hours off the
+ * one the server enforces and get rejected for a time the picker offered.
+ */
 export function minDateTimeLocal(now = new Date()): string {
-  const d = new Date(now.getTime() + MIN_LEAD_TIME_MS);
-  d.setSeconds(0, 0);
-  d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const floor = new Date(now.getTime() + MIN_LEAD_TIME_MS);
+  // Round up on the instant, so the 15-minute grid survives the zone change.
+  const rounded = new Date(Math.ceil(floor.getTime() / 900_000) * 900_000);
+  return toLocalDateTimeInput(rounded);
 }
 
 /** Resolves ANY line, including unavailable ones, so /ops renders legacy rows. */

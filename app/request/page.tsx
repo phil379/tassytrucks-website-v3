@@ -4,7 +4,7 @@ import RequestForm from '@/components/request/RequestForm';
 import { COPY, coerceServiceLine } from '@/lib/trip-request';
 
 export const metadata: Metadata = {
-  title: 'Request a ride — Tassy Transportation',
+  title: 'Request a ride in Charlotte NC',
   description:
     'Request medical, recovery, wellness, pet, or student transport in Charlotte NC. A dispatcher confirms every request by phone or text and quotes pricing before the trip is confirmed.',
   alternates: { canonical: '/request' },

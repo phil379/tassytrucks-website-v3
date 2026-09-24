@@ -159,7 +159,7 @@ export default function CalmPetTransportPage() {
                 unhurried treatment from the first knock.
               </p>
               <p>
-                Booking takes about two minutes online, or you can call our 24/7
+                Requesting a ride takes about two minutes online, or you can call our 24/7
                 dispatch line at (704) 941-8508 and talk it through with a person.
                 We ask for a 2-hour minimum lead time on routine rides, and we
                 serve all of Charlotte and Mecklenburg County plus Matthews,

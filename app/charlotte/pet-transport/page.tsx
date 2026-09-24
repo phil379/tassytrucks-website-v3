@@ -200,7 +200,7 @@ export default function PetTransportPage() {
                 and your home is in another, that is a normal Tuesday for us.
               </p>
               <p>
-                Booking takes about two minutes online, or call (704) 941-8508 —
+                Requesting a ride takes about two minutes online, or call (704) 941-8508 —
                 dispatch answers 24/7. For routine rides we ask for a minimum of
                 two hours&rsquo; lead time, though more notice always helps us hold
                 your preferred window. Have your pet&rsquo;s vaccine records handy

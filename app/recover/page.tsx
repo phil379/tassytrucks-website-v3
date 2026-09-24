@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { subscribe, facilitySignup } from '@/lib/saas-links';
-import { request } from '@/lib/request-links';
+import { subscribe, facilitySignup, contact } from '@/lib/saas-links';
 
 export const metadata: Metadata = {
   title: 'Tassy Guardian — oncology & recovery transport',
@@ -11,6 +10,9 @@ export const metadata: Metadata = {
   openGraph: { url: '/recover', images: ['/og-image/recover'] },
 };
 
+// Tassy Guardian needs CNA-trained drivers the company does not currently have,
+// so this line is not accepting requests. The page stays up and keeps its story;
+// the CTA asks about availability instead of taking a booking we cannot honour.
 export default function RecoverPage() {
   return (
     <ServicePage
@@ -18,8 +20,8 @@ export default function RecoverPage() {
       title="Recovery transport with the dignity it deserves."
       tagline="CNA-trained drivers. Quiet cabin. Family-grade care."
       description="Tassy Guardian is built for oncology patients, chemo/radiation recurrences, and hospital discharges where the standard ride-share or NEMT isn't enough. Drivers are CNA-trained. Vehicles are quieted and equipped for nausea management. Every ride includes a recovery amenity kit. Anchor partners include major Charlotte cancer centers."
-      bookHref={request.recover}
-      bookLabel="Request recovery transport"
+      bookHref={contact.phone}
+      bookLabel="Ask about availability"
       serviceName="Tassy Guardian — Oncology & Recovery Transport"
       path="/recover"
       highlightsHeading="Oncology & recovery transport in Charlotte NC"
@@ -42,7 +44,7 @@ export default function RecoverPage() {
           name: 'Guardian Essential',
           price: '$185',
           features: ['Single ride', 'Recovery kit', 'CNA driver', 'Door-through-door'],
-          cta: { label: 'Request Essential', href: request.recover },
+          cta: { label: 'Ask about availability', href: contact.phone },
         },
         {
           name: 'Guardian Signature',

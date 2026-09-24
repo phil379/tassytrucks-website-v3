@@ -18,7 +18,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     ],
   },
   {
-    h: 'Bookings & pricing',
+    h: 'Requests & pricing',
     body: [
       'Prices are shown before you confirm a booking — no surge pricing and no hidden fees. Subscription plans renew monthly and can be changed or cancelled anytime; changes take effect at the next billing cycle. Medicaid-covered trips are billed to the payer or broker, not the rider, when eligibility is confirmed.',
     ],

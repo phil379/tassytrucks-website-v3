@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Check, ArrowRight } from 'lucide-react';
-import { subscribe } from '@/lib/saas-links';
+import { subscribe, contact } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -136,7 +136,7 @@ const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[
         name: 'Guardian Essential', price: '$185', cadence: 'ride',
         blurb: 'Single recovery ride.',
         features: ['CNA driver', 'Recovery kit', 'Door-through-door', 'Family notification'],
-        cta: { label: 'Request a ride', href: request.recover },
+        cta: { label: 'Ask about availability', href: contact.phone },
       },
       {
         name: 'Guardian Signature', price: '$595', cadence: 'mo',

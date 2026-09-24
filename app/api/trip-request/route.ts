@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { tripRequestSchema } from '@/lib/trip-request';
+import { tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
@@ -36,6 +36,22 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { ok: false, error: 'Too many requests. Please call us at (704) 941-8508.' },
       { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
+  // Explicit guard for lines that exist as a product but are not currently
+  // bookable. The zod enum below already rejects these, but this states the
+  // reason out loud and survives someone re-adding a line to the enum without
+  // meaning to re-open requests for it.
+  if (typeof raw.serviceLine === 'string' && UNAVAILABLE_SERVICE_LINES.includes(raw.serviceLine as never)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'That service is not currently accepting requests. Please call (704) 941-8508 to ask about availability.',
+        fieldErrors: { serviceLine: 'Not currently available' },
+      },
+      { status: 400 },
     );
   }
 

@@ -148,7 +148,7 @@ export default function PostSurgeryTransportPage() {
           body: (
             <>
               <p>
-                Book online in about two minutes or call (704) 941-8508 — a
+                Request a ride in about two minutes or call (704) 941-8508 — a
                 person answers 24/7, which matters when your facility calls the
                 day before with a changed arrival time. Tell us the procedure
                 location, your check-in time, and your best guess at discharge.
@@ -181,7 +181,7 @@ export default function PostSurgeryTransportPage() {
               at one of the freestanding surgery and endoscopy centers scattered
               across SouthPark, Ballantyne, and University City, we have driven
               that route. Wheelchair-accessible vehicles are available if you
-              expect to need one going home — just tell dispatch when you book.
+              expect to need one going home — just tell dispatch when you request the ride.
             </p>
           ),
         },

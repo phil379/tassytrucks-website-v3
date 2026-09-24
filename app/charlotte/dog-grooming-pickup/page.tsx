@@ -71,9 +71,9 @@ export default function DogGroomingPickupPage() {
               <p>
                 For standing appointments, set the ride up once and stop thinking
                 about it. We schedule recurring weekly or biweekly slots that match
-                your grooming cadence, with the same pickup window each time. Book
+                your grooming cadence, with the same pickup window each time. Request
                 round-trip and we handle both legs, including the wait-and-return
-                coordination with your groomer&rsquo;s front desk. Book one-way if
+                coordination with your groomer&rsquo;s front desk. Request one-way if
                 you can manage drop-off but not pickup — or the reverse. Frequent
                 riders can put the whole routine on a{' '}
                 <Link href="/winnie" className={linkCls}>

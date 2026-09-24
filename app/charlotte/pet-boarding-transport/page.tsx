@@ -146,10 +146,10 @@ export default function PetBoardingTransportPage() {
           ),
         },
         {
-          h2: 'Booking and service area',
+          h2: 'Requests and service area',
           body: (
             <p>
-              Book online in about two minutes or call (704) 941-8508 — dispatch
+              Request a ride in about two minutes or call (704) 941-8508 — dispatch
               answers 24/7, which matters when your flight lands late. Routine
               rides need a 2-hour minimum lead time, but boarding runs are best
               booked as soon as your travel is confirmed so your preferred

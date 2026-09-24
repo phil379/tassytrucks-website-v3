@@ -74,7 +74,7 @@ export default function WheelchairTransportPage() {
                 driver can safely do.
               </p>
               <p>
-                Booking for a parent or spouse who uses a wheelchair? You can
+                Requesting a ride for a parent or spouse who uses a wheelchair? You can
                 arrange everything and receive the confirmations yourself — see{' '}
                 <Link href="/charlotte/family-medical-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   booking for a family member
@@ -159,7 +159,7 @@ export default function WheelchairTransportPage() {
       faqs={[
         {
           q: 'Do I have to transfer out of my wheelchair during the ride?',
-          a: 'No. You board and ride in your own chair. The driver secures it at four points and fits a separate lap and shoulder belt. If you prefer to transfer to a vehicle seat and stow the chair, that works too — tell dispatch when you book.',
+          a: 'No. You board and ride in your own chair. The driver secures it at four points and fits a separate lap and shoulder belt. If you prefer to transfer to a vehicle seat and stow the chair, that works too — tell dispatch when you request the ride.',
         },
         {
           q: 'Can you transport power wheelchairs in Charlotte?',
@@ -175,7 +175,7 @@ export default function WheelchairTransportPage() {
         },
         {
           q: 'How far in advance should I book a wheelchair ride in Charlotte?',
-          a: 'Booking the day before is ideal so we can guarantee the right vehicle. Same-day requests are accepted whenever an accessible vehicle is available — call (704) 941-8508 and dispatch will tell you honestly whether we can make your window.',
+          a: 'Requesting the day before is ideal so we can guarantee the right vehicle. Same-day requests are accepted whenever an accessible vehicle is available — call (704) 941-8508 and dispatch will tell you honestly whether we can make your window.',
         },
       ]}
       relatedLinks={[

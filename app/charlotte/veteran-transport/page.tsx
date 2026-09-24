@@ -86,7 +86,7 @@ export default function VeteranTransportPage() {
               h3: 'What to expect on ride day',
               body: (
                 <p>
-                  Booking takes about two minutes online or one phone call. We
+                  Requesting a ride takes about two minutes online or one phone call. We
                   confirm the trip the day before, and your driver arrives ahead
                   of the pickup window — not inside it. You ride in a clean,
                   properly insured vehicle with a driver who knows the

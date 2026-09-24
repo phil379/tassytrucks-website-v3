@@ -60,7 +60,7 @@ export default function DialysisTransportPage() {
           ),
         },
         {
-          h2: 'Book the whole series once — M-W-F or T-Th-Sa',
+          h2: 'Request the whole series once — M-W-F or T-Th-Sa',
           body: (
             <>
               <p>

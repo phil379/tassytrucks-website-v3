@@ -254,7 +254,7 @@ export default function LandingPageShell({
             Ready when you are.
           </h2>
           <p className="mt-3 ink-mute max-w-xl mx-auto">
-            Book online in about two minutes, or call our Charlotte dispatch line —
+            Request a ride in about two minutes, or call our Charlotte dispatch line —
             a person answers, 24/7.
           </p>
           <div className="mt-8 flex gap-3 flex-wrap justify-center">

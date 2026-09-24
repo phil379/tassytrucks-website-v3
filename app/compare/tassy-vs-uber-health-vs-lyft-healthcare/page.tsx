@@ -64,7 +64,7 @@ const rows: Row[] = [
     lyft: 'Dashboard support for organizations',
   },
   {
-    label: 'Booking method',
+    label: 'Request method',
     tassy: 'Phone or web wizard — no app required',
     uber: 'Organization dashboard / API',
     lyft: 'Organization dashboard / API',

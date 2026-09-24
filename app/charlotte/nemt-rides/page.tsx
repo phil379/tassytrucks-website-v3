@@ -108,12 +108,12 @@ export default function NemtRidesPage() {
           body: (
             <>
               <p>
-                Book online through our two-minute wizard, or call (704) 941-8508 —
+                Request a ride through our two-minute form, or call (704) 941-8508 —
                 a person answers around the clock, not a phone tree. Tell us the
                 pickup address, the appointment time, and any mobility needs. We
                 schedule the pickup so you arrive early, not breathless. For
                 recurring trips like dialysis, we set the whole series at once so
-                you never have to re-book.
+                you never have to request it again.
               </p>
               <p>
                 Need a ride for a parent or spouse instead of yourself? That works

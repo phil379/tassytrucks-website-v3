@@ -21,7 +21,7 @@ import { z } from 'zod';
  * `recovery` + `wellness` (the two lines where the driver waits). If that is
  * backwards, swapping the two `label`/`href` values below is the whole fix.
  */
-export const SERVICE_LINES = [
+const ALL_SERVICE_LINES = [
   { value: 'care', label: 'Tassy Care — medical transport', href: '/nemt' },
   { value: 'recovery', label: 'VIP Concierge — post-procedure', href: '/vip' },
   { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', href: '/renew' },
@@ -30,7 +30,30 @@ export const SERVICE_LINES = [
   { value: 'scholar', label: 'Tassy Scholar — student transport', href: '/school' },
 ] as const;
 
-export type ServiceLine = (typeof SERVICE_LINES)[number]['value'];
+export type ServiceLine = (typeof ALL_SERVICE_LINES)[number]['value'];
+
+/**
+ * Service lines that exist as a product but cannot currently be requested.
+ *
+ * `guardian` (Tassy Guardian) requires CNA-trained drivers the company does not
+ * have right now. The /recover page stays up and the line keeps its identity —
+ * it is simply not bookable, and its CTA asks about availability instead.
+ *
+ * Removing it from SERVICE_LINES does three things at once: it leaves the
+ * dropdown, it drops out of SERVICE_VALUES so the shared zod enum rejects it on
+ * the server, and `serviceLabel()` still resolves it so existing rows in the
+ * ops queue keep rendering a real name.
+ */
+export const UNAVAILABLE_SERVICE_LINES: readonly ServiceLine[] = ['guardian'];
+
+export function isRequestable(value: string): value is ServiceLine {
+  return SERVICE_VALUES.includes(value as ServiceLine);
+}
+
+/** The lines a visitor can actually pick. Drives the dropdown AND the zod enum. */
+export const SERVICE_LINES = ALL_SERVICE_LINES.filter(
+  (s) => !UNAVAILABLE_SERVICE_LINES.includes(s.value),
+);
 
 export const SERVICE_VALUES = SERVICE_LINES.map((s) => s.value) as [ServiceLine, ...ServiceLine[]];
 
@@ -133,8 +156,9 @@ export function minDateTimeLocal(now = new Date()): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+/** Resolves ANY line, including unavailable ones, so /ops renders legacy rows. */
 export function serviceLabel(value: string): string {
-  return SERVICE_LINES.find((s) => s.value === value)?.label ?? value;
+  return ALL_SERVICE_LINES.find((s) => s.value === value)?.label ?? value;
 }
 
 /** Normalise an arbitrary `?service=` param to a valid line, defaulting to care. */

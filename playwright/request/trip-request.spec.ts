@@ -8,7 +8,9 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
  * secrets, and a skipped test that says why beats a red build that says nothing.
  */
 
-const SERVICES = ['care', 'recovery', 'wellness', 'pet', 'guardian', 'scholar'] as const;
+// 'guardian' is deliberately absent: Tassy Guardian needs CNA-trained drivers
+// the company does not have, so it is not requestable.
+const SERVICES = ['care', 'recovery', 'wellness', 'pet', 'scholar'] as const;
 
 const MEDICAL_WARNING = 'Please do not include medical details, diagnoses, or procedure names.';
 const CONFIRMATION = 'We confirm every request by phone or text within 2 hours during business hours.';
@@ -101,6 +103,50 @@ test('wait-time copy shows for recovery and wellness only', async ({ page }) => 
 
   await page.goto('/request?service=pet');
   await expect(page.getByText(WAIT_COPY, { exact: false })).toHaveCount(0);
+});
+
+// ── Guardian is switched off ─────────────────────────────────────────────────
+
+test('guardian is not offered in the dropdown', async ({ page }) => {
+  await page.goto('/request');
+  const values = await page.locator('#serviceLine option').evaluateAll((opts) =>
+    opts.map((o) => (o as HTMLOptionElement).value),
+  );
+  expect(values, 'guardian is gone').not.toContain('guardian');
+  expect(values.length, 'the other five remain').toBe(5);
+});
+
+test('?service=guardian falls back rather than preselecting it', async ({ page }) => {
+  await page.goto('/request?service=guardian');
+  await expect(page.locator('#serviceLine')).not.toHaveValue('guardian');
+});
+
+test('a hand-crafted POST with service=guardian is rejected', async ({ request }) => {
+  const res = await request.post('/api/trip-request', {
+    data: { ...validPayload('guardian-guard-test'), serviceLine: 'guardian' },
+  });
+
+  expect(res.status(), 'server refuses the unavailable line').toBe(400);
+  const body = await res.json();
+  expect(body.ok).toBe(false);
+  expect(body.error).toContain('not currently accepting requests');
+});
+
+test('the /recover page stays up and asks about availability', async ({ page }) => {
+  const res = await page.goto('/recover');
+  expect(res?.status(), '/recover is still published').toBe(200);
+
+  const cta = page.getByRole('link', { name: /Ask about availability/i }).first();
+  await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute('href', /^tel:/);
+
+  // And nothing on the page routes into a guardian request.
+  const guardianLinks = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('a[href]'))
+      .map((a) => a.getAttribute('href') ?? '')
+      .filter((h) => h.includes('service=guardian')),
+  );
+  expect(guardianLinks, 'no guardian request links').toEqual([]);
 });
 
 // ── Validation ───────────────────────────────────────────────────────────────
@@ -307,12 +353,13 @@ test('every ride CTA on the homepage points to /request, none to the SaaS bookin
 });
 
 test('service pages route their CTA to the matching service line', async ({ page }) => {
+  // /recover is absent on purpose — Tassy Guardian is not requestable; it is
+  // covered by the "asks about availability" test above.
   const expected: Record<string, string> = {
     '/nemt': 'service=care',
     '/vip': 'service=recovery',
     '/winnie': 'service=pet',
     '/renew': 'service=wellness',
-    '/recover': 'service=guardian',
   };
 
   for (const [path, fragment] of Object.entries(expected)) {

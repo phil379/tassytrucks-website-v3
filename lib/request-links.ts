@@ -62,3 +62,16 @@ export const seoRequest = (vertical: Vertical, params: Record<string, string> = 
 
 /** Winnie Ride request deep link (replaces WINNIE_BOOK_URL). */
 export const WINNIE_REQUEST_URL = seoRequest('winnie', { source: 'web' });
+
+/**
+ * Tassy Scholar plan links.
+ *
+ * These previously deep-linked into the SaaS subscription setup wizard
+ * (`/book/school/<plan>/setup`), which is part of the booking flow that has
+ * never worked — so a parent trying to pay hit a dead end. They now land on the
+ * request form with the plan they picked carried through as a query param,
+ * which the form stamps onto `trip_requests.source`. Dispatch sees which plan
+ * they chose and quotes it.
+ */
+export const scholarPlan = (plan: 'full-year' | 'weekly' | 'after-school') =>
+  to('scholar', { plan });

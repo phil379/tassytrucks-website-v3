@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Phone, Check } from 'lucide-react';
-import { book, contact } from '@/lib/saas-links';
+import { contact } from '@/lib/saas-links';
+import { request, scholarPlan } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Tassy Scholar — daily student transport',
@@ -28,15 +29,17 @@ const serviceLd = {
   areaServed: ['Charlotte NC', 'High Point NC', 'Spartanburg SC', 'Rock Hill SC', 'Cincinnati OH'],
 };
 
-// Mirrors the SaaS /book/school plans (FIX_PROD_008/010). Each "Get started" deep-links
-// to the plan-specific 6-step setup wizard (slugs verified live).
+// Each plan links to the request form with the chosen plan carried through, so
+// dispatch can quote it. These used to deep-link into the SaaS subscription
+// setup wizard — part of the booking flow that has never worked, so a parent
+// trying to pay hit a dead end.
 const PLANS = [
   {
     name: 'Full School Year',
     badge: 'Best value',
     cadence: 'Daily AM + PM · Mon–Fri · Aug–May',
     features: ['AM + PM every school day', 'Same trusted driver', 'Schedule locked for the year', 'Priority on weather days'],
-    href: book.schoolFullYear,
+    href: scholarPlan('full-year'),
     highlight: true,
   },
   {
@@ -44,7 +47,7 @@ const PLANS = [
     badge: null,
     cadence: 'Pick your days · e.g. Tue / Wed / Thu',
     features: ['Choose the days that fit', 'AM and/or PM per day', 'Same trusted driver', 'Locked monthly schedule'],
-    href: book.schoolWeekly,
+    href: scholarPlan('weekly'),
     highlight: false,
   },
   {
@@ -52,7 +55,7 @@ const PLANS = [
     badge: null,
     cadence: 'Sports · clubs · programs',
     features: ['Per-program scheduling', 'Sports, clubs & enrichment', 'Pay upfront for the season', 'Locked, predictable schedule'],
-    href: book.schoolAfterSchool,
+    href: scholarPlan('after-school'),
     highlight: false,
   },
 ];
@@ -92,7 +95,7 @@ export default function SchoolPage() {
             predictable rides, the same friendly face, all year.
           </p>
           <div className="mt-9 flex gap-3 flex-wrap">
-            <a href={book.school} className="btn-gold">Choose your plan <ArrowRight size={16} /></a>
+            <a href={request.school} className="btn-gold">Choose your plan <ArrowRight size={16} /></a>
             <a href={contact.phone} className="btn-call"><Phone size={15} /> Call {contact.phoneDisplay}</a>
           </div>
           {/* MEGA_TASSY_PUBLISH_READY — brand motto on every service-line hero */}
@@ -216,7 +219,7 @@ export default function SchoolPage() {
             <div className="rounded-2xl border border-white/10 p-6" style={{ background: 'rgba(244,239,224,0.04)' }}>
               <div className="eyebrow opacity-70 text-current">For parents</div>
               <p className="mt-2 text-sm opacity-85 leading-relaxed">Pick a plan above and complete setup in minutes — schedule, kid profile, and safety acknowledgments.</p>
-              <a href={book.school} className="btn-gold mt-4 text-sm">Choose your plan <ArrowRight size={16} /></a>
+              <a href={request.school} className="btn-gold mt-4 text-sm">Choose your plan <ArrowRight size={16} /></a>
             </div>
             <div className="rounded-2xl border border-white/10 p-6" style={{ background: 'rgba(244,239,224,0.04)' }}>
               <div className="eyebrow opacity-70 text-current">For districts & EverDriven partners</div>

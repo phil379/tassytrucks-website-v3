@@ -162,11 +162,11 @@ export default function PostSurgeryPetTransportPage() {
               </p>
               <p>
                 Discharge times move — clinics run long, and a vet may want one
-                more hour of observation. That&rsquo;s fine. Book the pickup
+                more hour of observation. That&rsquo;s fine. Request the pickup
                 window once you have a rough discharge estimate, and call dispatch
                 at (704) 941-8508 if the clinic shifts it; a person answers 24/7.
                 Routine rides need a 2-hour minimum lead time, so the moment the
-                clinic gives you a window is the moment to book. If your pet has
+                clinic gives you a window is the moment to request the ride. If your pet has
                 regular checkups ahead, our{' '}
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides

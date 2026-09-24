@@ -70,7 +70,7 @@ export default function VetAppointmentRidesPage() {
           body: (
             <>
               <p>
-                <strong>You book.</strong> Online in about two minutes, or call
+                <strong>You request.</strong> Online in about two minutes, or call
                 (704) 941-8508 — dispatch answers 24/7. Tell us the pickup address,
                 the clinic, and the appointment time. Routine rides need a minimum
                 of two hours&rsquo; lead time; more notice makes your preferred
@@ -174,7 +174,7 @@ export default function VetAppointmentRidesPage() {
                 from $39/mo usually beats booking one ride at a time.
               </p>
               <p>
-                Booking is the same two-minute process every time: pickup address,
+                Requesting a ride is the same two-minute process every time: pickup address,
                 clinic, appointment time. Dispatch answers (704) 941-8508 around
                 the clock — a person, not a phone tree — and your pet&rsquo;s
                 vaccine records stay on file after the first trip.
@@ -190,7 +190,7 @@ export default function VetAppointmentRidesPage() {
         },
         {
           q: 'How much notice do you need for a vet ride?',
-          a: 'A minimum of two hours for routine rides. Booking the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
+          a: 'A minimum of two hours for routine rides. Requesting the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
         },
         {
           q: 'Does my pet need vaccines to ride?',

@@ -449,3 +449,17 @@ test('the push notification leaks no personal data', async ({ request }) => {
   const ref = (await res.json()).id.slice(0, 8);
   expect(published, 'carries the reference').toContain(ref);
 });
+
+test('/ops has no horizontal overflow at 375px', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto('/ops');
+
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(scrollWidth, 'fits a 375px screen').toBeLessThanOrEqual(375);
+
+  // The gate's own controls clear the 44px minimum.
+  for (const sel of ['#password', 'button[type="submit"]']) {
+    const box = await page.locator(sel).boundingBox();
+    expect(box!.height, `${sel} is 44px+`).toBeGreaterThanOrEqual(44);
+  }
+});

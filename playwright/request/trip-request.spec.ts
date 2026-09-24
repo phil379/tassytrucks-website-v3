@@ -115,8 +115,94 @@ test('required-field validation blocks submit', async ({ page }) => {
   await page.goto('/request');
   await page.getByRole('button', { name: 'Request a Ride' }).click();
 
-  await expect(page.getByText('Enter a pickup address')).toBeVisible();
+  // Inline error, wired to the field it belongs to.
+  await expect(page.locator('#pickupAddress-error')).toHaveText('Enter a pickup address');
   expect(posted, 'no request was sent').toBe(false);
+});
+
+// ── Accessibility (WCAG 2.1 AA) ──────────────────────────────────────────────
+
+test('a11y: every field has a real label and a 44px+ target', async ({ page }) => {
+  await page.goto('/request');
+
+  const ids = [
+    'serviceLine',
+    'pickupAddress',
+    'dropoffAddress',
+    'requestedAt',
+    'passengers',
+    'mobility',
+    'vehicleNotes',
+    'contactName',
+    'contactPhone',
+    'contactEmail',
+  ];
+
+  for (const id of ids) {
+    const label = page.locator(`label[for="${id}"]`);
+    await expect(label, `${id} has a <label for>`).toHaveCount(1);
+    expect((await label.textContent())?.trim(), `${id} label is not empty`).toBeTruthy();
+
+    const box = await page.locator(`#${id}`).boundingBox();
+    expect(box!.height, `${id} is at least 44px tall`).toBeGreaterThanOrEqual(44);
+  }
+
+  // The honeypot is hidden from assistive tech, not just off-screen.
+  await expect(page.locator('#company')).toHaveCount(1);
+  expect(await page.locator('#company').evaluate((el) => el.closest('[aria-hidden="true"]') !== null)).toBe(true);
+});
+
+test('a11y: validation errors are announced and linked to their fields', async ({ page }) => {
+  await page.route('**/api/trip-request', (route) => route.abort());
+  await page.goto('/request');
+
+  const summary = page.getByTestId("error-summary");
+  await page.getByRole('button', { name: 'Request a Ride' }).click();
+
+  // A live region carries the whole error set — an inline <p> alone is not
+  // announced unless focus happens to be on that field.
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('problem');
+  await expect(summary).toHaveAttribute('aria-live', 'assertive');
+
+  // Focus lands in the summary so a screen reader user is told what happened.
+  await expect(summary).toBeFocused();
+
+  // The invalid field is marked and points at its own error text.
+  const pickup = page.locator('#pickupAddress');
+  await expect(pickup).toHaveAttribute('aria-invalid', 'true');
+  await expect(pickup).toHaveAttribute('aria-describedby', /pickupAddress-error/);
+});
+
+test('a11y: the submit button is reachable by keyboard alone', async ({ page }) => {
+  await page.goto('/request');
+  await page.locator('#serviceLine').focus();
+
+  // Tab forward until the submit button takes focus. The cap is generous; the
+  // point is that no control traps focus on the way there.
+  let reached = false;
+  for (let i = 0; i < 40 && !reached; i++) {
+    await page.keyboard.press('Tab');
+    reached = await page.evaluate(
+      () => document.activeElement?.getAttribute('type') === 'submit',
+    );
+  }
+  expect(reached, 'submit is reachable via Tab').toBe(true);
+
+  // And it has a visible focus indicator.
+  const outline = await page.evaluate(() => {
+    const el = document.activeElement as HTMLElement;
+    const s = getComputedStyle(el);
+    return { width: s.outlineWidth, style: s.outlineStyle };
+  });
+  expect(outline.style, 'focus outline is drawn').not.toBe('none');
+  expect(parseFloat(outline.width), 'focus outline has width').toBeGreaterThan(0);
+});
+
+test('a11y: exactly one main landmark and one h1', async ({ page }) => {
+  await page.goto('/request');
+  await expect(page.locator('main')).toHaveCount(1);
+  await expect(page.locator('h1')).toHaveCount(1);
 });
 
 test('server rejects a pickup time inside the 4-hour window', async ({ request }) => {

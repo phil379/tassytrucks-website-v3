@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-const input =
-  'w-full rounded-lg border border-line bg-white px-3 py-3 text-base outline-none focus:border-[color:var(--gold,#C8932E)]';
+// Shared control style: dark-themed, 48px min height, 16px text (no iOS zoom).
+const input = 'form-field';
 
 function fmt(iso: string | null): string {
   if (!iso) return '—';
@@ -31,7 +31,7 @@ function fmt(iso: string | null): string {
 
 function LoginGate({ error }: { error?: string }) {
   return (
-    <main className="bg-cream min-h-screen">
+    <div className="bg-cream min-h-screen">
       <section className="container-x py-16">
         <div className="max-w-sm mx-auto card-tile p-6">
           <h1 className="serif text-2xl font-semibold">Ops queue</h1>
@@ -44,23 +44,23 @@ function LoginGate({ error }: { error?: string }) {
             <input id="password" name="password" type="password" className={input} autoFocus required />
 
             {error === 'bad' && (
-              <p role="alert" className="text-sm text-red-700">
+              <p role="alert" className="form-error">
                 Incorrect password.
               </p>
             )}
             {error === 'unconfigured' && (
-              <p role="alert" className="text-sm text-red-700">
+              <p role="alert" className="form-error">
                 OPS_PASSWORD is not configured on the server.
               </p>
             )}
 
-            <button type="submit" className="btn-primary w-full justify-center py-4 text-base">
+            <button type="submit" className="btn-primary w-full justify-center min-h-[52px] text-base">
               Sign in
             </button>
           </form>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
@@ -96,7 +96,7 @@ export default async function OpsPage({
   }
 
   return (
-    <main className="bg-cream min-h-screen">
+    <div className="bg-cream min-h-screen">
       <section className="container-x py-8">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <h1 className="serif text-2xl font-semibold">
@@ -107,7 +107,7 @@ export default async function OpsPage({
             </span>
           </h1>
           <form action={logout}>
-            <button type="submit" className="btn-ghost px-4 py-2 text-sm">
+            <button type="submit" className="btn-ghost px-4 min-h-[44px] text-sm">
               Sign out
             </button>
           </form>
@@ -119,8 +119,10 @@ export default async function OpsPage({
             <li>
               <Link
                 href="/ops"
-                className={`inline-block rounded-full border px-4 py-2.5 text-sm ${
-                  !statusFilter ? 'border-ink bg-ink text-cream' : 'border-line bg-white'
+                className={`inline-flex items-center rounded-full border px-5 min-h-[44px] text-sm ${
+                  !statusFilter
+                    ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/20 font-medium'
+                    : 'border-line'
                 }`}
               >
                 All
@@ -130,8 +132,10 @@ export default async function OpsPage({
               <li key={s}>
                 <Link
                   href={`/ops?status=${s}`}
-                  className={`inline-block rounded-full border px-4 py-2.5 text-sm capitalize ${
-                    statusFilter === s ? 'border-ink bg-ink text-cream' : 'border-line bg-white'
+                  className={`inline-flex items-center rounded-full border px-5 min-h-[44px] text-sm capitalize ${
+                    statusFilter === s
+                      ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/20 font-medium'
+                      : 'border-line'
                   }`}
                 >
                   {s}
@@ -142,7 +146,7 @@ export default async function OpsPage({
         </nav>
 
         {loadError && (
-          <p role="alert" className="mt-6 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+          <p role="alert" className="mt-6 form-alert">
             {loadError}
           </p>
         )}
@@ -164,42 +168,42 @@ export default async function OpsPage({
 
               <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
-                  <dt className="ink-mute">Phone</dt>
+                  <dt className="ink-soft">Phone</dt>
                   <dd>
-                    <a className="underline text-base py-1 inline-block" href={`tel:${row.contact_phone}`}>
+                    <a className="underline text-base inline-flex items-center min-h-[44px]" href={`tel:${row.contact_phone}`}>
                       {row.contact_phone}
                     </a>
                     <span className="ink-mute"> · prefers {row.preferred_contact ?? 'phone'}</span>
                   </dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Email</dt>
+                  <dt className="ink-soft">Email</dt>
                   <dd>{row.contact_email ?? '—'}</dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Pickup</dt>
+                  <dt className="ink-soft">Pickup</dt>
                   <dd>{row.pickup_address}</dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Destination</dt>
+                  <dt className="ink-soft">Destination</dt>
                   <dd>{row.dropoff_address}</dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Requested</dt>
+                  <dt className="ink-soft">Requested</dt>
                   <dd>{fmt(row.requested_at)}</dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Return</dt>
+                  <dt className="ink-soft">Return</dt>
                   <dd>{row.return_trip ? fmt(row.return_at) : 'No'}</dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Passengers / mobility</dt>
+                  <dt className="ink-soft">Passengers / mobility</dt>
                   <dd>
                     {row.passengers ?? 1} · {row.mobility ?? '—'}
                   </dd>
                 </div>
                 <div>
-                  <dt className="ink-mute">Submitted</dt>
+                  <dt className="ink-soft">Submitted</dt>
                   <dd>{fmt(row.created_at)}</dd>
                 </div>
               </dl>
@@ -261,7 +265,7 @@ export default async function OpsPage({
                   />
                 </div>
 
-                <button type="submit" className="btn-primary w-full justify-center py-4 text-base">
+                <button type="submit" className="btn-primary w-full justify-center min-h-[52px] text-base">
                   Save
                 </button>
               </form>
@@ -269,6 +273,6 @@ export default async function OpsPage({
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

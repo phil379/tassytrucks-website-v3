@@ -5,6 +5,9 @@ const BASE = 'https://www.tassytrucks.com';
 // Static + SEO landing routes. Add new landing pages here when they ship.
 const routes: Array<{ path: string; priority: number }> = [
   { path: '/', priority: 1.0 },
+  // The conversion page. Every ride CTA on the site now lands here, so it must
+  // be discoverable in its own right — it was missing from the sitemap.
+  { path: '/request', priority: 0.9 },
   { path: '/nemt', priority: 0.9 },
   { path: '/vip', priority: 0.9 },
   { path: '/winnie', priority: 0.9 },

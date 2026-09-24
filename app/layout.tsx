@@ -58,6 +58,9 @@ export const viewport: Viewport = {
 const localBusinessLd = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
+  // Stable identity so every per-page Service block can point at one business
+  // record instead of re-declaring an anonymous provider.
+  '@id': 'https://www.tassytrucks.com/#business',
   name: 'Tassy Transportation',
   description:
     'Charlotte-based premium transportation: Tassy Care, VIP concierge, pet transport, wellness and oncology recovery rides. Service-Disabled Veteran-Owned Small Business.',
@@ -79,6 +82,13 @@ const localBusinessLd = {
     addressCountry: 'US',
   },
   openingHours: 'Mo-Su 00:00-23:59',
+  // The market, stated machine-readably. Previously the geography existed only
+  // in prose and in the 16 SEO landing pages — the root business record, which
+  // is what an assistant reads first, did not say where the company operates.
+  areaServed: [
+    { '@type': 'City', name: 'Charlotte', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+    { '@type': 'AdministrativeArea', name: 'Mecklenburg County', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+  ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Tassy Transportation transportation services',

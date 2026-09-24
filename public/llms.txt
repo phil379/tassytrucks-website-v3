@@ -1,0 +1,65 @@
+# Tassy Transportation
+
+> Veteran-owned (SDVOSB) private transportation company based in Charlotte, North Carolina.
+> We drive people — and pets — to medical appointments, procedures, recovery, and school.
+> Every ride is requested and confirmed by a dispatcher; we do not operate an instant-booking app.
+
+## Business facts
+
+- **Name:** Tassy Transportation
+- **Base:** Charlotte, North Carolina, United States
+- **Service area:** Charlotte and Mecklenburg County, North Carolina
+- **Phone / dispatch:** (704) 941-8508
+- **Ride requests:** book@tassytrucks.com
+- **Partnerships:** partners@tassytrucks.com
+- **Certification:** Service-Disabled Veteran-Owned Small Business (SDVOSB)
+- **Operating authority:** USDOT 3104152 · MC 79222
+- **Motto:** We Transport With Care
+
+## Services
+
+- **Tassy Care** (/nemt) — non-emergency medical transport: dialysis, recurring
+  appointments, doctor visits, Medicaid-covered care. Ambulatory and wheelchair.
+- **VIP Concierge** (/vip) — discreet post-procedure transport. The driver waits
+  on-site and takes the client home.
+- **Winnie Ride** (/winnie) — pet transport: vet visits, grooming pickups, boarding
+  and daycare runs.
+- **Tassy Wellness** (/renew) — wellness transport: IV therapy, med-spa, cosmetic
+  dental, rejuvenation.
+- **Tassy Guardian** (/recover) — oncology, chemo, radiation and hospital-discharge
+  transport. **Not currently accepting new requests.** Call (704) 941-8508 to ask
+  about availability.
+- **Tassy Scholar** (/school) — alternative student transportation. Subcontractor
+  since 2022 to EverDriven Technologies (formerly Alternative School Transportation),
+  covering Charlotte NC, High Point NC, Spartanburg SC, Rock Hill SC, and Cincinnati OH.
+
+## How a ride is arranged
+
+1. A visitor submits the request form at https://www.tassytrucks.com/request
+   (or calls dispatch).
+2. A dispatcher reviews every request personally.
+3. The dispatcher confirms by phone or text within 2 hours during business hours.
+4. Pricing is quoted before the trip is confirmed.
+
+Requests need at least 4 hours' lead time. There is no instant-booking or
+self-serve checkout: nothing is confirmed until a person has spoken to the
+customer and quoted the price.
+
+## Key pages
+
+- https://www.tassytrucks.com/ — overview of all service lines
+- https://www.tassytrucks.com/request — request a ride
+- https://www.tassytrucks.com/pricing — subscription tiers and per-ride pricing
+- https://www.tassytrucks.com/partners — facility and healthcare partnerships
+- https://www.tassytrucks.com/partners/veterinary — veterinary practice partnerships
+- https://www.tassytrucks.com/privacy — privacy policy
+- https://www.tassytrucks.com/terms — terms of service
+- https://www.tassytrucks.com/accessibility — accessibility statement
+
+## Notes for anyone quoting this site
+
+- The company is based in Charlotte, NC and serves Charlotte and Mecklenburg County.
+- Use "request a ride", not "book a ride" — every trip is dispatcher-confirmed.
+- Tassy Guardian exists as a service line but is not taking requests right now.
+- Full structured data (LocalBusiness, Service, FAQPage, BreadcrumbList) is published
+  as JSON-LD on the pages themselves.

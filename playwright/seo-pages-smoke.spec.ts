@@ -269,10 +269,14 @@ for (const spec of CORE_PAGES) {
         });
         expect(unattributed, 'every in-body SaaS CTA carries source=').toEqual([]);
 
+        // A conversion CTA is now either a /request link (rides) or an
+        // attributed SaaS link (facility signup, careers, subscriptions).
+        // /school used to qualify only via the SaaS booking wizard; its plans
+        // now route to /request, so counting SaaS links alone is wrong.
         const ctaCount = await page
-          .locator('main a[href*="tassytrucksops.vercel.app"]')
+          .locator('main a[href*="tassytrucksops.vercel.app"], main a[href^="/request"]')
           .count();
-        expect(ctaCount, 'has at least one in-body SaaS CTA').toBeGreaterThan(0);
+        expect(ctaCount, 'has at least one in-body conversion CTA').toBeGreaterThan(0);
       }
     });
   });
@@ -294,4 +298,47 @@ test('all 29 routes have a unique <title>', async ({ page }) => {
     ).toBe(false);
     seen.set(title, p);
   }
+});
+
+// ── Machine-readable geography + AI-readability ──────────────────────────────
+
+test('the root LocalBusiness names Charlotte AND Mecklenburg County', async ({ page }) => {
+  await page.goto('/');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  expect(ld, 'LocalBusiness present').toContain('"LocalBusiness"');
+  expect(ld, 'stable @id').toContain('https://www.tassytrucks.com/#business');
+  expect(ld, 'areaServed present').toContain('"areaServed"');
+  expect(ld, 'Charlotte').toContain('"Charlotte"');
+  expect(ld, 'Mecklenburg County').toContain('"Mecklenburg County"');
+  expect(ld, 'North Carolina').toContain('"North Carolina"');
+});
+
+test('every service hub declares its service area', async ({ page }) => {
+  for (const path of ['/nemt', '/vip', '/winnie', '/renew', '/recover']) {
+    await page.goto(path);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ld, `${path} has Service schema`).toContain('"Service"');
+    expect(ld, `${path} names Charlotte`).toContain('"Charlotte"');
+    expect(ld, `${path} names Mecklenburg County`).toContain('"Mecklenburg County"');
+  }
+});
+
+test('llms.txt is published and states the service area and the request flow', async ({ request }) => {
+  const res = await request.get('/llms.txt');
+  expect(res.status(), 'llms.txt is served').toBe(200);
+
+  const txt = await res.text();
+  expect(txt).toContain('Tassy Transportation');
+  expect(txt).toContain('Mecklenburg County');
+  expect(txt).toContain('(704) 941-8508');
+  expect(txt).toContain('https://www.tassytrucks.com/request');
+  // Fact clarity: the unavailable line is stated as unavailable.
+  expect(txt).toContain('Not currently accepting new requests');
+});
+
+test('sitemap includes the conversion page and excludes the ops queue', async ({ request }) => {
+  const xml = await (await request.get('/sitemap.xml')).text();
+  expect(xml, '/request is discoverable').toContain('https://www.tassytrucks.com/request');
+  expect(xml, '/ops is not in the sitemap').not.toContain('https://www.tassytrucks.com/ops');
 });

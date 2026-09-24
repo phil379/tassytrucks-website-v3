@@ -52,7 +52,10 @@ export default function ServicePage({
             name: 'Tassy Transportation',
             telephone: '+1-704-941-8508',
           },
-          areaServed: { '@type': 'City', name: 'Charlotte', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+          areaServed: [
+            { '@type': 'City', name: 'Charlotte', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+            { '@type': 'AdministrativeArea', name: 'Mecklenburg County', containedInPlace: { '@type': 'State', name: 'North Carolina' } },
+          ],
           url: `https://www.tassytrucks.com${path}`,
         }
       : null;

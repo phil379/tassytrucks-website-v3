@@ -30,21 +30,32 @@ test('/school loads with the parent-direct hero', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('Daily school transport');
 });
 
-// FIX_PROD_021 — the no-booking constraint was REVERSED. The SaaS now ships the
-// parent-direct subscription, so /school deep-links to /book/school + the three
-// plan-setup wizards. This test guards the NEW contract.
-test('/school deep-links to the parent-direct booking wizards', async ({ page }) => {
+// The SaaS parent-direct subscription wizard (/book/school/<plan>/setup) is part
+// of the booking flow that has never worked — a parent trying to pay hit a dead
+// end there. /school now routes to the in-repo request pipeline, carrying the
+// chosen plan so dispatch can quote it. This test guards THAT contract.
+test('/school routes every plan into the request pipeline', async ({ page }) => {
   await page.goto('/school');
   const main = page.locator('main');
-  // Hero CTA + the three plan cards all link into the SaaS booking surface.
-  expect(await main.locator('a[href*="/book/school"]').count()).toBeGreaterThanOrEqual(4);
-  for (const slug of ['full-year', 'weekly', 'after-school']) {
-    expect(await main.locator(`a[href*="/book/school/${slug}/setup"]`).count()).toBeGreaterThanOrEqual(1);
+
+  // Hero CTA + the three plan cards.
+  expect(await main.locator('a[href*="/request?service=scholar"]').count()).toBeGreaterThanOrEqual(4);
+
+  for (const plan of ['full-year', 'weekly', 'after-school']) {
+    expect(
+      await main.locator(`a[href*="plan=${plan}"]`).count(),
+      `${plan} plan links to the request form`,
+    ).toBeGreaterThanOrEqual(1);
   }
-  // Every CTA carries the analytics source param.
-  const firstBook = await main.locator('a[href*="/book/school"]').first().getAttribute('href');
-  expect(firstBook).toContain('source=web');
-  // The old "we don't take direct bookings" disclaimer is gone.
+
+  // And nothing on the page still points at the dead SaaS booking surface.
+  const deadLinks = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('a[href]'))
+      .map((a) => a.getAttribute('href') ?? '')
+      .filter((h) => h.includes('/book/school')),
+  );
+  expect(deadLinks, 'no SaaS school booking links remain').toEqual([]);
+
   await expect(main).not.toContainText('do not currently take direct parent bookings');
 });
 

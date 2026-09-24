@@ -1,9 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "comment": "Hobby allows ONE cron invocation per day. A */15 schedule here does not fail the build - Vercel refuses to create the deployment at all, posts 'Deployment failed' to the commit, and no deployment record ever appears in the dashboard. That is what blocked 90b3489..2cb286b (19 commits) from ever shipping. Until the account is on Pro, the real 15-minute escalation runs from an external scheduler hitting /api/cron/escalate-stale-requests with 'Authorization: Bearer $CRON_SECRET'. This daily entry stays as a backstop so a dead external scheduler still gets caught once a day.",
   "crons": [
     {
       "path": "/api/cron/escalate-stale-requests",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 14 * * *"
     }
   ]
 }

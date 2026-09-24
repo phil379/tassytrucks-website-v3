@@ -18,6 +18,8 @@ import {
   type ServiceLine,
 } from '@/lib/trip-request';
 import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
+import TripDetailsFields from '@/components/request/TripDetailsFields';
+import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { SHOW_ESTIMATES, estimateTrip, formatRange } from '@/lib/quote';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
@@ -70,13 +72,32 @@ export default function RequestForm({
     return requested && allowed.includes(requested) ? requested : defaultMobilityFor(initialService);
   });
 
+  /**
+   * The per-service answers — pet breed, school, who signs the patient out.
+   * Kept as plain strings here and coerced once, by the shared validator, so
+   * the form and the server agree on what a number or a date means.
+   */
+  const [details, setDetails] = useState<Record<string, string>>({});
+
   function changeService(next: ServiceLine) {
     setService(next);
     // Carry the answer over when it still exists in the new list (`other` does),
     // otherwise fall back to that line's sensible default.
     const allowed = mobilityOptionsFor(next).map((m) => m.value as string);
     setMobility((current) => (allowed.includes(current) ? current : defaultMobilityFor(next)));
+    // Wipe the detail block. The keys overlap across lines by coincidence, not
+    // by meaning — carrying a pet's name into a Scholar request would put a
+    // dog's name where a child's belongs.
+    setDetails({});
+    setErrors((current) => {
+      const kept: Record<string, string> = {};
+      for (const [key, message] of Object.entries(current)) {
+        if (!key.startsWith('details.')) kept[key] = message;
+      }
+      return kept;
+    });
   }
+
   const [returnTrip, setReturnTrip] = useState(false);
 
   // Lifted out of the address fields so the estimate can react to them. Null
@@ -98,6 +119,15 @@ export default function RequestForm({
   const [done, setDone] = useState<string | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
+
+  /** Errors for the detail block, keyed the way that block expects them. */
+  const detailErrors = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const [key, message] of Object.entries(errors)) {
+      if (key.startsWith('details.')) out[key.slice('details.'.length)] = message;
+    }
+    return out;
+  }, [errors]);
 
   const [minDateTime, setMinDateTime] = useState('');
   useEffect(() => setMinDateTime(minDateTimeLocal()), []);
@@ -273,17 +303,29 @@ export default function RequestForm({
       contactEmail: String(fd.get('contactEmail') ?? '') || null,
       preferredContact: String(fd.get('preferredContact') ?? 'phone'),
       company: String(fd.get('company') ?? ''),
+      // Raw strings. The server re-validates them against the same spec and
+      // stores only what comes back from it.
+      tripDetails: details,
       source,
     };
 
     // Client-side validation is a courtesy. The server re-runs this same schema
     // and is the authority.
     const check = tripRequestSchema.safeParse(payload);
-    if (!check.success) {
+    const detailCheck = validateDetails(payload.serviceLine, details);
+
+    if (!check.success || !detailCheck.ok) {
       const next: Record<string, string> = {};
-      for (const issue of check.error.issues) {
-        const key = issue.path.join('.') || 'form';
-        if (!next[key]) next[key] = issue.message;
+      if (!check.success) {
+        for (const issue of check.error.issues) {
+          const key = issue.path.join('.') || 'form';
+          if (!next[key]) next[key] = issue.message;
+        }
+      }
+      if (!detailCheck.ok) {
+        for (const [key, message] of Object.entries(detailCheck.errors)) {
+          next[`details.${key}`] = message;
+        }
       }
       announce(next);
       return;
@@ -361,7 +403,11 @@ export default function RequestForm({
             <ul className="list-disc pl-5 mt-1 space-y-0.5">
               {errorList.map(([name, message]) => (
                 <li key={name}>
-                  <a href={`#${name}`} className="underline">
+                  {/* A detail error is keyed `details.pet_name` but the input it
+                      belongs to is `#details-pet_name`. Without this the link in
+                      the summary scrolls nowhere, which is worse than no link —
+                      a screen reader user is told where to go and then dropped. */}
+                  <a href={`#${name.replace('details.', 'details-')}`} className="underline">
                     {message}
                   </a>
                 </li>
@@ -498,6 +544,16 @@ export default function RequestForm({
         </div>
       </div>
 
+      {/* Who or what is travelling. Swaps with the service line — a pet owner
+          is asked about a breed, a parent about a school. See
+          lib/trip-details.ts for why this is a spec rather than markup. */}
+      <TripDetailsFields
+        service={service}
+        values={details}
+        errors={detailErrors}
+        onChange={(key, value) => setDetails((current) => ({ ...current, [key]: value }))}
+      />
+
       <div>
         <label className={labelCls} htmlFor="vehicleNotes">
           Anything we should know to prepare the vehicle?
@@ -519,6 +575,18 @@ export default function RequestForm({
           {notes.length} of {VEHICLE_NOTES_MAX} characters used
         </p>
         <FieldError name="vehicleNotes" />
+      </div>
+
+      {/* THE HEADING IS THE FIX. Without it, "First name" sat directly under
+          "How does your pet travel?" and read as a request for the dog's name.
+          Say whose details these are, every time, on every service line. */}
+      <div className="border-t border-line pt-6">
+        <h2 className="serif text-lg font-semibold">Your contact details</h2>
+        <p className="ink-soft mt-1 text-xs">
+          {detailsFor(service)
+            ? 'Yours — the person we call back, not the passenger above.'
+            : 'The person we call back to confirm this trip.'}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

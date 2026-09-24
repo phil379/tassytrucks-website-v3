@@ -5,6 +5,7 @@ import {
   shortRef,
   type TripRequestInput,
 } from './trip-request';
+import { describeDetails, detailsFor } from './trip-details';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -200,6 +201,10 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     '',
     `Vehicle notes:     ${data.vehicleNotes || '—'}`,
     '',
+    // Who or what is travelling. This is the block that decides which vehicle
+    // and which driver, so it goes in the email a dispatcher reads on a phone
+    // rather than only in the queue they have to log into.
+    ...detailLines(data.serviceLine, data.tripDetails),
     `Quote and confirm here: ${opsUrl()}`,
   ];
 
@@ -208,6 +213,22 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}`,
     text: lines.join('\n'),
   });
+}
+
+/**
+ * The per-service answers, as aligned plain-text lines, under a heading that
+ * names the subject. Empty when the line asks nothing extra — in which case the
+ * heading is omitted too, rather than printing "About your pet" over nothing.
+ */
+function detailLines(serviceLine: string, stored: unknown): string[] {
+  const items = describeDetails(serviceLine, stored);
+  if (items.length === 0) return [];
+  const section = detailsFor(serviceLine);
+  return [
+    `${(section?.title ?? 'Trip details').toUpperCase()}`,
+    ...items.map((item) => `  ${`${item.label}:`.padEnd(30)} ${item.value}`),
+    '',
+  ];
 }
 
 /**

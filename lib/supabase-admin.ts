@@ -61,6 +61,8 @@ export type TripRequestRow = {
   passengers: number | null;
   mobility: string | null;
   vehicle_notes: string | null;
+  /** Per-service answers. Shape varies by service_line — lib/trip-details.ts. */
+  trip_details: Record<string, string | number | boolean> | null;
   quoted_cents: number | null;
   wait_included_min: number | null;
   overage_cents_per_30min: number | null;

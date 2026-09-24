@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { isOpsAuthed } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES, type TripRequestRow } from '@/lib/supabase-admin';
 import { mobilityLabel, serviceLabel } from '@/lib/trip-request';
+import { describeDetails } from '@/lib/trip-details';
 import { login, logout, updateRow, advanceStatus } from './actions';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
@@ -238,6 +239,20 @@ export default async function OpsPage({
                   <dd>{fmt(row.created_at)}</dd>
                 </div>
               </dl>
+
+              {/* Who or what is travelling. Labelled from the same spec the
+                  customer filled in, so a dispatcher reads "Door through door"
+                  and never has to know it was stored as `through`. */}
+              {describeDetails(row.service_line, row.trip_details).length > 0 && (
+                <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border border-line bg-cream p-3 text-sm sm:grid-cols-3">
+                  {describeDetails(row.service_line, row.trip_details).map((item) => (
+                    <div key={item.key}>
+                      <dt className="ink-soft text-xs">{item.label}</dt>
+                      <dd className="whitespace-pre-wrap break-words">{item.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
 
               {row.vehicle_notes && (
                 <p className="mt-3 rounded-lg bg-cream border border-line p-3 text-sm">

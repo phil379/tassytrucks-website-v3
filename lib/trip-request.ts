@@ -234,6 +234,17 @@ const tripRequestObject = z
     contactEmail: z.union([z.literal(''), z.string().trim().email('Enter a valid email')]).optional().nullable(),
     preferredContact: z.enum(PREFERRED_CONTACT).default('phone'),
 
+    /**
+     * The per-service answers, as raw strings off the form.
+     *
+     * Deliberately UNTYPED here. The shape depends on the service line, and the
+     * authority on it is validateDetails() in lib/trip-details.ts, which the
+     * route runs separately — teaching zod the same rules in a second place is
+     * how the two drift apart. All this line does is let the key through
+     * without failing the whole request.
+     */
+    tripDetails: z.unknown().optional().nullable(),
+
     /** Honeypot — must stay empty. Real browsers never fill a hidden field. */
     company: z.string().optional().nullable(),
   })

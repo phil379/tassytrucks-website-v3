@@ -5,6 +5,7 @@ import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
+import { validateDetails } from '@/lib/trip-details';
 import { parseLocalDateTime } from '@/lib/time';
 
 /**
@@ -89,6 +90,36 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
+  // The per-service answers get their own pass, against the spec rather than
+  // against zod. A missing pet name or an unrecognised grade comes back here as
+  // a field error keyed `details.<key>`, which is exactly what the form expects.
+  //
+  // OMITTING THE KEY ENTIRELY IS NOT THE SAME AS LEAVING IT BLANK. The form
+  // always posts the object, even empty, so a customer always gets the
+  // questions enforced. A caller that does not send the key at all is an older
+  // integration that predates these questions, and the answer to that is a row
+  // a dispatcher has to chase on the phone — not a rejected booking. Same rule
+  // as the legacy single `contactName` field: keep the old shape working.
+  const suppliedDetails = data.tripDetails !== undefined && data.tripDetails !== null;
+  const detailCheck = suppliedDetails
+    ? validateDetails(data.serviceLine, data.tripDetails)
+    : ({ ok: true, values: {} } as const);
+
+  if (!detailCheck.ok) {
+    const fieldErrors: Record<string, string> = {};
+    for (const [key, message] of Object.entries(detailCheck.errors)) {
+      fieldErrors[`details.${key}`] = message;
+    }
+    return NextResponse.json(
+      { ok: false, error: 'Please check the form.', fieldErrors },
+      { status: 400 },
+    );
+  }
+  // An empty object is stored as NULL, not as `{}`. A dispatcher scanning the
+  // queue should be able to tell "this line asks nothing extra" from "they
+  // answered nothing", and `{}` reads as neither.
+  const tripDetails = Object.keys(detailCheck.values).length > 0 ? detailCheck.values : null;
+
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? null;
 
@@ -169,6 +200,8 @@ export async function POST(request: Request) {
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,
+        // Validated above, never the raw body. See lib/trip-details.ts.
+        trip_details: tripDetails,
         source,
         user_agent: userAgent,
       })
@@ -189,7 +222,10 @@ export async function POST(request: Request) {
   }
 
   // Past this line the request is captured. Nothing below may change the status code.
-  const notifications = await fireNotifications(id, data);
+  // The alert gets the VALIDATED details, the same object that went into the
+  // row — never the raw body, or a dispatcher's email could be made to print
+  // whatever a script chose to post.
+  const notifications = await fireNotifications(id, { ...data, tripDetails });
 
   return NextResponse.json({ ok: true, id, notifications }, { status: 200 });
 }

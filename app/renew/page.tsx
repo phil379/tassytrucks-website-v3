@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { subscribe, facilitySignup } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Wellness — IV therapy & med-spa rides',
+  title: 'IV therapy & med-spa rides in Charlotte | Tassy Transportation',
   description:
-    'Premium Charlotte transport for IV therapy clinics, med-spas, and rejuvenation appointments. Hydration kit on every ride. Wellness subscriptions from $149/mo.',
+    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $69 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
   alternates: { canonical: '/renew' },
   openGraph: { url: '/renew', images: ['/og-image/renew'] },
 };
@@ -14,59 +13,51 @@ export const metadata: Metadata = {
 export default function RenewPage() {
   return (
     <ServicePage
-      eyebrow="Wellness · IV Therapy + Med-Spa + Rejuvenation"
-      title="The transport your wellness routine deserves."
-      tagline="IV therapy. Med-spa. Cryotherapy. Cosmetic dental. We get you there and back, refreshed."
-      description="Tassy Wellness is the wellness-focused arm of our premium fleet. Built for the customer who's invested in their longevity — IV drips, hyperbaric, rejuvenation, and aesthetic maintenance. Every ride includes a hydration recovery kit and the same premium fleet as VIP Concierge."
+      eyebrow="Wellness &amp; med-spa appointments"
+      title="Two ways to get to a wellness appointment."
+      tagline="Which one you need depends on how you will feel afterwards."
+      description="Wellness and med-spa runs used to be their own service line. They are now handled by the two lines that actually fit: Tassy Concierge when you are simply going there and back under your own steam, and Tassy Recovery when the procedure means you should not be driving and someone needs to wait for you. Same company, clearer pricing, and you are never sold the expensive one when the cheaper one is right."
       bookHref={request.renew}
-      bookLabel="Request a wellness ride"
-      serviceName="Tassy Wellness — Wellness & Med-Spa Transport"
+      bookLabel="Book a ride"
+      altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
+      serviceName="Wellness and Med-Spa Transportation"
       path="/renew"
-      highlightsHeading="Wellness & med-spa transport across Charlotte"
+      highlightsHeading="Getting to IV therapy, med-spa and aesthetic appointments in Charlotte"
       highlights={[
         {
-          title: 'Hydration recovery kit',
-          body: 'Every Wellness ride includes electrolytes, snack, hand cream, and a Tassy-branded water bottle. The post-IV ride home is part of the experience.',
+          title: 'Going there and coming back on your own',
+          body: 'An IV drip, a facial, a routine appointment you walk out of feeling fine. That is Tassy Concierge — a reserved car and a professional driver, flat rate from $69 one way. Book the return separately for whenever you expect to be finished.',
         },
         {
-          title: 'Med-spa partnerships',
-          body: 'We have direct relationships with Charlotte\'s leading med-spas and IV therapy clinics. Bundle transport into their treatment package.',
+          title: 'If you should not be driving afterwards',
+          body: 'Sedation, anything that leaves you groggy, or a clinic that asks you to arrange a ride home. That is Tassy Recovery — from $129 for the trip there, the wait, and the trip home, with one pharmacy stop on the way.',
         },
         {
-          title: 'Recurring memberships',
-          body: 'Most Wellness customers book 2-4x per month. Subscription tiers turn that into predictable, discounted recurring rides.',
+          title: 'Ask us which one you need',
+          body: 'Call and describe the appointment. If Concierge covers it we will tell you, because selling you the round trip when you do not need one is how a company loses the next booking.',
+        },
+        {
+          title: 'Going regularly?',
+          body: 'A standing course of treatment can go on the Standing Ride Plan — the same driver at the same time each week, 15% off, billed monthly, minimum eight legs.',
         },
       ]}
       tiers={[
         {
-          name: 'Wellness Essential',
-          price: '$149',
-          cadence: 'mo',
-          features: ['2 rides included', 'Hydration kit', 'Premium sedan', 'Same-day booking'],
-          cta: { label: 'Subscribe Essential', href: subscribe.renewEssential },
+          name: 'Tassy Concierge',
+          price: 'From $69',
+          cadence: 'one way',
+          features: ['Reserved for your time', 'Flat rate, no surge', 'Full-size SUV', 'Book the return separately'],
+          cta: { label: 'Reserve a car', href: request.vip },
         },
         {
-          name: 'Wellness Signature',
-          price: '$295',
-          cadence: 'mo',
-          features: ['4 rides included', 'Premium SUV option', 'Aromatherapy add-on', 'Priority scheduling'],
-          cta: { label: 'Subscribe Signature', href: subscribe.renewSignature },
+          name: 'Tassy Recovery',
+          price: 'From $129',
+          cadence: 'there, the wait, and home',
+          features: ['Driver waits 20 minutes', 'One pharmacy stop included', 'Help to the car and to your door', 'Family text on the way home'],
+          cta: { label: 'Book the round trip', href: request.recover },
           highlight: true,
         },
-        {
-          name: 'Wellness Elite',
-          price: '$495',
-          cadence: 'mo',
-          features: ['Unlimited rides', 'Luxury fleet', 'Spa-day add-on', 'Dedicated coordinator'],
-          cta: { label: 'Subscribe Elite', href: subscribe.renewElite },
-        },
       ]}
-      partnerCta={{
-        title: 'Are you a med-spa, IV clinic, or wellness practice?',
-        body: 'Bundle Tassy Wellness with your treatment packages. Facility portal, white-label voucher codes, and patient-experience uplift built in.',
-        href: facilitySignup('clinic'),
-        label: 'Get started · no credit card',
-      }}
     />
   );
 }

@@ -98,6 +98,10 @@ export async function POST(request: Request) {
     serviceLine: data.serviceLine,
     pickup: { lat: data.pickupLat, lng: data.pickupLng },
     dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
+    // The typed addresses are passed too, so a row with no picked place still
+    // gets a ZIP-derived estimate rather than a blank in the ops queue.
+    pickupAddress: data.pickupAddress,
+    dropoffAddress: data.dropoffAddress,
     requestedAt: data.requestedAt,
     passengers: data.passengers,
     returnTrip: data.returnTrip,

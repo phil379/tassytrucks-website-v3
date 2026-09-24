@@ -62,6 +62,7 @@ export default function AddressAutocomplete({
   describedBy,
   defaultValue = '',
   onResolve,
+  onText,
   debug = false,
 }: {
   name: string;
@@ -79,6 +80,15 @@ export default function AddressAutocomplete({
    * that no longer describes the address on screen.
    */
   onResolve?: (place: ResolvedPlace | null) => void;
+  /**
+   * Fires on every keystroke with the raw text in the field.
+   *
+   * This is what keeps pricing alive when Places cannot help: no Maps key, an
+   * address typed rather than picked, or Google having a bad afternoon. The ZIP
+   * inside this string is enough to put a real estimate on screen — see
+   * lib/zip-centroids.ts — and a blank panel loses the booking outright.
+   */
+  onText?: (value: string) => void;
   /**
    * Operator-only. Shows why suggestions are off instead of failing silently.
    * Never on for a customer — see the note in lib/google-maps.ts.
@@ -101,6 +111,13 @@ export default function AddressAutocomplete({
   useEffect(() => {
     onResolveRef.current?.(resolved);
   }, [resolved]);
+
+  // Same pattern for the raw text, for the same reason: report what rendered.
+  const onTextRef = useRef(onText);
+  onTextRef.current = onText;
+  useEffect(() => {
+    onTextRef.current?.(text);
+  }, [text]);
 
   const listId = useId();
   const statusId = useId();

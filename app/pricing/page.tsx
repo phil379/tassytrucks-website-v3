@@ -1,269 +1,294 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Check, ArrowRight } from 'lucide-react';
-import { subscribe, contact } from '@/lib/saas-links';
+import { ArrowRight } from 'lucide-react';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Pricing — Tassy subscriptions & per-ride tiers',
+  title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
   description:
-    'VIP Concierge, Winnie Ride, Tassy Wellness, and Tassy Guardian subscription tiers plus per-ride pricing. Charlotte premium transport from $39/mo.',
+    'Charlotte medical, pet and premium transport priced by distance, not by meter. Tassy Care from $49, Recovery from $129, Concierge from $69, Winnie Ride from $49. No surge.',
   alternates: { canonical: '/pricing' },
   openGraph: { url: '/pricing', images: ['/og-image/pricing'] },
 };
 
-type Tier = {
-  name: string;
-  price: string;
-  cadence?: string;
-  blurb: string;
-  features: string[];
-  cta: { label: string; href: string };
-  highlight?: boolean;
-};
+type Row = { band: string; a: string; b: string };
 
-const sections: { eyebrow: string; title: string; body: string; tiers: Tier[] }[] = [
+function RateTable({
+  heading,
+  note,
+  colA,
+  colASub,
+  colB,
+  colBSub,
+  rows,
+  href,
+  cta,
+}: {
+  heading: string;
+  note: string;
+  colA: string;
+  colASub: string;
+  colB: string;
+  colBSub: string;
+  rows: Row[];
+  href: string;
+  cta: string;
+}) {
+  return (
+    <div className="card-tile !p-0 overflow-hidden">
+      <div className="p-6 pb-4">
+        <h3 className="serif text-2xl font-semibold">{heading}</h3>
+        <p className="ink-soft mt-2 text-sm leading-relaxed">{note}</p>
+      </div>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-charcoal text-white">
+            <th scope="col" className="text-left px-6 py-3 font-semibold">
+              Distance
+            </th>
+            <th scope="col" className="text-right px-4 py-3 font-semibold">
+              {colA}
+              <span className="block font-normal text-[color:var(--gold)] text-[11px]">
+                {colASub}
+              </span>
+            </th>
+            <th scope="col" className="text-right px-6 py-3 font-semibold">
+              {colB}
+              <span className="block font-normal text-[color:var(--gold)] text-[11px]">
+                {colBSub}
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.band} className="border-b border-line last:border-0">
+              <td className="px-6 py-2.5">{r.band}</td>
+              <td className="px-4 py-2.5 text-right font-semibold tabular-nums">{r.a}</td>
+              <td className="px-6 py-2.5 text-right font-semibold tabular-nums">{r.b}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="p-6 pt-4">
+        <Link href={href} className="btn-gold inline-flex items-center gap-2">
+          {cta} <ArrowRight size={16} aria-hidden="true" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+const MEDICAL: Row[] = [
+  { band: 'Up to 3 miles', a: '$49', b: '$129' },
+  { band: '4 – 7 miles', a: '$59', b: '$149' },
+  { band: '8 – 12 miles', a: '$74', b: '$169' },
+  { band: '13 – 17 miles', a: '$89', b: '$195' },
+  { band: '18 – 22 miles', a: '$109', b: '$225' },
+  { band: '23 – 30 miles', a: '$129', b: '$259' },
+  { band: 'Over 30 miles', a: 'Call us', b: 'Call us' },
+];
+
+const CONCIERGE: Row[] = [
+  { band: 'Up to 3 miles', a: '$69', b: '$138' },
+  { band: '4 – 7 miles', a: '$89', b: '$178' },
+  { band: '8 – 12 miles', a: '$109', b: '$218' },
+  { band: '13 – 17 miles', a: '$129', b: '$258' },
+  { band: '18 – 22 miles', a: '$155', b: '$310' },
+  { band: '23 – 30 miles', a: '$185', b: '$370' },
+  { band: 'Over 30 miles', a: 'Call us', b: 'Call us' },
+];
+
+const WINNIE: Row[] = [
+  { band: 'Up to 5 miles', a: '$49', b: '$89' },
+  { band: '6 – 10 miles', a: '$59', b: '$106' },
+  { band: '11 – 15 miles', a: '$69', b: '$124' },
+  { band: '16 – 20 miles', a: '$79', b: '$142' },
+  { band: '21 – 25 miles', a: '$89', b: '$160' },
+  { band: 'Over 25 miles', a: 'Call us', b: 'Call us' },
+];
+
+const PLANS = [
   {
-    eyebrow: 'VIP Concierge subscriptions',
-    title: 'For aesthetic & plastic-surgery patients',
-    body: 'Built for repeat patients of Charlotte\'s premium clinics. Monthly credit + bonus amenities + priority booking.',
-    tiers: [
-      {
-        name: 'Companion Pass', price: '$95', cadence: 'mo',
-        blurb: 'For routine procedures & follow-ups.',
-        features: ['1 Companion Recovery ride/mo', 'Quarterly Tassy gift box', '10% off à la carte', 'Priority booking'],
-        cta: { label: 'Subscribe', href: subscribe.vipCompanion },
-      },
-      {
-        name: 'Concierge Pass', price: '$295', cadence: 'mo',
-        blurb: 'Most popular — surgeon-recommended.',
-        features: ['2 Premium Recovery rides/mo', 'Cashmere blanket every ride', 'Annual Tassy spa day', '15% off à la carte'],
-        cta: { label: 'Subscribe', href: subscribe.vipConcierge },
-        highlight: true,
-      },
-      {
-        name: 'Recovery Pass', price: '$795', cadence: 'mo',
-        blurb: 'For multi-procedure recovery programs.',
-        features: ['Unlimited Premium rides', 'Maximum tier 4x/mo', 'Custom-monogrammed robe', 'Dedicated coordinator'],
-        cta: { label: 'Subscribe', href: subscribe.vipRecovery },
-      },
-    ],
+    name: 'Standing Ride Plan',
+    save: '15% off',
+    body: 'Your standing appointment, the same driver at the same time every week. Minimum eight legs a month, billed monthly, priority over one-off bookings.',
   },
   {
-    eyebrow: 'Winnie Ride — B2C subscriptions',
-    title: 'For pet parents',
-    body: 'Vet visits, grooming, daycare, airport. Carrier, harness, calming spray included on every ride.',
-    tiers: [
-      {
-        name: 'Winnie Starter', price: '$39', cadence: 'mo',
-        blurb: 'Casual pet-parent plan.',
-        features: ['1 ride/mo', 'Carrier + harness', 'Standard amenities', 'SMS booking'],
-        cta: { label: 'Subscribe Starter', href: subscribe.winnieStarter },
-      },
-      {
-        name: 'Winnie Standard', price: '$89', cadence: 'mo',
-        blurb: 'For multi-pet households.',
-        features: ['3 rides/mo', 'Multi-pet friendly', 'Quarterly framed photo', 'Priority scheduling'],
-        cta: { label: 'Subscribe Standard', href: subscribe.winnieStandard },
-        highlight: true,
-      },
-      {
-        name: 'Winnie Premium', price: '$179', cadence: 'mo',
-        blurb: 'For frequent vet + travel users.',
-        features: ['6 rides/mo', 'Branded pet bed on signup', 'Monthly treat box', 'Airport-ready'],
-        cta: { label: 'Subscribe Premium', href: subscribe.winniePremium },
-      },
-    ],
+    name: 'Care Pack 10',
+    save: '10% off',
+    body: 'Ten rides paid up front, good for a year. For treatment cycles and follow-ups that do not fall on a fixed day.',
   },
   {
-    eyebrow: 'Winnie Ride — B2B subscriptions',
-    title: 'For vet clinics, groomers, daycares',
-    body: 'White-label pet transport, multi-pet recurring rides, dedicated facility portal, net-30 invoicing.',
-    tiers: [
-      {
-        name: 'B2B Starter', price: '$150', cadence: 'mo',
-        blurb: 'Solo practices.',
-        features: ['10 rides/mo pool', 'Facility portal access', 'Net-30 invoicing', 'Single contact'],
-        cta: { label: 'Subscribe', href: subscribe.winnieB2BStarter },
-      },
-      {
-        name: 'B2B Standard', price: '$395', cadence: 'mo',
-        blurb: 'Multi-vet clinic / busy groomer.',
-        features: ['35 rides/mo pool', 'Multi-user portal', 'Custom amenity kit', 'Recurring schedules'],
-        cta: { label: 'Subscribe', href: subscribe.winnieB2BStandard },
-        highlight: true,
-      },
-      {
-        name: 'B2B Premium', price: '$995', cadence: 'mo',
-        blurb: 'High-volume / multi-location.',
-        features: ['100 rides/mo pool', 'Dedicated account mgr', 'Branded co-marketing', 'API webhooks'],
-        cta: { label: 'Subscribe', href: subscribe.winnieB2BPremium },
-      },
-    ],
+    name: 'Winnie Monthly',
+    save: '10–15% off',
+    body: 'Four trips a month is 10% off, eight trips is 15% off. Built for daycare runs and a standing groomer.',
   },
   {
-    eyebrow: 'Tassy Wellness — Wellness',
-    title: 'For IV therapy + med-spa regulars',
-    body: 'Hydration kit + premium fleet every ride.',
-    tiers: [
-      {
-        name: 'Wellness Essential', price: '$149', cadence: 'mo',
-        blurb: 'Casual wellness routine.',
-        features: ['2 rides included', 'Hydration kit', 'Premium sedan', 'Same-day booking'],
-        cta: { label: 'Subscribe', href: subscribe.renewEssential },
-      },
-      {
-        name: 'Wellness Signature', price: '$295', cadence: 'mo',
-        blurb: 'Weekly med-spa habit.',
-        features: ['4 rides included', 'Premium SUV option', 'Aromatherapy add-on', 'Priority booking'],
-        cta: { label: 'Subscribe', href: subscribe.renewSignature },
-        highlight: true,
-      },
-      {
-        name: 'Wellness Elite', price: '$495', cadence: 'mo',
-        blurb: 'High-frequency / longevity-focused.',
-        features: ['Unlimited rides', 'Luxury fleet', 'Spa-day add-on', 'Dedicated coordinator'],
-        cta: { label: 'Subscribe', href: subscribe.renewElite },
-      },
-    ],
-  },
-  {
-    eyebrow: 'Tassy Guardian — Oncology',
-    title: 'For chemo, radiation, recovery programs',
-    body: 'CNA-trained drivers. Quiet cabin. Family-grade care.',
-    tiers: [
-      {
-        name: 'Guardian Essential', price: '$185', cadence: 'ride',
-        blurb: 'Single recovery ride.',
-        features: ['CNA driver', 'Recovery kit', 'Door-through-door', 'Family notification'],
-        cta: { label: 'Ask about availability', href: contact.phone },
-      },
-      {
-        name: 'Guardian Signature', price: '$595', cadence: 'mo',
-        blurb: 'Active treatment program.',
-        features: ['4 rides/mo', 'CNA driver option', 'Premium amenities', 'Coordinator support'],
-        cta: { label: 'Subscribe', href: subscribe.recoverSignature },
-        highlight: true,
-      },
-      {
-        name: 'Guardian Elite', price: '$1,295', cadence: 'mo',
-        blurb: 'Intensive treatment / family caregiver.',
-        features: ['Unlimited rides', 'Dedicated CNA driver', 'Caregiver companion', 'Full coordination'],
-        cta: { label: 'Subscribe', href: subscribe.recoverElite },
-      },
-    ],
+    name: 'Facility Account',
+    save: '5–10% off',
+    body: 'Clinics and surgery centers book on account and get one invoice a month. 5% from 10 trips a month, 10% from 25.',
   },
 ];
 
 export default function PricingPage() {
   return (
     <>
-      <section className="border-b border-charcoal/8">
-        <div className="container-x py-20">
+      <section className="border-b border-line">
+        <div className="container-x py-16">
           <div className="eyebrow">Pricing</div>
-          <h1 className="h-display mt-4">
-            Subscribe and save — or pay per ride.
+          <h1 className="serif mt-3 text-4xl md:text-5xl font-semibold max-w-3xl leading-[1.08]">
+            Know your price before you book.
           </h1>
-          <p className="mt-5 text-lg text-ink-muted max-w-2xl">
-            Six lines of care. Subscribe to the verticals you ride often, or pay per ride &mdash;
-            flat tiers for VIP Concierge, Medicaid-covered options for Tassy Care.
-            Switch or cancel anytime. All Tassy-branded amenities included.
+          <p className="ink-soft mt-5 max-w-2xl text-lg leading-relaxed">
+            Flat rates by distance across Charlotte and Mecklenburg County. No meter
+            running, no surge, no surprise at the end. A dispatcher confirms your exact
+            price before the trip is booked, and it does not move afterwards.
           </p>
+          <Link href={request.ride} className="btn-gold mt-7 inline-flex items-center gap-2">
+            Get your price <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </div>
       </section>
 
-      {sections.map((sec, idx) => (
-        <section
-          key={sec.eyebrow}
-          className={idx % 2 === 0 ? 'bg-cream' : 'bg-charcoal text-cream-text'}
-        >
-          <div className="container-x py-20">
-            <div className="max-w-2xl">
-              <div className={`eyebrow ${idx % 2 === 0 ? '' : 'text-cream-text/50'}`}>{sec.eyebrow}</div>
-              <h2 className="h-section mt-3">{sec.title}</h2>
-              <p className={`mt-3 ${idx % 2 === 0 ? 'text-ink-muted' : 'text-cream-text/70'}`}>{sec.body}</p>
-            </div>
-
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
-              {sec.tiers.map((t) => {
-                const dark = idx % 2 === 1;
-                return (
-                  <div
-                    key={t.name}
-                    className={`rounded-2xl p-7 border ${
-                      t.highlight
-                        ? 'bg-gold text-charcoal border-gold'
-                        : dark
-                          ? 'bg-cream/5 border-cream/10 text-cream-text'
-                          // FIX_PROD_034 — on the dark "cream"-token canvas the old
-                          // bg-white siblings inherited the light default text → near-invisible.
-                          // Option A (LOCKED): cream surface + charcoal text + subtle gold border.
-                          : 'bg-[#F4EFE0] text-[#1B1A17] border-[#C8932E]/30'
-                    }`}
-                  >
-                    {t.highlight && (
-                      <div className="eyebrow text-charcoal/70">Most popular</div>
-                    )}
-                    <h3 className="font-serif text-2xl">{t.name}</h3>
-                    <p className={`mt-1 text-sm ${
-                      t.highlight ? 'text-charcoal/70' : dark ? 'text-cream-text/60' : 'text-[#444239]'
-                    }`}>
-                      {t.blurb}
-                    </p>
-                    <div className="mt-4">
-                      <span className={`font-serif text-4xl ${t.highlight ? '' : 'italic text-[#C8932E]'}`}>{t.price}</span>
-                      {t.cadence && <span className="ml-1 text-sm opacity-70">/{t.cadence}</span>}
-                    </div>
-                    <ul className="mt-6 space-y-2 text-sm">
-                      {t.features.map((f) => (
-                        <li key={f} className="flex gap-2">
-                          <Check
-                            size={16}
-                            className={`mt-0.5 shrink-0 ${
-                              t.highlight ? 'text-charcoal' : 'text-gold'
-                            }`}
-                          />
-                          <span className={
-                            t.highlight ? 'text-charcoal/90'
-                              : dark ? 'text-cream-text/80' : 'text-[#444239]'
-                          }>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <a
-                      href={t.cta.href}
-                      className={`mt-6 inline-flex items-center justify-center w-full rounded-md py-2.5 font-semibold transition-colors ${
-                        t.highlight
-                          ? 'bg-charcoal text-cream-text hover:bg-charcoal/85'
-                          : dark
-                            ? 'border border-cream/30 text-cream-text hover:bg-cream hover:text-charcoal'
-                            // FIX_PROD_034 (LOCKED Option A) — gold CTA accent on the cream sibling.
-                            : 'bg-[#C8932E] text-[#1B1A17] hover:bg-[#E5A93B]'
-                      }`}
-                    >
-                      {t.cta.label}
-                    </a>
-                  </div>
-                );
-              })}
+      <section className="bg-surface border-b border-line">
+        <div className="container-x py-14">
+          <h2 className="h-section max-w-2xl">Medical transport</h2>
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RateTable
+              heading="Tassy Care &amp; Tassy Recovery"
+              note="Tassy Care is one way, for appointments you get yourself to and from. Tassy Recovery is the ride home after a procedure — it covers the trip there, the wait, and the trip home, and it is the service a surgery center is asking for when they say you need a responsible adult."
+              colA="Tassy Care"
+              colASub="one way"
+              colB="Tassy Recovery"
+              colBSub="there and back · 20 min wait"
+              rows={MEDICAL}
+              href={request.nemt}
+              cta="Request a medical ride"
+            />
+            <div className="flex flex-col gap-6">
+              <div className="card-tile">
+                <h3 className="serif text-xl font-semibold">Travelling in a wheelchair</h3>
+                <p className="ink-soft mt-2 text-sm leading-relaxed">
+                  <strong className="text-ink">Tassy Care WAV</strong> uses a ramp-equipped
+                  vehicle and an operator trained in securement. You stay in your chair for
+                  the whole trip. Those vehicles come from our partner network, so we quote
+                  your route on the call rather than print a rate we cannot hold to. Call
+                  with your two addresses and you will have a price in minutes.
+                </p>
+                <a href="tel:+17049418508" className="btn-gold mt-5 inline-flex items-center gap-2">
+                  Call (704) 941-8508
+                </a>
+              </div>
+              <div className="card-tile">
+                <h3 className="serif text-xl font-semibold">Tassy Scholar</h3>
+                <p className="ink-soft mt-2 text-sm leading-relaxed">
+                  School and after-school runs are sold <strong className="text-ink">by the
+                  route and billed monthly</strong>, never per ride — the cost of a school
+                  leg turns on how many stops it has, not how many miles. First child $45 a
+                  leg, each brother or sister at the same address $20, third child at that
+                  address free, with a $55 route minimum.
+                </p>
+                <p className="ink-soft mt-3 text-sm leading-relaxed">
+                  The after-school run, three days a week, starts at{' '}
+                  <strong className="text-ink">$660 a month</strong>. Schools, districts and
+                  case managers: daily routes quoted on account.
+                </p>
+                <Link href={request.school} className="btn-gold mt-5 inline-flex items-center gap-2">
+                  Get a route quote <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
             </div>
           </div>
-        </section>
-      ))}
+        </div>
+      </section>
 
-      {/* Per-service tier note */}
-      <section className="bg-cream">
-        <div className="container-x py-20 text-center">
-          <div className="eyebrow">Don&apos;t want to subscribe?</div>
-          <h2 className="h-section mt-3">Pay per ride — no commitment.</h2>
-          <p className="mt-4 text-ink-muted max-w-2xl mx-auto">
-            Every Tassy service works à la carte. VIP Concierge has four flat tiers from $185–$695. Tassy Care
-            is Medicaid-covered for eligible patients or flat-rate private. Winnie/Wellness/Guardian priced per ride.
-          </p>
-          <div className="mt-8 flex justify-center gap-3 flex-wrap">
-            <Link href="/vip" className="btn-gold">VIP tiers <ArrowRight size={16} /></Link>
-            <Link href="/nemt" className="btn-ghost">Tassy Care details</Link>
-            <Link href="/winnie" className="btn-ghost">Winnie pricing</Link>
+      <section className="border-b border-line">
+        <div className="container-x py-14">
+          <h2 className="h-section max-w-2xl">Premium and pet transport</h2>
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RateTable
+              heading="Tassy Concierge"
+              note="Airport, golf, dinner, events, collecting a client from their hotel. A reserved vehicle and a professional driver, booked for a time you chose. Nothing medical — a round trip is two reserved legs, and the driver is released in between. If you need the car to wait for you, book Tassy Recovery instead."
+              colA="One way"
+              colASub="reserved for your time"
+              colB="Round trip"
+              colBSub="two reserved legs"
+              rows={CONCIERGE}
+              href={request.vip}
+              cta="Reserve a car"
+            />
+            <RateTable
+              heading="Winnie Ride"
+              note="Dedicated pet transport to the vet, groomer, daycare or boarding — and you do not travel with them. We collect your animal, hand them over by name, and bring them back. There-and-back includes 20 minutes of wait. Second pet $15."
+              colA="One way"
+              colASub="you stay at work"
+              colB="There and back"
+              colBSub="20 min wait included"
+              rows={WINNIE}
+              href={request.winnie}
+              cta="Request a pet ride"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-surface border-b border-line">
+        <div className="container-x py-14">
+          <h2 className="h-section max-w-2xl">
+            If you ride with us often, stop paying per ride.
+          </h2>
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PLANS.map((p) => (
+              <div key={p.name} className="card-tile">
+                <h3 className="serif text-lg font-semibold">{p.name}</h3>
+                <div className="mt-1 text-lg font-bold text-[color:var(--gold)]">{p.save}</div>
+                <p className="ink-soft mt-2 text-sm leading-relaxed">{p.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="container-x py-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="serif text-2xl font-semibold">What can change the price</h2>
+              <ul className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
+                <li>Before 6am or after 8pm: <strong className="text-ink">+$25</strong></li>
+                <li>Weekends: <strong className="text-ink">+$20</strong></li>
+                <li>
+                  Extra passenger: <strong className="text-ink">+$10</strong> on Tassy Care,{' '}
+                  <strong className="text-ink">+$15</strong> on Recovery and Concierge
+                </li>
+                <li>
+                  Wait beyond what is included: quoted to you{' '}
+                  <strong className="text-ink">before</strong> it is charged, never after
+                </li>
+              </ul>
+              <p className="ink-soft mt-4 text-sm leading-relaxed">
+                Surcharges are charged once per dispatch, not once per leg. A round trip is
+                one driver on one day.
+              </p>
+            </div>
+            <div>
+              <h2 className="serif text-2xl font-semibold">The small print, in plain words</h2>
+              <p className="ink-soft mt-4 text-sm leading-relaxed">
+                Prices are for Charlotte and Mecklenburg County and are confirmed by a
+                dispatcher before your trip is booked. Tolls and extra wait are quoted in
+                advance. Tassy Transportation provides transportation and passenger
+                assistance — it is not an ambulance service and does not provide emergency
+                care, home health, medication administration, diagnosis or treatment. In an
+                emergency, call 911.
+              </p>
+              <Link
+                href={request.ride}
+                className="btn-gold mt-6 inline-flex items-center gap-2"
+              >
+                Get your price <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

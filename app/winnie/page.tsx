@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import ServicePage from '@/components/ServicePage';
 import PawIcon from '@/components/seo/PawIcon';
-import { subscribe, facilitySignup } from '@/lib/saas-links';
+
 import { request } from '@/lib/request-links';
 
 const charlotteServices = [
@@ -17,9 +17,9 @@ const charlotteServices = [
 ];
 
 export const metadata: Metadata = {
-  title: 'Winnie Ride — Charlotte pet transport',
+  title: 'Winnie Ride — Charlotte pet transport | From $49',
   description:
-    'Climate-controlled Charlotte pet transport for vet visits, grooming, daycare & airport. Carriers, harnesses & calming spray included. Tiers from $39/mo.',
+    'Dedicated Charlotte pet transport to the vet, groomer, daycare or boarding — you do not have to go. Flat rates from $49 one way, $89 there and back. (704) 941-8508.',
   alternates: { canonical: '/winnie' },
   openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
 };
@@ -28,10 +28,10 @@ export default function WinniePage() {
   return (
     <>
     <ServicePage
-      eyebrow="Pet Transport · Vet, Travel, Daycare"
-      title="Premium pet transport — they ride like family."
-      tagline="Climate-controlled. Carrier-equipped. Calming and clean."
-      description="Winnie Ride is Tassy's purpose-built pet transport service. Climate-controlled vehicles, sanitized carriers, safety harnesses, vet-safe calming spray, and treats — every ride. B2C for pet parents, B2B for veterinary clinics, groomers, and daycare facilities. Subscription tiers from $39/mo."
+      eyebrow="Winnie Ride · Pet transport"
+      title="Your pet gets there. You don't have to leave work."
+      tagline="Vet, groomer, daycare, boarding — and you don't travel with them."
+      description="Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $49 one way, $89 there and back with the wait included."
       bookHref={request.winnie}
       bookLabel="Request a pet ride"
       serviceName="Winnie Ride — Pet Transportation"
@@ -39,54 +39,51 @@ export default function WinniePage() {
       highlightsHeading="Charlotte pet transport, built around your pet"
       highlights={[
         {
-          title: 'Vet-clinic certified',
-          body: 'Drivers trained in pet handling. Carrier types matched to species & size. Sedation-aware protocols when needed.',
+          title: 'The owner does not have to come',
+          body: 'This is the whole point, and it is what Uber Pet does not do — that is a surcharge for bringing your dog along with you. We take your animal on their own, and hand them over at the other end by name.',
         },
         {
-          title: 'Climate-controlled',
-          body: 'Brachycephalic-safe temperatures. HEPA-filtered cabins. No more leaving Bella in a hot car after grooming.',
+          title: 'A flat price, both ways',
+          body: '$49 for anything inside 5 miles one way. $89 there and back, with 20 minutes of wait built in so a quick nail trim does not need two separate trips.',
         },
         {
-          title: 'B2B partnerships',
-          body: 'Vet clinics, groomers, and daycares get a dedicated facility portal with multi-pet scheduling, recurring rides, and net-30 billing.',
+          title: 'Carrier, harness and a calm cabin',
+          body: 'Carrier or harness matched to size, seat protection, and a driver who knows that an anxious dog in a strange car needs a slower door and a quieter voice.',
+        },
+        {
+          title: 'Standing runs cost less',
+          body: 'Four trips a month is 10% off, eight trips is 15% off, billed monthly. Built for daycare runs and a groomer you see on the same day every month.',
         },
       ]}
       tiers={[
         {
-          name: 'Starter (B2C)',
-          price: '$39',
-          cadence: 'mo',
-          features: ['1 ride/mo included', 'Carrier + harness', 'Standard amenities', 'SMS booking'],
-          cta: { label: 'Subscribe Starter', href: subscribe.winnieStarter },
+          name: 'Up to 5 miles',
+          price: '$49',
+          cadence: 'one way · $89 there and back',
+          features: ['Carrier or harness included', 'Seat protection', '20 min wait on a round trip', 'Second pet $15'],
+          cta: { label: 'Request this', href: request.winnie },
         },
         {
-          name: 'Standard (B2C)',
-          price: '$89',
-          cadence: 'mo',
-          features: ['3 rides/mo', 'Quarterly framed pet photo', 'Priority scheduling', 'Multi-pet OK'],
-          cta: { label: 'Subscribe Standard', href: subscribe.winnieStandard },
+          name: '6 to 15 miles',
+          price: '$59–69',
+          cadence: 'one way · $106–124 there and back',
+          features: ['Everything above', 'Across Mecklenburg County', 'Handover by name at the clinic', 'Text when they are collected'],
+          cta: { label: 'Request this', href: request.winnie },
           highlight: true,
         },
         {
-          name: 'Premium (B2C)',
-          price: '$179',
-          cadence: 'mo',
-          features: ['6 rides/mo', 'Branded pet bed on signup', 'Monthly treat box', 'Airport-ready'],
-          cta: { label: 'Subscribe Premium', href: subscribe.winniePremium },
-        },
-        {
-          name: 'Facility (B2B)',
-          price: '$395+',
-          cadence: 'mo',
-          features: ['Dedicated facility portal', 'Net-30 invoicing', 'Recurring multi-pet rides', 'Custom amenity kit'],
-          cta: { label: 'See B2B tiers', href: subscribe.winnieB2BStandard },
+          name: '16 to 25 miles',
+          price: '$79–89',
+          cadence: 'one way · $142–160 there and back',
+          features: ['Everything above', 'Longer runs and out-of-county vets', 'Over 25 miles, call us', 'Monthly plans 10–15% off'],
+          cta: { label: 'Request this', href: request.winnie },
         },
       ]}
       partnerCta={{
-        title: 'Are you a vet, groomer, or daycare?',
-        body: 'Add Winnie Ride to your client experience. Facility portal, contract rates, recurring scheduling, and Tassy-branded pet amenities for every client of yours.',
-        href: facilitySignup('veterinary'),
-        label: 'Get started · no credit card',
+        title: 'Vets, groomers and boarding facilities',
+        body: 'Offer transport to clients who cannot get away during your opening hours. We book on account and invoice monthly, with preferred rates from 10 trips a month.',
+        href: 'mailto:phil@tassytrucks.com?subject=Partner%20account%20—%20Winnie%20Ride',
+        label: 'Start a partner account',
       }}
     />
 

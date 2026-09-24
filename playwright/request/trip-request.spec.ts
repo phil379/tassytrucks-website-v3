@@ -10,11 +10,11 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 
 // 'guardian' is deliberately absent: Tassy Guardian needs CNA-trained drivers
 // the company does not have, so it is not requestable.
-const SERVICES = ['care', 'recovery', 'wellness', 'pet', 'scholar'] as const;
+const SERVICES = ['care', 'recovery', 'concierge', 'pet', 'scholar'] as const;
 
 const MEDICAL_WARNING = 'Please do not include medical details, diagnoses, or procedure names.';
 const CONFIRMATION = 'We confirm every request by phone or text within 2 hours during business hours.';
-const WAIT_COPY = 'include up to 60 minutes of on-site wait time';
+const WAIT_COPY = '20 minutes of on-site wait included';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -128,12 +128,14 @@ test('the medical-details helper text is present', async ({ page }) => {
   await expect(page.locator('#vehicleNotes-help')).toHaveText(MEDICAL_WARNING);
 });
 
-test('wait-time copy shows for recovery and wellness only', async ({ page }) => {
+test('wait-time copy shows for recovery ONLY', async ({ page }) => {
   await page.goto('/request?service=recovery');
   await expect(page.getByText(WAIT_COPY, { exact: false })).toBeVisible();
 
-  await page.goto('/request?service=wellness');
-  await expect(page.getByText(WAIT_COPY, { exact: false })).toBeVisible();
+  // Concierge is one way and the driver is released. Promising a wait here
+  // would sell the wrong product to someone who needs Recovery.
+  await page.goto('/request?service=concierge');
+  await expect(page.getByText(WAIT_COPY, { exact: false })).toHaveCount(0);
 
   await page.goto('/request?service=pet');
   await expect(page.getByText(WAIT_COPY, { exact: false })).toHaveCount(0);
@@ -166,13 +168,17 @@ test('a hand-crafted POST with service=guardian is rejected', async ({ request }
   expect(body.error).toContain('not currently accepting requests');
 });
 
-test('the /recover page stays up and asks about availability', async ({ page }) => {
+test('/recover is now Tassy Recovery and is bookable', async ({ page }) => {
+  // /recover used to be Tassy Guardian, which was not requestable. Since the
+  // Recovery/Concierge split it means what its URL says: the ride home after a
+  // procedure, and it books like any other line.
   const res = await page.goto('/recover');
   expect(res?.status(), '/recover is still published').toBe(200);
 
-  const cta = page.getByRole('link', { name: /Ask about availability/i }).first();
-  await expect(cta).toBeVisible();
-  await expect(cta).toHaveAttribute('href', /^tel:/);
+  const hrefs = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('main a[href]')).map((a) => a.getAttribute('href') ?? ''),
+  );
+  expect(hrefs.some((h) => h.includes('service=recovery')), 'books into recovery').toBe(true);
 
   // And nothing on the page routes into a guardian request.
   const guardianLinks = await page.evaluate(() =>
@@ -415,13 +421,17 @@ test('every ride CTA on the homepage points to /request, none to the SaaS bookin
 });
 
 test('service pages route their CTA to the matching service line', async ({ page }) => {
-  // /recover is absent on purpose — Tassy Guardian is not requestable; it is
-  // covered by the "asks about availability" test above.
+  // /vip and /recover SWAPPED meaning when Recovery and Concierge were split:
+  // /recover is the post-procedure line, /vip is the premium lifestyle line.
+  // /renew (the retired Wellness vertical) folds into Concierge so its inbound
+  // links keep landing somewhere real.
   const expected: Record<string, string> = {
     '/nemt': 'service=care',
-    '/vip': 'service=recovery',
+    '/recover': 'service=recovery',
+    '/vip': 'service=concierge',
+    '/renew': 'service=concierge',
     '/winnie': 'service=pet',
-    '/renew': 'service=wellness',
+    '/school': 'service=scholar',
   };
 
   for (const [path, fragment] of Object.entries(expected)) {

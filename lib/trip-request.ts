@@ -13,22 +13,33 @@ import { parseLocalDateTimeMs, toLocalDateTimeInput } from '@/lib/time';
  */
 
 /**
- * The six service lines.
+ * The service lines, in the order a visitor sees them.
  *
- * ⚠️ `recovery` vs `guardian` was ambiguous in the brief. Resolved as:
- *   recovery = VIP Concierge — post-procedure, driver waits on-site
- *   guardian = Tassy Guardian — oncology / chemo / hospital discharge
- * This reading is what makes the "60 minutes of on-site wait" rule apply to
- * `recovery` + `wellness` (the two lines where the driver waits). If that is
- * backwards, swapping the two `label`/`href` values below is the whole fix.
+ * RECOVERY AND CONCIERGE ARE DIFFERENT PRODUCTS, NOT TIERS OF ONE. They used to
+ * be a single line called "VIP Concierge" and that was the costliest modelling
+ * mistake on the card:
+ *
+ *   recovery  — the ride home after a procedure. Bought because a surgery
+ *               center will not discharge a sedated patient without a
+ *               responsible adult. Inelastic. Round trip, driver waits.
+ *   concierge — airport, golf, dinner, events. Bought because someone wants a
+ *               good car. Elastic, and needs no medical training at all.
+ *
+ * Collapsing them put a trained medical operator into golf trips — pure cost
+ * against a customer who will not pay for it — and sold a discharge as a
+ * luxury, to a patient whose free alternative is asking their daughter.
+ *
+ * `wellness` is retired into UNAVAILABLE_SERVICE_LINES rather than deleted, so
+ * rows written before the split still render a real name in the ops queue.
  */
 const ALL_SERVICE_LINES = [
-  { value: 'care', label: 'Tassy Care — medical transport', short: 'Tassy Care', href: '/nemt' },
-  { value: 'recovery', label: 'VIP Concierge — post-procedure', short: 'VIP Concierge', href: '/vip' },
-  { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', short: 'Tassy Wellness', href: '/renew' },
+  { value: 'care', label: 'Tassy Care — medical appointments', short: 'Tassy Care', href: '/nemt' },
+  { value: 'recovery', label: 'Tassy Recovery — ride home after a procedure', short: 'Tassy Recovery', href: '/recover' },
+  { value: 'concierge', label: 'Tassy Concierge — airport, golf, events', short: 'Tassy Concierge', href: '/vip' },
   { value: 'pet', label: 'Winnie Ride — pet transport', short: 'Winnie Ride', href: '/winnie' },
+  { value: 'scholar', label: 'Tassy Scholar — school and after-school', short: 'Tassy Scholar', href: '/school' },
+  { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', short: 'Tassy Wellness', href: '/renew' },
   { value: 'guardian', label: 'Tassy Guardian — oncology, discharge', short: 'Tassy Guardian', href: '/recover' },
-  { value: 'scholar', label: 'Tassy Scholar — student transport', short: 'Tassy Scholar', href: '/school' },
 ] as const;
 
 export type ServiceLine = (typeof ALL_SERVICE_LINES)[number]['value'];
@@ -45,7 +56,7 @@ export type ServiceLine = (typeof ALL_SERVICE_LINES)[number]['value'];
  * the server, and `serviceLabel()` still resolves it so existing rows in the
  * ops queue keep rendering a real name.
  */
-export const UNAVAILABLE_SERVICE_LINES: readonly ServiceLine[] = ['guardian'];
+export const UNAVAILABLE_SERVICE_LINES: readonly ServiceLine[] = ['guardian', 'wellness'];
 
 export function isRequestable(value: string): value is ServiceLine {
   return SERVICE_VALUES.includes(value as ServiceLine);
@@ -58,8 +69,14 @@ export const SERVICE_LINES = ALL_SERVICE_LINES.filter(
 
 export const SERVICE_VALUES = SERVICE_LINES.map((s) => s.value) as [ServiceLine, ...ServiceLine[]];
 
-/** The two lines that include on-site wait time. Drives the extra copy block. */
-export const WAIT_TIME_LINES: ServiceLine[] = ['recovery', 'wellness'];
+/**
+ * The lines where the driver waits on site, which drives the extra copy block.
+ *
+ * Only Recovery now. Concierge is one way and the driver is released — if a
+ * Concierge customer needs the car to wait, the product they want is Recovery,
+ * and the form should not imply otherwise.
+ */
+export const WAIT_TIME_LINES: ServiceLine[] = ['recovery'];
 
 /**
  * Mobility options, by service line.
@@ -151,7 +168,7 @@ export const COPY = {
   confirmation:
     'We confirm every request by phone or text within 2 hours during business hours. Pricing is quoted before your trip is confirmed.',
   waitTime:
-    'Recovery and wellness trips include up to 60 minutes of on-site wait time. Additional wait is billed in 30-minute increments and quoted upfront.',
+    'Tassy Recovery covers the trip there, the wait, and the trip home, with 20 minutes of on-site wait included. Longer than that is $35 per extra half hour — quoted to you before it is charged, never after.',
 } as const;
 
 const trimmed = (max: number) => z.string().trim().max(max);

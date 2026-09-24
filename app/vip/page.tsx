@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { subscribe } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'VIP Concierge — plastic surgery recovery rides',
+  title: 'Tassy Concierge — reserved private car, Charlotte | From $69',
   description:
-    "Charlotte's premium aesthetic-recovery transport: post-op plastic surgery, IV therapy, cosmetic dental, med-spa. Four tiers from $185. Total discretion.",
+    'Airport runs, golf, dinner, events and client pickups in Charlotte. A reserved vehicle and a professional driver, booked for a time you chose. Flat rates from $69. No surge.',
   alternates: { canonical: '/vip' },
   openGraph: { url: '/vip', images: ['/og-image/vip'] },
 };
@@ -14,61 +13,63 @@ export const metadata: Metadata = {
 export default function VipPage() {
   return (
     <ServicePage
-      eyebrow="Premium · Plastic Surgery + Aesthetic Recovery"
-      title="Recovery in cashmere."
-      tagline="A premium ride home from Charlotte's best surgeons & clinics."
-      description="VIP Concierge is Tassy's signature service. Built for patients recovering from plastic surgery, cosmetic dental, IV therapy, and high-end aesthetic procedures. Four service tiers from Recovery Ride ($185) to Maximum Discretion ($695) — each with its own amenity kit, vehicle class, and driver training. Anchor partners include leading Charlotte clinics."
+      eyebrow="Tassy Concierge · Premium private transport"
+      title="Booked for your time. Not whoever accepts the ping."
+      tagline="Airport, golf, dinner, events, and the client you are collecting."
+      description="A reserved vehicle and a professional driver, confirmed in advance for a time you chose. Flat rates by distance — you know the number before you book, and it does not move because it started raining. From $69. Nothing medical about this service; if you need the driver to wait for you after a procedure, that is Tassy Recovery."
       bookHref={request.vip}
-      bookLabel="Request a recovery ride"
-      serviceName="VIP Concierge Transport"
+      bookLabel="Reserve a car"
+      altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
+      serviceName="Private Car Service"
       path="/vip"
-      highlightsHeading="Premium plastic-surgery recovery rides in Charlotte"
+      highlightsHeading="Reserved private car service in Charlotte"
       highlights={[
         {
-          title: 'Four service tiers',
-          body: 'Recovery $185 · Companion $285 · Premium $445 · Maximum $695. Pick the level of care the procedure requires — we handle everything from the curb up.',
+          title: 'No surge, ever',
+          body: 'A 5am airport run costs what the card says it costs. Flat rates by distance, agreed before the trip, and they do not move for weather, demand or a holiday weekend.',
         },
         {
-          title: 'Branded amenity kits',
-          body: 'Tassy-branded blankets, ginger candies, recovery snacks, hand cream, charging cables. Up to 27 items in the Maximum tier. Up to 50% perceived value uplift.',
+          title: 'Reserved, not dispatched',
+          body: 'Your car is committed to your time in advance. You are not refreshing an app at 4:40am hoping someone accepts, and you are not explaining the address to a driver who has never done this route.',
         },
         {
-          title: 'Discretion built in',
-          body: 'Unmarked premium vehicles, privacy curtain option, NDA-trained drivers. Your patient walks out, gets home, and tells everyone about the ride — without anyone knowing what they had done.',
+          title: 'A driver who does this for a living',
+          body: 'Professional drivers, licensed and insured, who know the terminal doors, the club entrance and where to wait when the restaurant has no drop-off. Trained, background-checked, and the same standard every trip.',
+        },
+        {
+          title: 'The vehicle is a full-size SUV',
+          body: 'Room for luggage, golf clubs or four people who do not want to sit shoulder to shoulder. Suburban, Expedition, Yukon or Navigator class.',
         },
       ]}
       tiers={[
         {
-          name: 'Recovery Ride',
-          price: '$185',
-          features: ['Premium sedan', '7-item amenity kit', 'Door-to-curb', 'Same-day booking'],
-          cta: { label: 'Request Recovery', href: request.vip },
+          name: 'Up to 7 miles',
+          price: '$69–89',
+          cadence: 'one way',
+          features: ['Reserved for your time', 'Flat rate, no surge', 'Professional driver', 'Full-size SUV'],
+          cta: { label: 'Reserve this', href: request.vip },
         },
         {
-          name: 'Companion Recovery',
-          price: '$285',
-          features: ['SUV or sedan', '13-item kit', 'Trained companion', 'Door-through-door'],
-          cta: { label: 'Request Companion', href: request.vip },
-        },
-        {
-          name: 'Premium Recovery',
-          price: '$445',
-          features: ['Luxury SUV', '21-item kit', 'Cashmere blanket', 'Aromatherapy + heated pack'],
-          cta: { label: 'Request Premium', href: request.vip },
+          name: '8 to 17 miles',
+          price: '$109–129',
+          cadence: 'one way',
+          features: ['Everything above', 'Airport, uptown, Ballantyne, Lake Norman', 'Luggage and clubs included', 'Round trip is two reserved legs'],
+          cta: { label: 'Reserve this', href: request.vip },
           highlight: true,
         },
         {
-          name: 'Maximum Discretion',
-          price: '$695',
-          features: ['Black-car flagship', '27-item kit', 'Plush robe + slippers', 'Welcome candle + flowers'],
-          cta: { label: 'Request Maximum', href: request.vip },
+          name: '18 to 30 miles',
+          price: '$155–185',
+          cadence: 'one way',
+          features: ['Everything above', 'Longer runs across the metro', 'Extra passenger $15', 'Over 30 miles, call us'],
+          cta: { label: 'Reserve this', href: request.vip },
         },
       ]}
       partnerCta={{
-        title: 'Subscribe & save — VIP Concierge passes',
-        body: 'Companion Pass $95/mo · Concierge Pass $295/mo (most popular) · Recovery Pass $795/mo. Includes monthly credit, bonus amenities, and priority booking.',
-        href: subscribe.vipConcierge,
-        label: 'See subscription tiers',
+        title: 'Hotels, clubs and corporate partners',
+        body: 'Put a reliable car behind your guests and clients. We book on account and invoice monthly, with preferred rates from 10 trips a month.',
+        href: 'mailto:phil@tassytrucks.com?subject=Corporate%20account%20—%20Tassy%20Concierge',
+        label: 'Open an account',
       }}
     />
   );

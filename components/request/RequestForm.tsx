@@ -84,6 +84,9 @@ export default function RequestForm({
   // describes a corrected address is worse than no price.
   const [pickupPlace, setPickupPlace] = useState<ResolvedPlace | null>(null);
   const [dropoffPlace, setDropoffPlace] = useState<ResolvedPlace | null>(null);
+  /** Raw field text. Feeds the ZIP fallback when no place could be picked. */
+  const [pickupText, setPickupText] = useState('');
+  const [dropoffText, setDropoffText] = useState('');
   const [whenValue, setWhenValue] = useState('');
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
@@ -122,6 +125,11 @@ export default function RequestForm({
       serviceLine: service,
       pickup: pickupPlace,
       dropoff: dropoffPlace,
+      // The raw text matters even when a place was picked: with no Maps key
+      // there is no place to pick, and the ZIP in what they typed is the only
+      // thing that can produce a price. See lib/zip-centroids.ts.
+      pickupAddress: pickupText,
+      dropoffAddress: dropoffText,
       requestedAt: whenValue,
       passengers,
       returnTrip,
@@ -132,6 +140,8 @@ export default function RequestForm({
     service,
     pickupPlace,
     dropoffPlace,
+    pickupText,
+    dropoffText,
     whenValue,
     passengers,
     returnTrip,
@@ -327,6 +337,7 @@ export default function RequestForm({
           hasError={Boolean(errors.pickupAddress)}
           describedBy={errors.pickupAddress ? 'pickupAddress-error' : undefined}
           onResolve={setPickupPlace}
+          onText={setPickupText}
           debug={debugMaps}
         />
         <FieldError name="pickupAddress" />
@@ -341,6 +352,7 @@ export default function RequestForm({
           hasError={Boolean(errors.dropoffAddress)}
           describedBy={errors.dropoffAddress ? 'dropoffAddress-error' : undefined}
           onResolve={setDropoffPlace}
+          onText={setDropoffText}
           debug={debugMaps}
         />
         <FieldError name="dropoffAddress" />
@@ -536,6 +548,14 @@ export default function RequestForm({
                   ? ` · ${estimate.surcharges.map((x) => x.label.toLowerCase()).join(' and ')}`
                   : ''}
               </p>
+              {/* A ZIP-derived price is a good estimate and a bad promise. Say which. */}
+              {!estimate.exact && (
+                <p className="ink-soft mt-2 text-xs">
+                  Measured between{' '}
+                  {estimate.measuredFrom ?? 'the ZIP codes you entered'} — add the full
+                  street address for an exact figure.
+                </p>
+              )}
               <p className="ink-soft mt-2 text-xs">
                 An estimate, not a final price. Tolls, extra wait time and a route we
                 cannot see yet can move it. A dispatcher confirms the exact figure
@@ -547,8 +567,8 @@ export default function RequestForm({
             <p className="ink-soft text-sm">{quoted.message}</p>
           ) : (
             <p className="ink-soft text-sm">
-              {/* Deliberately not a guess. See the rules at the top of lib/quote.ts. */}
-              Pick both addresses from the suggestions to see an estimated fare.
+              {/* Never a guess — but a ZIP is enough to stop this being a dead end. */}
+              Add a ZIP code to both addresses to see your price.
             </p>
           )}
         </div>

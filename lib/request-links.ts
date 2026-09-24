@@ -8,11 +8,17 @@
  *
  * Service-line mapping (site vertical → pipeline service line):
  *   /nemt    Tassy Care       → care
- *   /vip     VIP Concierge    → recovery
+ *   /recover Tassy Recovery   → recovery     ride home after a procedure
+ *   /vip     Tassy Concierge  → concierge    airport, golf, events
  *   /winnie  Winnie Ride      → pet
- *   /renew   Tassy Wellness   → wellness
- *   /recover Tassy Guardian   → guardian
  *   /school  Tassy Scholar    → scholar
+ *   /renew   Tassy Wellness   → RETIRED, folds into Concierge
+ *
+ * ⚠️ `/vip` and `/recover` SWAPPED on 2026-09-24 when Recovery and Concierge
+ * were split into separate products. /recover now means what its URL says —
+ * the ride home after a procedure — and /vip is the premium lifestyle line.
+ * The old /renew (Wellness) vertical routes to Concierge so its inbound links
+ * and SEO pages keep landing somewhere real.
  */
 
 export const REQUEST_BASE = '/request';
@@ -21,10 +27,10 @@ export type Vertical = 'nemt' | 'vip' | 'winnie' | 'renew' | 'recover' | 'school
 
 export const SERVICE_BY_VERTICAL: Record<Vertical, string> = {
   nemt: 'care',
-  vip: 'recovery',
+  vip: 'concierge',
   winnie: 'pet',
-  renew: 'wellness',
-  recover: 'guardian',
+  renew: 'concierge',
+  recover: 'recovery',
   school: 'scholar',
 };
 
@@ -38,10 +44,10 @@ export const request = {
   /** The generic "Request a Ride" CTA — visitor picks the service on the form. */
   ride: REQUEST_BASE,
   nemt: to('care'),
-  vip: to('recovery'),
+  vip: to('concierge'),
   winnie: to('pet'),
-  renew: to('wellness'),
-  recover: to('guardian'),
+  renew: to('concierge'),
+  recover: to('recovery'),
   school: to('scholar'),
 };
 

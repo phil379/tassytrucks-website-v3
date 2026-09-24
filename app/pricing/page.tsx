@@ -5,7 +5,7 @@ import { subscribe, contact } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Pricing — Tassy subscriptions & per-service tiers',
+  title: 'Pricing — Tassy subscriptions & per-ride tiers',
   description:
     'VIP Concierge, Winnie Ride, Tassy Wellness, and Tassy Guardian subscription tiers plus per-ride pricing. Charlotte premium transport from $39/mo.',
   alternates: { canonical: '/pricing' },

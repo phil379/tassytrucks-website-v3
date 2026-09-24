@@ -4,9 +4,9 @@ import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'NEMT in Charlotte NC — Book Medical Transport',
+  title: 'NEMT in Charlotte NC — Request Medical Transport',
   description:
-    'Non-emergency medical transportation in Charlotte NC. Veteran-owned, 24/7 dispatch, ambulatory and wheelchair rides. Book online or call (704) 941-8508.',
+    'Non-emergency medical transportation in Charlotte NC. Veteran-owned, 24/7 dispatch, ambulatory and wheelchair rides. Request online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/nemt-rides' },
   openGraph: { url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
 };

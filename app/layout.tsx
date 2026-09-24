@@ -74,6 +74,7 @@ const localBusinessLd = {
     { '@type': 'PropertyValue', propertyID: 'MC', value: '79222' },
   ],
   hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
+  priceRange: '$$',
   image: 'https://www.tassytrucks.com/brand/og-image.png',
   address: {
     '@type': 'PostalAddress',
@@ -81,7 +82,6 @@ const localBusinessLd = {
     addressRegion: 'NC',
     addressCountry: 'US',
   },
-  openingHours: 'Mo-Su 00:00-23:59',
   // The market, stated machine-readably. Previously the geography existed only
   // in prose and in the 16 SEO landing pages — the root business record, which
   // is what an assistant reads first, did not say where the company operates.
@@ -97,7 +97,10 @@ const localBusinessLd = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'VIP Concierge Transport', url: 'https://www.tassytrucks.com/vip' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Winnie Ride — Pet Transportation', url: 'https://www.tassytrucks.com/winnie' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Wellness — Wellness Transport', url: 'https://www.tassytrucks.com/renew' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Guardian — Oncology Recovery Rides', url: 'https://www.tassytrucks.com/recover' } },
+      // Tassy Guardian is intentionally absent: the line is not accepting
+      // requests (no CNA-trained drivers), and this catalog is what an assistant
+      // reads as 'what they currently offer'. /recover stays published and keeps
+      // its own Service description.
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Tassy Scholar — Alternative student transportation', url: 'https://www.tassytrucks.com/school' } },
     ],
   },

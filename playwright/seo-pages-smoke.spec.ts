@@ -22,7 +22,7 @@ const PAGES: PageSpec[] = [
   { path: '/charlotte/veteran-transport', h1: 'veteran medical transport in charlotte', cta: ['service=care', 'utm_source=seo-veteran', 'payer=va'] },
   { path: '/charlotte/concierge-medical-transport', h1: 'concierge medical transport in charlotte', cta: ['service=recovery', 'utm_source=seo-concierge'] },
   { path: '/charlotte/best-nemt-providers', h1: 'best nemt providers in charlotte', cta: ['service=care', 'utm_source=seo-best'] },
-  { path: '/charlotte/family-medical-rides', h1: 'book a medical ride for someone else', cta: ['service=care', 'utm_source=seo-family'] },
+  { path: '/charlotte/family-medical-rides', h1: 'request a medical ride for someone else', cta: ['service=care', 'utm_source=seo-family'] },
   { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['service=care', 'utm_source=seo-compare'], table: true },
   // MEGA_SEO_002
   { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
@@ -341,4 +341,59 @@ test('sitemap includes the conversion page and excludes the ops queue', async ({
   const xml = await (await request.get('/sitemap.xml')).text();
   expect(xml, '/request is discoverable').toContain('https://www.tassytrucks.com/request');
   expect(xml, '/ops is not in the sitemap').not.toContain('https://www.tassytrucks.com/ops');
+});
+
+test('the business record is service-area only — no address, no coordinates', async ({ page }) => {
+  await page.goto('/');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  // Standing instruction: the only addresses available are residential, so the
+  // business is described by where it OPERATES, never where it sits.
+  expect(ld, 'no street address').not.toContain('streetAddress');
+  expect(ld, 'no geo block').not.toContain('"geo"');
+  expect(ld, 'no coordinates').not.toContain('GeoCoordinates');
+
+  // Locality/region only is fine and is what identifies the market.
+  expect(ld).toContain('"addressLocality":"Charlotte"');
+});
+
+test('root schema states a price range and does not assert 24/7 hours', async ({ page }) => {
+  await page.goto('/');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  expect(ld, 'priceRange present').toContain('"priceRange":"$$"');
+  // Real hours are unknown; asserting Mo-Su 00:00-23:59 was a 24/7 claim in
+  // structured data. Omitted until the hours are known.
+  expect(ld, 'no openingHours claim').not.toContain('openingHours');
+});
+
+test('the offer catalog does not advertise a line that is closed to requests', async ({ page }) => {
+  await page.goto('/');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  expect(ld, 'Guardian is not offered').not.toContain('Tassy Guardian');
+  // The five lines that ARE taking requests remain.
+  for (const name of ['Tassy Care', 'VIP Concierge', 'Winnie Ride', 'Tassy Wellness', 'Tassy Scholar']) {
+    expect(ld, `${name} still offered`).toContain(name);
+  }
+});
+
+test('/request publishes WebPage + ContactPoint schema', async ({ page }) => {
+  await page.goto('/request');
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+  expect(ld).toContain('"WebPage"');
+  expect(ld).toContain('"ContactPoint"');
+  expect(ld).toContain('+1-704-941-8508');
+  expect(ld).toContain('Mecklenburg County');
+  expect(ld, 'linked to the one business record').toContain('https://www.tassytrucks.com/#business');
+});
+
+test('Guardian offers email as well as a phone call', async ({ page }) => {
+  await page.goto('/recover');
+  const hrefs = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('main a[href]')).map((a) => a.getAttribute('href') ?? ''),
+  );
+  expect(hrefs.some((h) => h.startsWith('tel:')), 'phone option').toBe(true);
+  expect(hrefs.some((h) => h.startsWith('mailto:')), 'email option').toBe(true);
 });

@@ -34,38 +34,38 @@ type Vertical = {
 const verticals: Vertical[] = [
   {
     slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
-    blurb: 'Non-emergency medical transport for dialysis, recurring appointments, doctor visits, and Medicaid-covered care.',
-    bullets: ['ADA compliant', 'Broker partners accepted'],
+    blurb: 'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
+    bullets: ['Flat rates from $49, one way', 'Wheelchair quoted on the call'],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,
   },
   {
-    slug: '/vip', name: 'VIP Concierge', Icon: Sparkles, anim: 'svc-anim--spark',
-    blurb: 'Discreet, professional post-procedure transport. Driver arrives early, waits on-site, brings you home safely.',
-    bullets: ['Female drivers on request', 'HIPAA-aware, judgment-free'],
-    cta: 'Request a VIP trip',
+    slug: '/recover', name: 'Tassy Recovery', Icon: Shield, anim: 'svc-anim--shield',
+    blurb: 'Most surgery centers will not discharge you without a responsible adult. We meet you at the desk, wait, and take you home — with one pharmacy stop on the way.',
+    bullets: ['From $129 — there, the wait, and home', 'One pharmacy stop included'],
+    cta: 'Book your ride home',
+    bookHref: request.recover,
+  },
+  {
+    slug: '/vip', name: 'Tassy Concierge', Icon: Sparkles, anim: 'svc-anim--spark',
+    blurb: 'Airport at 5am, a round of golf, dinner, the client you are collecting. A reserved car and a professional driver, booked for a time you chose.',
+    bullets: ['Flat rates from $69 — no surge, ever', 'Full-size SUV, room for luggage'],
+    cta: 'Reserve a car',
     bookHref: request.vip,
   },
   {
     slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
-    blurb: 'Vet visits, grooming pickups, doggy daycare runs. Trained drivers, climate-controlled vehicles, GPS tracking.',
-    bullets: ['Photo + chip verification', 'Owner gets real-time updates'],
+    blurb: 'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
+    bullets: ['From $49 one way, $89 there and back', 'Carrier or harness included'],
     cta: 'Request a Winnie Ride',
     bookHref: request.winnie,
   },
   {
-    slug: '/renew', name: 'Tassy Wellness', Icon: Droplets, anim: 'svc-anim--drip',
-    blurb: 'Wellness transport — IV therapy, med-spa, cosmetic dental, rejuvenation. Hydration kit on every ride.',
-    bullets: ['Premium fleet', 'Med-spa partnerships'],
-    cta: 'Request a Wellness trip',
+    slug: '/renew', name: 'Wellness & med-spa', Icon: Droplets, anim: 'svc-anim--drip',
+    blurb: 'IV therapy, med-spa and aesthetic appointments. Concierge if you are fine to travel alone, Recovery if the procedure means you should not be driving.',
+    bullets: ['Concierge from $69 one way', 'Recovery from $129 both ways'],
+    cta: 'See which one you need',
     bookHref: request.renew,
-  },
-  {
-    slug: '/recover', name: 'Tassy Guardian', Icon: Shield, anim: 'svc-anim--shield',
-    blurb: 'Oncology, chemo, radiation, hospital discharge. CNA-trained drivers. Quiet, equipped cabin.',
-    bullets: ['CNA-trained drivers', 'Recovery amenity kit'],
-    cta: 'Ask about availability',
-    bookHref: contact.phone,
   },
   {
     slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
@@ -74,7 +74,8 @@ const verticals: Vertical[] = [
       'Subcontractor since 2022 · EverDriven Technologies (formerly Alternative School Transportation)',
       '5 metros: Charlotte NC · High Point NC · Spartanburg SC · Rock Hill SC · Cincinnati OH',
     ],
-    cta: 'Our school transport story',
+    cta: 'Get a route quote',
+    bookHref: request.school,
   },
 ];
 
@@ -98,8 +99,9 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-7 text-lg lg:text-xl ink-soft leading-relaxed max-w-xl">
-              Premium medical, wellness, pet, and school transport across Charlotte —
-              veteran-owned, SDVOSB certified, HIPAA-compliant.
+              Medical, post-procedure, pet and school transport across Charlotte and
+              Mecklenburg County. Flat rates by distance — you know the price before you
+              book, and it does not move afterwards.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-5">
@@ -112,7 +114,7 @@ export default function HomePage() {
             </div>
 
             <p className="mt-4 text-xs ink-mute flex items-center gap-2">
-              <span className="dot" /> Dispatchers online now · Avg. response 8 min
+              <span className="dot" /> Request any time · a dispatcher confirms your driver and your price within 2 hours
             </p>
 
             {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
@@ -120,8 +122,8 @@ export default function HomePage() {
                 verification, task #222); credentials shown here are all documentable. */}
             <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
               {[
-                ['SDVOSB',  'VA-eligible'],
-                ['HIPAA',   'PHI-compliant'],
+                ['SDVOSB',  'VA-verified'],
+                ['MBE · DBE', 'SBE certified'],
                 ['USDOT',   '#3104152'],
                 ['Veteran', 'Owned & operated'],
               ].map(([num, label]) => (
@@ -146,21 +148,21 @@ export default function HomePage() {
                       <span className="text-xs font-semibold">Airport Transfer — CLT</span>
                       <span className="status-badge status-en-route">● En route</span>
                     </div>
-                    <div className="text-xs ink-mute">Premium Luxury SUV · 12 min to pickup</div>
+                    <div className="text-xs ink-mute">Tassy Concierge · full-size SUV · $109 flat</div>
                   </div>
                   <div className="trip-card">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">Post-Procedure Concierge</span>
+                      <span className="text-xs font-semibold">Tassy Recovery</span>
                       <span className="status-badge status-confirmed">● Confirmed</span>
                     </div>
-                    <div className="text-xs ink-mute">Cosmetic surgery recovery · Driver waiting on-site</div>
+                    <div className="text-xs ink-mute">Discharge pickup · driver waits · $149 agreed</div>
                   </div>
                   <div className="trip-card">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">Tassy Care Dialysis Pickup</span>
+                      <span className="text-xs font-semibold">Tassy Care · dialysis</span>
                       <span className="status-badge status-completed">● Completed</span>
                     </div>
-                    <div className="text-xs ink-mute">Atrium Health · &quot;Outstanding service!&quot; ★★★★★</div>
+                    <div className="text-xs ink-mute">Standing Ride Plan · same driver every Tuesday</div>
                   </div>
                 </div>
               </div>
@@ -259,17 +261,15 @@ export default function HomePage() {
               Discharge transport shouldn&apos;t be a daily fire drill.
             </h2>
             <p className="text-lg leading-relaxed mb-6 opacity-75">
-              Tassy partners with hospitals across the Carolinas to handle every Tassy Care trip, every
-              discharge, every recurring patient transport — under one master contract, one
-              billing portal, one accountable team.
+              Your patient cannot be released until someone responsible is standing there.
+              Tassy Recovery is that person — a named adult at the discharge desk, on a
+              booking your coordinator made in advance, at a price they could quote the
+              family before they made it.
             </p>
-            <blockquote className="serif italic text-lg leading-relaxed mb-8 pl-4 border-l-2 opacity-90"
-                        style={{ borderColor: 'var(--gold)' }}>
-              &quot;Phil&apos;s team is HIPAA-aware, professional, and I&apos;ve never had a complaint. Top-tier service.&quot;
-              <footer className="text-sm not-italic mt-2 opacity-60">
-                — Dr. Kim, RN · Discharge Planner, Atrium Health
-              </footer>
-            </blockquote>
+            <p className="text-lg leading-relaxed mb-8 opacity-75">
+              Book on account, one invoice a month instead of chasing receipts. Preferred
+              rates from 10 trips a month, contract rates from 25.
+            </p>
             <div className="flex flex-wrap gap-3">
               <a href={apply.facility} className="btn-gold">Request a partnership call</a>
               <a href={contact.salesEmail} className="btn-ghost" style={{ color: 'var(--cream-text)' }}>
@@ -280,20 +280,21 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-surface rounded-2xl p-6 text-cream-text">
-              <div className="serif text-3xl font-semibold">&lt; 30 min</div>
-              <div className="text-xs ink-mute uppercase tracking-wider mt-1">Avg. discharge pickup</div>
+              <div className="serif text-3xl font-semibold">20 min</div>
+              <div className="text-xs ink-mute uppercase tracking-wider mt-1">Of discharge wait, in the price</div>
             </div>
             <div className="bg-surface rounded-2xl p-6 text-cream-text">
-              <div className="serif text-3xl font-semibold">98%</div>
-              <div className="text-xs ink-mute uppercase tracking-wider mt-1">On-time arrival</div>
+              <div className="serif text-3xl font-semibold">2 hrs</div>
+              <div className="text-xs ink-mute uppercase tracking-wider mt-1">To confirm any booking</div>
             </div>
             <div className="bg-surface rounded-2xl p-6 col-span-2 text-cream-text">
-              <div className="text-xs ink-mute uppercase tracking-wider mb-3">Current facility partners</div>
+              <div className="text-xs ink-mute uppercase tracking-wider mb-3">Certified for institutional procurement</div>
               <div className="flex flex-wrap gap-3 items-center">
-                <span className="pill">Atrium Health Charlotte</span>
-                <span className="pill">Aesthetic Carolina</span>
-                <span className="pill">Bataclan Pets</span>
-                <span className="pill" style={{ opacity: 0.5 }}>+ your facility</span>
+                <span className="pill">SDVOSB</span>
+                <span className="pill">MBE</span>
+                <span className="pill">DBE</span>
+                <span className="pill">SBE</span>
+                <span className="pill">USDOT #3104152</span>
               </div>
             </div>
           </div>
@@ -304,29 +305,37 @@ export default function HomePage() {
       <section className="bg-cream">
         <div className="container-x py-24">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="eyebrow mb-3">What clients say</div>
+            <div className="eyebrow mb-3">How it works</div>
             <h2 className="h-section">
-              Trusted by Charlotte families<br />&amp; healthcare teams.
+              Three steps, and the price<br />is settled before step three.
             </h2>
-            {/* FIX_PROD_131 — unverified "4.9★ / 15,000+ rides" line removed pending
-                Phil's verification (task #222); replaced with a documentable line. */}
             <p className="text-sm ink-mute mt-4">
-              Veteran-owned · SDVOSB certified · Serving Charlotte &amp; the Carolinas
+              Veteran-owned · SDVOSB, MBE, DBE &amp; SBE certified · Charlotte &amp; Mecklenburg County
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { q: "After my mom's surgery, Tassy picked her up like family. Driver brought a blanket and a water. Worth every penny.", a: 'Janelle R. · Charlotte' },
-              { q: "We use Tassy for every weekly dialysis run. On-time, every time. The kind of service that makes my job easier.", a: 'Marcus T. · Discharge planner' },
-              { q: "Phil's team has moved 4 of our patients post-op. Zero complaints. The amenity kit is a brilliant touch.", a: 'Aesthetic Carolina · Anchor partner' },
+              {
+                n: '01',
+                h: 'Tell us the trip',
+                b: 'Two addresses, a date and a time. The form shows your estimated price as you type — no call needed to find out roughly what it costs.',
+              },
+              {
+                n: '02',
+                h: 'We confirm within 2 hours',
+                b: 'A dispatcher calls or texts with your exact price and your driver. Nothing is charged, and nothing is booked, until you say yes.',
+              },
+              {
+                n: '03',
+                h: 'The price does not move',
+                b: 'What you agreed is what you pay. Tolls and extra wait are quoted to you before they are charged — never added afterwards.',
+              },
             ].map((t) => (
-              <div key={t.a} className="card-tile">
-                <div className="quote-mark">"</div>
-                <p className="serif text-lg leading-relaxed -mt-6 flex-grow">{t.q}</p>
-                <div className="mt-6 pt-6 border-t border-line text-xs ink-mute uppercase tracking-wider">
-                  {t.a}
-                </div>
+              <div key={t.n} className="card-tile">
+                <div className="serif text-4xl font-semibold gold-text">{t.n}</div>
+                <h3 className="serif text-xl font-semibold mt-3">{t.h}</h3>
+                <p className="ink-soft leading-relaxed mt-2 flex-grow">{t.b}</p>
               </div>
             ))}
           </div>

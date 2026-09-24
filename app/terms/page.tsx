@@ -20,7 +20,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Requests & pricing',
     body: [
-      'Prices are shown before you confirm a booking — no surge pricing and no hidden fees. Subscription plans renew monthly and can be changed or cancelled anytime; changes take effect at the next billing cycle. Medicaid-covered trips are billed to the payer or broker, not the rider, when eligibility is confirmed.',
+      'Prices are shown before you confirm a booking — no surge pricing and no hidden fees. Fares are set by distance band and confirmed by a dispatcher before the trip is booked; tolls and wait beyond what is included are quoted to you in advance, never charged afterwards. Recurring plans (Standing Ride, Winnie Monthly, facility accounts) are billed monthly and can be changed or cancelled with 30 days’ notice; changes take effect at the next billing cycle.',
     ],
   },
   {

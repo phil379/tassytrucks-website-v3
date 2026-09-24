@@ -21,12 +21,13 @@ export default function AccessibilityPage() {
           <div>
             <h2 className="serif text-2xl font-semibold">On the road</h2>
             <p className="mt-3 ink-soft leading-relaxed">
-              Accessible transportation is our core business, not an add-on. Our fleet includes
-              ADA-compliant, tie-down-certified wheelchair vehicles, and our drivers are trained
-              in patient handling, securement, and door-through-door assistance. Tell us what you
-              need when you book — mobility equipment, a service animal, extra time, or a
-              caregiver riding along — and we will plan the trip around it at no extra charge for
-              the accommodation itself.
+              Accessible transportation is our core business, not an add-on. Wheelchair trips
+              (Tassy Care WAV) are run in ramp-equipped vehicles from our partner network, with an
+              operator trained in securement — you stay in your chair for the whole trip, and we
+              quote the route on the call. Every other trip is door-through-door as standard. Tell
+              us what you need when you book — mobility equipment, a service animal, extra time,
+              or a caregiver riding along — and we will plan the trip around it at no extra charge
+              for the accommodation itself.
             </p>
           </div>
 

@@ -18,20 +18,34 @@
 
 ## Services
 
-- **Tassy Care** (/nemt) — non-emergency medical transport: dialysis, recurring
-  appointments, doctor visits, Medicaid-covered care. Ambulatory and wheelchair.
-- **VIP Concierge** (/vip) — discreet post-procedure transport. The driver waits
-  on-site and takes the client home.
-- **Winnie Ride** (/winnie) — pet transport: vet visits, grooming pickups, boarding
-  and daycare runs.
-- **Tassy Wellness** (/renew) — wellness transport: IV therapy, med-spa, cosmetic
-  dental, rejuvenation.
-- **Tassy Guardian** (/recover) — oncology, chemo, radiation and hospital-discharge
-  transport. **Not currently accepting new requests.** Call (704) 941-8508 to ask
-  about availability.
-- **Tassy Scholar** (/school) — alternative student transportation. Subcontractor
-  since 2022 to EverDriven Technologies (formerly Alternative School Transportation),
-  covering Charlotte NC, High Point NC, Spartanburg SC, Rock Hill SC, and Cincinnati OH.
+- **Tassy Care** (/nemt) — one-way medical transport for ambulatory passengers:
+  dialysis, infusion, physical therapy, specialist appointments. Flat distance
+  bands from $49 (0-3 mi) to $129 (23-30 mi). Over 30 miles is quoted.
+- **Tassy Care WAV** — wheelchair-accessible transport in a ramp-equipped vehicle
+  from a partner network. **Quoted on the call, not published**, because the rate
+  depends on the subcontractor.
+- **Tassy Recovery** (/recover) — the ride home after outpatient surgery, sedation,
+  dental work or a hospital discharge, for the trips where a facility will not
+  release a patient without a responsible adult. Round trip with 20 minutes of
+  discharge wait and one pharmacy stop included. From $129 to $259.
+- **Tassy Concierge** (/vip) — premium one-way private transport with nothing
+  medical about it: airport, golf, dining, events, client pickups. From $69 to
+  $185. A round trip is two reserved legs.
+- **Winnie Ride** (/winnie) — dedicated pet transport with the owner NOT in the
+  vehicle: vet, groomer, daycare, boarding. $49-$89 one way, $89-$160 there and
+  back with 20 minutes of wait.
+- **Tassy Scholar** — school and after-school routes, priced per ROUTE and billed
+  monthly, never per ride: first child $45 a leg, each sibling at the same address
+  $20, third child at that address free, $55 route minimum. After-school three days
+  a week from $660/month. Daily routes are sold to schools, districts and case
+  managers on account.
+- Retired lines: **Tassy Wellness** (/renew) now routes to Concierge or Recovery
+  depending on whether the procedure leaves the client able to travel alone.
+  **Tassy Guardian** is not currently accepting requests.
+Tassy Trucks LLC has also been a subcontractor since 2022 to EverDriven Technologies
+(formerly Alternative School Transportation), running alternative student
+transportation in Charlotte NC, High Point NC, Spartanburg SC, Rock Hill SC and
+Cincinnati OH (/school).
 
 ## How a ride is arranged
 

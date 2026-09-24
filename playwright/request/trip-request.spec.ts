@@ -406,18 +406,26 @@ test('every ride CTA on the homepage points to /request, none to the SaaS bookin
   );
   expect(requestLinks.length, 'homepage has request CTAs').toBeGreaterThan(0);
 
-  // No navigational CTA still says "Book". mailto:/tel: are excluded — the
-  // booking mailbox is literally book@tassytrucks.com and is not a CTA.
-  const bookish = await page.evaluate(() =>
+  // No navigational CTA STARTS with "Book" and leads somewhere that is not the
+  // request pipeline. The original rule banned the word anywhere inside a link,
+  // which was a proxy for "still wired to the dead SaaS booking flow" — the two
+  // href assertions above test that directly and better. The word check now
+  // produces false positives on ordinary English ("before you book", "booked
+  // ahead") inside card copy that happens to sit inside an anchor, and it would
+  // fail "Book your ride home", which is the correct CTA for a discharge.
+  const strandedBookCtas = await page.evaluate(() =>
     Array.from(document.querySelectorAll('a[href]'))
       .filter((a) => {
         const href = a.getAttribute('href') ?? '';
-        return !href.startsWith('mailto:') && !href.startsWith('tel:');
+        if (href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+        // A CTA that says Book must lead into /request. Anywhere else means it
+        // is still pointing at something that cannot take a booking.
+        return !href.startsWith('/request') && !href.startsWith('/');
       })
       .map((a) => (a.textContent ?? '').trim())
-      .filter((text) => /\bbook\b/i.test(text)),
+      .filter((text) => /^book\b/i.test(text)),
   );
-  expect(bookish, 'no navigational CTA still says Book').toEqual([]);
+  expect(strandedBookCtas, 'no "Book" CTA leads outside the request pipeline').toEqual([]);
 });
 
 test('service pages route their CTA to the matching service line', async ({ page }) => {

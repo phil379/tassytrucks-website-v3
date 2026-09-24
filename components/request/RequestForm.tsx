@@ -17,7 +17,8 @@ import {
   tripRequestSchema,
   type ServiceLine,
 } from '@/lib/trip-request';
-import AddressAutocomplete from '@/components/request/AddressAutocomplete';
+import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
+import { SHOW_ESTIMATES, estimateTrip, formatRange } from '@/lib/quote';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -77,6 +78,14 @@ export default function RequestForm({
     setMobility((current) => (allowed.includes(current) ? current : defaultMobilityFor(next)));
   }
   const [returnTrip, setReturnTrip] = useState(false);
+
+  // Lifted out of the address fields so the estimate can react to them. Null
+  // whenever the visitor edits an address after picking it — a price that
+  // describes a corrected address is worse than no price.
+  const [pickupPlace, setPickupPlace] = useState<ResolvedPlace | null>(null);
+  const [dropoffPlace, setDropoffPlace] = useState<ResolvedPlace | null>(null);
+  const [whenValue, setWhenValue] = useState('');
+  const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');
 
@@ -97,6 +106,25 @@ export default function RequestForm({
     const qs = utm.toString();
     return qs ? `${pathname}?${qs}` : pathname;
   }, [pathname, searchParams]);
+
+  /**
+   * Off for everyone until the rate card is approved (lib/quote.ts). The query
+   * flag is a preview door so the panel can be reviewed on the live site
+   * without publishing a price to the public.
+   */
+  const estimatesEnabled = SHOW_ESTIMATES || searchParams.get('preview_quote') === '1';
+
+  const estimate = useMemo(() => {
+    if (!estimatesEnabled) return null;
+    return estimateTrip({
+      serviceLine: service,
+      pickup: pickupPlace,
+      dropoff: dropoffPlace,
+      requestedAt: whenValue,
+      passengers,
+      returnTrip,
+    });
+  }, [estimatesEnabled, service, pickupPlace, dropoffPlace, whenValue, passengers, returnTrip]);
 
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
   const errorList = Object.entries(errors);
@@ -150,6 +178,9 @@ export default function RequestForm({
       dropoffPlaceId: String(fd.get('dropoffAddressPlaceId') ?? '') || null,
       dropoffLat: String(fd.get('dropoffAddressLat') ?? '') || null,
       dropoffLng: String(fd.get('dropoffAddressLng') ?? '') || null,
+      // Only the FLAG. The server recomputes the amounts from the coordinates
+      // it received — a price the browser could edit is not defensible.
+      estimateShown: Boolean(estimate),
       contactFirstName: String(fd.get('contactFirstName') ?? ''),
       contactLastName: String(fd.get('contactLastName') ?? ''),
       contactPhone: String(fd.get('contactPhone') ?? ''),
@@ -281,6 +312,7 @@ export default function RequestForm({
           required
           hasError={Boolean(errors.pickupAddress)}
           describedBy={errors.pickupAddress ? 'pickupAddress-error' : undefined}
+          onResolve={setPickupPlace}
         />
         <FieldError name="pickupAddress" />
       </div>
@@ -293,6 +325,7 @@ export default function RequestForm({
           required
           hasError={Boolean(errors.dropoffAddress)}
           describedBy={errors.dropoffAddress ? 'dropoffAddress-error' : undefined}
+          onResolve={setDropoffPlace}
         />
         <FieldError name="dropoffAddress" />
       </div>
@@ -306,6 +339,8 @@ export default function RequestForm({
           {...fieldProps('requestedAt')}
           type="datetime-local"
           min={minDateTime}
+          value={whenValue}
+          onChange={(e) => setWhenValue(e.target.value)}
           aria-describedby={errors.requestedAt ? 'requestedAt-error requestedAt-help' : 'requestedAt-help'}
           required
         />
@@ -343,7 +378,14 @@ export default function RequestForm({
           <label className={labelCls} htmlFor="passengers">
             {passengerLabelFor(service)}
           </label>
-          <input {...fieldProps('passengers')} type="number" min={1} max={8} defaultValue={1} />
+          <input
+            {...fieldProps('passengers')}
+            type="number"
+            min={1}
+            max={8}
+            value={passengers}
+            onChange={(e) => setPassengers(Math.max(1, Math.min(8, Number(e.target.value) || 1)))}
+          />
           <FieldError name="passengers" />
         </div>
 
@@ -453,6 +495,46 @@ export default function RequestForm({
           ))}
         </div>
       </fieldset>
+
+      {estimatesEnabled && (
+        <div
+          data-testid="trip-estimate"
+          className="rounded-xl border border-line p-4"
+          aria-live="polite"
+        >
+          {estimate ? (
+            <>
+              <p className="text-sm">
+                <span className="ink-soft">Estimated fare</span>{' '}
+                <span className="serif text-2xl font-semibold text-[color:var(--gold)]">
+                  {formatRange(estimate)}
+                </span>
+              </p>
+              <p className="ink-soft mt-1.5 text-xs">
+                About {estimate.miles} miles
+                {returnTrip ? ', both legs' : ''}
+                {estimate.atMinimum ? ' · minimum fare applies' : ''}
+                {estimate.waitIncludedMin > 0
+                  ? ` · includes ${estimate.waitIncludedMin} min on-site wait`
+                  : ''}
+                {estimate.surcharges.length > 0
+                  ? ` · ${estimate.surcharges.map((x) => x.label.toLowerCase()).join(' and ')}`
+                  : ''}
+              </p>
+              <p className="ink-soft mt-2 text-xs">
+                An estimate, not a final price. Tolls, extra wait time and a route we
+                cannot see yet can move it. A dispatcher confirms the exact figure
+                before your trip is booked.
+              </p>
+            </>
+          ) : (
+            <p className="ink-soft text-sm">
+              {/* Deliberately not a guess. See the rules at the top of lib/quote.ts. */}
+              Pick both addresses from the suggestions to see an estimated fare.
+            </p>
+          )}
+        </div>
+      )}
 
       {showWaitCopy && (
         <p className="ink-soft text-sm rounded-lg border border-line p-4">{COPY.waitTime}</p>

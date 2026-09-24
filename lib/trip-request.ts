@@ -201,6 +201,16 @@ const tripRequestObject = z
     dropoffLat: optionalCoordinate(-90, 90),
     dropoffLng: optionalCoordinate(-180, 180),
 
+    /**
+     * Whether the customer actually SAW a price range before submitting.
+     *
+     * Only this flag comes from the client. The amounts never do - the server
+     * recomputes the estimate from the coordinates it received, because a
+     * number the browser could edit is not a number you can defend in a billing
+     * dispute.
+     */
+    estimateShown: z.coerce.boolean().default(false),
+
     contactFirstName: trimmed(100).min(1, 'Enter your first name'),
     contactLastName: trimmed(100).min(1, 'Enter your last name'),
     contactPhone: trimmed(40).min(7, 'Enter a phone number we can reach you on'),

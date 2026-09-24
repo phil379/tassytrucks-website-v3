@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fullName, tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request';
+import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
@@ -90,6 +91,18 @@ export async function POST(request: Request) {
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? null;
 
+  // Recomputed here from the coordinates that arrived, never taken from the
+  // request body. Null whenever the addresses were typed instead of picked -
+  // there is nothing to measure, and a guessed price is worse than none.
+  const estimate = estimateTrip({
+    serviceLine: data.serviceLine,
+    pickup: { lat: data.pickupLat, lng: data.pickupLng },
+    dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
+    requestedAt: data.requestedAt,
+    passengers: data.passengers,
+    returnTrip: data.returnTrip,
+  });
+
   let id: string;
   try {
     const { data: inserted, error } = await supabaseAdmin()
@@ -123,6 +136,12 @@ export async function POST(request: Request) {
         dropoff_place_id: data.dropoffPlaceId || null,
         dropoff_lat: data.dropoffLat ?? null,
         dropoff_lng: data.dropoffLng ?? null,
+        estimate_low_cents: estimate?.lowCents ?? null,
+        estimate_high_cents: estimate?.highCents ?? null,
+        estimate_miles: estimate?.miles ?? null,
+        // Only true when the range was on screen. An estimate computed for the
+        // ops queue while the public display is off is not a promise.
+        estimate_shown: Boolean(estimate && data.estimateShown),
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,

@@ -61,6 +61,7 @@ export default function AddressAutocomplete({
   hasError,
   describedBy,
   defaultValue = '',
+  onResolve,
 }: {
   name: string;
   apiKey: string | undefined;
@@ -70,6 +71,13 @@ export default function AddressAutocomplete({
   hasError?: boolean;
   describedBy?: string;
   defaultValue?: string;
+  /**
+   * Fires whenever the resolved place changes, INCLUDING to null when the
+   * visitor edits the text after picking. The parent needs that null as much as
+   * it needs the coordinates: it is the signal to withdraw a price estimate
+   * that no longer describes the address on screen.
+   */
+  onResolve?: (place: ResolvedPlace | null) => void;
 }) {
   const { places, failed } = useGooglePlaces(apiKey);
 
@@ -78,6 +86,15 @@ export default function AddressAutocomplete({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+
+  // Reported to the parent via effect rather than inside the handlers, so the
+  // parent sees exactly the value that rendered — no path can update one
+  // without the other.
+  const onResolveRef = useRef(onResolve);
+  onResolveRef.current = onResolve;
+  useEffect(() => {
+    onResolveRef.current?.(resolved);
+  }, [resolved]);
 
   const listId = useId();
   const statusId = useId();

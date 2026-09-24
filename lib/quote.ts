@@ -59,12 +59,29 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
 export const SHOW_ESTIMATES = true;
 
 /**
- * Straight line under-reads real driving distance. Charlotte is a hub-and-spoke
- * city cut by I-77, I-85 and a rail corridor, so a crow-flies mile is closer to
- * 1.3 road miles here than the 1.2 typical of a grid city.
+ * THE FALLBACK ONLY. When two real coordinates are available the engine uses
+ * Google's actual driving distance (lib/road-distance.ts) and these are not
+ * consulted at all. They exist for the case with nothing to measure: a ZIP
+ * centroid, a typed address, no Maps key.
+ *
+ * Calibrated 2026-09-24 against 16 real Charlotte-metro pairs measured through
+ * the Routes API:
+ *
+ *     min 1.12   p10 1.20   median 1.36   mean 1.39   p90 1.59   max 1.75
+ *
+ * The previous pair, 1.25/1.45, bracketed only the middle of that. The low end
+ * mattered: a trip whose straight-line miles times 1.25 sat just under a band
+ * cap was usually a band higher in reality, so the site quoted $59 for a ride
+ * the card prices at $69. Every one of those is $10 off the top, and the error
+ * only ever ran one way.
+ *
+ * These now sit at roughly p25 and p90 of the measured spread. The honest cost
+ * is a wider printed range on ZIP-only estimates, which is the truth: without
+ * the two addresses we do not know whether this is a 1.12 trip or a 1.75 one.
  */
-const ROAD_FACTOR_LOW = 1.25;
-const ROAD_FACTOR_HIGH = 1.45;
+const ROAD_FACTOR_LOW = 1.3;
+const ROAD_FACTOR_MID = 1.36;
+const ROAD_FACTOR_HIGH = 1.55;
 
 export type LatLng = { lat: number; lng: number };
 
@@ -327,6 +344,15 @@ export type Quote = {
   exact: boolean;
   /** "Charlotte, NC to Matthews, NC" when measured from ZIPs, else null. */
   measuredFrom: string | null;
+  /**
+   * TRUE when `miles` is Google's real driving distance, FALSE when it is a
+   * straight line stretched by a factor.
+   *
+   * The panel uses this to choose between "11.1 miles" and "about 10.6 miles".
+   * That distinction is not pedantry: a customer who checks our number against
+   * Google Maps and finds it short concludes the price is wrong too.
+   */
+  distanceMeasured: boolean;
 };
 
 export type QuoteOnly = {
@@ -394,6 +420,19 @@ export type QuoteInput = {
   returnTrip?: boolean | null;
   /** Switches Tassy Care to a WAV quote when it is `wheelchair`. */
   mobility?: string | null;
+  /**
+   * REAL driving miles from Google's Routes API, when we have them.
+   *
+   * Supplied by /api/distance in the browser and by the Routes call in
+   * app/api/trip-request/route.ts on the server. When this is a finite
+   * positive number it wins outright: it selects the band, it is the number
+   * printed on screen, and the estimate collapses to a single price because
+   * there is no longer anything to be uncertain about.
+   *
+   * Undefined and null are ordinary states — no key, Google slow, a ZIP-only
+   * address. The straight-line fallback covers them.
+   */
+  roadMiles?: number | null;
 };
 
 /**
@@ -430,26 +469,44 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const card = cardFor(input.serviceLine, input.mobility);
   if (!card) return null;
 
+  // A measured road distance ends the guessing. Both ends of the range become
+  // the same number, so the panel prints one price instead of a spread, and the
+  // mileage on screen is the mileage the customer's own phone will show.
+  const measured =
+    typeof input.roadMiles === 'number' && Number.isFinite(input.roadMiles) && input.roadMiles > 0
+      ? input.roadMiles
+      : null;
+
   const straight = haversineMiles(from.point, to.point);
-  if (!Number.isFinite(straight)) return null;
+  if (measured === null && !Number.isFinite(straight)) return null;
 
-  const milesLow = straight * ROAD_FACTOR_LOW;
-  const milesHigh = straight * ROAD_FACTOR_HIGH;
-
-  const lowBand = bandFor(card, milesLow);
-  const highBand = bandFor(card, milesHigh);
+  const milesLow = measured ?? straight * ROAD_FACTOR_LOW;
+  const milesMid = measured ?? straight * ROAD_FACTOR_MID;
+  const milesHigh = measured ?? straight * ROAD_FACTOR_HIGH;
 
   // Past the last rung. Do NOT extrapolate: the reason the card ends is that
   // beyond it the trip stops being a lookup and starts being a conversation
   // about tolls, driver hours and whether the vehicle comes back empty.
-  if (!lowBand || !highBand) {
+  //
+  // THE MIDDLE ESTIMATE DECIDES THIS, not the pessimistic one. Uptown to
+  // Concord is 25.5 real road miles — comfortably inside the 30-mile rung —
+  // but 19.4 straight-line times the p90 factor is 30.1, and judging it on
+  // that number turns a priceable trip into "call us". Refusing to quote is
+  // the most expensive mistake this function can make; a range that clips at
+  // the top rung is the cheap one.
+  const midBand = bandFor(card, milesMid);
+  if (!midBand) {
     return {
       kind: 'quote-only',
       reason: 'beyond-bands',
-      miles: Math.round(milesLow * 10) / 10,
+      miles: Math.round(milesMid * 10) / 10,
       message: `That is a longer trip than our published ${card.label} rates cover. Send the request and a dispatcher will quote it — usually within 2 hours.`,
     };
   }
+
+  // Clamped to the card, having already established the trip belongs on it.
+  const lowBand = bandFor(card, milesLow) ?? card.bands[0]!;
+  const highBand = bandFor(card, milesHigh) ?? card.bands[card.bands.length - 1]!;
 
   const surcharges = surchargesFor(input.requestedAt);
   const surchargeTotal = surcharges.reduce((sum, s) => sum + s.cents, 0);
@@ -484,7 +541,9 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     kind: 'estimate',
     lowCents: price(lowBand),
     highCents: price(highBand),
-    miles: Math.round(milesLow * 10) / 10,
+    // The MIDDLE estimate, not the low one. Printing the optimistic figure is
+    // what made the site read 10.6 miles for an 11.1-mile drive.
+    miles: Math.round(milesMid * 10) / 10,
     surcharges,
     entryBand: lowBand === card.bands[0] && highBand === card.bands[0],
     waitIncludedMin,
@@ -492,6 +551,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     roundTrip: bothLegs,
     exact,
     measuredFrom: exact || !fromPlace || !toPlace ? null : `${fromPlace} to ${toPlace}`,
+    distanceMeasured: measured !== null,
   };
 }
 

@@ -4,6 +4,7 @@ import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { parseLocalDateTime } from '@/lib/time';
 
 /**
@@ -91,11 +92,22 @@ export async function POST(request: Request) {
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? null;
 
+  // The SAME measured distance the visitor was shown, fetched again here rather
+  // than trusted from the body - a price the browser can edit is not a price.
+  // Cached in lib/road-distance.ts, so in practice this is the browser's own
+  // lookup served back with no second call to Google. Null is fine: the engine
+  // falls back to the straight-line estimate exactly as the form did.
+  const pickupPoint = coerceLatLng({ lat: data.pickupLat, lng: data.pickupLng });
+  const dropoffPoint = coerceLatLng({ lat: data.dropoffLat, lng: data.dropoffLng });
+  const measured =
+    pickupPoint && dropoffPoint ? await roadDistance(pickupPoint, dropoffPoint) : null;
+
   // Recomputed here from the coordinates that arrived, never taken from the
   // request body. Null whenever the addresses were typed instead of picked -
   // there is nothing to measure, and a guessed price is worse than none.
   const quoted = estimateTrip({
     serviceLine: data.serviceLine,
+    roadMiles: measured?.miles ?? null,
     pickup: { lat: data.pickupLat, lng: data.pickupLng },
     dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
     // The typed addresses are passed too, so a row with no picked place still

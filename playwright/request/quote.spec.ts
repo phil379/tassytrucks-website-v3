@@ -465,3 +465,135 @@ test.describe('coverage and formatting', () => {
     expect(SHOW_ESTIMATES).toBe(true);
   });
 });
+
+/**
+ * Real driving distance beats a stretched straight line.
+ *
+ * The bug these guard against, reported 2026-09-24: the site said "about 10.6
+ * miles" for a trip Google Maps calls 11.1, and "about 8 miles" for one Google
+ * calls 8.5. Both numbers were straight-line distance times 1.25. A customer
+ * who checks our mileage against their own phone and finds it short stops
+ * trusting the price next to it.
+ *
+ * The three fixtures below are MEASURED, not invented — Routes API,
+ * 3106 Aransas Rd to Bank of America Stadium and to 2513 Pruitt St.
+ */
+const ARANSAS = { lat: 35.2892281, lng: -80.9819877 };
+const STADIUM = { lat: 35.2253326, lng: -80.8536063 };
+const PRUITT = { lat: 35.2263648, lng: -80.89841 };
+const ARANSAS_TO_STADIUM_ROAD_MILES = 11.11;
+const ARANSAS_TO_PRUITT_ROAD_MILES = 8.47;
+
+test.describe('measured driving distance', () => {
+  test('a measured distance is printed as-is, not stretched', () => {
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: ARANSAS,
+        dropoff: STADIUM,
+        roadMiles: ARANSAS_TO_STADIUM_ROAD_MILES,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.miles).toBe(11.1);
+    expect(q.distanceMeasured).toBe(true);
+  });
+
+  test('without it, the printed figure is the middle estimate and says "about"', () => {
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: ARANSAS,
+        dropoff: STADIUM,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.distanceMeasured).toBe(false);
+    // Straight line here is 8.5 miles. The old code printed 10.6 (x1.25),
+    // which is 0.5 short of the truth; the middle factor lands on 11.5.
+    expect(q.miles).toBeGreaterThan(11);
+  });
+
+  test('a measured distance collapses the range to one price', () => {
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: ARANSAS,
+        dropoff: STADIUM,
+        roadMiles: ARANSAS_TO_STADIUM_ROAD_MILES,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.lowCents).toBe(q.highCents);
+    expect(formatRange(q)).not.toContain('–');
+  });
+
+  test('the two trips Phil compared are NOT the same price', () => {
+    const stadium = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: ARANSAS,
+        dropoff: STADIUM,
+        roadMiles: ARANSAS_TO_STADIUM_ROAD_MILES,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    const pruitt = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: ARANSAS,
+        dropoff: PRUITT,
+        roadMiles: ARANSAS_TO_PRUITT_ROAD_MILES,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(stadium.lowCents).toBe(6900);
+    expect(pruitt.lowCents).toBe(5900);
+    expect(stadium.lowCents).toBeGreaterThan(pruitt.lowCents);
+  });
+
+  test('a measured distance selects the band the customer can verify', () => {
+    // 11.11 real miles is the 12-mile rung on Tassy Care ($74). Straight line
+    // times the old 1.25 gave 10.6 — the same rung here, but a trip 0.4 miles
+    // longer would have been priced a rung low. That gap was the leak.
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: ARANSAS,
+        dropoff: STADIUM,
+        roadMiles: ARANSAS_TO_STADIUM_ROAD_MILES,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.lowCents).toBe(7400);
+  });
+
+  test('a junk roadMiles is ignored rather than trusted', () => {
+    for (const bad of [0, -5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const q = asEstimate(
+        estimateTrip({
+          serviceLine: 'care',
+          pickup: UPTOWN,
+          dropoff: CMC,
+          roadMiles: bad,
+          requestedAt: WEEKDAY_MIDDAY,
+        }),
+      );
+      expect(q.distanceMeasured).toBe(false);
+      expect(q.lowCents).toBe(4900);
+    }
+  });
+
+  test('a trip inside the card is not refused because the pessimistic factor overshoots', () => {
+    // Uptown to Concord is 25.5 real road miles — inside the 30-mile rung.
+    // Judged on straight line x 1.55 it is 30.1, and the engine used to answer
+    // "call us" for a trip it can price.
+    const q = estimateTrip({
+      serviceLine: 'care',
+      pickup: UPTOWN,
+      dropoff: CONCORD,
+      requestedAt: WEEKDAY_MIDDAY,
+    });
+    expect(q?.kind).toBe('estimate');
+  });
+});

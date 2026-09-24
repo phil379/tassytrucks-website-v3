@@ -119,10 +119,71 @@ export default function RequestForm({
   /** Operator diagnostic: /request?debug_maps=1 says why suggestions are off. */
   const debugMaps = searchParams.get('debug_maps') === '1';
 
+  /**
+   * REAL driving miles, from Google's Routes API via /api/distance.
+   *
+   * Null is the normal starting state and a normal ending state: no Maps key,
+   * an address typed rather than picked, Google slow, quota gone. The quote
+   * engine falls back to a stretched straight line and labels it "about". The
+   * lookup never gates the price — the panel shows the fallback number first
+   * and tightens to the measured one a moment later.
+   */
+  const [roadMiles, setRoadMiles] = useState<number | null>(null);
+
+  const pickupLat = pickupPlace?.lat ?? null;
+  const pickupLng = pickupPlace?.lng ?? null;
+  const dropoffLat = dropoffPlace?.lat ?? null;
+  const dropoffLng = dropoffPlace?.lng ?? null;
+
+  useEffect(() => {
+    if (
+      pickupLat === null ||
+      pickupLng === null ||
+      dropoffLat === null ||
+      dropoffLng === null
+    ) {
+      // One end just changed or was cleared. Drop the old number immediately:
+      // a measured distance for the PREVIOUS address is worse than none.
+      setRoadMiles(null);
+      return;
+    }
+
+    let cancelled = false;
+    const controller = new AbortController();
+    // Short debounce. Picking from the dropdown can fire pickup and dropoff in
+    // quick succession, and one billed call per pair is the point.
+    const timer = setTimeout(() => {
+      fetch('/api/distance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickup: { lat: pickupLat, lng: pickupLng },
+          dropoff: { lat: dropoffLat, lng: dropoffLng },
+        }),
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: { miles?: number | null } | null) => {
+          if (cancelled) return;
+          setRoadMiles(typeof data?.miles === 'number' ? data.miles : null);
+        })
+        .catch(() => {
+          if (!cancelled) setRoadMiles(null);
+        });
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [pickupLat, pickupLng, dropoffLat, dropoffLng]);
+
   const quoted = useMemo(() => {
     if (!estimatesEnabled) return null;
     return estimateTrip({
       serviceLine: service,
+      roadMiles,
       pickup: pickupPlace,
       dropoff: dropoffPlace,
       // The raw text matters even when a place was picked: with no Maps key
@@ -137,6 +198,7 @@ export default function RequestForm({
     });
   }, [
     estimatesEnabled,
+    roadMiles,
     service,
     pickupPlace,
     dropoffPlace,
@@ -539,7 +601,14 @@ export default function RequestForm({
                 </span>
               </p>
               <p className="ink-soft mt-1.5 text-xs">
-                {estimate.cardLabel} · about {estimate.miles} miles
+                {/* "11.1 miles" when Google measured the drive, "about 10.6"
+                    when it is a straight line stretched by a factor. A
+                    customer checking our number against their own phone must
+                    not find it short. */}
+                {estimate.cardLabel} ·{' '}
+                {estimate.distanceMeasured
+                  ? `${estimate.miles} miles driving`
+                  : `about ${estimate.miles} miles`}
                 {estimate.roundTrip ? ' · both legs included' : ''}
                 {estimate.waitIncludedMin > 0
                   ? ` · includes ${estimate.waitIncludedMin} min on-site wait`

@@ -10,7 +10,12 @@
   --bg: #0d1117;                        /* dark canvas (was #FAF7F0) */
   --ink: #F4EFE0;                       /* primary TEXT — cream on dark (was #1B1A17) */
   --ink-soft: rgba(244,239,224,0.72);   /* secondary text (was #444239) */
-  --ink-mute: rgba(244,239,224,0.5);    /* muted text (was #76736B) */
+  /* AAA (WCAG 1.4.6, 7:1). Was 0.5 alpha = 4.77:1 on the canvas and 4.67:1 on
+     cards — AA, but thin for an elderly and post-surgical audience. 0.68 gives
+     8.2:1 on the canvas and 7.5:1 on --surface, clearing 7:1 on the worse of
+     the two. It now sits close to --ink-soft by necessity: at this background
+     there is not much room between "muted" and "AAA". */
+  --ink-mute: rgba(244,239,224,0.68);
   --gold: #C8932E;
   --gold-warm: #E5A93B;
   --line: rgba(244,239,224,0.12);       /* dark hairline (was #E8E1D1) */
@@ -71,7 +76,9 @@ body {
     min-height: 48px;           /* > 44px target (WCAG 2.5.5) */
     background: #0f141a;
     color: var(--ink);
-    border: 1px solid var(--line);
+    /* 3.5:1 against the field fill. --line (1.34:1) is fine for decorative
+       hairlines but too faint to show where an input actually is. */
+    border: 1px solid rgba(244, 239, 224, 0.40);
     border-radius: 10px;
     padding: 0.75rem 0.9rem;
     font-size: 16px;

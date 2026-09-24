@@ -15,7 +15,7 @@ const config: Config = {
         bg:         '#0d1117',
         ink:        '#1B1A17',                  // dark surface / on-gold text (unchanged)
         'ink-soft': 'rgba(244,239,224,0.72)',
-        'ink-mute': 'rgba(244,239,224,0.5)',
+        'ink-mute': 'rgba(244,239,224,0.68)',  // AAA 7:1 — see globals.css
         gold:       '#C8932E',
         'gold-warm':'#E5A93B',
         line:       'rgba(244,239,224,0.12)',

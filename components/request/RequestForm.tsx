@@ -214,6 +214,9 @@ export default function RequestForm({
     return estimateTrip({
       serviceLine: service,
       roadMiles,
+      // The one detail answer that moves the price. The engine ignores it on
+      // every line but Recovery, so switching service cannot carry $45 across.
+      escort: details.escort === 'yes',
       pickup: pickupPlace,
       dropoff: dropoffPlace,
       // The raw text matters even when a place was picked: with no Maps key
@@ -229,6 +232,7 @@ export default function RequestForm({
   }, [
     estimatesEnabled,
     roadMiles,
+    details.escort,
     service,
     pickupPlace,
     dropoffPlace,
@@ -681,6 +685,7 @@ export default function RequestForm({
                 {estimate.waitIncludedMin > 0
                   ? ` · includes ${estimate.waitIncludedMin} min on-site wait`
                   : ''}
+                {estimate.escortCents > 0 ? ' · Tassy Escort included' : ''}
                 {estimate.surcharges.length > 0
                   ? ` · ${estimate.surcharges.map((x) => x.label.toLowerCase()).join(' and ')}`
                   : ''}

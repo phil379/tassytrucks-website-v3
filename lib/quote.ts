@@ -83,6 +83,43 @@ const ROAD_FACTOR_LOW = 1.3;
 const ROAD_FACTOR_MID = 1.36;
 const ROAD_FACTOR_HIGH = 1.55;
 
+/**
+ * TASSY ESCORT — a trained driver walks the patient out, rather than waiting
+ * at the curb. Flat, charged once, Tassy Recovery only.
+ *
+ * WHY THIS IS NOT A HIRED ROLE. The obvious build was to employ CNAs for this.
+ * A CNA in Charlotte runs $17.88/hour on average and $22–27 loaded, and nobody
+ * hires for ninety minutes — a practical call-out is two to four hours, so one
+ * escort would cost $45–90 in labor against a $129 Recovery fare. Worse, a
+ * licensed clinical operator in the vehicle implies clinical care the company
+ * is not licensed to provide, which enlarges the insurance question rather than
+ * answering it. Walking someone from a discharge desk to a car is an escort
+ * task, not a clinical one.
+ *
+ * So the driver who was already dispatched arrives fifteen minutes early and
+ * goes inside. The marginal cost is about twenty-five minutes of time that is
+ * already on the road — roughly $10–15 — which is why this price holds up.
+ *
+ * WHY $45 RATHER THAN $35. This is the only thing that makes a booking possible
+ * for a patient with nobody to sign them out; today that request is declined
+ * outright. Demand for it is inelastic and the alternative is no trip at all,
+ * so it sits at the top of the approved range.
+ *
+ * ⚠️ UNVERIFIED AND LOAD-BEARING: some surgery centers will not discharge a
+ * sedated patient to a paid escort, only to a responsible adult who takes them
+ * home. That rule varies by facility and has NOT been checked with any
+ * Charlotte center yet. Until it has, sell this as "we walk them out", never as
+ * "we can be your responsible adult".
+ */
+export const ESCORT_CENTS = 4500;
+
+/** Lines that can carry an escort. Recovery only — see the note above. */
+export const ESCORT_LINES: readonly ServiceLine[] = ['recovery'];
+
+export function escortAvailable(service: string): boolean {
+  return ESCORT_LINES.includes(service as ServiceLine);
+}
+
 export type LatLng = { lat: number; lng: number };
 
 /** One rung of a card. `upToMiles` is inclusive; `cents` is the whole fare. */
@@ -353,6 +390,8 @@ export type Quote = {
    * Google Maps and finds it short concludes the price is wrong too.
    */
   distanceMeasured: boolean;
+  /** $45 when a Tassy Escort was asked for, 0 otherwise. Already in the total. */
+  escortCents: number;
 };
 
 export type QuoteOnly = {
@@ -433,6 +472,12 @@ export type QuoteInput = {
    * address. The straight-line fallback covers them.
    */
   roadMiles?: number | null;
+  /**
+   * Tassy Escort — the driver goes inside and walks them out. Recovery only;
+   * silently ignored on every other line so a stale query string cannot add
+   * $45 to a pet ride.
+   */
+  escort?: boolean | null;
 };
 
 /**
@@ -512,6 +557,11 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const surchargeTotal = surcharges.reduce((sum, s) => sum + s.cents, 0);
   const extras = Math.max(0, (input.passengers ?? 1) - 1) * card.perExtra;
 
+  // Charged ONCE, like a surcharge and unlike a fare. The driver walks them out
+  // of the building one time; a return leg does not double it.
+  const escortCents =
+    input.escort && escortAvailable(input.serviceLine) ? ESCORT_CENTS : 0;
+
   // Recovery is already a round trip, so ticking the box must not double it.
   const bothLegs = card.returnFactor === 1 || Boolean(input.returnTrip);
   const factor = input.returnTrip ? card.returnFactor : 1;
@@ -524,7 +574,8 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     return (
       roundTo(Math.max(legs, input.returnTrip ? card.returnFloor : 0), 100) +
       surchargeTotal +
-      extras
+      extras +
+      escortCents
     );
   };
 
@@ -552,6 +603,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     exact,
     measuredFrom: exact || !fromPlace || !toPlace ? null : `${fromPlace} to ${toPlace}`,
     distanceMeasured: measured !== null,
+    escortCents,
   };
 }
 

@@ -33,6 +33,12 @@ export type ConfirmedTrip = {
   discountCents?: number | null;
   driverName?: string | null;
   vehicleDescription?: string | null;
+  /**
+   * Stripe payment link. Optional on purpose — a facility on account is
+   * invoiced monthly and must NOT be sent a card link, and a deployment with
+   * no Stripe key still has to be able to confirm a trip.
+   */
+  payUrl?: string | null;
 };
 
 function fmtWhen(iso: string | null | undefined): string {
@@ -180,6 +186,22 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
     </table>
   </td></tr>
 
+  ${
+    t.payUrl
+      ? `<tr><td style="padding:24px 28px 0;" align="center">
+    <a href="${esc(t.payUrl)}"
+       style="display:inline-block;background:${INK};color:#FFFFFF;text-decoration:none;
+              font-weight:700;font-size:16px;padding:15px 34px;border-radius:10px;">
+      Pay ${esc(price)} now
+    </a>
+    <p style="margin:12px 0 0;color:${MUTE};font-size:13px;line-height:1.6;">
+      Paying ahead means nothing to settle at the car. Card only — we never ask
+      for payment details over the phone.
+    </p>
+  </td></tr>`
+      : ''
+  }
+
   <tr><td style="padding:24px 28px 8px;" align="center">
     <a href="tel:+17049418508"
        style="display:inline-block;background:${GOLD};color:${INK};text-decoration:none;
@@ -248,6 +270,17 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
   lines.push(
     '  Need to change or cancel? Call us. No fee if you tell us at least 4 hours ahead.',
     '',
+  );
+  if (t.payUrl) {
+    lines.push(
+      'PAY AHEAD',
+      `  ${t.payUrl}`,
+      '  Paying ahead means nothing to settle at the car. Card only — we never ask',
+      '  for payment details over the phone.',
+      '',
+    );
+  }
+  lines.push(
     `Dispatch: (704) 941-8508 — quote ${t.confirmationCode} and we will have your trip on screen.`,
     '',
     '— Tassy Transportation, Charlotte NC',

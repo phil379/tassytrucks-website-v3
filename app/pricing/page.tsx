@@ -263,6 +263,10 @@ export default function PricingPage() {
                   <strong className="text-ink">+$15</strong> on Recovery and Concierge
                 </li>
                 <li>
+                  Tassy Escort on Recovery: <strong className="text-ink">+$45</strong> — your
+                  driver comes in 15 minutes early and walks them out to the car
+                </li>
+                <li>
                   Wait beyond what is included: quoted to you{' '}
                   <strong className="text-ink">before</strong> it is charged, never after
                 </li>

@@ -9,7 +9,7 @@ import type { ServiceLine } from '@/lib/trip-request';
  * asking for their dog's surname. Worse, it collected nothing a dispatcher
  * actually needs to quote or crew the job: no breed, no weight, no vaccination,
  * no carrier, no grade, no school, no flight number, nobody signing the patient
- * out of the surgery centre.
+ * out of the surgery center.
  *
  * ONE SPEC, FOUR CONSUMERS. The field list below is the only place a question
  * is written down. The form renders from it, the server validates against it,
@@ -253,7 +253,7 @@ const RECOVERY: DetailSection = {
         { value: 'someone_else', label: 'Someone else will be there' },
         { value: 'driver_only', label: 'Nobody — the driver is the responsible adult' },
       ],
-      help: 'Most surgery centres will not release a sedated patient without one. Tell us now, not at the door.',
+      help: 'Most surgery centers will not release a sedated patient without one. Tell us now, not at the door.',
     },
     {
       key: 'responsible_adult_name',
@@ -262,6 +262,26 @@ const RECOVERY: DetailSection = {
       max: 80,
       half: true,
       showWhen: { key: 'responsible_adult', equals: ['someone_else'] },
+    },
+    {
+      /**
+       * TASSY ESCORT. Deliberately placed straight after "who is signing them
+       * out", because the answer `driver_only` is the moment the customer
+       * realizes they have a problem — and this is the answer to it.
+       *
+       * The wording is careful and must stay careful. We walk them out. We do
+       * not claim to BE the responsible adult, because whether a surgery center
+       * accepts a paid escort in that role varies by facility and has not been
+       * checked with any Charlotte center. See lib/quote.ts, ESCORT_CENTS.
+       */
+      key: 'escort',
+      label: 'Add a Tassy Escort? (+$45)',
+      type: 'select',
+      options: [
+        { value: 'no', label: 'No — someone will be with them' },
+        { value: 'yes', label: 'Yes — walk them out to the car' },
+      ],
+      help: 'Your driver comes in 15 minutes early, meets them at the discharge desk and walks them to the car instead of waiting at the curb.',
     },
     {
       key: 'support_to_car',

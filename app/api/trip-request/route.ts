@@ -5,7 +5,7 @@ import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
-import { validateDetails } from '@/lib/trip-details';
+import { validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { parseLocalDateTime } from '@/lib/time';
 
 /**
@@ -101,9 +101,9 @@ export async function POST(request: Request) {
   // a dispatcher has to chase on the phone — not a rejected booking. Same rule
   // as the legacy single `contactName` field: keep the old shape working.
   const suppliedDetails = data.tripDetails !== undefined && data.tripDetails !== null;
-  const detailCheck = suppliedDetails
+  const detailCheck: DetailValidation = suppliedDetails
     ? validateDetails(data.serviceLine, data.tripDetails)
-    : ({ ok: true, values: {} } as const);
+    : { ok: true, values: {} };
 
   if (!detailCheck.ok) {
     const fieldErrors: Record<string, string> = {};
@@ -139,6 +139,9 @@ export async function POST(request: Request) {
   const quoted = estimateTrip({
     serviceLine: data.serviceLine,
     roadMiles: measured?.miles ?? null,
+    // Read from the VALIDATED details, so the stored estimate matches the one
+    // on screen. The engine ignores it off Recovery.
+    escort: tripDetails?.escort === 'yes',
     pickup: { lat: data.pickupLat, lng: data.pickupLng },
     dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
     // The typed addresses are passed too, so a row with no picked place still

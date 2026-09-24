@@ -70,6 +70,22 @@ export type TripRequestRow = {
   source: string | null;
   user_agent: string | null;
   internal_notes: string | null;
+  confirmation_code: string | null;
+  confirmed_at: string | null;
+  agreed_cents: number | null;
+  discount_label: string | null;
+  discount_cents: number | null;
+  driver_name: string | null;
+  vehicle_description: string | null;
+  estimate_low_cents: number | null;
+  estimate_high_cents: number | null;
+  estimate_miles: number | null;
+  estimate_shown: boolean | null;
+  /** Set at confirmation. NULL for a facility on account. */
+  payment_link_url: string | null;
+  stripe_payment_link_id: string | null;
+  /** Written ONLY by the Stripe webhook, never by a human in /ops. */
+  paid_at: string | null;
 };
 
 export const TRIP_STATUSES = [

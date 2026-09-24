@@ -10,13 +10,25 @@ export const metadata: Metadata = {
   openGraph: { url: '/recover', images: ['/og-image/recover'] },
 };
 
+/**
+ * ⚠️ CLAIMS ON THIS PAGE.
+ *
+ * It used to say Tassy Recovery "is the named adult", and the facility block
+ * promised a patient "does not leave until someone responsible is standing
+ * there". Whether a surgery center will discharge to a paid escort at all
+ * varies by facility, and not one Charlotte center has been asked.
+ *
+ * Until that is checked, this page describes what the driver DOES — comes
+ * inside, waits, drives them home — and never claims a role the facility may
+ * not grant. See lib/quote.ts, ESCORT_CENTS, for the same warning.
+ */
 export default function RecoverPage() {
   return (
     <ServicePage
       eyebrow="Tassy Recovery · After a procedure"
-      title="They won't discharge you without a responsible adult."
-      tagline="This is that person."
-      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Tassy Recovery is the named adult who comes to the discharge desk, waits while the paperwork catches up, and takes you home — with one pharmacy stop on the way. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $129."
+      title="They won't discharge you without someone to take you home."
+      tagline="We come inside and wait."
+      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Your Tassy driver comes to the discharge desk, waits while the paperwork catches up, and takes you home — with one pharmacy stop on the way. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $129."
       bookHref={request.recover}
       bookLabel="Book your ride home"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
@@ -26,7 +38,11 @@ export default function RecoverPage() {
       highlights={[
         {
           title: 'We meet you at the desk, not the curb',
-          body: 'A discharge nurse cannot hand a sedated patient to a parking lot. Your driver comes inside to the discharge desk or whichever entrance your facility names, and is there by name when they ask who is collecting you.',
+          body: 'A discharge nurse cannot hand a sedated patient to a parking lot. Your driver comes inside to the discharge desk, or whichever entrance your facility names, rather than waiting outside for you to find the car.',
+        },
+        {
+          title: 'Tassy Escort — add $45',
+          body: 'Nobody available to collect them? Your driver arrives fifteen minutes early, meets them at the discharge desk and walks them out to the car with their bag and their paperwork. Ask your facility first whether they will discharge to a paid escort — some will, some require a family member, and it is better to know before the day.',
         },
         {
           title: 'Twenty minutes of wait, built into the price',
@@ -75,7 +91,7 @@ export default function RecoverPage() {
       ]}
       partnerCta={{
         title: 'Surgery centers, dental practices and med spas',
-        body: 'Add a private transportation option to your discharge workflow. We book on account, invoice monthly, and your patient does not leave until someone responsible is standing there. Preferred rates from 10 trips a month.',
+        body: 'Add a private transportation option to your discharge workflow. We book on account, invoice monthly, and your patient is collected from the desk by a named driver at a time you set. Preferred rates from 10 trips a month.',
         href: 'mailto:phil@tassytrucks.com?subject=Facility%20account%20—%20Tassy%20Recovery',
         label: 'Ask for the facility packet',
       }}

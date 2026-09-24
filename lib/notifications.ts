@@ -169,6 +169,44 @@ async function sendResendEmail(payload: { to: string; subject: string; text: str
   }
 }
 
+/**
+ * Send one email with both an HTML part and a plain-text alternative.
+ *
+ * Exported because the confirmation email (lib/confirmation-email.ts) is HTML —
+ * it is the document a customer screenshots and shows a front desk — while
+ * everything in this file is deliberately plain text. Both parts are sent:
+ * hospital mail systems strip HTML, and the pickup time has to survive that.
+ *
+ * Throws on failure. The caller decides whether that fails the operation, and
+ * for a confirmation it should: a trip marked confirmed that the customer was
+ * never told about is worse than an error the dispatcher can see and retry.
+ */
+export async function sendRichEmail(payload: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('RESEND_API_KEY is not set');
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [payload.to],
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+  }
+}
+
 /** Full detail to the operator's own mailbox, plain text. */
 async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<void> {
   const to = process.env.OPERATOR_EMAIL;

@@ -9,6 +9,8 @@ import {
   cardFor,
   isQuoteOnly,
   estimateTrip,
+  escortAvailable,
+  ESCORT_CENTS,
   formatRange,
   formatUsd,
   haversineMiles,
@@ -595,5 +597,82 @@ test.describe('measured driving distance', () => {
       requestedAt: WEEKDAY_MIDDAY,
     });
     expect(q?.kind).toBe('estimate');
+  });
+});
+
+/**
+ * Tassy Escort — the driver goes inside and walks them out, $45 flat.
+ *
+ * The product decision this encodes: NOT a hired CNA. A CNA in Charlotte is
+ * $17.88/hour average, $22–27 loaded, with a two-to-four-hour practical
+ * minimum — $45 to $90 of labor against a $129 fare, plus a scope-of-practice
+ * problem nobody needed. The driver was already dispatched; he arrives fifteen
+ * minutes early instead. See lib/quote.ts, ESCORT_CENTS.
+ */
+test.describe('Tassy Escort', () => {
+  const RECOVERY_TRIP = {
+    serviceLine: 'recovery' as const,
+    pickup: UPTOWN,
+    dropoff: CMC,
+    requestedAt: WEEKDAY_MIDDAY,
+  };
+
+  test('it adds exactly $45 to a Recovery fare', () => {
+    const without = asEstimate(estimateTrip(RECOVERY_TRIP));
+    const with_ = asEstimate(estimateTrip({ ...RECOVERY_TRIP, escort: true }));
+    expect(with_.lowCents - without.lowCents).toBe(4500);
+    expect(with_.escortCents).toBe(4500);
+    expect(without.escortCents).toBe(0);
+  });
+
+  test('it is charged ONCE, not once per leg', () => {
+    // Recovery is already a round trip. The driver walks them out of the
+    // building one time, so a second leg must not buy a second escort.
+    const oneWay = asEstimate(estimateTrip({ ...RECOVERY_TRIP, escort: true }));
+    const returning = asEstimate(
+      estimateTrip({ ...RECOVERY_TRIP, escort: true, returnTrip: true }),
+    );
+    expect(returning.escortCents).toBe(4500);
+    expect(oneWay.escortCents).toBe(4500);
+  });
+
+  test('it stacks with a surcharge rather than replacing it', () => {
+    const night = asEstimate(
+      estimateTrip({ ...RECOVERY_TRIP, requestedAt: WEEKDAY_NIGHT, escort: true }),
+    );
+    const plain = asEstimate(estimateTrip(RECOVERY_TRIP));
+    // $45 escort + $25 after hours, both charged once.
+    expect(night.lowCents - plain.lowCents).toBe(4500 + 2500);
+  });
+
+  test('no other service line can be charged for one', () => {
+    for (const line of ['care', 'concierge', 'pet'] as const) {
+      const base = asEstimate(
+        estimateTrip({ serviceLine: line, pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY }),
+      );
+      const asked = asEstimate(
+        estimateTrip({
+          serviceLine: line,
+          pickup: UPTOWN,
+          dropoff: CMC,
+          requestedAt: WEEKDAY_MIDDAY,
+          escort: true,
+        }),
+      );
+      expect(asked.escortCents, `${line} must not carry an escort`).toBe(0);
+      expect(asked.lowCents, `${line} price must not move`).toBe(base.lowCents);
+    }
+  });
+
+  test('escortAvailable names Recovery and nothing else', () => {
+    expect(escortAvailable('recovery')).toBe(true);
+    for (const line of ['care', 'concierge', 'pet', 'scholar', 'nonsense']) {
+      expect(escortAvailable(line), line).toBe(false);
+    }
+  });
+
+  test('the price is the one the rate card publishes', () => {
+    // /pricing and /recover both print $45. If this changes, they change too.
+    expect(ESCORT_CENTS).toBe(4500);
   });
 });

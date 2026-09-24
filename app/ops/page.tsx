@@ -4,7 +4,7 @@ import { isOpsAuthed } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES, type TripRequestRow } from '@/lib/supabase-admin';
 import { mobilityLabel, serviceLabel } from '@/lib/trip-request';
 import { describeDetails } from '@/lib/trip-details';
-import { login, logout, updateRow, advanceStatus } from './actions';
+import { login, logout, updateRow, advanceStatus, confirmAndSend } from './actions';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
 
@@ -262,6 +262,67 @@ export default async function OpsPage({
               )}
 
               {row.source && <p className="ink-mute text-xs mt-3">Source: {row.source}</p>}
+
+              {/* CONFIRM AND TELL THEM. The one step that did not exist: until
+                  this button, a dispatcher could quote a trip and advance its
+                  status while the customer heard nothing after "we will call
+                  you". Agreeing a price and sending the confirmation is one
+                  action because they are one action in real life — the
+                  dispatcher is on the phone when they press it. */}
+              {row.status !== 'cancelled' && row.status !== 'closed' && (
+                <form action={confirmAndSend} className="mt-5 rounded-xl border border-line p-4">
+                  <input type="hidden" name="id" value={row.id} />
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1">
+                      <label
+                        className="block text-sm font-medium mb-1.5"
+                        htmlFor={`agreed-${row.id}`}
+                      >
+                        Agreed price (USD)
+                      </label>
+                      <input
+                        id={`agreed-${row.id}`}
+                        name="agreedDollars"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        inputMode="decimal"
+                        className={input}
+                        defaultValue={
+                          row.agreed_cents != null
+                            ? (row.agreed_cents / 100).toFixed(2)
+                            : row.quoted_cents != null
+                              ? (row.quoted_cents / 100).toFixed(2)
+                              : row.estimate_high_cents != null
+                                ? (row.estimate_high_cents / 100).toFixed(2)
+                                : ''
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <label className="mt-3 flex items-center gap-3 text-sm cursor-pointer select-none min-h-[44px]">
+                    <input type="checkbox" name="onAccount" className="h-5 w-5 rounded border-line" />
+                    {/* A facility on account is invoiced monthly. Sending them a
+                        card link is how an account customer pays twice. */}
+                    On account — invoice monthly, no payment link
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="btn-gold mt-3 w-full justify-center min-h-[52px] text-base"
+                  >
+                    {row.confirmation_code ? 'Resend confirmation' : 'Confirm & send payment link'}
+                  </button>
+
+                  {row.confirmation_code && (
+                    <p className="ink-mute mt-2 text-xs">
+                      {row.confirmation_code}
+                      {row.paid_at ? ` · paid ${fmt(row.paid_at)}` : ' · awaiting payment'}
+                    </p>
+                  )}
+                </form>
+              )}
 
               {nextStatus(row.status) && (
                 <form action={advanceStatus} className="mt-5">

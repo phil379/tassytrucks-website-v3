@@ -236,6 +236,12 @@ export default function AddressAutocomplete({
         setActiveIndex(0);
         event.preventDefault();
       }
+      // Enter in an address box means "I have finished typing this address",
+      // never "submit the whole form". Letting it through submits a form the
+      // visitor is still filling in and answers them with a wall of red
+      // validation errors — which is exactly what happened to the first person
+      // who tried this field. The page has a large, obvious submit button.
+      if (event.key === 'Enter') event.preventDefault();
       return;
     }
 
@@ -249,12 +255,13 @@ export default function AddressAutocomplete({
         setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
         break;
       case 'Enter':
-        if (activeIndex >= 0) {
-          // Only swallow Enter when a suggestion is actually highlighted,
-          // so Enter still submits the form the rest of the time.
-          event.preventDefault();
-          void choose(suggestions[activeIndex]!);
-        }
+        // Always swallowed while the list is open, whether or not a row is
+        // highlighted. With suggestions on screen, Enter unambiguously means
+        // "take one" — and if none is highlighted it means "I am done here",
+        // which is still not a request to submit an unfinished form.
+        event.preventDefault();
+        if (activeIndex >= 0) void choose(suggestions[activeIndex]!);
+        else setOpen(false);
         break;
       case 'Escape':
         event.preventDefault();

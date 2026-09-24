@@ -62,6 +62,7 @@ export default function AddressAutocomplete({
   describedBy,
   defaultValue = '',
   onResolve,
+  debug = false,
 }: {
   name: string;
   apiKey: string | undefined;
@@ -78,8 +79,13 @@ export default function AddressAutocomplete({
    * that no longer describes the address on screen.
    */
   onResolve?: (place: ResolvedPlace | null) => void;
+  /**
+   * Operator-only. Shows why suggestions are off instead of failing silently.
+   * Never on for a customer — see the note in lib/google-maps.ts.
+   */
+  debug?: boolean;
 }) {
-  const { places, failed } = useGooglePlaces(apiKey);
+  const { places, failed, status } = useGooglePlaces(apiKey);
 
   const [text, setText] = useState(defaultValue);
   const [resolved, setResolved] = useState<ResolvedPlace | null>(null);
@@ -347,6 +353,20 @@ export default function AddressAutocomplete({
       {!failed && !places && (
         <p className="ink-soft mt-1.5 text-xs" aria-hidden="true">
           Loading address suggestions…
+        </p>
+      )}
+
+      {debug && (
+        <p
+          data-testid={`${name}-maps-status`}
+          className="ink-soft mt-1.5 font-mono text-xs"
+          aria-hidden="true"
+        >
+          {status === 'ready' && 'suggestions: on'}
+          {status === 'loading' && 'suggestions: loading…'}
+          {status === 'no-key' && 'suggestions: OFF — GOOGLE_MAPS_API_KEY is not set on this deployment'}
+          {status === 'load-failed' &&
+            'suggestions: OFF — Google rejected the key. Check (1) Maps JavaScript API + Places API (New) enabled, (2) this domain on the referrer allowlist, (3) billing on. Console has the exact error.'}
         </p>
       )}
     </div>

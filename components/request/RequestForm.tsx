@@ -114,6 +114,9 @@ export default function RequestForm({
    */
   const estimatesEnabled = SHOW_ESTIMATES || searchParams.get('preview_quote') === '1';
 
+  /** Operator diagnostic: /request?debug_maps=1 says why suggestions are off. */
+  const debugMaps = searchParams.get('debug_maps') === '1';
+
   const estimate = useMemo(() => {
     if (!estimatesEnabled) return null;
     return estimateTrip({
@@ -313,6 +316,7 @@ export default function RequestForm({
           hasError={Boolean(errors.pickupAddress)}
           describedBy={errors.pickupAddress ? 'pickupAddress-error' : undefined}
           onResolve={setPickupPlace}
+          debug={debugMaps}
         />
         <FieldError name="pickupAddress" />
       </div>
@@ -326,6 +330,7 @@ export default function RequestForm({
           hasError={Boolean(errors.dropoffAddress)}
           describedBy={errors.dropoffAddress ? 'dropoffAddress-error' : undefined}
           onResolve={setDropoffPlace}
+          debug={debugMaps}
         />
         <FieldError name="dropoffAddress" />
       </div>

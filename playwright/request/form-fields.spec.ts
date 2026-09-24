@@ -280,3 +280,28 @@ test.describe('the rendered form', () => {
     await expect(page.locator('#contactName')).toHaveCount(0);
   });
 });
+
+// ── Operator diagnostic ──────────────────────────────────────────────────────
+
+test.describe('?debug_maps=1 explains why suggestions are off', () => {
+  test('a customer is never told anything is wrong', async ({ page }) => {
+    await page.goto('/request');
+    await expect(page.getByTestId('pickupAddress-maps-status')).toHaveCount(0);
+  });
+
+  test('the operator gets the actual reason', async ({ page }) => {
+    // CI runs without GOOGLE_MAPS_API_KEY, which is also the state production
+    // was in when Phil reported no suggestions.
+    await page.goto('/request?debug_maps=1');
+    await expect(page.getByTestId('pickupAddress-maps-status')).toContainText(
+      'GOOGLE_MAPS_API_KEY is not set',
+    );
+    await expect(page.getByTestId('dropoffAddress-maps-status')).toBeVisible();
+  });
+
+  test('the field still works while the diagnostic is showing', async ({ page }) => {
+    await page.goto('/request?debug_maps=1');
+    await page.locator('#pickupAddress').fill('3106 Aransas Rd, Charlotte NC');
+    await expect(page.locator('#pickupAddress')).toHaveValue('3106 Aransas Rd, Charlotte NC');
+  });
+});

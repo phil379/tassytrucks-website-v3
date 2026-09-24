@@ -68,10 +68,19 @@ function loadPlaces(apiKey: string): Promise<MapsPlaces> {
   return loaderPromise;
 }
 
+/**
+ * Why the picker is not working. Never shown to a customer — the field is a
+ * plain text input to them and nothing is broken. This exists because the
+ * operator otherwise has no way to tell "no key configured" apart from "key
+ * rejected by Google", and those have completely different fixes.
+ */
+export type PlacesStatus = 'loading' | 'ready' | 'no-key' | 'load-failed';
+
 export type PlacesState = {
   places: MapsPlaces | null;
   /** True once we know the picker cannot work. The field stays usable anyway. */
   failed: boolean;
+  status: PlacesStatus;
 };
 
 /**
@@ -84,20 +93,37 @@ export type PlacesState = {
  * depend on a third party being reachable.
  */
 export function useGooglePlaces(apiKey: string | undefined): PlacesState {
-  const [state, setState] = useState<PlacesState>({ places: null, failed: !apiKey });
+  const [state, setState] = useState<PlacesState>({
+    places: null,
+    failed: !apiKey,
+    status: apiKey ? 'loading' : 'no-key',
+  });
 
   useEffect(() => {
     if (!apiKey) {
-      setState({ places: null, failed: true });
+      // Loud in the console, silent on the page. The operator needs to know;
+      // the customer filling in the form does not.
+      console.warn(
+        '[address] GOOGLE_MAPS_API_KEY is not set for this deployment — ' +
+          'address suggestions are off and the field is a plain text input.',
+      );
+      setState({ places: null, failed: true, status: 'no-key' });
       return;
     }
     let cancelled = false;
     loadPlaces(apiKey)
       .then((places) => {
-        if (!cancelled) setState({ places, failed: false });
+        if (!cancelled) setState({ places, failed: false, status: 'ready' });
       })
-      .catch(() => {
-        if (!cancelled) setState({ places: null, failed: true });
+      .catch((err: Error) => {
+        console.warn(
+          '[address] Google Maps did not load. Usual causes, in order: the ' +
+            'Maps JavaScript API or Places API (New) is not enabled on this ' +
+            'Google Cloud project; the key is HTTP-referrer restricted and this ' +
+            'domain is not on the allowlist; or billing is not enabled. ' +
+            'Underlying error: ' + err.message,
+        );
+        if (!cancelled) setState({ places: null, failed: true, status: 'load-failed' });
       });
     return () => {
       cancelled = true;

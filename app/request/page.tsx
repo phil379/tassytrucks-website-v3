@@ -52,12 +52,28 @@ const requestPageLd = {
   },
 };
 
+/**
+ * `force-dynamic` is load-bearing here, not a performance oversight.
+ *
+ * The Google Maps key is read at request time and handed to the client
+ * component as a prop. If this page were statically generated the key would be
+ * baked into the build output, and rotating it would mean a redeploy. Dynamic
+ * rendering means a rotated key is live on the very next request.
+ */
+export const dynamic = 'force-dynamic';
+
 export default function RequestPage({
   searchParams,
 }: {
   searchParams: { service?: string };
 }) {
   const initialService = coerceServiceLine(searchParams.service);
+
+  // Necessarily public — Google's JS API runs in the browser. What protects it
+  // is the HTTP-referrer restriction on the key in Google Cloud Console, which
+  // must list every domain this site is served from. Undefined is fine: the
+  // address fields fall back to plain text inputs.
+  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   return (
     <div className="bg-cream">
@@ -76,7 +92,7 @@ export default function RequestPage({
 
           <div className="card-tile mt-8 p-6 sm:p-8">
             <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
-              <RequestForm initialService={initialService} />
+              <RequestForm initialService={initialService} googleMapsApiKey={googleMapsApiKey} />
             </Suspense>
           </div>
 

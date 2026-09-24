@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { isOpsAuthed } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES, type TripRequestRow } from '@/lib/supabase-admin';
-import { serviceLabel } from '@/lib/trip-request';
+import { mobilityLabel, serviceLabel } from '@/lib/trip-request';
 import { login, logout, updateRow, advanceStatus } from './actions';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
@@ -230,7 +230,7 @@ export default async function OpsPage({
                 <div>
                   <dt className="ink-soft">Passengers / mobility</dt>
                   <dd>
-                    {row.passengers ?? 1} · {row.mobility ?? '—'}
+                    {row.passengers ?? 1} · {mobilityLabel(row.mobility)}
                   </dd>
                 </div>
                 <div>

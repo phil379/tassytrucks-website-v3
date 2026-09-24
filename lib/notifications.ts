@@ -1,4 +1,10 @@
-import { serviceShortName, shortRef, type TripRequestInput } from './trip-request';
+import {
+  fullName,
+  mobilityLabel,
+  serviceShortName,
+  shortRef,
+  type TripRequestInput,
+} from './trip-request';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -180,7 +186,7 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     `Request ID:        ${id}`,
     `Service:           ${serviceShortName(data.serviceLine)}`,
     '',
-    `Name:              ${data.contactName}`,
+    `Name:              ${fullName(data)}`,
     `Phone:             ${data.contactPhone}`,
     `Email:             ${data.contactEmail || '—'}`,
     `Preferred contact: ${data.preferredContact}`,
@@ -190,7 +196,7 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     `Requested:         ${formatWhen(data.requestedAt)}`,
     `Return trip:       ${data.returnTrip ? `yes — ${formatWhen(data.returnAt ?? '')}` : 'no'}`,
     `Passengers:        ${data.passengers ?? 1}`,
-    `Mobility:          ${data.mobility || '—'}`,
+    `Mobility:          ${mobilityLabel(data.mobility)}`,
     '',
     `Vehicle notes:     ${data.vehicleNotes || '—'}`,
     '',
@@ -199,7 +205,7 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
 
   await sendResendEmail({
     to,
-    subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${data.contactName}`,
+    subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}`,
     text: lines.join('\n'),
   });
 }
@@ -215,7 +221,10 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
 async function notifyRequester(id: string, data: TripRequestInput): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
-  const firstName = data.contactName.trim().split(/\s+/)[0] || 'there';
+  // The form collects the given name directly now, so the greeting no longer
+  // guesses by splitting a full name on whitespace - which pulled "Van" out of
+  // "Van Nguyen" for anyone whose family name is written first.
+  const firstName = data.contactFirstName.trim() || 'there';
 
   const text = [
     `Hi ${firstName},`,

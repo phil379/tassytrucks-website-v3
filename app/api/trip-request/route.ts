@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request';
+import { fullName, tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
@@ -96,7 +96,11 @@ export async function POST(request: Request) {
       .from(TRIP_REQUESTS_TABLE)
       .insert({
         service_line: data.serviceLine,
-        contact_name: data.contactName,
+        // contact_name stays the combined value: /ops, the notification
+        // templates and every row written before the split all read it.
+        contact_name: fullName(data),
+        contact_first_name: data.contactFirstName,
+        contact_last_name: data.contactLastName,
         contact_phone: data.contactPhone,
         contact_email: data.contactEmail || null,
         preferred_contact: data.preferredContact,
@@ -110,6 +114,15 @@ export async function POST(request: Request) {
           data.returnTrip && data.returnAt
             ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? null)
             : null,
+        // Set only when the visitor PICKED a suggestion. A typed address leaves
+        // these null, which is how a later mileage quote can tell which rows it
+        // can measure and which have to be geocoded first.
+        pickup_place_id: data.pickupPlaceId || null,
+        pickup_lat: data.pickupLat ?? null,
+        pickup_lng: data.pickupLng ?? null,
+        dropoff_place_id: data.dropoffPlaceId || null,
+        dropoff_lat: data.dropoffLat ?? null,
+        dropoff_lng: data.dropoffLng ?? null,
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,

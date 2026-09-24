@@ -71,6 +71,10 @@ function validPayload(marker: string) {
     passengers: 1,
     mobility: 'ambulatory',
     vehicleNotes: 'Folding walker in the trunk.',
+    // Deliberately the LEGACY single-name shape. The form now posts
+    // contactFirstName + contactLastName; leaving this as-is means every
+    // DB-backed test in this file also proves the back-compat split still
+    // works for anything already integrated against the old API.
     contactName: 'Playwright Test',
     contactPhone: '704-555-0142',
     contactEmail: '',
@@ -98,7 +102,8 @@ for (const service of SERVICES) {
       'passengers',
       'mobility',
       'vehicleNotes',
-      'contactName',
+      'contactFirstName',
+      'contactLastName',
       'contactPhone',
       'contactEmail',
     ]) {
@@ -208,7 +213,8 @@ test('a11y: every field has a real label and a 44px+ target', async ({ page }) =
     'passengers',
     'mobility',
     'vehicleNotes',
-    'contactName',
+    'contactFirstName',
+    'contactLastName',
     'contactPhone',
     'contactEmail',
   ];

@@ -5,15 +5,19 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import {
   COPY,
-  MOBILITY_OPTIONS,
   SERVICE_LINES,
   VEHICLE_NOTES_MAX,
   WAIT_TIME_LINES,
   coerceServiceLine,
+  defaultMobilityFor,
   minDateTimeLocal,
+  mobilityLabelFor,
+  mobilityOptionsFor,
+  passengerLabelFor,
   tripRequestSchema,
   type ServiceLine,
 } from '@/lib/trip-request';
+import AddressAutocomplete from '@/components/request/AddressAutocomplete';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -32,11 +36,46 @@ const labelCls = 'block text-sm font-medium mb-1.5';
  *      reader user is told what happened instead of being silently returned to
  *      the top of a long form.
  */
-export default function RequestForm({ initialService }: { initialService: ServiceLine }) {
+export default function RequestForm({
+  initialService,
+  googleMapsApiKey,
+}: {
+  initialService: ServiceLine;
+  /**
+   * Passed down from a dynamically-rendered server component rather than read
+   * from NEXT_PUBLIC_*, so rotating the key takes effect on the next request
+   * instead of needing a rebuild. Undefined is a supported state: the address
+   * fields degrade to plain text inputs.
+   */
+  googleMapsApiKey?: string;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [service, setService] = useState<ServiceLine>(initialService);
+
+  /**
+   * Mobility is a function of WHO is travelling, so it has to be state, not a
+   * defaultValue. Switching to Winnie Ride must swap the whole question — a pet
+   * owner should never be asked whether their dog uses a walker or a cane.
+   *
+   * The initial value honours `?mobility=` so the wheelchair-transport landing
+   * page, which already deep-links `mobility=wheelchair`, arrives with the
+   * right option selected instead of quietly defaulting to "walks unaided".
+   */
+  const [mobility, setMobility] = useState<string>(() => {
+    const requested = searchParams.get('mobility');
+    const allowed = mobilityOptionsFor(initialService).map((m) => m.value as string);
+    return requested && allowed.includes(requested) ? requested : defaultMobilityFor(initialService);
+  });
+
+  function changeService(next: ServiceLine) {
+    setService(next);
+    // Carry the answer over when it still exists in the new list (`other` does),
+    // otherwise fall back to that line's sensible default.
+    const allowed = mobilityOptionsFor(next).map((m) => m.value as string);
+    setMobility((current) => (allowed.includes(current) ? current : defaultMobilityFor(next)));
+  }
   const [returnTrip, setReturnTrip] = useState(false);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');
@@ -105,7 +144,14 @@ export default function RequestForm({ initialService }: { initialService: Servic
       passengers: Number(fd.get('passengers') ?? 1),
       mobility: String(fd.get('mobility') ?? '') || null,
       vehicleNotes: String(fd.get('vehicleNotes') ?? '') || null,
-      contactName: String(fd.get('contactName') ?? ''),
+      pickupPlaceId: String(fd.get('pickupAddressPlaceId') ?? '') || null,
+      pickupLat: String(fd.get('pickupAddressLat') ?? '') || null,
+      pickupLng: String(fd.get('pickupAddressLng') ?? '') || null,
+      dropoffPlaceId: String(fd.get('dropoffAddressPlaceId') ?? '') || null,
+      dropoffLat: String(fd.get('dropoffAddressLat') ?? '') || null,
+      dropoffLng: String(fd.get('dropoffAddressLng') ?? '') || null,
+      contactFirstName: String(fd.get('contactFirstName') ?? ''),
+      contactLastName: String(fd.get('contactLastName') ?? ''),
       contactPhone: String(fd.get('contactPhone') ?? ''),
       contactEmail: String(fd.get('contactEmail') ?? '') || null,
       preferredContact: String(fd.get('preferredContact') ?? 'phone'),
@@ -215,7 +261,7 @@ export default function RequestForm({ initialService }: { initialService: Servic
         <select
           {...fieldProps('serviceLine')}
           value={service}
-          onChange={(e) => setService(coerceServiceLine(e.target.value))}
+          onChange={(e) => changeService(coerceServiceLine(e.target.value))}
         >
           {SERVICE_LINES.map((s) => (
             <option key={s.value} value={s.value}>
@@ -227,20 +273,27 @@ export default function RequestForm({ initialService }: { initialService: Servic
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="pickupAddress">
-          Pickup address <span aria-hidden="true">*</span>
-          <span className="sr-only">(required)</span>
-        </label>
-        <input {...fieldProps('pickupAddress')} autoComplete="street-address" required />
+        <AddressAutocomplete
+          name="pickupAddress"
+          label="Pickup address"
+          apiKey={googleMapsApiKey}
+          autoComplete="street-address"
+          required
+          hasError={Boolean(errors.pickupAddress)}
+          describedBy={errors.pickupAddress ? 'pickupAddress-error' : undefined}
+        />
         <FieldError name="pickupAddress" />
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="dropoffAddress">
-          Destination <span aria-hidden="true">*</span>
-          <span className="sr-only">(required)</span>
-        </label>
-        <input {...fieldProps('dropoffAddress')} required />
+        <AddressAutocomplete
+          name="dropoffAddress"
+          label="Destination"
+          apiKey={googleMapsApiKey}
+          required
+          hasError={Boolean(errors.dropoffAddress)}
+          describedBy={errors.dropoffAddress ? 'dropoffAddress-error' : undefined}
+        />
         <FieldError name="dropoffAddress" />
       </div>
 
@@ -288,7 +341,7 @@ export default function RequestForm({ initialService }: { initialService: Servic
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className={labelCls} htmlFor="passengers">
-            Passengers
+            {passengerLabelFor(service)}
           </label>
           <input {...fieldProps('passengers')} type="number" min={1} max={8} defaultValue={1} />
           <FieldError name="passengers" />
@@ -296,10 +349,14 @@ export default function RequestForm({ initialService }: { initialService: Servic
 
         <div>
           <label className={labelCls} htmlFor="mobility">
-            Mobility
+            {mobilityLabelFor(service)}
           </label>
-          <select {...fieldProps('mobility')} defaultValue="ambulatory">
-            {MOBILITY_OPTIONS.map((m) => (
+          <select
+            {...fieldProps('mobility')}
+            value={mobility}
+            onChange={(e) => setMobility(e.target.value)}
+          >
+            {mobilityOptionsFor(service).map((m) => (
               <option key={m.value} value={m.value}>
                 {m.label}
               </option>
@@ -334,14 +391,25 @@ export default function RequestForm({ initialService }: { initialService: Servic
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label className={labelCls} htmlFor="contactName">
-            Name <span aria-hidden="true">*</span>
+          <label className={labelCls} htmlFor="contactFirstName">
+            First name <span aria-hidden="true">*</span>
             <span className="sr-only">(required)</span>
           </label>
-          <input {...fieldProps('contactName')} autoComplete="name" required />
-          <FieldError name="contactName" />
+          <input {...fieldProps('contactFirstName')} autoComplete="given-name" required />
+          <FieldError name="contactFirstName" />
         </div>
 
+        <div>
+          <label className={labelCls} htmlFor="contactLastName">
+            Last name <span aria-hidden="true">*</span>
+            <span className="sr-only">(required)</span>
+          </label>
+          <input {...fieldProps('contactLastName')} autoComplete="family-name" required />
+          <FieldError name="contactLastName" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <label className={labelCls} htmlFor="contactPhone">
             Phone <span aria-hidden="true">*</span>
@@ -350,14 +418,14 @@ export default function RequestForm({ initialService }: { initialService: Servic
           <input {...fieldProps('contactPhone')} type="tel" autoComplete="tel" required />
           <FieldError name="contactPhone" />
         </div>
-      </div>
 
-      <div>
-        <label className={labelCls} htmlFor="contactEmail">
-          Email
-        </label>
-        <input {...fieldProps('contactEmail')} type="email" autoComplete="email" />
-        <FieldError name="contactEmail" />
+        <div>
+          <label className={labelCls} htmlFor="contactEmail">
+            Email
+          </label>
+          <input {...fieldProps('contactEmail')} type="email" autoComplete="email" />
+          <FieldError name="contactEmail" />
+        </div>
       </div>
 
       <fieldset>

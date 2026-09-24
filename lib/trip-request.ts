@@ -61,13 +61,79 @@ export const SERVICE_VALUES = SERVICE_LINES.map((s) => s.value) as [ServiceLine,
 /** The two lines that include on-site wait time. Drives the extra copy block. */
 export const WAIT_TIME_LINES: ServiceLine[] = ['recovery', 'wellness'];
 
-export const MOBILITY_OPTIONS = [
+/**
+ * Mobility options, by service line.
+ *
+ * A single shared list was asking pet owners whether their dog uses a walker or
+ * a cane, and asking dialysis patients whether they travel in a pet carrier.
+ * Both questions read as "this form was not built for you", on the one page
+ * where that costs a booking.
+ *
+ * So the question itself changes with the service line: who is travelling
+ * decides which list, which label, and which default. `other` is in both lists
+ * deliberately - it is the escape hatch for either.
+ */
+export const PASSENGER_MOBILITY_OPTIONS = [
   { value: 'ambulatory', label: 'Ambulatory — walks unaided' },
   { value: 'walker', label: 'Walker / cane' },
   { value: 'wheelchair', label: 'Wheelchair' },
-  { value: 'pet_carrier', label: 'Pet carrier' },
   { value: 'other', label: 'Other' },
 ] as const;
+
+export const PET_MOBILITY_OPTIONS = [
+  { value: 'pet_carrier', label: 'Travels in a carrier or crate' },
+  { value: 'pet_leash', label: 'On a leash or harness' },
+  { value: 'pet_assist', label: 'Needs help getting in and out' },
+  { value: 'other', label: 'Other' },
+] as const;
+
+/** Service lines whose passenger is an animal. */
+export const PET_LINES: readonly ServiceLine[] = ['pet'];
+
+export function isPetLine(service: string): boolean {
+  return PET_LINES.includes(service as ServiceLine);
+}
+
+/** Every value either list can produce. Drives the shared zod enum. */
+export const MOBILITY_VALUES = [
+  ...new Set([
+    ...PASSENGER_MOBILITY_OPTIONS.map((m) => m.value),
+    ...PET_MOBILITY_OPTIONS.map((m) => m.value),
+  ]),
+] as [string, ...string[]];
+
+/** The list to render for this service line. */
+export function mobilityOptionsFor(service: string) {
+  return isPetLine(service) ? PET_MOBILITY_OPTIONS : PASSENGER_MOBILITY_OPTIONS;
+}
+
+/** The question to ask above that list. */
+export function mobilityLabelFor(service: string): string {
+  return isPetLine(service) ? 'How does your pet travel?' : 'Mobility';
+}
+
+/** "Passengers" is the wrong noun for a crate of cats. */
+export function passengerLabelFor(service: string): string {
+  return isPetLine(service) ? 'Pets' : 'Passengers';
+}
+
+export function defaultMobilityFor(service: string): string {
+  return isPetLine(service) ? 'pet_carrier' : 'ambulatory';
+}
+
+/** Resolves ANY stored value to a readable label, for /ops and emails. */
+export function mobilityLabel(value: string | null | undefined): string {
+  if (!value) return '—';
+  const all = [...PASSENGER_MOBILITY_OPTIONS, ...PET_MOBILITY_OPTIONS];
+  return all.find((m) => m.value === value)?.label ?? value;
+}
+
+/**
+ * Kept for anything still importing the old flat list. New code should call
+ * `mobilityOptionsFor(service)` so the question matches the passenger.
+ * @deprecated
+ */
+export const MOBILITY_OPTIONS = PASSENGER_MOBILITY_OPTIONS;
 
 export const PREFERRED_CONTACT = ['phone', 'text', 'email'] as const;
 
@@ -90,7 +156,21 @@ export const COPY = {
 
 const trimmed = (max: number) => z.string().trim().max(max);
 
-export const tripRequestSchema = z
+/**
+ * A coordinate that may be absent.
+ *
+ * `z.coerce.number().nullable()` does NOT work here: coercion runs first and
+ * `Number(null)` is 0, so a missing latitude would silently validate as the
+ * equator. The preprocess maps every flavour of "not provided" to undefined
+ * before any coercion happens.
+ */
+const optionalCoordinate = (min: number, max: number) =>
+  z.preprocess(
+    (v) => (v === null || v === undefined || v === '' ? undefined : v),
+    z.coerce.number().min(min).max(max).optional(),
+  );
+
+const tripRequestObject = z
   .object({
     serviceLine: z.enum(SERVICE_VALUES),
 
@@ -107,11 +187,22 @@ export const tripRequestSchema = z
 
     passengers: z.coerce.number().int().min(1, 'At least 1').max(8, 'Call us for groups over 8').default(1),
 
-    mobility: z.enum(['ambulatory', 'walker', 'wheelchair', 'pet_carrier', 'other']).optional().nullable(),
+    mobility: z.enum(MOBILITY_VALUES).optional().nullable(),
 
     vehicleNotes: trimmed(VEHICLE_NOTES_MAX).optional().nullable(),
 
-    contactName: trimmed(200).min(2, 'Enter your name'),
+    // What the address picker resolved, when the visitor PICKED a suggestion
+    // rather than typing freehand. All optional: a typed address is still a
+    // valid request, it just cannot be measured.
+    pickupPlaceId: trimmed(300).optional().nullable(),
+    pickupLat: optionalCoordinate(-90, 90),
+    pickupLng: optionalCoordinate(-180, 180),
+    dropoffPlaceId: trimmed(300).optional().nullable(),
+    dropoffLat: optionalCoordinate(-90, 90),
+    dropoffLng: optionalCoordinate(-180, 180),
+
+    contactFirstName: trimmed(100).min(1, 'Enter your first name'),
+    contactLastName: trimmed(100).min(1, 'Enter your last name'),
     contactPhone: trimmed(40).min(7, 'Enter a phone number we can reach you on'),
     contactEmail: z.union([z.literal(''), z.string().trim().email('Enter a valid email')]).optional().nullable(),
     preferredContact: z.enum(PREFERRED_CONTACT).default('phone'),
@@ -146,9 +237,63 @@ export const tripRequestSchema = z
         message: 'Add an email address, or choose phone or text instead',
       });
     }
+
+    // The mobility answer has to belong to the list that service line shows.
+    // The form can only offer the right list, but a hand-crafted POST can pair
+    // serviceLine=pet with mobility=wheelchair, and that row would reach a
+    // driver as a wheelchair job for a dog.
+    if (data.mobility) {
+      const allowed = mobilityOptionsFor(data.serviceLine).map((m) => m.value as string);
+      if (!allowed.includes(data.mobility)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['mobility'],
+          message: isPetLine(data.serviceLine)
+            ? 'Choose how your pet travels'
+            : 'Choose a mobility option for this service',
+        });
+      }
+    }
   });
 
-export type TripRequestInput = z.infer<typeof tripRequestSchema>;
+/**
+ * Fill first/last name from a legacy single `contactName`.
+ *
+ * The form now posts contactFirstName + contactLastName. Anything already
+ * integrated against the old single-field API - and every row written before
+ * today - sends `contactName`. Splitting it here keeps one authority for the
+ * rule instead of duplicating it in the route and the client, and means the
+ * old shape keeps working rather than 400ing.
+ *
+ * Runs before validation, so a legacy caller sends "Maria Santos" and gets the
+ * same result as a form that posted the two fields separately.
+ */
+function fillNamesFromLegacy(raw: unknown): unknown {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return raw;
+  const input = { ...(raw as Record<string, unknown>) };
+
+  const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+  const first = str(input.contactFirstName);
+  const last = str(input.contactLastName);
+  const legacy = str(input.contactName);
+
+  if (!first && !last && legacy) {
+    const gap = legacy.indexOf(' ');
+    input.contactFirstName = gap === -1 ? legacy : legacy.slice(0, gap);
+    input.contactLastName = gap === -1 ? '' : legacy.slice(gap + 1).trim();
+  }
+
+  return input;
+}
+
+export const tripRequestSchema = z.preprocess(fillNamesFromLegacy, tripRequestObject);
+
+export type TripRequestInput = z.infer<typeof tripRequestObject>;
+
+/** The full name, as one string — what /ops, emails and the manifest read. */
+export function fullName(data: Pick<TripRequestInput, 'contactFirstName' | 'contactLastName'>): string {
+  return `${data.contactFirstName} ${data.contactLastName}`.trim();
+}
 
 /**
  * Round `now` up to the next 15 minutes, +4h, as a value for

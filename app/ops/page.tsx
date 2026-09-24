@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { isOpsAuthed } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES, type TripRequestRow } from '@/lib/supabase-admin';
 import { serviceLabel } from '@/lib/trip-request';
-import { login, logout, updateRow } from './actions';
+import { login, logout, updateRow, advanceStatus } from './actions';
+import { nextStatus } from '@/lib/ops-status';
+import ElapsedSince from '@/components/ops/ElapsedSince';
 
 export const metadata: Metadata = {
   title: 'Ops queue',
@@ -90,7 +92,15 @@ export default async function OpsPage({
 
     const { data, error } = await query;
     if (error) throw new Error(error.message);
-    rows = (data ?? []) as TripRequestRow[];
+
+    // Newest first from the query; then pin 'new' to the top. An untouched
+    // request is the only thing on this screen that is actually waiting on the
+    // operator, so it should never be below a row that is already handled.
+    rows = ((data ?? []) as TripRequestRow[]).sort((a, b) => {
+      const aNew = a.status === 'new' ? 0 : 1;
+      const bNew = b.status === 'new' ? 0 : 1;
+      return aNew - bNew;
+    });
   } catch (err) {
     loadError = err instanceof Error ? err.message : 'Could not load requests.';
   }
@@ -163,7 +173,10 @@ export default async function OpsPage({
                   <p className="text-xs uppercase tracking-wider ink-mute">{serviceLabel(row.service_line)}</p>
                   <h2 className="serif text-xl font-semibold mt-0.5">{row.contact_name}</h2>
                 </div>
-                <span className="rounded-full border border-line px-3 py-1 text-xs capitalize">{row.status}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {row.status === 'new' && <ElapsedSince iso={row.created_at} />}
+                  <span className="rounded-full border border-line px-3 py-1 text-xs capitalize">{row.status}</span>
+                </div>
               </header>
 
               <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
@@ -182,11 +195,29 @@ export default async function OpsPage({
                 </div>
                 <div>
                   <dt className="ink-soft">Pickup</dt>
-                  <dd>{row.pickup_address}</dd>
+                  <dd>
+                    <a
+                      className="underline inline-flex items-center min-h-[44px]"
+                      href={`https://maps.google.com/?q=${encodeURIComponent(row.pickup_address)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {row.pickup_address}
+                    </a>
+                  </dd>
                 </div>
                 <div>
                   <dt className="ink-soft">Destination</dt>
-                  <dd>{row.dropoff_address}</dd>
+                  <dd>
+                    <a
+                      className="underline inline-flex items-center min-h-[44px]"
+                      href={`https://maps.google.com/?q=${encodeURIComponent(row.dropoff_address)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {row.dropoff_address}
+                    </a>
+                  </dd>
                 </div>
                 <div>
                   <dt className="ink-soft">Requested</dt>
@@ -217,7 +248,21 @@ export default async function OpsPage({
 
               {row.source && <p className="ink-mute text-xs mt-3">Source: {row.source}</p>}
 
-              <form action={updateRow} className="mt-5 border-t border-line pt-5 space-y-4">
+              {nextStatus(row.status) && (
+                <form action={advanceStatus} className="mt-5">
+                  <input type="hidden" name="id" value={row.id} />
+                  <input type="hidden" name="from" value={row.status} />
+                  <button type="submit" className="btn-gold w-full justify-center min-h-[52px] text-base">
+                    Mark {nextStatus(row.status)}
+                  </button>
+                </form>
+              )}
+
+              <details className="mt-3 border-t border-line pt-4">
+                <summary className="cursor-pointer text-sm font-medium min-h-[44px] flex items-center">
+                  Quote, notes, or another status
+                </summary>
+              <form action={updateRow} className="mt-4 space-y-4">
                 <input type="hidden" name="id" value={row.id} />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -269,6 +314,7 @@ export default async function OpsPage({
                   Save
                 </button>
               </form>
+              </details>
             </article>
           ))}
         </div>

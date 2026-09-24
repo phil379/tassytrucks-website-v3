@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { OPS_COOKIE, isOpsAuthed, passwordMatches, sessionToken } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES } from '@/lib/supabase-admin';
+import { ADVANCE } from '@/lib/ops-status';
 
 /**
  * Every mutation re-checks the cookie. A server action is a public HTTP endpoint —
@@ -70,5 +71,34 @@ export async function updateRow(formData: FormData) {
   const { error } = await supabaseAdmin().from(TRIP_REQUESTS_TABLE).update(patch).eq('id', id);
   if (error) throw new Error(error.message);
 
+  revalidatePath('/ops');
+}
+
+/**
+ * One-tap status advance: new → quoted → confirmed.
+ *
+ * The operator works this standing up, between other things. Opening a select,
+ * choosing a value and pressing Save is three interactions for the move they
+ * make ninety percent of the time. This is one.
+ */
+export async function advanceStatus(formData: FormData) {
+  assertAuthed();
+
+  const id = String(formData.get('id') ?? '');
+  const from = String(formData.get('from') ?? '');
+  if (!id) throw new Error('Missing id');
+
+  const to = ADVANCE[from];
+  if (!to) throw new Error(`No advance step from "${from}"`);
+
+  // Guarded on the current value: if someone else moved the row first, this
+  // updates nothing rather than dragging it backwards.
+  const { error } = await supabaseAdmin()
+    .from(TRIP_REQUESTS_TABLE)
+    .update({ status: to })
+    .eq('id', id)
+    .eq('status', from);
+
+  if (error) throw new Error(error.message);
   revalidatePath('/ops');
 }

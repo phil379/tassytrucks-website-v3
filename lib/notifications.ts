@@ -1,16 +1,53 @@
-import { serviceLabel, type TripRequestInput } from './trip-request';
+import { serviceShortName, shortRef, type TripRequestInput } from './trip-request';
 
 /**
- * Three alerts fire after a request is stored. Each is independent and each
+ * Alerts fire after a request is stored. Each leg is independent and each
  * swallows its own failure.
  *
- * The row is the system of record. An alert is an alert — a dead Zapier hook or
- * a Resend outage must never turn a captured request into a lost one. Every
+ * The row is the system of record. An alert is an alert — a dead push service
+ * or an email outage must never turn a captured request into a lost one. Every
  * failure is logged with the request id so nothing disappears silently.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PII RULE — read before editing the push payloads.
+ *
+ * An ntfy topic is readable by ANYONE who knows the topic string. It is a
+ * shared secret, not an authenticated channel. So a push notification carries
+ * a reference and a pickup time and NOTHING ELSE: no name, no phone number, no
+ * pickup address, no destination, no email.
+ *
+ * The alert is a trigger. /ops is the system of record. That is better design
+ * independent of the privacy point — the operator opens one screen that always
+ * has the current state, rather than trusting a stale text message.
+ *
+ * Email is different: the operator email goes to a mailbox we control, and the
+ * auto-reply goes to the customer's own address with the customer's own data.
+ * Those may carry detail. The PUSH legs may not.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 const DISPATCH_PHONE = '(704) 941-8508';
 const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || 'Tassy Transportation <dispatch@tassytrucks.com>';
+
+function siteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tassytrucks.com').replace(/\/+$/, '');
+}
+
+function opsUrl(): string {
+  return `${siteUrl()}/ops`;
+}
+
+/** Short, human-readable pickup time. Carries no location and no identity. */
+function shortWhen(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'time TBC';
+  return d.toLocaleString('en-US', {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/New_York',
+  });
+}
 
 function formatWhen(iso: string): string {
   const d = new Date(iso);
@@ -25,26 +62,99 @@ function formatWhen(iso: string): string {
   });
 }
 
-async function sendResendEmail(payload: {
-  to: string;
-  subject: string;
-  text: string;
-}): Promise<void> {
+// ─────────────────────────────────────────────────────────────────────────────
+// Push
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * HTTP header values are Latin-1. An em-dash in a Title header throws
+ * "Header 'Title' has invalid value" and kills the whole leg — which is exactly
+ * how the first escalation attempt failed in testing. The body is a UTF-8
+ * request body and is unaffected, so only headers get folded.
+ */
+function asciiHeader(value: string): string {
+  return value
+    .replace(/[\u2010-\u2015]/g, '-')   // hyphens, en/em dashes
+    .replace(/[\u2018\u2019]/g, "'")     // curly single quotes
+    .replace(/[\u201C\u201D]/g, '"')     // curly double quotes
+    .replace(/\u2026/g, '...')
+    .replace(/\u00B7/g, '-')             // middle dot
+    // eslint-disable-next-line no-control-regex
+    .replace(/[^\x20-\x7E]/g, '');       // anything still outside printable ASCII
+}
+
+type PushMessage = {
+  title: string;
+  body: string;
+  priority?: 'default' | 'high' | 'urgent';
+  tags?: string[];
+};
+
+/**
+ * ntfy.sh — free, no account, no quota. The primary alert sink.
+ * Throws if the topic is unset, so the caller records the leg as failed rather
+ * than silently believing the operator was told.
+ */
+async function pushToNtfy(message: PushMessage): Promise<void> {
+  const topic = process.env.NTFY_TOPIC;
+  if (!topic) throw new Error('NTFY_TOPIC is not set');
+
+  // Base URL is configurable so a self-hosted ntfy can be swapped in, and so a
+  // test can point at an unroutable host to prove an unreachable push does not
+  // fail the request.
+  const base = (process.env.NTFY_BASE_URL || 'https://ntfy.sh').replace(/\/+$/, '');
+
+  const res = await fetch(`${base}/${encodeURIComponent(topic)}`, {
+    method: 'POST',
+    headers: {
+      Title: asciiHeader(message.title),
+      Click: opsUrl(),
+      Priority: message.priority ?? 'default',
+      ...(message.tags?.length ? { Tags: message.tags.join(',') } : {}),
+    },
+    body: message.body,
+  });
+
+  if (!res.ok) throw new Error(`ntfy responded ${res.status}`);
+}
+
+/**
+ * Optional second sink, kept for later use.
+ *
+ * ABSENT-SAFE BY CONTRACT: when ZAPIER_SMS_WEBHOOK_URL is unset this resolves
+ * without doing anything and without reporting a failure. Unset means "this
+ * sink is not configured", which is not an error — nothing else changes.
+ *
+ * It receives the same PII-free payload as ntfy. A webhook URL is a private
+ * endpoint, so personal data there would be defensible, but keeping one shape
+ * means there is only one place to check when asking "what leaves the system?".
+ */
+async function pushToZapier(ref: string, message: PushMessage): Promise<'sent' | 'skipped'> {
+  const url = process.env.ZAPIER_SMS_WEBHOOK_URL;
+  if (!url) return 'skipped';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ref, title: message.title, body: message.body, click: opsUrl() }),
+  });
+
+  if (!res.ok) throw new Error(`Zapier responded ${res.status}`);
+  return 'sent';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Email
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function sendResendEmail(payload: { to: string; subject: string; text: string }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: [payload.to],
-      subject: payload.subject,
-      text: payload.text,
-    }),
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: FROM_ADDRESS, to: [payload.to], subject: payload.subject, text: payload.text }),
   });
 
   if (!res.ok) {
@@ -52,30 +162,7 @@ async function sendResendEmail(payload: {
   }
 }
 
-/** 1 — compact JSON to Zapier, which owns the SMS leg. */
-async function notifyOperatorSms(id: string, data: TripRequestInput): Promise<void> {
-  const url = process.env.ZAPIER_SMS_WEBHOOK_URL;
-  if (!url) throw new Error('ZAPIER_SMS_WEBHOOK_URL is not set');
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id,
-      service: data.serviceLine,
-      name: data.contactName,
-      phone: data.contactPhone,
-      pickup: data.pickupAddress,
-      dropoff: data.dropoffAddress,
-      when: data.requestedAt,
-      return: data.returnTrip ? 'y' : 'n',
-    }),
-  });
-
-  if (!res.ok) throw new Error(`Zapier responded ${res.status}`);
-}
-
-/** 2 — full detail to the operator, plain text. */
+/** Full detail to the operator's own mailbox, plain text. */
 async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<void> {
   const to = process.env.OPERATOR_EMAIL;
   if (!to) throw new Error('OPERATOR_EMAIL is not set');
@@ -89,8 +176,9 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     : when.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
 
   const lines = [
+    `Reference:         ${shortRef(id)}`,
     `Request ID:        ${id}`,
-    `Service:           ${serviceLabel(data.serviceLine)}`,
+    `Service:           ${serviceShortName(data.serviceLine)}`,
     '',
     `Name:              ${data.contactName}`,
     `Phone:             ${data.contactPhone}`,
@@ -106,7 +194,7 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     '',
     `Vehicle notes:     ${data.vehicleNotes || '—'}`,
     '',
-    '— Open the ops queue at /ops to quote and confirm.',
+    `Quote and confirm here: ${opsUrl()}`,
   ];
 
   await sendResendEmail({
@@ -117,119 +205,122 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
 }
 
 /**
- * 3 — auto-reply to the requester. Under 80 words, no medical language, and
- * none of "instant", "guaranteed", "tracked", or "24/7" — we do not promise
- * what the business cannot keep.
+ * Auto-reply to the requester. 78 words.
+ *
+ * It confirms what they asked for so they know a person read it, states the
+ * callback window the /request page already commits to, gives the dispatch
+ * number, and says pricing is quoted first. It asserts nothing about
+ * availability, tracking, or hours, and it carries no marketing language.
  */
 async function notifyRequester(id: string, data: TripRequestInput): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
+  const firstName = data.contactName.trim().split(/\s+/)[0] || 'there';
+
   const text = [
-    `Hi ${data.contactName.split(' ')[0]},`,
+    `Hi ${firstName},`,
     '',
-    "We have your ride request and a dispatcher is reviewing it now.",
+    `We have your ${serviceShortName(data.serviceLine)} request for ${formatWhen(data.requestedAt)}.`,
+    'A dispatcher is reviewing it now.',
     '',
-    'Someone will reach out by phone or text within 2 hours during business hours to',
-    'confirm the details. Pricing is quoted before your trip is confirmed — you will',
-    'not be charged until you agree to the quote.',
+    'Someone will call or text you within 2 hours during business hours to confirm',
+    'the details and give you a price. Nothing is booked and nothing is charged',
+    'until you agree to that price.',
     '',
-    `Need us sooner? Call ${DISPATCH_PHONE}.`,
+    `If you need us sooner, call dispatch on ${DISPATCH_PHONE}.`,
     '',
     '— Tassy Transportation',
-    `Reference: ${id}`,
+    `Reference: ${shortRef(id)}`,
   ].join('\n');
 
   await sendResendEmail({
     to: data.contactEmail,
-    subject: 'We received your ride request',
+    subject: `We have your request — ref ${shortRef(id)}`,
     text,
   });
 }
 
-/**
- * Speed-to-lead escalation: a SECOND operator SMS for a request that is still
- * untouched well past the window the auto-reply promised.
- *
- * Deliberately operator-only. The customer already got one auto-reply saying
- * someone would be in touch within 2 hours; a second message telling them we
- * have not managed it yet would make the silence worse, not better. This pages
- * the operator and nobody else.
- *
- * Throws on failure so the caller can leave `escalated_at` NULL and retry on
- * the next run — an SMS that never sent must not be recorded as sent.
- */
-export async function notifyOperatorUrgent(row: {
-  id: string;
-  service_line: string;
-  contact_name: string;
-  contact_phone: string;
-  pickup_address: string;
-  dropoff_address: string;
-  requested_at: string;
-  return_trip: boolean;
-  created_at: string;
-}): Promise<void> {
-  const url = process.env.ZAPIER_SMS_WEBHOOK_URL;
-  if (!url) throw new Error('ZAPIER_SMS_WEBHOOK_URL is not set');
+// ─────────────────────────────────────────────────────────────────────────────
+// Orchestration
+// ─────────────────────────────────────────────────────────────────────────────
 
-  const waitingMinutes = Math.floor((Date.now() - Date.parse(row.created_at)) / 60000);
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      id: row.id,
-      urgent: true,
-      reason: 'still_new',
-      waiting_minutes: waitingMinutes,
-      service: row.service_line,
-      name: row.contact_name,
-      phone: row.contact_phone,
-      pickup: row.pickup_address,
-      dropoff: row.dropoff_address,
-      when: row.requested_at,
-      return: row.return_trip ? 'y' : 'n',
-    }),
-  });
-
-  if (!res.ok) throw new Error(`Zapier responded ${res.status}`);
-}
+export type LegOutcome = 'sent' | 'failed' | 'skipped';
 
 export type NotificationOutcome = {
-  operatorSms: 'sent' | 'failed' | 'skipped';
-  operatorEmail: 'sent' | 'failed' | 'skipped';
-  requesterEmail: 'sent' | 'failed' | 'skipped';
+  push: LegOutcome;
+  pushFallback: LegOutcome;
+  operatorEmail: LegOutcome;
+  requesterEmail: LegOutcome;
 };
 
+async function runLeg(id: string, label: string, fn: () => Promise<LegOutcome | void>): Promise<LegOutcome> {
+  try {
+    const result = await fn();
+    return result === 'skipped' ? 'skipped' : 'sent';
+  } catch (err) {
+    console.error(
+      `[trip-request ${id}] notification "${label}" failed:`,
+      err instanceof Error ? err.message : err,
+    );
+    return 'failed';
+  }
+}
+
 /**
- * Fires all three concurrently. Always resolves — never throws, never rejects.
+ * Fires every leg concurrently. Always resolves — never throws, never rejects.
  * The caller returns 200 regardless of what happened here.
  */
 export async function fireNotifications(id: string, data: TripRequestInput): Promise<NotificationOutcome> {
-  const run = async (
-    label: string,
-    fn: () => Promise<void>,
-  ): Promise<'sent' | 'failed'> => {
-    try {
-      await fn();
-      return 'sent';
-    } catch (err) {
-      // Logged, never rethrown. The request is already stored.
-      console.error(
-        `[trip-request ${id}] notification "${label}" failed:`,
-        err instanceof Error ? err.message : err,
-      );
-      return 'failed';
-    }
+  const ref = shortRef(id);
+  const message: PushMessage = {
+    title: `New ${serviceShortName(data.serviceLine)} request`,
+    body: `Ref ${ref} · pickup ${shortWhen(data.requestedAt)}`,
+    tags: ['bell'],
   };
 
-  const [operatorSms, operatorEmail, requesterEmail] = await Promise.all([
-    run('operator-sms', () => notifyOperatorSms(id, data)),
-    run('operator-email', () => notifyOperatorEmail(id, data)),
+  const [push, pushFallback, operatorEmail, requesterEmail] = await Promise.all([
+    runLeg(id, 'ntfy', () => pushToNtfy(message)),
+    runLeg(id, 'zapier', () => pushToZapier(ref, message)),
+    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data)),
     data.contactEmail
-      ? run('requester-autoreply', () => notifyRequester(id, data))
-      : Promise.resolve<'skipped'>('skipped'),
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data))
+      : Promise.resolve<LegOutcome>('skipped'),
   ]);
 
-  return { operatorSms, operatorEmail, requesterEmail };
+  return { push, pushFallback, operatorEmail, requesterEmail };
+}
+
+/**
+ * Speed-to-lead escalation: a SECOND operator alert for a request still
+ * untouched well past the window the auto-reply promised.
+ *
+ * Operator-only by design. The customer already got one auto-reply; a second
+ * message telling them we have not managed it yet makes the silence worse.
+ *
+ * Throws if EVERY configured sink fails, so the caller leaves `escalated_at`
+ * NULL and retries next run. An alert that never sent must not be recorded as
+ * sent.
+ */
+export async function notifyOperatorUrgent(row: { id: string }): Promise<void> {
+  const ref = shortRef(row.id);
+  const message: PushMessage = {
+    title: 'URGENT - request unanswered 90 min',
+    body: `Ref ${ref}`,
+    priority: 'urgent',
+    tags: ['rotating_light'],
+  };
+
+  const results = await Promise.allSettled([pushToNtfy(message), pushToZapier(ref, message)]);
+
+  const delivered = results.some(
+    (r) => r.status === 'fulfilled' && r.value !== 'skipped',
+  );
+
+  if (!delivered) {
+    const reasons = results
+      .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+      .map((r) => (r.reason instanceof Error ? r.reason.message : String(r.reason)))
+      .join('; ');
+    throw new Error(`no escalation sink delivered${reasons ? `: ${reasons}` : ''}`);
+  }
 }

@@ -46,13 +46,13 @@ export async function GET(request: Request) {
 
   const cutoff = new Date(Date.now() - STALE_AFTER_MINUTES * 60_000).toISOString();
 
-  let stale: Array<Parameters<typeof notifyOperatorUrgent>[0]> = [];
+  let stale: Array<{ id: string; created_at: string }> = [];
   try {
     const { data, error } = await supabaseAdmin()
       .from(TRIP_REQUESTS_TABLE)
-      .select(
-        'id, service_line, contact_name, contact_phone, pickup_address, dropoff_address, requested_at, return_trip, created_at',
-      )
+      // Only what the escalation needs. The alert carries a reference and
+      // nothing else, so there is no reason to pull personal data here.
+      .select('id, created_at')
       .eq('status', 'new')
       .is('escalated_at', null)
       .lt('created_at', cutoff)

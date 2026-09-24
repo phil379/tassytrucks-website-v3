@@ -22,12 +22,12 @@ import { z } from 'zod';
  * backwards, swapping the two `label`/`href` values below is the whole fix.
  */
 const ALL_SERVICE_LINES = [
-  { value: 'care', label: 'Tassy Care — medical transport', href: '/nemt' },
-  { value: 'recovery', label: 'VIP Concierge — post-procedure', href: '/vip' },
-  { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', href: '/renew' },
-  { value: 'pet', label: 'Winnie Ride — pet transport', href: '/winnie' },
-  { value: 'guardian', label: 'Tassy Guardian — oncology, discharge', href: '/recover' },
-  { value: 'scholar', label: 'Tassy Scholar — student transport', href: '/school' },
+  { value: 'care', label: 'Tassy Care — medical transport', short: 'Tassy Care', href: '/nemt' },
+  { value: 'recovery', label: 'VIP Concierge — post-procedure', short: 'VIP Concierge', href: '/vip' },
+  { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', short: 'Tassy Wellness', href: '/renew' },
+  { value: 'pet', label: 'Winnie Ride — pet transport', short: 'Winnie Ride', href: '/winnie' },
+  { value: 'guardian', label: 'Tassy Guardian — oncology, discharge', short: 'Tassy Guardian', href: '/recover' },
+  { value: 'scholar', label: 'Tassy Scholar — student transport', short: 'Tassy Scholar', href: '/school' },
 ] as const;
 
 export type ServiceLine = (typeof ALL_SERVICE_LINES)[number]['value'];
@@ -159,6 +159,16 @@ export function minDateTimeLocal(now = new Date()): string {
 /** Resolves ANY line, including unavailable ones, so /ops renders legacy rows. */
 export function serviceLabel(value: string): string {
   return ALL_SERVICE_LINES.find((s) => s.value === value)?.label ?? value;
+}
+
+/** Brand name only — for customer-facing copy and PII-free alert titles. */
+export function serviceShortName(value: string): string {
+  return ALL_SERVICE_LINES.find((s) => s.value === value)?.short ?? value;
+}
+
+/** First 8 characters of the uuid — the human-quotable reference. */
+export function shortRef(id: string): string {
+  return id.slice(0, 8);
 }
 
 /** Normalise an arbitrary `?service=` param to a valid line, defaulting to care. */

@@ -311,9 +311,16 @@ test('a notification failure still returns 200 and still inserts', async ({ requ
 
   // At least one leg failed (no Zapier/Resend credentials in test), and the row
   // still exists. That is the whole contract.
-  const outcomes = Object.values(body.notifications ?? {});
+  const notifications = body.notifications ?? {};
+  const outcomes = Object.values(notifications);
   expect(outcomes, 'notification outcomes reported').not.toHaveLength(0);
-  expect(outcomes).toContain('failed');
+  expect(outcomes, 'at least one leg failed').toContain('failed');
+
+  // Absent-safe contract: an unconfigured sink reports "skipped", never
+  // "failed", and changes nothing else.
+  if (!process.env.ZAPIER_SMS_WEBHOOK_URL) {
+    expect(notifications.pushFallback, 'unset Zapier no-ops').toBe('skipped');
+  }
 
   expect(await countRows(api, marker), 'row survived the failure').toBe(1);
   await api.dispose();
@@ -409,4 +416,36 @@ test('the escalation cron rejects a wrong bearer token', async ({ request }) => 
   });
   expect([401, 503]).toContain(res.status());
   expect((await res.json()).ok).toBe(false);
+});
+
+// ── Push payload carries no PII ──────────────────────────────────────────────
+
+test('the push notification leaks no personal data', async ({ request }) => {
+  const topic = process.env.NTFY_TOPIC;
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  test.skip(!topic, 'needs NTFY_TOPIC');
+
+  // Distinctive values so a leak cannot hide in ordinary text.
+  const marker = `pw-pii-${Date.now()}`;
+  const name = `Zzyzx Quimbleforth ${Date.now()}`;
+  const phone = '704-555-0177';
+
+  const res = await request.post('/api/trip-request', {
+    data: { ...validPayload(marker), contactName: name, contactPhone: phone },
+  });
+  expect(res.status()).toBe(200);
+
+  // Read back what was actually published to the public topic.
+  await new Promise((r) => setTimeout(r, 2000));
+  const published = await (await request.get(`https://ntfy.sh/${topic}/json?poll=1`)).text();
+
+  // An ntfy topic is readable by anyone who knows it. These must never appear.
+  expect(published, 'no name').not.toContain(name);
+  expect(published, 'no phone').not.toContain(phone);
+  expect(published, 'no pickup address').not.toContain(marker);
+  expect(published, 'no destination').not.toContain('Blythe');
+
+  // What it SHOULD carry: the reference, so the operator can find the row.
+  const ref = (await res.json()).id.slice(0, 8);
+  expect(published, 'carries the reference').toContain(ref);
 });

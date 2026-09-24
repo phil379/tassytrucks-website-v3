@@ -1,24 +1,47 @@
 import { test, expect } from '@playwright/test';
 import {
-  RATE_CARD,
+  CARE,
+  CARE_WAV,
+  CONCIERGE,
+  WINNIE,
   SHOW_ESTIMATES,
+  bandFor,
+  cardFor,
   estimateTrip,
   formatRange,
   formatUsd,
   haversineMiles,
   surchargesFor,
 } from '../../lib/quote';
+import type { Quote, QuoteOnly } from '../../lib/quote';
 import { SERVICE_VALUES } from '../../lib/trip-request';
 
-/** Uptown Charlotte → Atrium Health Carolinas Medical Center. ~1.8 straight miles. */
+/** Uptown Charlotte → Atrium Health Carolinas Medical Center. ~1.6 straight miles. */
 const UPTOWN = { lat: 35.2271, lng: -80.8431 };
 const CMC = { lat: 35.2046, lng: -80.8384 };
-/** Uptown → Concord. ~18 straight miles. */
+/** Uptown → Concord. ~18 straight miles, so ~22–26 road miles. */
 const CONCORD = { lat: 35.4088, lng: -80.5795 };
+/** Uptown → north Charlotte. ~5.5 straight miles, so 6.9–8.0 road miles. */
+const NORTH_CLT = { lat: 35.3068, lng: -80.8431 };
+/** Uptown → Winston-Salem. ~69 straight miles: past every card. */
+const WINSTON = { lat: 36.0999, lng: -80.2442 };
 
 const WEEKDAY_MIDDAY = '2026-10-07T13:00'; // Wednesday
 const SATURDAY_MIDDAY = '2026-10-10T13:00';
 const WEEKDAY_NIGHT = '2026-10-07T22:00';
+
+/** Narrows, and fails the test with a useful message rather than a type error. */
+function asEstimate(r: ReturnType<typeof estimateTrip>): Quote {
+  expect(r, 'expected an estimate').toBeTruthy();
+  expect(r!.kind).toBe('estimate');
+  return r as Quote;
+}
+
+function asQuoteOnly(r: ReturnType<typeof estimateTrip>): QuoteOnly {
+  expect(r, 'expected a quote-only answer').toBeTruthy();
+  expect(r!.kind).toBe('quote-only');
+  return r as QuoteOnly;
+}
 
 test.describe('distance', () => {
   test('haversine matches a known Charlotte pair', () => {
@@ -43,144 +66,323 @@ test.describe('it never quotes what it cannot measure', () => {
     expect(estimateTrip({ ...base })).toBeNull();
   });
 
-  test('one address resolved is not enough', () => {
+  test('one address picked is not enough', () => {
     expect(estimateTrip({ ...base, pickup: UPTOWN })).toBeNull();
     expect(estimateTrip({ ...base, dropoff: CMC })).toBeNull();
   });
 
-  test('null coordinates are not treated as the equator', () => {
-    // 0,0 is in the Atlantic. If null ever coerced to 0 this would return a
-    // four-figure fare for a trip across the ocean instead of null.
-    const quote = estimateTrip({
-      ...base,
-      pickup: { lat: null, lng: null },
-      dropoff: CMC,
-    });
-    expect(quote).toBeNull();
+  test('a half-resolved place (lat but no lng) is not enough', () => {
+    expect(
+      estimateTrip({ ...base, pickup: { lat: 35.2, lng: null }, dropoff: CMC }),
+    ).toBeNull();
   });
 });
 
-test.describe('the estimate is a range, never a single number', () => {
-  test('a real trip returns a low and a high', () => {
-    const quote = estimateTrip({
-      serviceLine: 'care',
-      pickup: UPTOWN,
-      dropoff: CONCORD,
-      requestedAt: WEEKDAY_MIDDAY,
-    })!;
-    expect(quote).not.toBeNull();
-    expect(quote.highCents).toBeGreaterThan(quote.lowCents);
-    expect(formatRange(quote)).toContain('–');
+test.describe('bands', () => {
+  test('a short trip lands in the entry band and reads as one number', () => {
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.lowCents).toBe(4000);
+    expect(q.highCents).toBe(4000);
+    expect(q.entryBand).toBe(true);
+    // The whole point of bands: no fake-precise range on a 2-mile trip.
+    expect(formatRange(q)).toBe('$40');
   });
 
-  test('a short trip falls back to the minimum fare and says so', () => {
-    const quote = estimateTrip({
-      serviceLine: 'care',
-      pickup: UPTOWN,
-      dropoff: CMC,
-      requestedAt: WEEKDAY_MIDDAY,
-    })!;
-    expect(quote.atMinimum, 'a 2-mile trip is a minimum-fare trip').toBe(true);
-    expect(quote.lowCents).toBeGreaterThanOrEqual(RATE_CARD.care.minimum);
-  });
-
-  test('farther costs more', () => {
-    const near = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY })!;
-    const far = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY })!;
+  test('a longer trip costs more', () => {
+    const near = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY }),
+    );
+    const far = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY }),
+    );
     expect(far.lowCents).toBeGreaterThan(near.lowCents);
   });
 
-  test('a round trip is two legs', () => {
-    const oneWay = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY })!;
-    const round = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY, returnTrip: true })!;
-    expect(round.lowCents).toBe(oneWay.lowCents * 2);
-  });
-
-  test('extra passengers cost extra', () => {
-    const one = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY, passengers: 1 })!;
-    const three = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY, passengers: 3 })!;
-    expect(three.lowCents).toBeGreaterThan(one.lowCents);
-  });
-
-  test('prices land on clean numbers, not $83.47', () => {
-    const quote = estimateTrip({ serviceLine: 'recovery', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY })!;
-    expect(quote.lowCents % 500, 'rounded to the nearest $5').toBe(0);
-    expect(formatUsd(quote.lowCents)).toMatch(/^\$[\d,]+$/);
-  });
-});
-
-test.describe('surcharges follow Charlotte time', () => {
-  test('a weekday midday trip has none', () => {
-    expect(surchargesFor(WEEKDAY_MIDDAY)).toHaveLength(0);
-  });
-
-  test('a 10pm weekday pickup is after hours', () => {
-    expect(surchargesFor(WEEKDAY_NIGHT).map((s) => s.label)).toContain('After hours');
-  });
-
-  test('a Saturday midday pickup is a weekend', () => {
-    expect(surchargesFor(SATURDAY_MIDDAY).map((s) => s.label)).toContain('Weekend');
-  });
-
-  test('surcharges are judged in Charlotte time, not the server zone', () => {
-    // 10pm in Charlotte is 2am UTC the next day. A UTC-based check would call
-    // this an early-morning trip on a different weekday.
-    const night = surchargesFor(WEEKDAY_NIGHT);
-    expect(night.map((s) => s.label)).toContain('After hours');
-    expect(night.map((s) => s.label)).not.toContain('Weekend');
-  });
-
-  test('an after-hours trip costs more than the same trip at midday', () => {
-    const day = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_MIDDAY })!;
-    const night = estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CONCORD, requestedAt: WEEKDAY_NIGHT })!;
-    expect(night.lowCents).toBeGreaterThan(day.lowCents);
-  });
-});
-
-test.describe('the rate card is complete and sane', () => {
-  test('every bookable service line has a rate', () => {
-    for (const line of SERVICE_VALUES) {
-      expect(RATE_CARD[line], `${line} has a rate`).toBeTruthy();
-    }
-  });
-
-  test('no line has a minimum below its own base fare', () => {
-    for (const [line, rate] of Object.entries(RATE_CARD)) {
-      expect(rate.minimum, `${line} minimum covers its base`).toBeGreaterThanOrEqual(rate.base);
-    }
-  });
-
-  test('every rate is a positive whole number of cents', () => {
-    for (const [line, rate] of Object.entries(RATE_CARD)) {
-      for (const [field, value] of Object.entries(rate)) {
-        expect(Number.isInteger(value), `${line}.${field} is whole cents`).toBe(true);
-        expect(value, `${line}.${field} is not negative`).toBeGreaterThanOrEqual(0);
+  test('bands are ascending on every card, and none is free', () => {
+    for (const card of [CARE, CARE_WAV, CONCIERGE, WINNIE]) {
+      for (let i = 1; i < card.bands.length; i += 1) {
+        expect(card.bands[i]!.upToMiles, `${card.label} band ${i} distance`).toBeGreaterThan(
+          card.bands[i - 1]!.upToMiles,
+        );
+        expect(card.bands[i]!.cents, `${card.label} band ${i} price`).toBeGreaterThan(
+          card.bands[i - 1]!.cents,
+        );
       }
+      expect(card.bands[0]!.cents, `${card.label} entry price`).toBeGreaterThan(0);
     }
   });
 
-  test('wheelchair-grade lines cost more per mile than student transport', () => {
-    expect(RATE_CARD.recovery.perMile).toBeGreaterThan(RATE_CARD.scholar.perMile);
+  test('bandFor picks the first rung that contains the distance', () => {
+    expect(bandFor(CARE, 3)!.cents).toBe(4000); // inclusive upper edge
+    expect(bandFor(CARE, 3.1)!.cents).toBe(5500);
+    expect(bandFor(CARE, 999)).toBeNull();
+  });
+
+  test('past the last band it says so instead of extrapolating', () => {
+    const q = asQuoteOnly(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: WINSTON,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.reason).toBe('beyond-bands');
+    expect(q.message).toContain('dispatcher');
   });
 });
 
-test.describe('the public display stays off until the rates are approved', () => {
-  test('SHOW_ESTIMATES is false', () => {
-    // This is the guard that keeps an unapproved price off a live booking page.
-    // If this test fails, someone published a rate card Phil has not signed off.
-    expect(SHOW_ESTIMATES).toBe(false);
+test.describe("Phil's approved entry prices", () => {
+  test('Tassy Care starts at $40 and Care WAV at $50', () => {
+    expect(CARE.bands[0]!.cents).toBe(4000);
+    expect(CARE_WAV.bands[0]!.cents).toBe(5000);
   });
 
-  test('no estimate panel appears on the public form', async ({ page }) => {
-    await page.goto('/request');
-    await expect(page.getByTestId('trip-estimate')).toHaveCount(0);
+  test('Concierge starts at $100', () => {
+    expect(CONCIERGE.bands[0]!.cents).toBe(10000);
   });
 
-  test('the preview flag opens the panel for review', async ({ page }) => {
-    await page.goto('/request?preview_quote=1');
-    const panel = page.getByTestId('trip-estimate');
-    await expect(panel).toHaveCount(1);
-    // With no addresses picked it must ask, not guess.
-    await expect(panel).toContainText('Pick both addresses');
+  test('Winnie Ride is exactly $49 / $59 / $69 / $79 / $89', () => {
+    expect(WINNIE.bands.map((b) => b.cents)).toEqual([4900, 5900, 6900, 7900, 8900]);
+  });
+
+  test('WAV costs more than ambulatory at every distance', () => {
+    for (let i = 0; i < CARE.bands.length; i += 1) {
+      expect(CARE_WAV.bands[i]!.cents).toBeGreaterThan(CARE.bands[i]!.cents);
+    }
+  });
+});
+
+test.describe('wheelchair switches the card', () => {
+  test('cardFor sends a wheelchair passenger to the WAV card', () => {
+    expect(cardFor('care', 'ambulatory')).toBe(CARE);
+    expect(cardFor('care', 'wheelchair')).toBe(CARE_WAV);
+    expect(cardFor('care', null)).toBe(CARE);
+  });
+
+  test('a wheelchair quote is the WAV price, and says which card it used', () => {
+    const amb = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        mobility: 'ambulatory',
+      }),
+    );
+    const wav = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        mobility: 'wheelchair',
+      }),
+    );
+    expect(wav.lowCents).toBeGreaterThan(amb.lowCents);
+    expect(wav.cardLabel).toBe('Tassy Care WAV');
+    expect(amb.cardLabel).toBe('Tassy Care');
+  });
+
+  test('wheelchair does NOT move a pet trip onto the WAV card', () => {
+    // A dog does not need a lift. The form blocks this combination, but the
+    // engine must not price it as a wheelchair run if a stale row reaches it.
+    expect(cardFor('pet', 'wheelchair')).toBe(WINNIE);
+  });
+});
+
+test.describe('round trips', () => {
+  test('Tassy Care doubles — two dispatches, two fares', () => {
+    const one = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY }),
+    );
+    const two = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        returnTrip: true,
+      }),
+    );
+    expect(two.lowCents).toBe(one.lowCents * 2);
+  });
+
+  test('Winnie round trip is $89 on the entry band, exactly as specified', () => {
+    const q = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        returnTrip: true,
+      }),
+    );
+    expect(q.lowCents).toBe(8900);
+    // And the wait allowance grows, because the driver stays with the animal.
+    expect(q.waitIncludedMin).toBe(30);
+  });
+
+  test('a Winnie round trip is cheaper than two one-ways', () => {
+    // Above the entry band, so the $89 floor is not what is being measured.
+    const one = asEstimate(
+      estimateTrip({ serviceLine: 'pet', pickup: UPTOWN, dropoff: NORTH_CLT, requestedAt: WEEKDAY_MIDDAY }),
+    );
+    const two = asEstimate(
+      estimateTrip({
+        serviceLine: 'pet',
+        pickup: UPTOWN,
+        dropoff: NORTH_CLT,
+        requestedAt: WEEKDAY_MIDDAY,
+        returnTrip: true,
+      }),
+    );
+    expect(two.lowCents).toBeLessThan(one.lowCents * 2);
+    expect(two.lowCents).toBeGreaterThan(one.lowCents);
+  });
+
+  test('Concierge is ALREADY a round trip and must not double', () => {
+    const one = asEstimate(
+      estimateTrip({ serviceLine: 'recovery', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY }),
+    );
+    const two = asEstimate(
+      estimateTrip({
+        serviceLine: 'recovery',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        returnTrip: true,
+      }),
+    );
+    expect(two.lowCents).toBe(one.lowCents);
+    expect(one.roundTrip).toBe(true);
+  });
+});
+
+test.describe('Tassy Scholar is quoted, not metered', () => {
+  test('it returns quote-only even with both addresses resolved', () => {
+    const q = asQuoteOnly(
+      estimateTrip({
+        serviceLine: 'scholar',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+      }),
+    );
+    expect(q.reason).toBe('quoted-line');
+    expect(q.message).toContain('school year');
+  });
+
+  test('it says so before it needs coordinates at all', () => {
+    // A parent picking "Tassy Scholar" should learn how it is priced
+    // immediately, not after filling in two addresses.
+    const q = asQuoteOnly(estimateTrip({ serviceLine: 'scholar' }));
+    expect(q.miles).toBeNull();
+  });
+});
+
+test.describe('surcharges', () => {
+  test('a weekday midday trip has none — this is the target window', () => {
+    expect(surchargesFor(WEEKDAY_MIDDAY)).toEqual([]);
+  });
+
+  test('a 10 PM weekday trip is after hours', () => {
+    const s = surchargesFor(WEEKDAY_NIGHT);
+    expect(s.map((x) => x.label)).toEqual(['After hours']);
+  });
+
+  test('a Saturday midday trip is a weekend', () => {
+    const s = surchargesFor(SATURDAY_MIDDAY);
+    expect(s.map((x) => x.label)).toEqual(['Weekend']);
+  });
+
+  test('surcharges land on the fare', () => {
+    const day = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY }),
+    );
+    const night = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_NIGHT }),
+    );
+    expect(night.lowCents - day.lowCents).toBe(2500);
+  });
+
+  test('a surcharge is charged ONCE, not once per leg', () => {
+    // One dispatch, at one hour of the day. Doubling the after-hours fee on a
+    // round trip is the kind of arithmetic a customer checks.
+    const oneWay = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_NIGHT }),
+    );
+    const round = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_NIGHT,
+        returnTrip: true,
+      }),
+    );
+    expect(round.lowCents).toBe((oneWay.lowCents - 2500) * 2 + 2500);
+  });
+
+  test('an unparseable time attracts nothing rather than guessing', () => {
+    expect(surchargesFor(null)).toEqual([]);
+    expect(surchargesFor('not a date')).toEqual([]);
+  });
+});
+
+test.describe('extra passengers', () => {
+  test('more passengers cost more, once', () => {
+    const one = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        passengers: 1,
+      }),
+    );
+    const three = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+        passengers: 3,
+      }),
+    );
+    expect(three.lowCents - one.lowCents).toBe(2 * CARE.perExtra);
+  });
+});
+
+test.describe('coverage and formatting', () => {
+  test('every requestable service line resolves to a card or a quote', () => {
+    for (const line of SERVICE_VALUES) {
+      const r = estimateTrip({
+        serviceLine: line,
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: WEEKDAY_MIDDAY,
+      });
+      expect(r, `${line} produced no answer at all`).toBeTruthy();
+      expect(['estimate', 'quote-only'], `${line}`).toContain(r!.kind);
+    }
+  });
+
+  test('money reads as whole dollars', () => {
+    expect(formatUsd(4000)).toBe('$40');
+    expect(formatUsd(123400)).toBe('$1,234');
+  });
+
+  test('estimates are on', () => {
+    // Phil approved the card on 2026-09-24 and asked for instant pricing.
+    // If this ever flips back to false, it should be a deliberate decision.
+    expect(SHOW_ESTIMATES).toBe(true);
   });
 });

@@ -108,16 +108,15 @@ export default function RequestForm({
   }, [pathname, searchParams]);
 
   /**
-   * Off for everyone until the rate card is approved (lib/quote.ts). The query
-   * flag is a preview door so the panel can be reviewed on the live site
-   * without publishing a price to the public.
+   * On since the rate card was approved (2026-09-24). The query flag stays so a
+   * future card can be reviewed on the live site before it is published.
    */
   const estimatesEnabled = SHOW_ESTIMATES || searchParams.get('preview_quote') === '1';
 
   /** Operator diagnostic: /request?debug_maps=1 says why suggestions are off. */
   const debugMaps = searchParams.get('debug_maps') === '1';
 
-  const estimate = useMemo(() => {
+  const quoted = useMemo(() => {
     if (!estimatesEnabled) return null;
     return estimateTrip({
       serviceLine: service,
@@ -126,8 +125,20 @@ export default function RequestForm({
       requestedAt: whenValue,
       passengers,
       returnTrip,
+      mobility,
     });
-  }, [estimatesEnabled, service, pickupPlace, dropoffPlace, whenValue, passengers, returnTrip]);
+  }, [
+    estimatesEnabled,
+    service,
+    pickupPlace,
+    dropoffPlace,
+    whenValue,
+    passengers,
+    returnTrip,
+    mobility,
+  ]);
+
+  const estimate = quoted?.kind === 'estimate' ? quoted : null;
 
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
   const errorList = Object.entries(errors);
@@ -516,9 +527,8 @@ export default function RequestForm({
                 </span>
               </p>
               <p className="ink-soft mt-1.5 text-xs">
-                About {estimate.miles} miles
-                {returnTrip ? ', both legs' : ''}
-                {estimate.atMinimum ? ' · minimum fare applies' : ''}
+                {estimate.cardLabel} · about {estimate.miles} miles
+                {estimate.roundTrip ? ' · both legs included' : ''}
                 {estimate.waitIncludedMin > 0
                   ? ` · includes ${estimate.waitIncludedMin} min on-site wait`
                   : ''}
@@ -532,6 +542,9 @@ export default function RequestForm({
                 before your trip is booked.
               </p>
             </>
+          ) : quoted?.kind === 'quote-only' ? (
+            /* Measurable, but not a table lookup. Say which, and why. */
+            <p className="ink-soft text-sm">{quoted.message}</p>
           ) : (
             <p className="ink-soft text-sm">
               {/* Deliberately not a guess. See the rules at the top of lib/quote.ts. */}

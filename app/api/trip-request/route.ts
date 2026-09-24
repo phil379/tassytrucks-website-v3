@@ -94,14 +94,22 @@ export async function POST(request: Request) {
   // Recomputed here from the coordinates that arrived, never taken from the
   // request body. Null whenever the addresses were typed instead of picked -
   // there is nothing to measure, and a guessed price is worse than none.
-  const estimate = estimateTrip({
+  const quoted = estimateTrip({
     serviceLine: data.serviceLine,
     pickup: { lat: data.pickupLat, lng: data.pickupLng },
     dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
     requestedAt: data.requestedAt,
     passengers: data.passengers,
     returnTrip: data.returnTrip,
+    // Wheelchair moves Tassy Care onto the WAV card. The form has always
+    // collected this; until now the price ignored it.
+    mobility: data.mobility,
   });
+
+  // Only a real estimate is stored as a number. A 'quote-only' answer (Scholar,
+  // or a trip past the last band) is NOT a price and must not be written into
+  // the estimate columns, where /ops would read it as one.
+  const estimate = quoted?.kind === 'estimate' ? quoted : null;
 
   let id: string;
   try {

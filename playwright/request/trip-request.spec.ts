@@ -30,6 +30,35 @@ async function countRows(api: APIRequestContext, marker: string): Promise<number
   return (await res.json()).length;
 }
 
+/**
+ * Delete every row this spec created, after the spec finishes.
+ *
+ * These tests run against the REAL tassy-ops database — .env.local points at
+ * production, because there is no separate test project. Without this, every
+ * `npm run verify` left fake trips sitting in the queue the operator actually
+ * works from. Nine of them accumulated before anyone noticed.
+ *
+ * Safe by construction: every row this file creates sets `pickupAddress` to a
+ * `pw-` marker, and no real request ever will. The delete is scoped to that
+ * prefix and nothing else.
+ *
+ * What this does NOT undo: each submission fires a real push to the operator's
+ * phone and a real email. Silencing those needs a test mode in the route, which
+ * does not exist yet.
+ */
+test.afterAll(async ({ playwright }) => {
+  if (!dbConfigured) return;
+  const api = await playwright.request.newContext();
+  const res = await api.delete(
+    `${SUPABASE_URL}/rest/v1/trip_requests?pickup_address=like.pw-*`,
+    { headers: { apikey: SERVICE_KEY!, Authorization: `Bearer ${SERVICE_KEY!}` } },
+  );
+  if (!res.ok()) {
+    console.warn(`[cleanup] could not remove test rows (${res.status()}) — check /ops for pw- entries`);
+  }
+  await api.dispose();
+});
+
 function validPayload(marker: string) {
   const when = new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString();
   return {
@@ -293,28 +322,48 @@ test('a valid submit inserts exactly one row and returns 200', async ({ request,
   await api.dispose();
 });
 
-test('a notification failure still returns 200 and still inserts', async ({ request, playwright }) => {
+/**
+ * The capture is independent of the notifications.
+ *
+ * This test used to assert `outcomes).toContain('failed')` - that at least one
+ * notification leg had failed. It passed for months, and it passed for the
+ * wrong reason: the environment had no Resend key, so a leg failed every time.
+ * The moment the credentials were filled in and all four legs went green, the
+ * test went RED. A test that only passes while the system is broken is worse
+ * than no test - it trains you to fix the system back to broken.
+ *
+ * What actually matters is narrower and always true: whatever the notification
+ * legs do, the request returns 200, the row lands exactly once, and every leg
+ * reports a known outcome rather than crashing the handler. That is what is
+ * asserted now.
+ *
+ * Deterministically forcing a transport failure would need a fault-injection
+ * hook in the route. That is a real gap, and it is a gap in the route, not
+ * something a spec should paper over by depending on a missing credential.
+ */
+test('the row lands regardless of what the notification legs do', async ({ request, playwright }) => {
   test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
 
   const api = await playwright.request.newContext();
-  const marker = `pw-notify-fail-${Date.now()}`;
+  const marker = `pw-notify-${Date.now()}`;
 
-  // Point the Zapier hook at a host that cannot resolve, so the SMS leg is
-  // guaranteed to throw. The row must survive it.
   const res = await request.post('/api/trip-request', {
     data: { ...validPayload(marker), contactEmail: 'nobody@example.invalid' },
   });
 
-  expect(res.status(), 'a dead notification never fails the request').toBe(200);
+  expect(res.status(), 'notifications never change the status code').toBe(200);
   const body = await res.json();
   expect(body.ok).toBe(true);
 
-  // At least one leg failed (no Zapier/Resend credentials in test), and the row
-  // still exists. That is the whole contract.
   const notifications = body.notifications ?? {};
   const outcomes = Object.values(notifications);
   expect(outcomes, 'notification outcomes reported').not.toHaveLength(0);
-  expect(outcomes, 'at least one leg failed').toContain('failed');
+
+  // Every leg reports one of three known states. An unhandled throw inside a
+  // notification would surface here as undefined or a missing key.
+  for (const [leg, outcome] of Object.entries(notifications)) {
+    expect(['sent', 'skipped', 'failed'], `${leg} reports a known outcome`).toContain(outcome);
+  }
 
   // Absent-safe contract: an unconfigured sink reports "skipped", never
   // "failed", and changes nothing else.
@@ -322,7 +371,7 @@ test('a notification failure still returns 200 and still inserts', async ({ requ
     expect(notifications.pushFallback, 'unset Zapier no-ops').toBe('skipped');
   }
 
-  expect(await countRows(api, marker), 'row survived the failure').toBe(1);
+  expect(await countRows(api, marker), 'exactly one row, whatever the legs did').toBe(1);
   await api.dispose();
 });
 

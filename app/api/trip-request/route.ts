@@ -5,6 +5,25 @@ import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { parseLocalDateTime } from '@/lib/time';
 
+/**
+ * Submissions allowed per IP per hour.
+ *
+ * Deliberately a knob rather than a literal. Two reasons:
+ *
+ *   1. A clinic or office coordinator booking rides for several patients comes
+ *      from one NAT'd IP shared with the whole building. Five is fine for a
+ *      household and wrong for a facility partner, which is the customer the
+ *      NEMT side is trying to win.
+ *   2. The Playwright suite submits more in one run than any real visitor
+ *      would, and a 429 there fails tests that are asserting something else
+ *      entirely. playwright.config.ts sets this high for the test server.
+ *
+ * This is a speed bump against form spam, not a security control -
+ * lib/rate-limit.ts is explicit about why (per-instance memory on serverless).
+ */
+const REQUESTS_PER_IP_PER_HOUR = Number(process.env.TRIP_REQUEST_RATE_LIMIT) || 5;
+
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +51,7 @@ export async function POST(request: Request) {
   }
 
   const ip = clientIp(request.headers);
-  const limit = rateLimit(`trip-request:${ip}`, 5, 60 * 60 * 1000);
+  const limit = rateLimit(`trip-request:${ip}`, REQUESTS_PER_IP_PER_HOUR, 60 * 60 * 1000);
   if (!limit.ok) {
     return NextResponse.json(
       { ok: false, error: 'Too many requests. Please call us at (704) 941-8508.' },

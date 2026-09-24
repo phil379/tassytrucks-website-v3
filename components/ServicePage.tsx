@@ -17,6 +17,9 @@ type Props = {
   description: string;
   bookHref: string;
   bookLabel?: string;
+  /** Optional second CTA beside the primary — e.g. an email alternative to a
+   *  phone-only ask, for anyone who cannot or would rather not call. */
+  altCta?: { href: string; label: string };
   highlights: { title: string; body: string }[];
   tiers?: Tier[];
   partnerCta?: { title: string; body: string; href: string; label: string };
@@ -34,7 +37,7 @@ type Props = {
 const TRUST_CHIPS = ['SDVOSB certified', 'USDOT #3104152', 'Licensed & insured', 'Trained drivers'];
 
 export default function ServicePage({
-  eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now',
+  eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now', altCta,
   highlights, tiers, partnerCta,
   highlightsHeading = 'Why Charlotte families choose Tassy',
   serviceName, path,
@@ -83,6 +86,11 @@ export default function ServicePage({
             <a href={bookHref} className="btn-gold">
               {bookLabel} <ArrowRight size={16} />
             </a>
+            {altCta && (
+              <a href={altCta.href} className="btn-call">
+                {altCta.label}
+              </a>
+            )}
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
           <ul className="mt-8 flex flex-wrap gap-2" aria-label="Credentials">

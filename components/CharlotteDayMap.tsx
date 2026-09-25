@@ -180,12 +180,14 @@ export default function CharlotteDayMap() {
           aria-label="Schematic map of Charlotte showing which Tassy service line runs at each hour of the day"
         >
           <ellipse className="cdm-road" cx="205" cy="165" rx="150" ry="122" strokeWidth="1.1" strokeDasharray="3 5" />
-          <path className="cdm-road" d="M188 18 C 196 90, 196 220, 204 305" strokeWidth="2.2" />
+          <path className="cdm-road" d="M186 18 C 178 88, 178 216, 202 305" strokeWidth="2.2" />
           <path className="cdm-road" d="M40 118 C 130 96, 250 104, 372 78" strokeWidth="2" />
           <path className="cdm-road" d="M205 165 C 260 188, 300 212, 348 240" strokeWidth="1.6" />
-          <text className="cdm-rl" x="172" y="30">77</text>
+          <ellipse className="cdm-road" cx="206" cy="167" rx="29" ry="25" strokeWidth="1.4" />
+          <text className="cdm-rl" x="162" y="72">77</text>
           <text className="cdm-rl" x="46" y="112">85</text>
           <text className="cdm-rl" x="60" y="250">485</text>
+          <text className="cdm-rl" x="174" y="201">277</text>
 
           {SERVICES.map((s) => (
             <path

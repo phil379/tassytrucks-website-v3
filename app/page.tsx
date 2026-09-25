@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { contact, apply } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
+import CharlotteDayMap from '@/components/CharlotteDayMap';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
 export const metadata: Metadata = {
@@ -137,36 +138,10 @@ export default function HomePage() {
 
           {/* Hero visual */}
           <div className="relative">
-            <div className="hero-image rounded-3xl aspect-[4/5] shadow-2xl relative overflow-hidden">
-              <div className="absolute bottom-6 left-6 right-6">
-                <div className="text-[10px] uppercase tracking-eyebrow text-white/85 mb-2 font-semibold">
-                  Live Trip Board
-                </div>
-                <div className="trip-rotator">
-                  <div className="trip-card">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">Airport Transfer — CLT</span>
-                      <span className="status-badge status-en-route">● En route</span>
-                    </div>
-                    <div className="text-xs ink-mute">Tassy Concierge · full-size SUV · $109 flat</div>
-                  </div>
-                  <div className="trip-card">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">Tassy Recovery</span>
-                      <span className="status-badge status-confirmed">● Confirmed</span>
-                    </div>
-                    <div className="text-xs ink-mute">Discharge pickup · driver waits · $149 agreed</div>
-                  </div>
-                  <div className="trip-card">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold">Tassy Care · dialysis</span>
-                      <span className="status-badge status-completed">● Completed</span>
-                    </div>
-                    <div className="text-xs ink-mute">Standing Ride Plan · same driver every Tuesday</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* The hero panel. Replaced a static gold gradient carrying a
+                "LIVE TRIP BOARD · En route" card for trips that were not
+                happening; see components/CharlotteDayMap.tsx. */}
+            <CharlotteDayMap />
 
             {/* Floating stat card */}
             <div className="absolute -top-6 -left-6 bg-surface border border-line rounded-2xl p-4 shadow-xl animate-float-slow hidden md:block">

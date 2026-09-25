@@ -56,6 +56,62 @@ function shortWhen(iso: string): string {
   });
 }
 
+/**
+ * When a dispatcher can realistically answer.
+ *
+ * The form now takes requests around the clock, so "within 2 hours" stopped
+ * being true at 2am. The old copy papered over that with "during business
+ * hours", which leaves the customer to work out what those are and when theirs
+ * starts. Now the email knows what time it is and says the actual thing.
+ */
+const BUSINESS_OPEN_HOUR = 7; // 7am Charlotte
+/**
+ * 7pm, not 9pm — this is the last hour the two-hour promise can still be KEPT,
+ * which is not the same as the last hour someone is around. Dispatch runs to
+ * about 9pm, but a request at 8:30pm promised "within 2 hours" lands at
+ * 10:30pm, ninety minutes after everyone has stopped. After 7pm the honest
+ * answer is the morning.
+ */
+const BUSINESS_CLOSE_HOUR = 19;
+
+/**
+ * The hour of the day in Charlotte, 0-23.
+ *
+ * Via Intl rather than a fixed UTC offset, because Charlotte is EDT for part of
+ * the year and EST for the rest — a hardcoded -5 would put the boundary an hour
+ * wrong for eight months of the year. `hour12: false` can render midnight as
+ * "24" on some ICU builds, hence the modulo.
+ */
+function charlotteHour(at: Date): number {
+  const hour = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    hour12: false,
+  }).format(at);
+  return Number(hour) % 24;
+}
+
+/**
+ * The one sentence that carries the promise, sized to the clock.
+ *
+ * Inside opening hours the "during business hours" qualifier is dropped: we
+ * already know it is business hours, so the plain promise is both shorter and
+ * more honest. Outside them we name a time the customer can hold us to instead
+ * of a window that has already closed.
+ *
+ * The dispatch number rides in the same sentence either way — someone who
+ * submits at 2am and reads "by 9 AM" is exactly the person who might need to
+ * reach a human now.
+ */
+export function callbackPromise(at: Date = new Date()): string {
+  const hour = charlotteHour(at);
+  const open = hour >= BUSINESS_OPEN_HOUR && hour < BUSINESS_CLOSE_HOUR;
+
+  return open
+    ? `Someone will call or text you within 2 hours to confirm the details and give you a price — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`
+    : `Someone will call or text you by 9 AM to confirm the details and give you a price — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`;
+}
+
 function formatWhen(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
@@ -270,12 +326,13 @@ function detailLines(serviceLine: string, stored: unknown): string[] {
 }
 
 /**
- * Auto-reply to the requester. 78 words.
+ * Auto-reply to the requester. ~70 words.
  *
  * It confirms what they asked for so they know a person read it, states the
  * callback window the /request page already commits to, gives the dispatch
- * number, and says pricing is quoted first. It asserts nothing about
- * availability, tracking, or hours, and it carries no marketing language.
+ * number, and says pricing is quoted first. The callback promise is sized to
+ * the clock (see callbackPromise). It asserts nothing about tracking, and it
+ * carries no marketing language.
  */
 async function notifyRequester(id: string, data: TripRequestInput): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
@@ -291,11 +348,8 @@ async function notifyRequester(id: string, data: TripRequestInput): Promise<void
     `We have your ${serviceShortName(data.serviceLine)} request for ${formatWhen(data.requestedAt)}.`,
     'A dispatcher is reviewing it now.',
     '',
-    'Someone will call or text you within 2 hours during business hours to confirm',
-    'the details and give you a price. Nothing is booked and nothing is charged',
-    'until you agree to that price.',
-    '',
-    `If you need us sooner, call dispatch on ${DISPATCH_PHONE}.`,
+    callbackPromise(),
+    'Nothing is booked and nothing is charged until you agree to that price.',
     '',
     '— Tassy Transportation',
     `Reference: ${shortRef(id)}`,

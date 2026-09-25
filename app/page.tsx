@@ -115,7 +115,7 @@ export default function HomePage() {
             </div>
 
             <p className="mt-4 text-xs ink-mute flex items-center gap-2">
-              <span className="dot" /> Request any time · a dispatcher confirms your driver and your price within 2 hours
+              <span className="dot" /> Request any time · a dispatcher usually confirms your driver and your price within 2 hours
             </p>
 
             {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
@@ -298,7 +298,7 @@ export default function HomePage() {
               },
               {
                 n: '02',
-                h: 'We confirm within 2 hours',
+                h: 'We usually confirm within 2 hours',
                 b: 'A dispatcher calls or texts with your exact price and your driver. Nothing is charged, and nothing is booked, until you say yes.',
               },
               {

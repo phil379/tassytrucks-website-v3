@@ -17,7 +17,7 @@ const PAGES: PageSpec[] = [
   { path: '/partners', h1: 'partner with tassy transportation', cta: ['facility/signup', 'source=partners-page'] },
   { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['service=care', 'utm_source=seo-nemt'] },
   { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['service=care', 'utm_source=seo-dialysis', 'recurring=1'] },
-  { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['service=recovery', 'utm_source=seo-postop', 'tier=recovery'] },
+  { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['service=recovery', 'utm_source=seo-postop'] },
   { path: '/charlotte/wheelchair-transport', h1: 'wheelchair transport in charlotte', cta: ['service=care', 'utm_source=seo-wc', 'mobility=wheelchair'] },
   { path: '/charlotte/veteran-transport', h1: 'veteran medical transport in charlotte', cta: ['service=care', 'utm_source=seo-veteran', 'payer=va'] },
   { path: '/charlotte/concierge-medical-transport', h1: 'concierge medical transport in charlotte', cta: ['service=recovery', 'utm_source=seo-concierge'] },
@@ -334,7 +334,7 @@ test('llms.txt is published and states the service area and the request flow', a
   expect(txt).toContain('(704) 941-8508');
   expect(txt).toContain('https://www.tassytrucks.com/request');
   // Fact clarity: the unavailable line is stated as unavailable.
-  expect(txt).toContain('Not currently accepting new requests');
+  expect(txt).toContain('is not currently accepting requests');
 });
 
 test('sitemap includes the conversion page and excludes the ops queue', async ({ request }) => {

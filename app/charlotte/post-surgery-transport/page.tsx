@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
 };
 
-const CTA_HREF = seoRequest('vip', { source: 'seo-postop', tier: 'recovery' });
+const CTA_HREF = seoRequest('recover', { source: 'seo-postop' });
 
 export default function PostSurgeryTransportPage() {
   return (

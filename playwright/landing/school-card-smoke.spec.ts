@@ -20,7 +20,7 @@ test('6th card is Tassy Scholar with EverDriven context', async ({ page }) => {
   await expect(card).toContainText('EverDriven');
   await expect(card).toContainText('2022');
   await expect(card).toContainText('5 metros');
-  await expect(card).toContainText('Our school transport story');
+  await expect(card).toContainText('Get a route quote');
   await expect(card).toHaveAttribute('href', '/school');
 });
 

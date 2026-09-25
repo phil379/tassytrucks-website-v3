@@ -245,8 +245,27 @@ const tripRequestObject = z
      */
     tripDetails: z.unknown().optional().nullable(),
 
-    /** Honeypot — must stay empty. Real browsers never fill a hidden field. */
-    company: z.string().optional().nullable(),
+    /**
+     * Honeypot — must stay empty.
+     *
+     * NOT named "company". `company`/`organization` is an autofill CATEGORY:
+     * Chrome, Safari and every password manager recognise it and fill it from
+     * the saved profile, even on a field that is off-screen, tabIndex -1 and
+     * aria-hidden. A real customer submitting the form therefore tripped the
+     * bot check, the request was dropped, and the UI said "Request received".
+     * That happened in production on 2026-09-25, twice, to Phil.
+     *
+     * `hp_token` matches no autofill heuristic. Do not rename it to anything
+     * that reads like a real field.
+     */
+    hp_token: z.string().optional().nullable(),
+
+    /**
+     * Milliseconds between the form rendering and the submit. The real bot
+     * signal: a script posts instantly, a person cannot fill this form in
+     * under a few seconds. Optional so an older cached client still submits.
+     */
+    elapsedMs: z.coerce.number().int().min(0).optional().nullable(),
   })
   .superRefine((data, ctx) => {
     // Charlotte wall-clock, not the server's zone. See lib/time.ts.

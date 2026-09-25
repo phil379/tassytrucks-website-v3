@@ -120,6 +120,13 @@ export default function RequestForm({
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * When this form first rendered. The gap to submit is the real bot signal —
+   * a script posts instantly; a person cannot fill this in under three seconds.
+   * A ref, not state, so it is fixed at mount and never triggers a re-render.
+   */
+  const renderedAtRef = useRef<number>(Date.now());
+
   /** Errors for the detail block, keyed the way that block expects them. */
   const detailErrors = useMemo(() => {
     const out: Record<string, string> = {};
@@ -306,7 +313,8 @@ export default function RequestForm({
       contactPhone: String(fd.get('contactPhone') ?? ''),
       contactEmail: String(fd.get('contactEmail') ?? '') || null,
       preferredContact: String(fd.get('preferredContact') ?? 'phone'),
-      company: String(fd.get('company') ?? ''),
+      hp_token: String(fd.get('hp_token') ?? ''),
+      elapsedMs: Date.now() - renderedAtRef.current,
       // Raw strings. The server re-validates them against the same spec and
       // stores only what comes back from it.
       tripDetails: details,
@@ -351,7 +359,20 @@ export default function RequestForm({
         return;
       }
 
-      setDone(json.id ?? 'received');
+      // A null id means the server accepted the POST but stored nothing — the
+      // bot path returns exactly that shape. This used to read
+      // `setDone(json.id ?? 'received')`, so a dropped booking rendered
+      // "Request received". It happened twice in production on 2026-09-25.
+      // Success is having a row id. Nothing else counts.
+      if (!json.id) {
+        announce(
+          {},
+          'We could not save your request — please call (704) 941-8508 and we will take it over the phone.',
+        );
+        return;
+      }
+
+      setDone(json.id);
     } catch {
       announce({}, 'We could not reach the server. Please call (704) 941-8508.');
     } finally {
@@ -378,10 +399,25 @@ export default function RequestForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-6">
-      {/* Honeypot — hidden from everyone, including screen readers. */}
+      {/*
+        Honeypot — hidden from everyone, including screen readers.
+
+        The name is deliberately meaningless. It used to be "company", which is
+        an autofill CATEGORY: browsers and password managers fill it from the
+        saved profile even here, off-screen and aria-hidden. Two real bookings
+        were silently discarded that way on 2026-09-25. Do not rename this to
+        anything that reads like a real field.
+      */}
       <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
-        <label htmlFor="company">Company</label>
-        <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+        <label htmlFor="hp_token">Leave this field empty</label>
+        <input
+          id="hp_token"
+          name="hp_token"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
       </div>
 
       {/*

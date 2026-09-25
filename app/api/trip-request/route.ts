@@ -30,6 +30,9 @@ const REQUESTS_PER_IP_PER_HOUR = Number(process.env.TRIP_REQUEST_RATE_LIMIT) || 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/** Fastest a human plausibly fills this form. Below it, treat as a script. */
+const MIN_FILL_MS = 3_000;
+
 /**
  * POST /api/trip-request — the one write path for the request pipeline.
  *
@@ -47,10 +50,31 @@ export async function POST(request: Request) {
 
   const raw = (body ?? {}) as Record<string, unknown>;
 
-  // Honeypot. A real browser leaves this hidden field empty. Answer 200 so a bot
-  // learns nothing from the response, but store nothing and alert no one.
-  if (typeof raw.company === 'string' && raw.company.trim() !== '') {
-    return NextResponse.json({ ok: true, id: null });
+  // ───────────────────────────────────────────────────────────────────────────
+  // Bot checks. Both answer 200 with a null id so a script learns nothing from
+  // the status code — and the CLIENT treats a null id as a failure, because a
+  // request that was not stored must never render "Request received".
+  //
+  // The honeypot is `hp_token`, not `company`. `company`/`organization` is an
+  // autofill category: browsers and password managers fill it from the saved
+  // profile even when the field is off-screen, tabIndex -1 and aria-hidden.
+  // That dropped two real submissions in production on 2026-09-25.
+  //
+  // `elapsedMs` is the signal that actually distinguishes a bot: a script posts
+  // immediately, a person cannot complete this form in under three seconds. It
+  // is optional so a client cached before this shipped still submits.
+  // ───────────────────────────────────────────────────────────────────────────
+  const trippedHoneypot = typeof raw.hp_token === 'string' && raw.hp_token.trim() !== '';
+  const elapsed = typeof raw.elapsedMs === 'number' ? raw.elapsedMs : null;
+  const submittedTooFast = elapsed !== null && elapsed < MIN_FILL_MS;
+
+  if (trippedHoneypot || submittedTooFast) {
+    // Logged, because a false positive here costs a booking and is otherwise
+    // invisible — the only trace would be a customer who says they submitted.
+    console.warn(
+      `[trip-request] discarded as bot: honeypot=${trippedHoneypot} elapsedMs=${elapsed ?? 'absent'}`,
+    );
+    return NextResponse.json({ ok: true, id: null, stored: false });
   }
 
   const ip = clientIp(request.headers);

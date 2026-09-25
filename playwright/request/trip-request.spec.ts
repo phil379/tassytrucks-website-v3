@@ -79,9 +79,32 @@ function validPayload(marker: string) {
     contactPhone: '704-555-0142',
     contactEmail: '',
     preferredContact: 'phone',
-    company: '',
+    hp_token: '',
     source: '/request?utm_source=playwright',
   };
+}
+
+/**
+ * Fill just enough for client-side validation to pass, so a test can reach the
+ * submit and assert what the UI does with the SERVER's answer.
+ */
+async function fillMinimalValidForm(page: import('@playwright/test').Page) {
+  // datetime-local wants local wall-clock, and the form enforces a 4h floor.
+  const when = new Date(Date.now() + 26 * 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const local = `${when.getFullYear()}-${pad(when.getMonth() + 1)}-${pad(when.getDate())}T${pad(when.getHours())}:${pad(when.getMinutes())}`;
+
+  await page.locator('#pickupAddress').fill('1200 Elizabeth Ave, Charlotte NC');
+  await page.locator('#dropoffAddress').fill('1000 Blythe Blvd, Charlotte NC');
+  await page.locator('#requestedAt').fill(local);
+  await page.locator('#contactFirstName').fill('Playwright');
+  await page.locator('#contactLastName').fill('Test');
+  await page.locator('#contactPhone').fill('704-555-0142');
+
+  // Per-service detail fields. Tassy Care requires two; they render as
+  // `details-<key>` (components/request/TripDetailsFields.tsx:90).
+  await page.locator('#details-rider_is').selectOption('self');
+  await page.locator('#details-assistance').selectOption('curb');
 }
 
 // ── Form rendering ───────────────────────────────────────────────────────────
@@ -235,8 +258,8 @@ test('a11y: every field has a real label and a 44px+ target', async ({ page }) =
   }
 
   // The honeypot is hidden from assistive tech, not just off-screen.
-  await expect(page.locator('#company')).toHaveCount(1);
-  expect(await page.locator('#company').evaluate((el) => el.closest('[aria-hidden="true"]') !== null)).toBe(true);
+  await expect(page.locator('#hp_token')).toHaveCount(1);
+  expect(await page.locator('#hp_token').evaluate((el) => el.closest('[aria-hidden="true"]') !== null)).toBe(true);
 });
 
 test('a11y: validation errors are announced and linked to their fields', async ({ page }) => {
@@ -304,7 +327,7 @@ test('server rejects a pickup time inside the 4-hour window', async ({ request }
 
 test('the honeypot is accepted but stores nothing', async ({ request }) => {
   const res = await request.post('/api/trip-request', {
-    data: { ...validPayload('honeypot-test'), company: 'spam-bot' },
+    data: { ...validPayload('honeypot-test'), hp_token: 'spam-bot' },
   });
 
   expect(res.status(), 'bots learn nothing from the status').toBe(200);
@@ -535,4 +558,92 @@ test('/ops has no horizontal overflow at 375px', async ({ page }) => {
     const box = await page.locator(sel).boundingBox();
     expect(box!.height, `${sel} is 44px+`).toBeGreaterThanOrEqual(44);
   }
+});
+
+// ── The silent drop (2026-09-25) ─────────────────────────────────────────────
+//
+// Two real submissions rendered "Request received" while trip_requests gained
+// no row. The server answered 200 {ok:true, id:null} on the bot path, and the
+// client read `setDone(json.id ?? 'received')` — so "stored nothing" became a
+// success screen. These are the tests that were missing.
+
+test('the UI does NOT claim success when the server stored nothing', async ({ page }) => {
+  // Exactly the bot-path response shape: accepted, but no row.
+  await page.route('**/api/trip-request', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true, id: null, stored: false }),
+    }),
+  );
+
+  await page.goto('/request');
+  await fillMinimalValidForm(page);
+  await page.getByRole('button', { name: 'Request a Ride' }).click();
+
+  // The success screen must never appear.
+  await expect(page.getByText('Request received')).toHaveCount(0);
+
+  // And the customer must be told, with a way to reach a human.
+  const summary = page.getByTestId('error-summary');
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('could not save your request');
+  await expect(summary).toContainText('704');
+});
+
+test('a stored request still shows success', async ({ page }) => {
+  // The same path with a real id must behave exactly as before — this is the
+  // guard against "fix the drop by breaking every booking".
+  await page.route('**/api/trip-request', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true, id: '8f3c1e2a-0000-4000-8000-000000000001' }),
+    }),
+  );
+
+  await page.goto('/request');
+  await fillMinimalValidForm(page);
+  await page.getByRole('button', { name: 'Request a Ride' }).click();
+
+  await expect(page.getByText('Request received')).toBeVisible();
+});
+
+test('the honeypot is not an autofill category', async ({ page }) => {
+  await page.goto('/request');
+
+  // "company"/"organization" is what browsers and password managers fill.
+  // The field that dropped two bookings must not come back under that name.
+  await expect(page.locator('#company'), 'no field named company').toHaveCount(0);
+  await expect(page.locator('[name="company"]'), 'no input named company').toHaveCount(0);
+  await expect(page.locator('[name="organization"]')).toHaveCount(0);
+
+  const hp = page.locator('#hp_token');
+  await expect(hp).toHaveCount(1);
+  await expect(hp).toHaveAttribute('autocomplete', 'off');
+  await expect(hp).toHaveAttribute('tabindex', '-1');
+  await expect(hp, 'starts empty').toHaveValue('');
+});
+
+test('a too-fast submit is discarded and does not claim success', async ({ request }) => {
+  const res = await request.post('/api/trip-request', {
+    data: { ...validPayload('too-fast-test'), elapsedMs: 10 },
+  });
+
+  expect(res.status(), 'a script learns nothing from the status').toBe(200);
+  const body = await res.json();
+  expect(body.id, 'nothing was stored').toBeNull();
+  expect(body.stored).toBe(false);
+});
+
+test('a human-paced submit is not treated as a bot', async ({ request }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+
+  const res = await request.post('/api/trip-request', {
+    data: { ...validPayload(`paced-${Date.now()}`), elapsedMs: 45_000 },
+  });
+
+  expect(res.status()).toBe(200);
+  const body = await res.json();
+  expect(body.id, 'a real row was created').toBeTruthy();
 });

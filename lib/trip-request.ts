@@ -397,10 +397,23 @@ export function shortRef(id: string): string {
  */
 const LEGACY_SERVICE_ALIASES: Record<string, ServiceLine> = { pet: 'winnie' };
 
+/**
+ * Resolve a retired service-line value to its replacement, or return it
+ * unchanged. Anything unrecognised passes straight through so the caller's own
+ * validation still reports it.
+ *
+ * Used on BOTH inbound paths — the `?service=` query param and the POST body.
+ * A browser holding a bundle cached before the rename posts the old value, and
+ * rejecting that costs a real booking for as long as the cache lives.
+ */
+export function resolveServiceAlias<T extends string | undefined | null>(raw: T): T | ServiceLine {
+  return raw && LEGACY_SERVICE_ALIASES[raw] ? LEGACY_SERVICE_ALIASES[raw] : raw;
+}
+
 /** Normalise an arbitrary `?service=` param to a valid line, defaulting to care. */
 export function coerceServiceLine(raw: string | undefined | null): ServiceLine {
   // Aliases resolve BEFORE the requestable check, or a retired value never
   // reaches its replacement.
-  const aliased = raw && LEGACY_SERVICE_ALIASES[raw] ? LEGACY_SERVICE_ALIASES[raw] : raw;
+  const aliased = resolveServiceAlias(raw);
   return SERVICE_VALUES.includes(aliased as ServiceLine) ? (aliased as ServiceLine) : 'care';
 }

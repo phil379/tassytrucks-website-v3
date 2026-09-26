@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { fullName, tripRequestSchema, UNAVAILABLE_SERVICE_LINES } from '@/lib/trip-request';
+import {
+  fullName,
+  resolveServiceAlias,
+  tripRequestSchema,
+  UNAVAILABLE_SERVICE_LINES,
+} from '@/lib/trip-request';
 import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { fireNotifications } from '@/lib/notifications';
@@ -84,6 +89,30 @@ export async function POST(request: Request) {
       { ok: false, error: 'Too many requests. Please call us at (704) 941-8508.' },
       { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
     );
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Resolve a retired service-line value to its replacement BEFORE anything
+  // looks at it. `pet` became `winnie` on 2026-09-26, and `pet` is now in
+  // UNAVAILABLE_SERVICE_LINES — so a browser still holding a bundle cached from
+  // before the rename posts `pet` and would be refused by the guard below,
+  // never even reaching the zod enum. That is a real booking lost for as long
+  // as the cache lives.
+  //
+  // This has to run ahead of BOTH checks, not just the parse: the unavailable
+  // guard is the earlier one, so aliasing after it would never fire.
+  //
+  // `resolveServiceAlias` is the same function coerceServiceLine uses on the
+  // `?service=` query path, so the two inbound routes cannot drift apart.
+  // ───────────────────────────────────────────────────────────────────────────
+  if (typeof raw.serviceLine === 'string') {
+    const resolved = resolveServiceAlias(raw.serviceLine);
+    if (resolved !== raw.serviceLine) {
+      console.info(
+        `[trip-request] legacy service line "${raw.serviceLine}" resolved to "${resolved}" — stale client bundle`,
+      );
+      raw.serviceLine = resolved;
+    }
   }
 
   // Explicit guard for lines that exist as a product but are not currently

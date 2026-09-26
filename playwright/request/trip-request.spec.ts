@@ -640,10 +640,73 @@ test('a human-paced submit is not treated as a bot', async ({ request }) => {
   test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
 
   const res = await request.post('/api/trip-request', {
-    data: { ...validPayload(`paced-${Date.now()}`), elapsedMs: 45_000 },
+    // Marker MUST carry the `pw-` prefix: the afterAll cleanup is scoped to it.
+    // Without it these rows survive as live `new` bookings, and the 90-minute
+    // escalation cron pages the operator URGENT about each one. Six had already
+    // accumulated that way.
+    data: { ...validPayload(`pw-paced-${Date.now()}`), elapsedMs: 45_000 },
   });
 
   expect(res.status()).toBe(200);
   const body = await res.json();
   expect(body.id, 'a real row was created').toBeTruthy();
+});
+
+// ── Retired service lines resolve, they do not 400 ───────────────────────────
+//
+// The regression guard for every future line rename, not just pet -> winnie.
+// A browser holding a bundle cached from before a rename posts the OLD value.
+// If the API refuses it, that is a real booking lost for as long as the cache
+// lives — and the customer has done nothing wrong.
+//
+// Note the two spellings: the API contract is camelCase `serviceLine`; the
+// column it lands in is `service_line`.
+
+test('a POST with a retired service line is stored under its replacement', async ({
+  request,
+  playwright,
+}) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+
+  const marker = `pw-alias-${Date.now()}`;
+
+  // `pet` is in UNAVAILABLE_SERVICE_LINES and out of the zod enum. Without the
+  // alias this is a 400 from the unavailable guard, which runs before the parse.
+  // validPayload() carries Tassy Care's detail answers; the pet line asks its
+  // own four required questions, so they travel with the service line.
+  const res = await request.post('/api/trip-request', {
+    data: {
+      ...validPayload(marker),
+      serviceLine: 'pet',
+      mobility: 'pet_carrier',
+      tripDetails: { pet_name: 'Rex', species: 'dog', rabies: 'current', carrier: 'owner' },
+    },
+  });
+
+  expect(res.status(), 'a stale client is not punished').toBe(200);
+  const body = await res.json();
+  expect(body.ok).toBe(true);
+  expect(body.id, 'a row was actually stored').toBeTruthy();
+
+  // The stored value must be the canonical one, or the ops board and the
+  // Stripe payment link title would both show a retired string to a customer.
+  const api = await playwright.request.newContext();
+  const row = await api.get(
+    `${SUPABASE_URL}/rest/v1/trip_requests?select=service_line&id=eq.${body.id}`,
+    { headers: { apikey: SERVICE_KEY!, Authorization: `Bearer ${SERVICE_KEY!}` } },
+  );
+  expect(row.status()).toBe(200);
+  const [stored] = await row.json();
+  expect(stored.service_line, 'stored as winnie, not pet').toBe('winnie');
+  await api.dispose();
+});
+
+test('an unknown service line is still rejected', async ({ request }) => {
+  // The alias must not become a catch-all that launders any junk into `care`.
+  const res = await request.post('/api/trip-request', {
+    data: { ...validPayload('pw-bogus-line'), serviceLine: 'not-a-service' },
+  });
+
+  expect(res.status(), 'nonsense is still a 400').toBe(400);
+  expect((await res.json()).ok).toBe(false);
 });

@@ -13,9 +13,12 @@ export const metadata: Metadata = {
 export default function FacilitySignupPage({
   searchParams,
 }: {
-  searchParams?: { source?: string; type?: string };
+  searchParams?: { source?: string; type?: string; rep?: string };
 }) {
   const source = searchParams?.source ?? 'partners-signup';
+  // No `rep` means nobody is credited — a real outcome, flagged for manual
+  // assignment rather than guessed at.
+  const rep = searchParams?.rep ?? null;
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
@@ -30,7 +33,7 @@ export default function FacilitySignupPage({
       </p>
 
       <div className="mt-10">
-        <FacilitySignupForm source={source} />
+        <FacilitySignupForm source={source} rep={rep} />
       </div>
 
       <ul className="mx-auto mt-10 grid max-w-lg gap-3 text-sm text-[color:var(--muted)]">

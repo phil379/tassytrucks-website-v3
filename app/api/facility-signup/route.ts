@@ -75,13 +75,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'Please check the form.', fieldErrors }, { status: 400 });
   }
 
-  const { facilityName, workEmail } = parsed.data;
+  const { facilityName, workEmail, rep } = parsed.data;
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
 
   let facilityId: string;
   let created: boolean;
   try {
-    const result = await createOrFindFacility({ facilityName, workEmail, source });
+    const result = await createOrFindFacility({ facilityName, workEmail, source, rep });
     facilityId = result.facilityId;
     created = result.created;
   } catch (err) {

@@ -163,6 +163,25 @@ export const facilitySignupSchema = z.object({
   workEmail: z.string().trim().email('Enter a valid work email'),
   hp_token: z.string().optional().nullable(),
   elapsedMs: z.coerce.number().int().min(0).optional().nullable(),
+
+  /**
+   * The sales rep who owns this signup, from `/partners/signup?rep=<slug>`.
+   *
+   * Attribution rides the URL so a hospital never types a Tassy employee's
+   * name — it cannot be faked or mistyped. Absent means nobody gets credit and
+   * the account needs manual assignment, which is a real outcome, not an error,
+   * so this is optional.
+   *
+   * Slug-shaped only. A stray value here would otherwise be written straight
+   * into the column that drives residual commission.
+   */
+  rep: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$/, 'Unrecognised referral link')
+    .optional()
+    .nullable(),
 });
 
 export type FacilitySignupInput = z.infer<typeof facilitySignupSchema>;

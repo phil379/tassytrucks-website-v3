@@ -37,6 +37,13 @@ export default defineConfig({
        * you already had running. Restart it if a spec starts seeing 429.
        */
       TRIP_REQUEST_RATE_LIMIT: '1000',
+      /**
+       * Same reason, second route. /api/facility-signup allows 5 per IP per
+       * hour; the facility spec posts nine times from one loopback address, so
+       * the later tests 429 for a reason unrelated to what they assert. That is
+       * how four of them came back red the first time they ran.
+       */
+      FACILITY_SIGNUP_RATE_LIMIT: '1000',
     },
   },
 });

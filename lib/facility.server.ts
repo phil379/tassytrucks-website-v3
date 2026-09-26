@@ -105,6 +105,8 @@ export async function createOrFindFacility(input: {
   facilityName: string;
   workEmail: string;
   source: string | null;
+  /** Rep slug from `?rep=`. Sets BOTH ownership columns. Null is valid. */
+  rep?: string | null;
 }): Promise<{ facilityId: string; userId: string; created: boolean }> {
   const db = supabaseAdmin();
   const email = input.workEmail.trim();
@@ -130,6 +132,13 @@ export async function createOrFindFacility(input: {
         status: 'pending',
         primary_contact_email: email,
         referral_source: input.source,
+        // Both start as the same person and then diverge: referred_by_rep is
+        // PERMANENT and drives residual commission; account_manager is who
+        // services the account today and can be reassigned. Writing only one
+        // of them here would silently break commission the first time an
+        // account changed hands.
+        referred_by_rep: input.rep ?? null,
+        account_manager: input.rep ?? null,
       })
       .select('id')
       .single(),

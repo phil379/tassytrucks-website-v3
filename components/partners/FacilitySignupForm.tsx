@@ -16,7 +16,13 @@ import { facilitySignupSchema } from '@/lib/facility';
  * `setDone(json.id ?? 'received')` turned a null id into a truthy value. A
  * signup that was not stored must never show a success screen.
  */
-export default function FacilitySignupForm({ source }: { source?: string }) {
+export default function FacilitySignupForm({
+  source,
+  rep,
+}: {
+  source?: string;
+  rep?: string | null;
+}) {
   const [done, setDone] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -40,6 +46,7 @@ export default function FacilitySignupForm({ source }: { source?: string }) {
       hp_token: String(fd.get('hp_token') ?? ''),
       elapsedMs: Date.now() - renderedAtRef.current,
       source: source ?? 'partners-signup',
+      rep: rep ?? null,
     };
 
     // Validate with the same schema the server uses, so the two can never

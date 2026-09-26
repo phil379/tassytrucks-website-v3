@@ -97,7 +97,7 @@ export async function POST(request: Request) {
   let emailSent = false;
   try {
     const base = process.env.NEXT_PUBLIC_SITE_URL ?? '';
-    const link = await generateFacilityMagicLink(workEmail, `${base}/facility/welcome`);
+    const link = await generateFacilityMagicLink(workEmail, `${base}/facility/confirm`);
 
     await sendRichEmail({
       to: workEmail,

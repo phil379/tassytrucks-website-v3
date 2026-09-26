@@ -68,6 +68,42 @@ export async function facilityByEmail(email: string): Promise<{
   return { facility, userId: user.id, role: user.role };
 }
 
+/**
+ * The signed-in facility user AND their facility, by auth id.
+ *
+ * Same shape as facilityByEmail on purpose: the session resolver takes either
+ * path and must not care which. facilityByAuthUser returns the facility alone
+ * and is kept for callers that only need that.
+ */
+export async function facilityContextByAuthUser(authUserId: string): Promise<{
+  facility: FacilityRow;
+  userId: string;
+  role: string;
+} | null> {
+  const db = supabaseAdmin();
+  const user = ok<{ id: string; facility_id: string; role: string; status: string } | null>(
+    await db
+      .from(FACILITY_USERS_TABLE)
+      .select('id, facility_id, role, status')
+      .eq('auth_user_id', authUserId)
+      .maybeSingle(),
+    'facility_users context by auth id',
+  );
+  if (!user || user.status === 'disabled') return null;
+
+  const facility = ok<FacilityRow | null>(
+    await db
+      .from(FACILITIES_TABLE)
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required')
+      .eq('id', user.facility_id)
+      .maybeSingle(),
+    'facilities context by auth id',
+  );
+  if (!facility) return null;
+
+  return { facility, userId: user.id, role: user.role };
+}
+
 export async function facilityByAuthUser(authUserId: string) {
   const db = supabaseAdmin();
   const user = ok<{ facility_id: string } | null>(
@@ -169,24 +205,56 @@ export async function createOrFindFacility(input: {
  * Supabase's own mailer, so the message looks like Tassy and not like a
  * platform. The link is single-use and short-lived; nothing about it is stored.
  */
-export async function generateFacilityMagicLink(email: string, redirectTo: string): Promise<string> {
+/**
+ * Mint the setup link.
+ *
+ * Returns OUR OWN /facility/confirm URL carrying the hashed token, not
+ * Supabase's `action_link`. The difference matters: an action_link for a
+ * non-PKCE magic link hands the session back in the URL **fragment**, which a
+ * Server Component cannot read — the wizard would load with no idea who
+ * arrived. A token_hash is exchanged server-side with verifyOtp, so the session
+ * cookie is set before the first screen renders and no token ever reaches
+ * client JavaScript.
+ */
+export async function generateFacilityMagicLink(email: string, confirmBase: string): Promise<string> {
   const db = supabaseAdmin();
   const { data, error } = await db.auth.admin.generateLink({
     type: 'magiclink',
     email,
-    options: { redirectTo },
   });
   if (error) throw new Error(`magic link: ${error.message}`);
 
-  const url = data?.properties?.action_link;
-  if (!url) throw new Error('magic link: Supabase returned no action_link');
-  return url;
+  const hashed = data?.properties?.hashed_token;
+  if (!hashed) throw new Error('magic link: Supabase returned no hashed_token');
+
+  /**
+   * Carry back the type Supabase ACTUALLY minted, not the type we asked for.
+   *
+   * Asking for `magiclink` does not guarantee you get one. A facility signs up
+   * before it has an auth user — createOrFindFacility writes the facilities row,
+   * and this call is what brings the auth user into existence — so for every
+   * genuinely new partner Supabase mints a token whose verification_type is
+   * `signup`, and /auth/v1/verify rejects a signup token presented as
+   * `magiclink` with "Email link is invalid or has expired". Hardcoding
+   * `magiclink` in the confirm URL therefore broke the wizard for 100% of first
+   * arrivals while working perfectly for anyone who had signed in before.
+   *
+   * Proven against knllznbdpejoaiexmdea 2026-09-26: generate_link{magiclink} on
+   * an unknown email returns 200 with verification_type=signup; verify with
+   * type=magiclink → 403, with type=signup → 200 and a session.
+   */
+  const verification = data?.properties?.verification_type ?? 'magiclink';
+
+  return (
+    `${confirmBase}?token_hash=${encodeURIComponent(hashed)}` +
+    `&type=${encodeURIComponent(verification)}`
+  );
 }
 
 /** Bind the auth user to the facility user the first time they sign in. */
 export async function linkAuthUser(facilityUserId: string, authUserId: string): Promise<void> {
   const db = supabaseAdmin();
-  ok(
+  const rows = ok<{ id: string }[]>(
     await db
       .from(FACILITY_USERS_TABLE)
       .update({ auth_user_id: authUserId, status: 'active', last_seen_at: new Date().toISOString() })
@@ -194,6 +262,19 @@ export async function linkAuthUser(facilityUserId: string, authUserId: string): 
       .select('id'),
     'link auth user',
   );
+
+  /**
+   * An update that matched nothing must not look like one that worked.
+   *
+   * PostgREST returns {error: null, data: []} when the filter matches no row —
+   * a deleted user, a row RLS hides, an id that never existed — and ok() only
+   * inspects `error`. Binding the session is the step every screen behind it
+   * depends on, so silence here would strand the partner on a wizard whose
+   * every save fails. Same class of bug as the two CHECK-constraint P0s.
+   */
+  if (!rows || rows.length === 0) {
+    throw new Error(`link auth user: no facility_users row matched id ${facilityUserId}`);
+  }
 }
 
 /* ───────────────────────────────────────────────────────── booking context */

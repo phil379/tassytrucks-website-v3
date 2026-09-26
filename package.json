@@ -13,6 +13,7 @@
     "verify": "bun run typecheck && bun run build && bun run test:smoke && bun run audit:links"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.1",
     "lucide-react": "^0.400.0",
     "next": "14.2.5",

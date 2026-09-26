@@ -120,8 +120,18 @@ if (leaks.length) {
 // ── the dead booking surface must not come back ─────────────────────────
 const sourceFiles = ['app', 'components'].flatMap(walk);
 
+/**
+ * `book.<slug>` must be an IDENTIFIER ACCESS, not an English sentence.
+ *
+ * The dot used to be matched as `book\s*\.\s*\w+`, and that whitespace made the
+ * rule fire on prose: "Invite the people who will actually book. You can add
+ * more later" reads as `book` `.` `You` and failed the facility wizard for a
+ * sentence, not a link. Requiring the dot to sit flush against a lowercase
+ * identifier matches every real key in `book` (lib/saas-links.ts: care, nemt,
+ * winnie, …) and cannot match the start of a new sentence.
+ */
 const revived = sourceFiles.filter((f) =>
-  /\b(book\s*\.\s*\w+|seoBook\s*\(|WINNIE_BOOK_URL)\b/.test(stripComments(readFileSync(f, 'utf8'))),
+  /\bbook\.[a-z]\w*|\bseoBook\s*\(|\bWINNIE_BOOK_URL\b/.test(stripComments(readFileSync(f, 'utf8'))),
 );
 
 if (revived.length) {

@@ -19,6 +19,12 @@ export default defineConfig({
   reporter: [['line']],
   use: {
     baseURL: 'http://localhost:3941',
+    /**
+     * Keep a trace for anything that fails or flakes. A wizard spec that lands
+     * on the wrong page fails as a locator timeout with no page snapshot, which
+     * is a dead end at 3am — the trace has the URL, the DOM and the network.
+     */
+    trace: 'retain-on-failure',
   },
   webServer: {
     command: 'bunx next start -p 3941',

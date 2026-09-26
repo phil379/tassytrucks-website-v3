@@ -42,6 +42,17 @@ function email(tag: string) {
 }
 
 /** Create the facility + user a magic link would land on, and return its link. */
+/**
+ * Auth users minted by THIS run, so afterAll can delete exactly those.
+ *
+ * generate_link creates the auth user as a side effect, and nothing here used
+ * to remove it — 302 `@pw-facility.invalid` users had piled up in tassy-ops by
+ * the time anyone looked. Scoped to this run's emails on purpose: a blanket
+ * delete-by-domain would also sweep whatever an earlier run left behind, which
+ * is a bulk delete against a live project and not this hook's decision to make.
+ */
+const mintedAuthUsers = new Set<string>();
+
 async function seedAndLink(api: APIRequestContext, workEmail: string, rep: string | null = null) {
   const fac = await api.post(`${SUPABASE_URL}/rest/v1/facilities`, {
     headers: { ...h(), Prefer: 'return=representation' },
@@ -70,6 +81,7 @@ async function seedAndLink(api: APIRequestContext, workEmail: string, rep: strin
   });
   expect(link.status(), 'generate magic link').toBe(200);
   const body = await link.json();
+  if (body.id) mintedAuthUsers.add(body.id as string);
   const tokenHash = body.hashed_token as string;
   expect(tokenHash, 'a hashed token came back').toBeTruthy();
 
@@ -134,6 +146,13 @@ test.afterAll(async ({ playwright }) => {
   for (const id of [...new Set(ids)]) {
     await api.delete(`${SUPABASE_URL}/rest/v1/facilities?id=eq.${id}`, { headers: h() });
   }
+
+  // The auth users generate_link created along the way. Without this they
+  // accumulate in the project's auth table forever.
+  for (const authId of mintedAuthUsers) {
+    await api.delete(`${SUPABASE_URL}/auth/v1/admin/users/${authId}`, { headers: h() });
+  }
+
   await api.dispose();
 });
 

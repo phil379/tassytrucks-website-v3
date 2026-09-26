@@ -147,6 +147,21 @@ test.afterAll(async ({ playwright }) => {
     await api.delete(`${SUPABASE_URL}/rest/v1/facilities?id=eq.${id}`, { headers: h() });
   }
 
+  /**
+   * Orphans: facilities reachable by NO facility_users row.
+   *
+   * The sweep above finds a facility only THROUGH its facility_users row, so a
+   * run interrupted between seedAndLink's two inserts — Ctrl-C, a killed task, a
+   * laptop that sleeps mid-suite — strands the facility where cleanup can never
+   * see it again. Six of them had accumulated in tassy-ops that way. Deleting by
+   * the contact email closes the gap, and the address is the same
+   * RFC 2606 .invalid domain, so it cannot match a real partner.
+   */
+  await api.delete(
+    `${SUPABASE_URL}/rest/v1/facilities?primary_contact_email=like.*@${TEST_DOMAIN}`,
+    { headers: h() },
+  );
+
   // The auth users generate_link created along the way. Without this they
   // accumulate in the project's auth table forever.
   for (const authId of mintedAuthUsers) {

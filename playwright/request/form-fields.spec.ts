@@ -19,7 +19,7 @@ import {
 
 test.describe('mobility options follow the service line', () => {
   test('a pet transport never offers a walker or a cane', () => {
-    const values = mobilityOptionsFor('pet').map((m) => m.value as string);
+    const values = mobilityOptionsFor('winnie').map((m) => m.value as string);
     expect(values).not.toContain('walker');
     expect(values).not.toContain('wheelchair');
     expect(values).not.toContain('ambulatory');
@@ -36,7 +36,7 @@ test.describe('mobility options follow the service line', () => {
   });
 
   test('the question itself changes, not just the options', () => {
-    expect(mobilityLabelFor('pet')).toBe('How does your pet travel?');
+    expect(mobilityLabelFor('winnie')).toBe('How does your pet travel?');
     expect(mobilityLabelFor('care')).toBe('Mobility');
     expect(passengerLabelFor('pet')).toBe('Pets');
     expect(passengerLabelFor('care')).toBe('Passengers');
@@ -98,8 +98,8 @@ test.describe('a hand-crafted POST cannot mismatch the passenger', () => {
 
   test('the matching pairs are accepted', () => {
     for (const [serviceLine, mobility] of [
-      ['pet', 'pet_carrier'],
-      ['pet', 'other'],
+      ['winnie', 'pet_carrier'],
+      ['winnie', 'other'],
       ['care', 'wheelchair'],
       ['care', 'other'],
     ] as const) {
@@ -212,7 +212,7 @@ test.describe('the rendered form', () => {
     await expect(page.locator('label[for="mobility"]')).toHaveText(/Mobility/);
     await expect(page.locator('#mobility option[value="walker"]')).toHaveCount(1);
 
-    await page.locator('#serviceLine').selectOption('pet');
+    await page.locator('#serviceLine').selectOption('winnie');
 
     await expect(page.locator('label[for="mobility"]')).toHaveText(/How does your pet travel\?/);
     await expect(page.locator('#mobility option[value="walker"]')).toHaveCount(0);

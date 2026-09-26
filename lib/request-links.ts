@@ -28,7 +28,7 @@ export type Vertical = 'nemt' | 'vip' | 'winnie' | 'renew' | 'recover' | 'school
 export const SERVICE_BY_VERTICAL: Record<Vertical, string> = {
   nemt: 'care',
   vip: 'concierge',
-  winnie: 'pet',
+  winnie: 'winnie',
   renew: 'concierge',
   recover: 'recovery',
   school: 'scholar',
@@ -45,7 +45,7 @@ export const request = {
   ride: REQUEST_BASE,
   nemt: to('care'),
   vip: to('concierge'),
-  winnie: to('pet'),
+  winnie: to('winnie'),
   renew: to('concierge'),
   recover: to('recovery'),
   school: to('scholar'),

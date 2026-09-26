@@ -36,6 +36,9 @@ const ALL_SERVICE_LINES = [
   { value: 'care', label: 'Tassy Care — medical appointments', short: 'Tassy Care', href: '/nemt' },
   { value: 'recovery', label: 'Tassy Recovery — ride home after a procedure', short: 'Tassy Recovery', href: '/recover' },
   { value: 'concierge', label: 'Tassy Concierge — airport, golf, events', short: 'Tassy Concierge', href: '/vip' },
+  { value: 'winnie', label: 'Winnie Ride — pet transport', short: 'Winnie Ride', href: '/winnie' },
+  // Legacy alias for `winnie`, retired below rather than deleted so rows
+  // written before 2026-09-26 still render a real name in /ops.
   { value: 'pet', label: 'Winnie Ride — pet transport', short: 'Winnie Ride', href: '/winnie' },
   { value: 'scholar', label: 'Tassy Scholar — school and after-school', short: 'Tassy Scholar', href: '/school' },
   { value: 'wellness', label: 'Tassy Wellness — IV therapy, med-spa', short: 'Tassy Wellness', href: '/renew' },
@@ -56,7 +59,7 @@ export type ServiceLine = (typeof ALL_SERVICE_LINES)[number]['value'];
  * the server, and `serviceLabel()` still resolves it so existing rows in the
  * ops queue keep rendering a real name.
  */
-export const UNAVAILABLE_SERVICE_LINES: readonly ServiceLine[] = ['guardian', 'wellness'];
+export const UNAVAILABLE_SERVICE_LINES: readonly ServiceLine[] = ['guardian', 'wellness', 'pet'];
 
 export function isRequestable(value: string): value is ServiceLine {
   return SERVICE_VALUES.includes(value as ServiceLine);
@@ -105,7 +108,7 @@ export const PET_MOBILITY_OPTIONS = [
 ] as const;
 
 /** Service lines whose passenger is an animal. */
-export const PET_LINES: readonly ServiceLine[] = ['pet'];
+export const PET_LINES: readonly ServiceLine[] = ['winnie', 'pet'];
 
 export function isPetLine(service: string): boolean {
   return PET_LINES.includes(service as ServiceLine);
@@ -382,7 +385,22 @@ export function shortRef(id: string): string {
   return id.slice(0, 8);
 }
 
+/**
+ * Legacy `?service=` values that must land somewhere real.
+ *
+ * `pet` was the canonical pet line until 2026-09-26. It is still in
+ * ALL_SERVICE_LINES so historical rows render, but it is no longer requestable
+ * — so without this alias an inbound /request?service=pet link (there are
+ * seven live SEO pages' worth, plus anything already shared) would fail the
+ * requestable check and silently degrade to `care`. A pet owner would land on
+ * the medical form.
+ */
+const LEGACY_SERVICE_ALIASES: Record<string, ServiceLine> = { pet: 'winnie' };
+
 /** Normalise an arbitrary `?service=` param to a valid line, defaulting to care. */
 export function coerceServiceLine(raw: string | undefined | null): ServiceLine {
-  return SERVICE_VALUES.includes(raw as ServiceLine) ? (raw as ServiceLine) : 'care';
+  // Aliases resolve BEFORE the requestable check, or a retired value never
+  // reaches its replacement.
+  const aliased = raw && LEGACY_SERVICE_ALIASES[raw] ? LEGACY_SERVICE_ALIASES[raw] : raw;
+  return SERVICE_VALUES.includes(aliased as ServiceLine) ? (aliased as ServiceLine) : 'care';
 }

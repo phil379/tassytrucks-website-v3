@@ -26,13 +26,13 @@ const PAGES: PageSpec[] = [
   { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['service=care', 'utm_source=seo-compare'], table: true },
   // MEGA_SEO_002
   { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
-  { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-pet'], winnie: true },
-  { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['service=pet', 'utm_source=seo-vet', 'purpose=vet'], winnie: true },
-  { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-postop', 'sedated=1'], winnie: true },
-  { path: '/charlotte/pet-boarding-transport', h1: 'pet boarding', cta: ['service=pet', 'utm_source=seo-boarding'], winnie: true },
-  { path: '/charlotte/calm-pet-transport', h1: 'calm pet transport in charlotte', cta: ['service=pet', 'utm_source=seo-calm', 'temperament=anxious'], winnie: true },
-  { path: '/charlotte/dog-grooming-pickup', h1: 'dog grooming pickup service in charlotte', cta: ['service=pet', 'utm_source=seo-grooming'], winnie: true },
-  { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', h1: 'uber pet', cta: ['service=pet', 'utm_source=seo-compare-pet'], winnie: true, table: true },
+  { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['service=winnie', 'utm_source=seo-pet'], winnie: true },
+  { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['service=winnie', 'utm_source=seo-vet', 'purpose=vet'], winnie: true },
+  { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['service=winnie', 'utm_source=seo-postop', 'sedated=1'], winnie: true },
+  { path: '/charlotte/pet-boarding-transport', h1: 'pet boarding', cta: ['service=winnie', 'utm_source=seo-boarding'], winnie: true },
+  { path: '/charlotte/calm-pet-transport', h1: 'calm pet transport in charlotte', cta: ['service=winnie', 'utm_source=seo-calm', 'temperament=anxious'], winnie: true },
+  { path: '/charlotte/dog-grooming-pickup', h1: 'dog grooming pickup service in charlotte', cta: ['service=winnie', 'utm_source=seo-grooming'], winnie: true },
+  { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', h1: 'uber pet', cta: ['service=winnie', 'utm_source=seo-compare-pet'], winnie: true, table: true },
 ];
 
 test.beforeAll(() => {

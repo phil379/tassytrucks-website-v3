@@ -268,6 +268,8 @@ const CARD_FOR_LINE: Partial<Record<ServiceLine, Card>> = {
   care: CARE,
   recovery: RECOVERY,
   concierge: CONCIERGE,
+  winnie: WINNIE,
+  // Legacy alias — rows written before 2026-09-26 still price correctly.
   pet: WINNIE,
 };
 

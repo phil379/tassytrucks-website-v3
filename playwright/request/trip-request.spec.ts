@@ -10,7 +10,7 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 
 // 'guardian' is deliberately absent: Tassy Guardian needs CNA-trained drivers
 // the company does not have, so it is not requestable.
-const SERVICES = ['care', 'recovery', 'concierge', 'pet', 'scholar'] as const;
+const SERVICES = ['care', 'recovery', 'concierge', 'winnie', 'scholar'] as const;
 
 const MEDICAL_WARNING = 'Please do not include medical details, diagnoses, or procedure names.';
 const CONFIRMATION = 'We confirm every request by phone or text within 2 hours during business hours.';
@@ -461,7 +461,7 @@ test('service pages route their CTA to the matching service line', async ({ page
     '/recover': 'service=recovery',
     '/vip': 'service=concierge',
     '/renew': 'service=concierge',
-    '/winnie': 'service=pet',
+    '/winnie': 'service=winnie',
     '/school': 'service=scholar',
   };
 

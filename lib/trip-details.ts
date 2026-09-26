@@ -446,6 +446,8 @@ const SCHOLAR: DetailSection = {
 
 /** The section for a line, or null when that line asks nothing extra. */
 export const TRIP_DETAILS: Partial<Record<ServiceLine, DetailSection>> = {
+  winnie: PET,
+  // Legacy alias, so a historical row still renders its pet answers.
   pet: PET,
   care: CARE,
   recovery: RECOVERY,

@@ -247,6 +247,42 @@ export default function PartnersPage() {
           a: 'For facility contracts, we bill the facility directly on net-30 terms through the facility portal, with line-item reconciliation for every trip. If your trips run through a Medicaid broker instead, billing follows the broker arrangement — we will map it out before the contract is signed.',
         },
       ]}
+      /* Credentials block, rendered directly above the FAQ whose first question
+         is "What documentation can you provide for our compliance team?".
+         Everything listed here is documentable -- no claim goes in this block
+         that Tassy cannot produce on request. */
+      beforeFaq={
+        <div className="rounded-tile border border-line p-7" style={{ background: 'var(--surface)' }}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+            {/* White chip: the medal's outer ring is navy and the theme is dark.
+                The badge is not recoloured or cropped. */}
+            <div className="rounded-full bg-white p-2 shrink-0 self-start sm:self-center">
+              <img
+                src="/brand/hirevets-2023-gold.png"
+                alt="2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor"
+                width={96}
+                height={96}
+                loading="lazy"
+                className="h-20 w-20 block"
+              />
+            </div>
+            <div>
+              <div className="eyebrow mb-2">Credentials</div>
+              <h2 className="serif text-2xl font-semibold leading-snug">
+                2023 HIRE Vets Medallion Award &mdash; Gold
+              </h2>
+              <p className="mt-2 ink-soft leading-relaxed max-w-2xl">
+                Awarded by the U.S. Department of Labor to employers who recruit, hire
+                and retain veterans. Alongside it we hold SDVOSB certification,
+                MBE, DBE and SBE certification, and federal operating authority under
+                USDOT #3104152 and MC #79222. Certificates of insurance, driver
+                credentials and vehicle credentials are available to your compliance
+                team on request.
+              </p>
+            </div>
+          </div>
+        </div>
+      }
       relatedLinks={[
         { label: 'Tassy Care rides', href: '/charlotte/nemt-rides' },
         { label: 'Dialysis transport', href: '/charlotte/dialysis-transport' },

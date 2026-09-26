@@ -31,6 +31,27 @@ export default function Footer() {
             <div>USDOT #3104152 · MC #79222</div>
             <div>SDVOSB Certified · Charlotte, North Carolina</div>
           </div>
+
+          {/* HIRE Vets medallion. White chip because the footer is dark and the
+              medal's outer ring is navy -- without a light backing the ring
+              disappears and it reads as a floating gold disc. The badge is not
+              recoloured or cropped. */}
+          <div className="mt-6 flex items-center gap-3">
+            <div className="rounded-full bg-white p-1.5 shrink-0">
+              <img
+                src="/brand/hirevets-2023-gold.png"
+                alt="2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor"
+                width={56}
+                height={56}
+                loading="lazy"
+                className="h-11 w-11 block"
+              />
+            </div>
+            <div className="text-xs opacity-70 leading-snug">
+              <div className="font-semibold opacity-100">2023 HIRE Vets Medallion</div>
+              <div>Gold Award · U.S. Dept. of Labor</div>
+            </div>
+          </div>
         </div>
 
         {/* Services */}

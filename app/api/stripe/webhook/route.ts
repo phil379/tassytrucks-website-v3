@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { verifyWebhookSignature } from '@/lib/stripe';
+import { notifyOperatorPaid } from '@/lib/notifications';
 
 /**
  * POST /api/stripe/webhook — Stripe tells us the money arrived.
@@ -72,11 +73,15 @@ export async function POST(request: Request) {
   // Two ways to find the trip, because one of them can go missing. Metadata is
   // what we set on the payment link; the link id is the fallback for the day
   // Stripe stops copying metadata onto the session it creates.
+  // Only rows NOT already paid. Stripe retries on its own schedule, and a
+  // retry must not re-stamp paid_at or fire a second alert.
+  const base = db.from(TRIP_REQUESTS_TABLE).update(patch).neq('payment_status', 'paid');
+
   const tripId = session.metadata?.trip_request_id;
   const query = tripId
-    ? db.from(TRIP_REQUESTS_TABLE).update(patch).eq('id', tripId)
+    ? base.eq('id', tripId)
     : session.payment_link
-      ? db.from(TRIP_REQUESTS_TABLE).update(patch).eq('stripe_payment_link_id', session.payment_link)
+      ? base.eq('stripe_payment_link_id', session.payment_link)
       : null;
 
   if (!query) {
@@ -92,9 +97,24 @@ export async function POST(request: Request) {
   }
 
   if (!data || data.length === 0) {
+    // Zero rows now means one of two very different things: a Stripe retry of
+    // a payment already recorded, or a payment for a request that isn't there.
+    const locator = tripId
+      ? db.from(TRIP_REQUESTS_TABLE).select('id').eq('id', tripId)
+      : db.from(TRIP_REQUESTS_TABLE).select('id').eq('stripe_payment_link_id', session.payment_link!);
+
+    const { data: existing } = await locator;
+    if (existing && existing.length > 0) {
+      return NextResponse.json({ ok: true, ignored: 'already paid' });
+    }
+
     console.error('[stripe] paid session matched no request:', session.id);
     return NextResponse.json({ ok: true, ignored: 'no matching request' });
   }
+
+  // The money is recorded. Only now does anyone get told — and a failed alert
+  // must not undo a stored payment.
+  await notifyOperatorPaid({ id: data[0].id });
 
   return NextResponse.json({ ok: true, updated: data.length });
 }

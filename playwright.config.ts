@@ -26,12 +26,24 @@ export default defineConfig({
      */
     trace: 'retain-on-failure',
   },
-  webServer: {
-    command: 'bunx next start -p 3941',
-    port: 3941,
-    reuseExistingServer: true,
-    timeout: 60_000,
-    env: {
+  /**
+   * TWO servers, deliberately.
+   *
+   * 3941 runs the real configuration, including the real NTFY_TOPIC — the
+   * PII spec asserts against messages actually published to that topic, so
+   * redirecting the sink globally silently turns that test into one that
+   * polls an empty topic and passes for the wrong reason. It nearly did.
+   *
+   * 3943 is the Stripe webhook's rig: a known signing secret and a push sink
+   * on a loopback port the specs start, count and kill.
+   */
+  webServer: [
+    {
+      command: 'bunx next start -p 3941',
+      port: 3941,
+      reuseExistingServer: true,
+      timeout: 60_000,
+      env: {
       /**
        * The suite submits far more than a real visitor would, and every spec
        * hits the server from the same loopback address. At the production
@@ -52,6 +64,29 @@ export default defineConfig({
       FACILITY_SIGNUP_RATE_LIMIT: '1000',
       /** Same reason, third route — the school specs post more than 5 times. */
       SCHOOL_BOOKING_RATE_LIMIT: '1000',
+      },
     },
-  },
+    {
+      command: 'bunx next start -p 3943',
+      port: 3943,
+      reuseExistingServer: true,
+      timeout: 60_000,
+      env: {
+        /**
+         * A KNOWN signing secret. Deliberately not the real one: a test that
+         * depends on a production secret being present on a laptop is a test
+         * that skips, and a payment path is the last place to accept that.
+         */
+        STRIPE_WEBHOOK_SECRET: 'whsec_pw_test_secret',
+        /**
+         * The push sink, pointed at a loopback port the specs own. Capture
+         * server up = "was the operator told?" is observable. Capture server
+         * down = connection refused, which is the shape of ntfy being down and
+         * is how the resilience test proves a dead sink cannot undo a payment.
+         */
+        NTFY_TOPIC: 'pw-test-topic',
+        NTFY_BASE_URL: 'http://127.0.0.1:3942',
+      },
+    },
+  ],
 });

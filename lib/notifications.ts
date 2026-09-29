@@ -446,3 +446,30 @@ export async function notifyOperatorUrgent(row: { id: string }): Promise<void> {
     throw new Error(`no escalation sink delivered${reasons ? `: ${reasons}` : ''}`);
   }
 }
+
+/**
+ * The money arrived. Tell the operator.
+ *
+ * Deliberately UNLIKE notifyOperatorUrgent: this NEVER throws. Its caller is
+ * the Stripe webhook, and a non-2xx there makes Stripe retry a payment we have
+ * already stored. A dead push service must not turn a recorded payment into a
+ * replayed one.
+ *
+ * PII RULE applies — see the header. Ref only. No name, no amount, no address.
+ */
+export async function notifyOperatorPaid(row: { id: string }): Promise<void> {
+  const ref = shortRef(row.id);
+  const message: PushMessage = {
+    title: 'PAID - ready to assign',
+    body: `Ref ${ref}`,
+    priority: 'high',
+    tags: ['moneybag'],
+  };
+
+  const results = await Promise.allSettled([pushToNtfy(message), pushToZapier(ref, message)]);
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('[stripe] paid alert leg failed for', ref, r.reason);
+    }
+  }
+}

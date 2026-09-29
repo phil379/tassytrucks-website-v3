@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AddressAutocomplete from '@/components/request/AddressAutocomplete';
+import SchoolPicker from '@/components/school/SchoolPicker';
 import { PolicyBody } from '@/components/school/PolicyBody';
 import {
   AM_TIMES,
@@ -40,6 +41,7 @@ type ChildForm = {
   last_name: string;
   grade: string;
   school_name: string;
+  school_id: string;
   school_address: string;
   emergency_contact_name: string;
   emergency_contact_phone: string;
@@ -96,6 +98,7 @@ export default function SchoolSetupWizard({
     last_name: '',
     grade: '',
     school_name: '',
+    school_id: '',
     school_address: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
@@ -193,7 +196,12 @@ export default function SchoolSetupWizard({
         body: JSON.stringify({
           plan: plan.slug,
           parent,
-          child: { ...child, grade: child.grade || null, safety_note: child.safety_note || null },
+          child: {
+            ...child,
+            grade: child.grade || null,
+            safety_note: child.safety_note || null,
+            school_id: child.school_id || null,
+          },
           schedule: sched,
           policies: Object.fromEntries(
             SCHOOL_POLICIES.map((p) => [p.key, { accepted: true as const, ts }]),
@@ -404,9 +412,28 @@ function ChildStep({
       <Field htmlFor="grade" labelText="Grade" hint="Optional.">
         <input id="grade" className={field} value={child.grade} onChange={(e) => set('grade', e.target.value)} placeholder="3rd" />
       </Field>
-      <Field htmlFor="schoolName" labelText="School name">
-        <input id="schoolName" className={field} value={child.school_name} onChange={(e) => set('school_name', e.target.value)} />
-      </Field>
+      {/*
+        Picked from the list, not typed. A run is several children going to the
+        SAME school, so a free-typed name cannot be grouped — and grouping is
+        where the margin in Scholar lives. Picking also fills the address, which
+        is one fewer thing for a parent to look up.
+      */}
+      <SchoolPicker
+        nameField="school_name_display"
+        idField="school_id_display"
+        label="School"
+        required
+        defaultName={child.school_name}
+        defaultId={child.school_id}
+        onPick={(hit, typed) =>
+          setChild((prev) => ({
+            ...prev,
+            school_name: typed,
+            school_id: hit?.id ?? '',
+            school_address: hit?.address ?? prev.school_address,
+          }))
+        }
+      />
       <AddressAutocomplete
         name="school_address"
         apiKey={apiKey}

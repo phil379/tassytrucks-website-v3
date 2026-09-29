@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
-import { COPY, coerceServiceLine } from '@/lib/trip-request';
+import { COPY, coerceServiceLine,
+  serviceWasHonoured,
+} from '@/lib/trip-request';
 
 export const metadata: Metadata = {
   title: 'Request a ride in Charlotte NC',
@@ -92,7 +94,18 @@ export default function RequestPage({
 
           <div className="card-tile mt-8 p-6 sm:p-8">
             <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
-              <RequestForm initialService={initialService} googleMapsApiKey={googleMapsApiKey} />
+              <RequestForm
+                initialService={initialService}
+                /*
+                  Whether the visitor ARRIVED with a choice, not merely which
+                  line is selected. coerceServiceLine always returns something,
+                  so the value alone cannot tell a deliberate ?service=scholar
+                  from a default — and the difference decides whether the form
+                  opens a picker or states the decision.
+                */
+                servicePreselected={serviceWasHonoured(searchParams.service)}
+                googleMapsApiKey={googleMapsApiKey}
+              />
             </Suspense>
           </div>
 

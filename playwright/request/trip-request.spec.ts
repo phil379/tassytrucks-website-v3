@@ -115,6 +115,15 @@ for (const service of SERVICES) {
     expect(res?.status(), 'status 200').toBe(200);
 
     await expect(page.locator('h1')).toHaveText('Request a ride');
+    /**
+     * Arriving with an honoured ?service= now STATES the choice rather than
+     * re-offering it (docs/scholar-ux-fixes-2026-09-29.md), so the value lives
+     * on a hidden input and the <select> only appears after "change". What
+     * matters is unchanged: the line the visitor asked for is the line that
+     * will submit.
+     */
+    await expect(page.locator('input[type="hidden"][name="serviceLine"]')).toHaveValue(service);
+    await page.getByRole('button', { name: 'change' }).click();
     await expect(page.locator('#serviceLine')).toHaveValue(service);
 
     // Every field the brief specifies, in the form.
@@ -177,7 +186,15 @@ test('guardian is not offered in the dropdown', async ({ page }) => {
 
 test('?service=guardian falls back rather than preselecting it', async ({ page }) => {
   await page.goto('/request?service=guardian');
+  /**
+   * A fallback is NOT a decision, so the picker stays open. Stating "Booking:
+   * Tassy Care" to someone who asked for Guardian would put words in their
+   * mouth — they came wanting something we no longer take, and the one thing
+   * they need is the ability to choose again.
+   */
+  await expect(page.locator('#serviceLine')).toBeVisible();
   await expect(page.locator('#serviceLine')).not.toHaveValue('guardian');
+  await expect(page.getByText('Booking:')).toHaveCount(0);
 });
 
 test('a hand-crafted POST with service=guardian is rejected', async ({ request }) => {

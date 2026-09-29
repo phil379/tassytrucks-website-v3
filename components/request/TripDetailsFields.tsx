@@ -8,6 +8,7 @@ import {
   type DetailSection,
 } from '@/lib/trip-details';
 import { BREEDS_BY_SPECIES } from '@/lib/pet-breeds';
+import SchoolPicker from '@/components/school/SchoolPicker';
 
 /**
  * The "who or what is travelling" block, rendered from lib/trip-details.ts.
@@ -58,6 +59,8 @@ export default function TripDetailsFields({
               listId={field.suggestFrom ? `${listPrefix}-${field.key}` : undefined}
               suggestions={suggestionsFor(field, values)}
               onChange={(next) => onChange(field.key, next)}
+              idValue={values[`${field.key}_id`] ?? ''}
+              onChangeId={(next) => onChange(`${field.key}_id`, next)}
             />
           </div>
         ))}
@@ -79,6 +82,8 @@ function Row({
   listId,
   suggestions,
   onChange,
+  idValue,
+  onChangeId,
 }: {
   field: DetailField;
   value: string;
@@ -86,6 +91,9 @@ function Row({
   listId?: string;
   suggestions: string[];
   onChange: (value: string) => void;
+  /** Only the `school` type uses these: the resolved id alongside the name. */
+  idValue: string;
+  onChangeId: (value: string) => void;
 }) {
   const id = `details-${field.key}`;
   const errorId = `${id}-error`;
@@ -108,18 +116,44 @@ function Row({
 
   return (
     <>
-      <label className="mb-1.5 block text-sm font-medium" htmlFor={id}>
-        {field.label}
-        {field.required && (
-          <>
-            {' '}
-            <span aria-hidden="true">*</span>
-            <span className="sr-only">(required)</span>
-          </>
-        )}
-      </label>
+      {/*
+        SchoolPicker renders its own <label> bound to its own input, so emitting
+        one here too would give the field two labels — the second pointing at an
+        id that does not exist.
+      */}
+      {field.type !== 'school' && (
+        <label className="mb-1.5 block text-sm font-medium" htmlFor={id}>
+          {field.label}
+          {field.required && (
+            <>
+              {' '}
+              <span aria-hidden="true">*</span>
+              <span className="sr-only">(required)</span>
+            </>
+          )}
+        </label>
+      )}
 
-      {field.type === 'select' ? (
+      {field.type === 'school' ? (
+        /*
+          A run is several children going to the SAME school, so the name has to
+          resolve to a row rather than be typed. The picker still accepts free
+          text — a school missing from the list must never cost a booking — and
+          a null id is what puts the trip in the review queue.
+        */
+        <SchoolPicker
+          nameField={`${id}-name`}
+          idField={`${id}-id`}
+          label={field.label}
+          required={field.required}
+          defaultName={value}
+          defaultId={idValue}
+          onPick={(hit, typed) => {
+            onChange(typed);
+            onChangeId(hit?.id ?? '');
+          }}
+        />
+      ) : field.type === 'select' ? (
         <select {...shared}>
           <option value="">Select…</option>
           {field.options?.map((option) => (

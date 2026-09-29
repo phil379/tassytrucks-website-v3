@@ -411,6 +411,24 @@ export function resolveServiceAlias<T extends string | undefined | null>(raw: T)
 }
 
 /** Normalise an arbitrary `?service=` param to a valid line, defaulting to care. */
+/**
+ * Did `?service=` actually name a line we offer?
+ *
+ * coerceServiceLine always returns something, so its result cannot distinguish
+ * "the visitor chose Scholar" from "the visitor asked for Guardian, which we no
+ * longer take, and got Care". That difference decides whether /request states
+ * the decision or opens the picker — and stating a decision the visitor did not
+ * make is worse than asking, because they came here wanting something else.
+ *
+ * Aliases count as honoured: ?service=pet resolves to Winnie, which IS what
+ * they asked for under its old name.
+ */
+export function serviceWasHonoured(raw: string | undefined | null): boolean {
+  if (!raw) return false;
+  const aliased = resolveServiceAlias(raw);
+  return SERVICE_VALUES.includes(aliased as ServiceLine);
+}
+
 export function coerceServiceLine(raw: string | undefined | null): ServiceLine {
   // Aliases resolve BEFORE the requestable check, or a retired value never
   // reaches its replacement.

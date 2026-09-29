@@ -272,6 +272,15 @@ export const schoolBookingSchema = z.object({
     last_name: z.string().trim().min(1, "Please add your child's last name"),
     grade: z.string().trim().max(40).optional().nullable(),
     school_name: z.string().trim().min(1, 'Please add the school'),
+    /**
+     * The resolved schools.id, when the parent picked from the list.
+     *
+     * Optional on purpose. A school missing from the list must never block a
+     * booking — the name is kept either way and a null id IS the review queue's
+     * predicate. Never make this required to "improve data quality": that
+     * trades a booking for a tidier table.
+     */
+    school_id: z.string().uuid().optional().nullable(),
     school_address: z.string().trim().min(1, 'Please add the school address'),
     emergency_contact_name: z.string().trim().min(1, 'Please add an emergency contact'),
     emergency_contact_phone: z.string().trim().min(7, 'Please add an emergency phone number'),

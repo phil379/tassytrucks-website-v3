@@ -115,7 +115,12 @@ async function fillStep1(page: Page, addr = '1200 Elizabeth Ave, Charlotte NC') 
 async function fillStep2(page: Page) {
   await page.locator('#childFirst').fill('Sam');
   await page.locator('#childLast').fill('Reed');
-  await page.locator('#schoolName').fill('Elizabeth Traditional');
+  // The school is a picker now, not a text box. Typed free-hand here on
+  // purpose: "can't find your school" has to keep working, and this proves the
+  // wizard still completes without a resolved id.
+  // Exact name: the wizard's "School address" autocomplete is also a combobox,
+  // so /School/i matches two fields.
+  await page.getByRole('combobox', { name: /^School \(required\)$/ }).fill('Elizabeth Traditional');
   await page.locator('input[name="school_address"]').fill('1200 Lamar Ave, Charlotte NC');
   await page.locator('#ecName').fill('Alex Reed');
   await page.locator('#ecPhone').fill('704-555-0199');

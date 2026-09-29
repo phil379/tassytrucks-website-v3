@@ -16,6 +16,7 @@ import {
   passengerLabelFor,
   tripRequestSchema,
   type ServiceLine,
+  serviceShortName,
 } from '@/lib/trip-request';
 import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
 import TripDetailsFields from '@/components/request/TripDetailsFields';
@@ -41,9 +42,12 @@ const labelCls = 'block text-sm font-medium mb-1.5';
  */
 export default function RequestForm({
   initialService,
+  servicePreselected = false,
   googleMapsApiKey,
 }: {
   initialService: ServiceLine;
+  /** True when the URL carried ?service= — see the decided line below. */
+  servicePreselected?: boolean;
   /**
    * Passed down from a dynamically-rendered server component rather than read
    * from NEXT_PUBLIC_*, so rotating the key takes effect on the next request
@@ -56,6 +60,16 @@ export default function RequestForm({
   const searchParams = useSearchParams();
 
   const [service, setService] = useState<ServiceLine>(initialService);
+  /**
+   * Show the picker only when the choice has NOT already been made.
+   *
+   * Arriving at /request?service=scholar means a parent has already chosen, on
+   * a page that explained the service. Re-offering Care, Recovery, Concierge and
+   * Winnie invites them to reconsider a decision they came here having made.
+   * The decision is stated instead, with `change` as the escape hatch for the
+   * parent who realises they actually need Care for a grandparent.
+   */
+  const [showServicePicker, setShowServicePicker] = useState(!servicePreselected);
 
   /**
    * Mobility is a function of WHO is travelling, so it has to be state, not a
@@ -458,21 +472,43 @@ export default function RequestForm({
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="serviceLine">
-          Service
-        </label>
-        <select
-          {...fieldProps('serviceLine')}
-          value={service}
-          onChange={(e) => changeService(coerceServiceLine(e.target.value))}
-        >
-          {SERVICE_LINES.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <FieldError name="serviceLine" />
+        {showServicePicker ? (
+          <>
+            <label className={labelCls} htmlFor="serviceLine">
+              Service
+            </label>
+            <select
+              {...fieldProps('serviceLine')}
+              value={service}
+              onChange={(e) => changeService(coerceServiceLine(e.target.value))}
+            >
+              {SERVICE_LINES.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <FieldError name="serviceLine" />
+          </>
+        ) : (
+          <>
+            {/* The decision, stated. `serviceLine` still submits, from a hidden
+                input, because the payload is read out of FormData. */}
+            <input type="hidden" name="serviceLine" value={service} />
+            <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+              <span className="ink-soft">Booking:</span>
+              <strong className="text-base">{serviceShortName(service)}</strong>
+              <span className="ink-soft">{serviceTail(service)}</span>
+              <button
+                type="button"
+                onClick={() => setShowServicePicker(true)}
+                className="min-h-[44px] underline"
+              >
+                change
+              </button>
+            </p>
+          </>
+        )}
       </div>
 
       <div>
@@ -773,4 +809,17 @@ export default function RequestForm({
       <p className="ink-soft text-sm">{COPY.confirmation}</p>
     </form>
   );
+}
+
+/**
+ * The descriptive half of a service label, for the decided line.
+ *
+ * Labels read "Tassy Scholar — school and after-school", so the brand is the
+ * <strong> and this is the rest. Returns '' for anything without the dash
+ * rather than guessing, so a relabelled line degrades to just the name.
+ */
+function serviceTail(value: string): string {
+  const label = SERVICE_LINES.find((s) => s.value === value)?.label ?? '';
+  const i = label.indexOf('—');
+  return i === -1 ? '' : label.slice(i).trim();
 }

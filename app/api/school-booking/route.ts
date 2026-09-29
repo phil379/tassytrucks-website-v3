@@ -118,6 +118,10 @@ export async function POST(request: Request) {
       last_name: data.child.last_name,
       grade: data.child.grade || null,
       school_name: data.child.school_name,
+      // NULL when the parent typed a school we do not have. That is the review
+      // predicate (students where school_id is null), not a failure — the name
+      // is kept regardless and the booking goes through.
+      school_id: data.child.school_id ?? null,
       school_address: data.child.school_address,
       home_address: data.parent.home_address,
       parent_name: parentName,
@@ -228,6 +232,8 @@ export async function POST(request: Request) {
           program: data.schedule.program ?? null,
           program_location: data.schedule.programLocation ?? null,
         },
+        school_id: data.child.school_id ?? null,
+        school_needs_review: !data.child.school_id,
         policy_version: POLICY_VERSION,
         policies: data.policies,
       },

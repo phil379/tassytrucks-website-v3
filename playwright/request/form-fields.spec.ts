@@ -212,6 +212,9 @@ test.describe('the rendered form', () => {
     await expect(page.locator('label[for="mobility"]')).toHaveText(/Mobility/);
     await expect(page.locator('#mobility option[value="walker"]')).toHaveCount(1);
 
+    // The selector is behind "change" now that an honoured ?service= states
+    // the decision instead of re-offering it.
+    await page.getByRole('button', { name: 'change' }).click();
     await page.locator('#serviceLine').selectOption('winnie');
 
     await expect(page.locator('label[for="mobility"]')).toHaveText(/How does your pet travel\?/);
@@ -224,6 +227,7 @@ test.describe('the rendered form', () => {
     await page.goto('/request?service=pet');
     await expect(page.locator('#mobility option[value="pet_carrier"]')).toHaveCount(1);
 
+    await page.getByRole('button', { name: 'change' }).click();
     await page.locator('#serviceLine').selectOption('care');
     await expect(page.locator('#mobility option[value="pet_carrier"]')).toHaveCount(0);
     await expect(page.locator('#mobility option[value="wheelchair"]')).toHaveCount(1);

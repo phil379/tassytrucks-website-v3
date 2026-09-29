@@ -41,7 +41,16 @@ export type DetailFieldType =
   | 'select'
   | 'number'
   | 'date'
-  | 'checkbox';
+  | 'checkbox'
+  /**
+   * Type-ahead against public.schools, with a free-text escape hatch.
+   *
+   * Stored like a text field — the name is what a dispatcher reads — but the
+   * picker also writes `<key>_id` with the resolved schools.id. A null id is
+   * the review predicate, never a validation failure: a school missing from the
+   * list must not cost a booking.
+   */
+  | 'school';
 
 export type DetailOption = { value: string; label: string };
 
@@ -400,8 +409,31 @@ const SCHOLAR: DetailSection = {
       max: 60,
       half: true,
     },
+    /**
+     * Required, and not only because students.last_name is NOT NULL.
+     *
+     * A school needs it — "which Marcus?" is not a question a driver should be
+     * resolving at a school gate — and the trusted-handoff policy promises a
+     * child is released only to an authorised adult, which starts with
+     * identifying the child unambiguously.
+     */
+    {
+      key: 'student_last_name',
+      label: "Student's last name",
+      type: 'text',
+      required: true,
+      max: 60,
+      half: true,
+    },
     { key: 'grade', label: 'Grade', type: 'select', options: GRADES, half: true },
-    { key: 'school_name', label: 'School', type: 'text', required: true, max: 120 },
+    {
+      key: 'school_name',
+      label: 'School',
+      type: 'school',
+      required: true,
+      max: 120,
+      help: 'Pick from the list so we can group your child with the right run.',
+    },
     {
       key: 'schedule',
       label: 'Which runs?',
@@ -525,6 +557,15 @@ export function validateDetails(service: string, raw: unknown): DetailValidation
     }
 
     switch (field.type) {
+      case 'school': {
+        // Text, plus the id the picker resolved. The id is optional by design:
+        // "can't find your school" has to keep working.
+        values[field.key] = text.slice(0, field.max ?? 200);
+        const idKey = `${field.key}_id`;
+        const id = String(input[idKey] ?? '').trim();
+        if (/^[0-9a-f-]{36}$/i.test(id)) values[idKey] = id;
+        break;
+      }
       case 'select': {
         const allowed = (field.options ?? []).some((o) => o.value === text);
         if (!allowed) {

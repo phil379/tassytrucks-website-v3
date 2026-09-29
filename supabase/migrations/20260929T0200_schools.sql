@@ -105,3 +105,19 @@ comment on column public.students.school_id is
 create index if not exists students_school_idx on public.students (school_id, status);
 
 notify pgrst, 'reload schema';
+
+-- ── address provenance ──────────────────────────────────────────────────────
+-- A school's address is the thing a driver acts on, so "where did this come
+-- from" must be answerable without archaeology. Three sources so far:
+-- charlotte-gis (the county schools layer), mecklenburg-masteraddress (an exact
+-- parcel-id join) and school-site (the school's own published footer).
+alter table public.schools
+  add column if not exists address_source text,
+  add column if not exists address_source_url text;
+
+comment on column public.schools.address_source is
+  'charlotte-gis | mecklenburg-masteraddress | school-site';
+comment on column public.schools.address_source_url is
+  'The exact URL the address was read from, so a disputed route can be traced.';
+
+notify pgrst, 'reload schema';

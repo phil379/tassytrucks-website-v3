@@ -43,6 +43,9 @@ type Row = {
   lat: number | null;
   lng: number | null;
   district: string | null;
+  active: boolean;
+  address_source: string | null;
+  address_source_url: string | null;
 };
 
 async function main() {
@@ -58,6 +61,14 @@ async function main() {
     lng: s.lng,
     // Public schools in Mecklenburg are CMS; private and charter are not.
     district: s.kind === 'public' ? 'Charlotte-Mecklenburg Schools' : null,
+    /**
+     * Carried explicitly so a re-seed can RETIRE a school, not just add one.
+     * Two of these are unbuilt CMS relief sites — planning placeholders, not
+     * buildings a parent picks — and the picker filters on active.
+     */
+    active: s.active !== false,
+    address_source: s.address_source ?? null,
+    address_source_url: s.address_source_url ?? null,
   }));
 
   const before = await count();

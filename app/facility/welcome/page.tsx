@@ -33,7 +33,7 @@ export default async function FacilityWelcomePage() {
   const facility = session.facility;
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+    <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
       <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
         Tassy Transportation
       </p>
@@ -51,6 +51,6 @@ export default async function FacilityWelcomePage() {
           initialKind={facility.kind}
         />
       </div>
-    </main>
+    </div>
   );
 }

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  */
 export default function FacilityLinkExpiredPage() {
   return (
-    <main className="mx-auto max-w-lg px-5 py-24 text-center">
+    <div className="mx-auto max-w-lg px-5 py-24 text-center">
       <h1 className="serif text-3xl font-semibold">That link has expired</h1>
       <p className="mt-4 text-[color:var(--ink-soft)]">
         Setup links work once and then stop, which is what keeps your account safe if the
@@ -32,6 +32,6 @@ export default function FacilityLinkExpiredPage() {
           Start again
         </a>
       </p>
-    </main>
+    </div>
   );
 }

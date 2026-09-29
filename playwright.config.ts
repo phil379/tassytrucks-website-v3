@@ -50,6 +50,8 @@ export default defineConfig({
        * how four of them came back red the first time they ran.
        */
       FACILITY_SIGNUP_RATE_LIMIT: '1000',
+      /** Same reason, third route — the school specs post more than 5 times. */
+      SCHOOL_BOOKING_RATE_LIMIT: '1000',
     },
   },
 });

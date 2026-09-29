@@ -43,6 +43,8 @@ type ChildForm = {
   school_name: string;
   school_id: string;
   school_address: string;
+  /** True only when the address came from the school list, not the parent. */
+  school_address_confirmed: boolean;
   emergency_contact_name: string;
   emergency_contact_phone: string;
   safety_note: string;
@@ -100,6 +102,7 @@ export default function SchoolSetupWizard({
     school_name: '',
     school_id: '',
     school_address: '',
+    school_address_confirmed: false,
     emergency_contact_name: '',
     emergency_contact_phone: '',
     safety_note: '',
@@ -430,19 +433,36 @@ function ChildStep({
             ...prev,
             school_name: typed,
             school_id: hit?.id ?? '',
-            school_address: hit?.address ?? prev.school_address,
+            /*
+              Never carry the previous school's address forward. Changing school
+              after picking one used to leave the old address sitting in a field
+              the parent could no longer see the source of — a wrong destination
+              that looks like a filled-in form.
+            */
+            school_address: hit?.address ?? '',
+            school_address_confirmed: Boolean(hit?.address),
           }))
         }
       />
-      <AddressAutocomplete
-        name="school_address"
-        apiKey={apiKey}
-        label="School address"
-        required
-        defaultValue={child.school_address}
-        onText={(v: string) => set('school_address', v)}
-        onResolve={(p) => p?.address && set('school_address', p.address)}
-      />
+      {/*
+        Asked for ONLY when we do not already hold it. 286 of 299 seeded schools
+        carry an address, so for almost every parent this input never appears —
+        the picker shows the address as confirmation instead. The remount key
+        guarantees it comes back EMPTY after a school change rather than
+        re-seeding itself from the address that has just been discarded.
+      */}
+      {!child.school_address_confirmed && (
+        <AddressAutocomplete
+          key={`school-address-${child.school_id || 'free'}`}
+          name="school_address"
+          apiKey={apiKey}
+          label="School address"
+          required
+          defaultValue={child.school_address}
+          onText={(v: string) => set('school_address', v)}
+          onResolve={(p) => p?.address && set('school_address', p.address)}
+        />
+      )}
       <div className="grid gap-5 sm:grid-cols-2">
         <Field htmlFor="ecName" labelText="Emergency contact">
           <input id="ecName" className={field} value={child.emergency_contact_name} onChange={(e) => set('emergency_contact_name', e.target.value)} />

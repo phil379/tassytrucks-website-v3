@@ -334,3 +334,60 @@ export function bookingReference(plan: PlanKey, n: number): string {
   const tag = plan === 'full_year' ? 'FY' : plan === 'weekly_pattern' ? 'WK' : 'AS';
   return `TASSY-SCHOOL-${tag}-${String(n % 10000).padStart(4, '0')}`;
 }
+
+/* ─────────────────────────────────────────────────── school address display */
+
+/**
+ * Title-case a GIS address for DISPLAY ONLY.
+ *
+ * The county publishes "4100 GALLANT LN CHARLOTTE NC 28273" — all caps, street
+ * types abbreviated. Shouting a parent's own school back at them looks like a
+ * system error, so it is normalised on the way to the screen and NEVER on the
+ * way to the database: schools.address keeps exactly what the source published,
+ * because that is the value we can point at when a route is disputed.
+ *
+ * State abbreviations and single-letter directionals stay upper — "Nc" and
+ * "4100 N Tryon" vs "4100 n Tryon" are both worse than leaving them alone.
+ */
+const KEEP_UPPER = new Set([
+  'NC', 'SC', 'US', 'NE', 'NW', 'SE', 'SW', 'N', 'S', 'E', 'W', 'II', 'III', 'IV',
+]);
+
+export function titleCaseAddress(raw: string | null | undefined): string {
+  if (!raw) return '';
+  return raw
+    .trim()
+    .split(/\s+/)
+    .map((word) => {
+      const bare = word.replace(/[^A-Za-z0-9]/g, '');
+      if (KEEP_UPPER.has(bare.toUpperCase())) return word.toUpperCase();
+      // A pure number or something like 28273 stays as it is.
+      if (/^\d+$/.test(bare)) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+/**
+ * Which of the three school states a form is in.
+ *
+ * The rule the states encode: never present an empty required field for a fact
+ * the system already holds. 286 of 299 seeded schools carry an address, so for
+ * the overwhelming majority asking for one is asking a parent to retype
+ * something we can already show them.
+ */
+export type SchoolFieldState =
+  /** Matched, and we hold the address. Show it; ask for nothing. */
+  | 'confirmed'
+  /** Matched, but no address on file. Ask, and say why. */
+  | 'matched_no_address'
+  /** Free text. Ask, as before — the null id stays the review predicate. */
+  | 'unmatched';
+
+export function schoolFieldState(
+  schoolId: string | null | undefined,
+  schoolAddress: string | null | undefined,
+): SchoolFieldState {
+  if (!schoolId) return 'unmatched';
+  return schoolAddress && schoolAddress.trim() !== '' ? 'confirmed' : 'matched_no_address';
+}

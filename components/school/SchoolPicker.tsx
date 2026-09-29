@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import { schoolFieldState, titleCaseAddress } from '@/lib/school-plans';
 
 export type SchoolHit = {
   id: string;
@@ -48,6 +49,7 @@ export default function SchoolPicker({
   const listId = useId();
   const [query, setQuery] = useState(defaultName);
   const [schoolId, setSchoolId] = useState(defaultId);
+  const [picked, setPicked] = useState<SchoolHit | null>(null);
   const [hits, setHits] = useState<SchoolHit[]>([]);
   const [open, setOpen] = useState(false);
   const [unlisted, setUnlisted] = useState(false);
@@ -95,13 +97,25 @@ export default function SchoolPicker({
   function pick(hit: SchoolHit) {
     setQuery(hit.name);
     setSchoolId(hit.id);
+    setPicked(hit);
     setHits([]);
     setOpen(false);
     onPick?.(hit, hit.name);
   }
 
+  /** Back to free text, with nothing left over from the confirmation. */
+  function clearMatch() {
+    setSchoolId('');
+    setPicked(null);
+    setQuery('');
+    setHits([]);
+    setOpen(false);
+    onPick?.(null, '');
+  }
+
   function retype(v: string) {
     setQuery(v);
+    setPicked(null);
     // Editing after picking withdraws the resolution — the id must never
     // outlive the name it belonged to.
     if (schoolId) {
@@ -111,6 +125,8 @@ export default function SchoolPicker({
       onPick?.(null, v);
     }
   }
+
+  const state = schoolFieldState(schoolId, picked?.address ?? null);
 
   const field =
     'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
@@ -163,11 +179,37 @@ export default function SchoolPicker({
         </ul>
       )}
 
-      {schoolId ? (
+      {/*
+        STATE A — matched and we hold the address.
+        Show the address as confirmation instead of presenting an empty
+        required field beside it. Every field removed is a person who finishes.
+      */}
+      {state === 'confirmed' && picked ? (
+        <div className="mt-2 rounded-lg border border-[color:var(--line)] px-3 py-2.5">
+          <p className="text-sm">{titleCaseAddress(picked.address)}</p>
+          <p className="mt-1 text-xs text-[color:var(--ink-mute)]">
+            We have this school on file — we&rsquo;ll group your child&rsquo;s ride with that run.{' '}
+            <button type="button" onClick={clearMatch} className="underline">
+              Not this one? Change school
+            </button>
+          </p>
+        </div>
+      ) : null}
+
+      {/*
+        STATE B — matched, but no address on file. Ask, and say why, so it does
+        not read as the form having forgotten what it just showed them.
+      */}
+      {state === 'matched_no_address' ? (
         <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">
-          Matched to our school list — we&rsquo;ll group your child&rsquo;s ride with that run.
+          We don&rsquo;t have an address on file for this school yet — please add it below.{' '}
+          <button type="button" onClick={clearMatch} className="underline">
+            Change school
+          </button>
         </p>
-      ) : (
+      ) : null}
+
+      {state !== 'unmatched' ? null : (
         <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">
           {searching ? 'Searching…' : null}{' '}
           <button

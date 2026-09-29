@@ -150,3 +150,172 @@ test('picking from the list resolves an id', async ({ page }) => {
   await expect(page.locator('input[type="hidden"][name$="-id"]')).not.toHaveValue('');
   await expect(page.getByText(/group your child.s ride with that run/i)).toBeVisible();
 });
+
+/* ── the school address is never asked for twice ──────────────────────────── */
+
+/**
+ * A school with NO address on file, created for the test rather than borrowed
+ * from the dataset.
+ *
+ * Part 2 backfills the blanks, so a spec that picked a real addressless school
+ * would pass today and quietly stop testing state B the moment the data was
+ * fixed. Owning the fixture keeps the state covered forever.
+ */
+const FIXTURE = {
+  source: 'pw-test',
+  source_key: 'pw-school-without-address',
+  name: 'Pw Test School Without Address',
+  kind: 'private',
+  active: true,
+};
+
+test.beforeAll(async ({ playwright }) => {
+  if (!dbConfigured) return;
+  const api = await playwright.request.newContext();
+  await api.post(`${SUPABASE_URL}/rest/v1/schools?on_conflict=source,source_key`, {
+    headers: { ...h(), 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+    data: [FIXTURE],
+  });
+  await api.dispose();
+});
+
+test.afterAll(async ({ playwright }) => {
+  if (!dbConfigured) return;
+  const api = await playwright.request.newContext();
+  await api.delete(`${SUPABASE_URL}/rest/v1/schools?source=eq.pw-test`, { headers: h() });
+  await api.dispose();
+});
+
+const schoolBox = (page: import('@playwright/test').Page) =>
+  page.getByRole('combobox', { name: /^School \(required\)$/ });
+
+/** The school picker lives on step 2, so step 1 has to be walked first. */
+async function openChildStep(page: import('@playwright/test').Page) {
+  await page.goto('/school/book/full-year');
+  await page.locator('#parentFirst').fill('Dana');
+  await page.locator('#parentLast').fill('Reed');
+  await page.locator('#parentEmail').fill(`pw-addr-${Date.now()}@pw-school.invalid`);
+  await page.locator('#parentPhone').fill('704-555-0188');
+  await page.locator('input[name="home_address"]').fill('1200 Elizabeth Ave, Charlotte NC');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Your child' })).toBeVisible();
+}
+
+async function pickFirst(page: import('@playwright/test').Page, term: string) {
+  await schoolBox(page).fill(term);
+  const option = page.getByRole('listbox').getByRole('option').first();
+  await expect(option).toBeVisible();
+  await option.click();
+}
+
+test('picking a school we have an address for asks for no address at all', async ({ page }) => {
+  test.skip(!dbConfigured, 'needs a seeded schools table');
+  await openChildStep(page);
+  await pickFirst(page, 'Ardrey Kell High');
+
+  // The fact is shown, not requested.
+  await expect(page.locator('input[name="school_address"]')).toHaveCount(0);
+  await expect(page.getByText(/We have this school on file/i)).toBeVisible();
+  /**
+   * Title-cased for display — the source stores it shouting. Asserted on the
+   * actual text, because getByText is case-insensitive by default and would
+   * happily match the title-cased string with an all-caps needle.
+   */
+  const shown = (await page.getByText(/Ardrey Kell Rd/i).first().textContent()) ?? '';
+  expect(shown).toContain('Ardrey Kell Rd');
+  expect(shown, 'display casing must be normalised').not.toContain('ARDREY KELL RD');
+});
+
+test('a school with no address on file asks for one, and says why', async ({ page }) => {
+  test.skip(!dbConfigured, 'needs a seeded schools table');
+  await openChildStep(page);
+  await pickFirst(page, 'Pw Test School Without Address');
+
+  await expect(page.getByText(/don.t have an address on file/i)).toBeVisible();
+  const addr = page.locator('input[name="school_address"]');
+  await expect(addr).toHaveCount(1);
+  await expect(addr).toHaveAttribute('required', '');
+});
+
+test('free text asks for the address, exactly once', async ({ page }) => {
+  await openChildStep(page);
+  await schoolBox(page).fill('A School Nobody Has Heard Of');
+  await expect(page.locator('input[name="school_address"]')).toHaveCount(1);
+});
+
+test('changing school clears the address it had filled in', async ({ page }) => {
+  test.skip(!dbConfigured, 'needs a seeded schools table');
+  await openChildStep(page);
+  await pickFirst(page, 'Ardrey Kell High');
+  await expect(page.locator('input[name="school_address"]')).toHaveCount(0);
+
+  await page.getByRole('button', { name: /Not this one\? Change school/i }).click();
+
+  // Back to free text with an EMPTY box — a stale address the parent can no
+  // longer see the source of is a wrong destination that looks filled in.
+  const addr = page.locator('input[name="school_address"]');
+  await expect(addr).toHaveCount(1);
+  await expect(addr).toHaveValue('');
+  await expect(schoolBox(page)).toHaveValue('');
+});
+
+test('the booking stores the school\'s own address, not a blank', async ({ page, playwright }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  const api = await playwright.request.newContext();
+  const parentEmail = `pw-sch-addr-${Date.now()}@pw-school.invalid`;
+
+  await page.goto('/school/book/full-year');
+  await page.locator('#parentFirst').fill('Dana');
+  await page.locator('#parentLast').fill('Reed');
+  await page.locator('#parentEmail').fill(parentEmail);
+  await page.locator('#parentPhone').fill('704-555-0188');
+  await page.locator('input[name="home_address"]').fill('1200 Elizabeth Ave, Charlotte NC');
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await page.locator('#childFirst').fill('Sam');
+  await page.locator('#childLast').fill('Reed');
+  await pickFirst(page, 'Ardrey Kell High');
+  await page.locator('#ecName').fill('Alex Reed');
+  await page.locator('#ecPhone').fill('704-555-0199');
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  await page.getByRole('button', { name: '6:45 AM' }).click();
+  await page.getByRole('button', { name: '3:15 PM' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
+  const boxes = page.locator('input[type="checkbox"]');
+  const count = await boxes.count();
+  for (let i = 0; i < count; i++) await boxes.nth(i).check();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.locator('input[type="checkbox"]').first().check();
+
+  /**
+   * Wait past MIN_FILL_MS before submitting.
+   *
+   * Playwright drives six steps in under three seconds, which is exactly the
+   * signature the honeypot's timing check exists to catch — the route answers
+   * 200 with a null id and the wizard correctly refuses to show step 6. The
+   * guard is right; the robot is the problem. A real parent takes minutes.
+   */
+  await page.waitForTimeout(3200);
+
+  await page.getByRole('button', { name: 'Confirm commitment' }).click();
+  await expect(page.getByRole('heading', { name: /You.re all set/i })).toBeVisible();
+
+  const rows = await api.get(
+    `${SUPABASE_URL}/rest/v1/students?select=school_id,school_name,school_address&parent_email=eq.${encodeURIComponent(parentEmail)}`,
+    { headers: h() },
+  );
+  const row = (await rows.json())[0];
+  expect(row.school_id, 'the pick must resolve').toBeTruthy();
+  expect(row.school_address, 'state A submits the school row we hold, not an empty string').toBeTruthy();
+  expect(row.school_address).toMatch(/ARDREY KELL/i);
+
+  // The stored value is the source's, untouched — display casing never persists.
+  const school = await api.get(`${SUPABASE_URL}/rest/v1/schools?select=address&id=eq.${row.school_id}`, { headers: h() });
+  expect(row.school_address).toBe((await school.json())[0].address);
+
+  await api.delete(`${SUPABASE_URL}/rest/v1/students?parent_email=like.*@pw-school.invalid`, { headers: h() });
+  await api.delete(`${SUPABASE_URL}/rest/v1/trip_requests?contact_email=like.*@pw-school.invalid`, { headers: h() });
+  await api.dispose();
+});

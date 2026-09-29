@@ -1746,15 +1746,15 @@
       "level": "high",
       "grade_span": "11-12",
       "address": "315 W Hebron Street, Charlotte, NC 28273-4304",
-      "lat": null,
-      "lng": null,
+      "lat": 35.129643,
+      "lng": -80.895612,
       "district": null,
       "active": true,
       "address_source": "school-site",
       "address_source_url": "https://harperhs.cmsk12.org/our-school/about-us",
-      "address_cross_checked": false,
+      "address_cross_checked": true,
       "address_verified_at": "2026-09-29",
-      "address_note": "SINGLE-SOURCED \u2014 never corroborated. CPCC's own campus catalog publishes no street address, so no second source exists. Zero parcel address points is expected on a college campus rather than suspicious, and the school sits on the CPCC Harper Campus, so a driver at this address is on the right campus either way. Treat as the weakest row here on any refresh."
+      "address_note": "No PARCEL address point (expected on a college campus), but the county's MasterAddress table does carry 315 W HEBRON ST CHARLOTTE NC 28273 as its own point, which matches the address the school publishes \u2014 so this is corroborated after all, and the coordinates are the county's. CPCC's campus catalog publishes no street address, so the school's own site remains the only source for the ZIP+4."
     },
     {
       "source_key": "hawk-ridge-elementary__9201-bryant-farms-rd-charlotte-nc-28277",
@@ -3386,7 +3386,7 @@
       "address_source_url": "https://palisadeshs.cmsk12.org",
       "address_cross_checked": false,
       "address_verified_at": "2026-09-29",
-      "address_note": "County address points on this parcel (14947/14971/15215) PREDATE the school, which opened August 2022, so the cross-check disagreed on stale data rather than on the address. Superseded by the school's own site, corroborated independently by its Wikipedia entry carrying the 2022 opening date. Stale data losing to current data is not the contradiction the stop-rule was written for."
+      "address_note": "County address points on this parcel (14947/14971/15215) PREDATE the school, which opened August 2022, so the cross-check disagreed on stale data rather than on the address. Superseded by the school's own site, corroborated independently by its Wikipedia entry carrying the 2022 opening date. Stale data losing to current data is not the contradiction the stop-rule was written for. Coordinates stay NULL: the county has no address point for 15221 York Road either, which is the same staleness that produced the parcel disagreement \u2014 the school opened August 2022. A guessed coordinate would price a quote off the wrong place, so null is the honest answer until the county catches up."
     },
     {
       "source_key": "palisades-park-elementary__15321-york-rd-charlotte-nc-28278",

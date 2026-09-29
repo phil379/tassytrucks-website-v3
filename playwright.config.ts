@@ -64,6 +64,30 @@ export default defineConfig({
       FACILITY_SIGNUP_RATE_LIMIT: '1000',
       /** Same reason, third route — the school specs post more than 5 times. */
       SCHOOL_BOOKING_RATE_LIMIT: '1000',
+      /**
+       * NO REAL EMAIL FROM THE TEST SUITE.
+       *
+       * This file deliberately loads .env.local into the test process, and
+       * `next start` reads it too. .env.local carries a REAL RESEND_API_KEY,
+       * and lib/notifications.ts has no test guard — so every spec that
+       * submits a booking sent real mail on the real account, and the operator
+       * leg landed in Phil's actual inbox. That is how ~3,000 emails went out
+       * against a business with no customers, until Resend answered
+       * 429 monthly_quota_exceeded and production auto-replies went dark.
+       *
+       * Empty string, not a fake key: notifyOperatorEmail throws on a falsy
+       * key BEFORE it builds a request, so this makes zero network calls.
+       * A fake key would still reach api.resend.com and 401.
+       *
+       * The email legs then fail, are logged, and are swallowed — the
+       * documented contract at the top of lib/notifications.ts. The row is
+       * still written and every assertion in the suite still holds.
+       *
+       * @next/env does not overwrite a variable already present in the
+       * environment, and '' is present. VERIFY after a full run: Resend's
+       * dashboard must show zero sends for the window.
+       */
+      RESEND_API_KEY: '',
       },
     },
     {

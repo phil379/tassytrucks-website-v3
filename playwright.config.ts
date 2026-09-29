@@ -110,6 +110,14 @@ export default defineConfig({
          */
         NTFY_TOPIC: 'pw-test-topic',
         NTFY_BASE_URL: 'http://127.0.0.1:3942',
+        /**
+         * Same reason as the 3941 server, and not merely belt-and-braces: a
+         * webServer `env` block is merged with process.env, and this config
+         * loads .env.local into that — so WITHOUT this line the rig would still
+         * hold the real key. Nothing here sends mail today, which is exactly
+         * the state 3941 was in before a spec was added that did.
+         */
+        RESEND_API_KEY: '',
       },
     },
   ],

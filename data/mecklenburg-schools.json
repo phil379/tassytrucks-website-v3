@@ -17,7 +17,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "albemarle-road-elementary__7800-riding-trail-rd-charlotte-nc-28212",
@@ -31,7 +34,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "albemarle-road-middle-school__6900-democracy-dr-charlotte-nc-28212",
@@ -45,7 +51,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "alexander-children-s-center__6220-thermal-rd-charlotte-nc-28211",
@@ -59,7 +68,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "alexander-graham-middle-school__1800-runnymede-ln-charlotte-nc-28211",
@@ -73,7 +85,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "allc-mosaic-school__6100-monroe-rd-charlotte-nc-28212",
@@ -87,7 +102,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "allenbrook-elementary__1430-allenbrook-dr-charlotte-nc-28208",
@@ -101,7 +119,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ambemarle-winterfield-relief-school",
@@ -115,7 +136,10 @@
       "district": null,
       "active": false,
       "address_source": null,
-      "address_source_url": null
+      "address_source_url": null,
+      "address_note": "Unbuilt CMS relief site \u2014 a planning placeholder, not a building a parent picks.",
+      "address_cross_checked": null,
+      "address_verified_at": null
     },
     {
       "source_key": "anami-montessori__2901-archdale-dr-charlotte-nc-28210",
@@ -129,7 +153,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ardrey-kell-high-school__10220-ardrey-kell-rd-charlotte-nc-28277",
@@ -143,7 +170,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ashley-park__2401-belfast-dr-charlotte-nc-28208",
@@ -157,7 +187,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "back-creek-christian-academy__1827-back-creek-church-rd-charlotte-nc-28213",
@@ -171,7 +204,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "bailey-middle-school__11900-bailey-rd-cornelius-nc-28031",
@@ -185,7 +221,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "bain-elementary__11540-bain-school-rd-mint-hill-nc-28227",
@@ -199,7 +238,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ballantyne-elementary__15425-scholastic-dr-charlotte-nc-28277",
@@ -213,7 +255,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "barnette-elementary__13659-beatties-ford-rd-huntersville-nc-28078",
@@ -227,7 +272,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "berean-junior-academy__3748-beatties-ford-rd-charlotte-nc-28216",
@@ -241,7 +289,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "berewick-elementary__5910-dixie-river-rd-charlotte-nc-28278",
@@ -255,7 +306,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "berryhill-school__10501-windy-grove-rd-charlotte-nc-28208",
@@ -269,7 +323,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "bethune-mays-classical-academy__800-briar-creek-rd-charlotte-nc-28205",
@@ -283,7 +340,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "beverly-woods-elementary__6001-quail-hollow-rd-charlotte-nc-28210",
@@ -297,7 +357,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "bible-baptist-christian__2724-margaret-wallace-rd-matthews-nc-28105",
@@ -311,7 +374,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "billingsville-elementary__124-skyland-av-charlotte-nc-28205",
@@ -325,7 +391,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "blythe-elementary__12202-hambright-rd-huntersville-nc-28078",
@@ -339,7 +408,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "briarwood-academy__1001-wilann-dr-charlotte-nc-28215",
@@ -353,7 +425,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "brisbane-academy__5901-statesville-rd-charlotte-nc-28269",
@@ -367,7 +442,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "british-international-school-of-charlotte__7000-endhaven-ln-charlotte-nc-28277",
@@ -381,7 +459,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "brookstone-schools__2414-lester-st-charlotte-nc-28208",
@@ -395,7 +476,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "bruns-academy__501-s-bruns-av-charlotte-nc-28208",
@@ -409,7 +493,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "butler-high__1810-matthews-mint-hill-rd-matthews-nc-28105",
@@ -423,7 +510,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "carmel-christian-school__1145-pineville-matthews-rd-matthews-nc-28105",
@@ -437,7 +527,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "carmel-middle__5001-camilla-dr-charlotte-nc-28226",
@@ -451,7 +544,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "cato-middle-college-high__8120-grier-rd-charlotte-nc-28215",
@@ -465,7 +561,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "chantilly-montessori__701-briar-creek-rd-charlotte-nc-28205",
@@ -479,7 +578,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charles-h-parker-academic-center__1546-walton-rd-charlotte-nc-28208",
@@ -493,7 +595,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-catholic-high-school__7702-pineville-matthews-rd-charlotte-nc-28226",
@@ -507,7 +612,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-christian-school__7301-sardis-rd-charlotte-nc-28270",
@@ -521,7 +629,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-country-day-school__1440-carmel-rd-charlotte-nc-28226",
@@ -535,7 +646,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-east-language-academy__6108-wilora-lake-rd-charlotte-nc-28212",
@@ -549,7 +663,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-engineering-early-college-uncc__9000-robert-d-snyder-rd-charlotte-nc-28223",
@@ -563,7 +680,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-jewish-day-school__5007-providence-rd-charlotte-nc-28270",
@@ -577,7 +697,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-latin-school__9502-providence-rd-charlotte-nc-28270",
@@ -591,7 +714,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-leadership-academy__1326-prince-hall-av-charlotte-nc-28206",
@@ -605,7 +731,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-preparatory-school__212-boyce-rd-charlotte-nc-28211",
@@ -619,7 +748,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-teacher-early-college-uncc__9000-robert-d-snyder-rd-charlotte-nc-28223",
@@ -633,7 +765,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "charlotte-united-christian-academy__7640-wallace-rd-charlotte-nc-28212",
@@ -647,7 +782,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "chesterbrook-academy-at-birkdale__15115-norman-view-ln-huntersville-nc-28078",
@@ -661,7 +799,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "christian-montessori-school__14101-stumptown-rd-huntersville-nc-28078",
@@ -675,7 +816,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "clear-creek-elementary__13501-albemarle-rd-charlotte-nc-28227",
@@ -689,7 +833,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "collinswood-language-academy__4000-applegate-rd-charlotte-nc-28209",
@@ -703,7 +850,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "combine-academy__646-matthews-mint-hill-rd-matthews-nc-28105",
@@ -717,7 +867,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "community-charter__510-s-torrence-st-charlotte-nc-28204",
@@ -731,7 +884,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "community-house-middle__9500-community-house-rd-charlotte-nc-28277",
@@ -745,7 +901,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "community-school-of-davidson__404-armour-st-davidson-nc-28036",
@@ -759,7 +918,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "community-school-of-davidson__565-griffith-st-davidson-nc-28036",
@@ -773,7 +935,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "cornelius-elementary__21126-catawba-av-cornelius-nc-28031",
@@ -787,7 +952,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "cornerstone-adventist-academy__11431-university-city-bv-charlotte-nc-28262",
@@ -801,7 +969,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "corvian-community-school__9501-david-taylor-dr-charlotte-nc-28262",
@@ -815,7 +986,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "cotswold-elementary__300-greenwich-rd-charlotte-nc-28211",
@@ -829,7 +1003,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "coulwood-stem-academy__500-kentberry-dr-charlotte-nc-28214",
@@ -843,7 +1020,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "countryside-montessori-school__9026-mallard-creek-rd-charlotte-nc-28262",
@@ -857,7 +1037,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "covenant-day-school__800-fullwood-ln-matthews-nc-28105",
@@ -871,7 +1054,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "crestdale-middle__940-sam-newell-rd-matthews-nc-28105",
@@ -885,7 +1071,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "croft-community-school__4911-hucks-rd-charlotte-nc-28269",
@@ -899,7 +1088,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "crossroads-charter-high__5500-n-tryon-st-charlotte-nc-28213",
@@ -913,7 +1105,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "crossway-academy__9129-monroe-rd-charlotte-nc-28270",
@@ -927,7 +1122,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "crown-point-elementary__3335-sam-newell-rd-matthews-nc-28105",
@@ -941,7 +1139,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "cyzner-institute__7022-sardis-rd-charlotte-nc-28211",
@@ -955,7 +1156,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "david-cox-road-elementary__4215-david-cox-rd-charlotte-nc-28269",
@@ -969,7 +1173,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "davidson-center-for-learning__452-s-main-st-davidson-nc-28036",
@@ -983,7 +1190,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "davidson-day-school__750-jetton-st-davidson-nc-28036",
@@ -997,7 +1207,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "davidson-elementary__635-south-st-davidson-nc-28036",
@@ -1011,7 +1224,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "davidson-green-school__511-s-main-st-davidson-nc-28036",
@@ -1025,7 +1241,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "daystar-arising-academy__1311-matthews-mint-hill-rd-matthews-nc-28105",
@@ -1039,7 +1258,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "devonshire-elementary__6500-barrington-dr-charlotte-nc-28215",
@@ -1053,7 +1275,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "dilworth-elementary__405-e-park-av-charlotte-nc-28203",
@@ -1067,7 +1292,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "dorothy-j-vaughan-academy-ot-technology__8601-old-concord-rd-charlotte-nc-28213",
@@ -1081,7 +1309,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "dream-children-school__2915-wild-duck-ct-charlotte-nc-28262",
@@ -1095,7 +1326,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "druid-hills-academy__2801-lucena-st-charlotte-nc-28206",
@@ -1109,7 +1343,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "e-e-waddell-language-academy__7030-nations-ford-rd-charlotte-nc-28217",
@@ -1123,7 +1360,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "east-mecklenburg-high__6800-monroe-rd-charlotte-nc-28212",
@@ -1137,7 +1377,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "east-voyager-academy-of-charlotte",
@@ -1145,13 +1388,16 @@
       "kind": "charter",
       "level": "elementary",
       "grade_span": "K-8",
-      "address": null,
-      "lat": null,
-      "lng": null,
+      "address": "7429 Tuckaseegee Rd, Charlotte, NC 28214",
+      "lat": 35.243938,
+      "lng": -80.952743,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://www.eastvoyager.org/",
+      "address_cross_checked": true,
+      "address_verified_at": "2026-09-29",
+      "address_note": null
     },
     {
       "source_key": "eastover-elementary__500-cherokee-rd-charlotte-nc-28207",
@@ -1165,7 +1411,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "eastway-middle__1501-norland-rd-charlotte-nc-28205",
@@ -1179,7 +1428,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "einstein-school-of-charlotte__3307-rea-rd-charlotte-nc-28226",
@@ -1193,7 +1445,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "elizabeth-lane-elementary__121-elizabeth-ln-matthews-nc-28105",
@@ -1207,7 +1462,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "elizabeth-traditional-elementary__1601-park-dr-charlotte-nc-28204",
@@ -1221,7 +1479,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "elon-park-elementary__11425-ardrey-kell-rd-charlotte-nc-28277",
@@ -1235,7 +1496,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "endhaven-elementary__6815-endhaven-ln-charlotte-nc-28277",
@@ -1249,7 +1513,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "epiphany-school-of-charlotte__1000-e-morehead-st-charlotte-nc-28203",
@@ -1263,7 +1530,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "evelyn-mack-academy__6850-monroe-rd-charlotte-nc-28212",
@@ -1277,7 +1547,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "faith-baptist-christian-school__6840-wilson-grove-rd-mint-hill-nc-28227",
@@ -1291,7 +1564,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "first-ward-creative-arts-academy__715-n-caldwell-st-charlotte-nc-28202",
@@ -1305,7 +1581,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "fletcher-school__8500-sardis-rd-charlotte-nc-28211",
@@ -1319,7 +1598,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "francis-bradley-middle__13345-beatties-ford-rd-huntersville-nc-28078",
@@ -1333,7 +1615,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "friendship-day-school-for-science-and-the-arts__3301-beatties-ford-rd-charlotte-nc-28216",
@@ -1347,7 +1632,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "garinger-high-school__1100-eastway-dr-charlotte-nc-28205",
@@ -1361,7 +1649,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "grace-covenant-academy__17301-statesville-rd-cornelius-nc-28031",
@@ -1375,7 +1666,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "grand-oak-elementary__15410-stumptown-rd-huntersville-nc-28078",
@@ -1389,7 +1683,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "greenway-park-elementary__8301-monroe-rd-charlotte-nc-28212",
@@ -1403,7 +1700,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "greyfriars-classical-academy__2701-rice-rd-matthews-nc-28105",
@@ -1417,7 +1717,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "harding-university-high__2001-alleghany-st-charlotte-nc-28208",
@@ -1431,7 +1734,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "harper-middle-college-at-cpcc",
@@ -1439,13 +1745,16 @@
       "kind": "public",
       "level": "high",
       "grade_span": "11-12",
-      "address": null,
+      "address": "315 W Hebron Street, Charlotte, NC 28273-4304",
       "lat": null,
       "lng": null,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://harperhs.cmsk12.org/our-school/about-us",
+      "address_cross_checked": false,
+      "address_verified_at": "2026-09-29",
+      "address_note": "SINGLE-SOURCED \u2014 never corroborated. CPCC's own campus catalog publishes no street address, so no second source exists. Zero parcel address points is expected on a college campus rather than suspicious, and the school sits on the CPCC Harper Campus, so a driver at this address is on the right campus either way. Treat as the weakest row here on any refresh."
     },
     {
       "source_key": "hawk-ridge-elementary__9201-bryant-farms-rd-charlotte-nc-28277",
@@ -1459,7 +1768,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hawthorne-academy-of-health-sciences__1411-hawthorne-ln-charlotte-nc-28205",
@@ -1473,7 +1785,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hickory-grove-christian-school__7200-e-w-t-harris-bv-charlotte-nc-28227",
@@ -1487,7 +1802,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hickory-grove-elementary__6300-highland-av-charlotte-nc-28215",
@@ -1501,7 +1819,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hidden-valley-elementary__5100-snow-white-ln-charlotte-nc-28213",
@@ -1515,7 +1836,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "highland-creek-elementary__7242-highland-creek-py-charlotte-nc-28269",
@@ -1529,7 +1853,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "highland-mill-montessori-elementary__3201-clemson-av-charlotte-nc-28205",
@@ -1543,7 +1870,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "highland-renaissance-academy__125-w-craighead-rd-charlotte-nc-28206",
@@ -1557,7 +1887,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "holy-trinity-catholic-middle-school__3100-park-rd-charlotte-nc-28209",
@@ -1571,7 +1904,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hopewell-high-school__11530-beatties-ford-rd-huntersville-nc-28078",
@@ -1585,7 +1921,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "hornets-nest-elementary__6700-beatties-ford-rd-charlotte-nc-28216",
@@ -1599,7 +1938,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "huntersville-elementary__200-gilead-rd-huntersville-nc-28078",
@@ -1613,7 +1955,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "huntingtowne-farms-elementary__2520-huntingtowne-farms-ln-charlotte-nc-28210",
@@ -1627,7 +1972,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "idlewild-elementary__7101-idlewild-rd-charlotte-nc-28212",
@@ -1641,7 +1989,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "imeck-at-cochrane__6200-starhaven-dr-charlotte-nc-28215",
@@ -1655,7 +2006,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "independence-high__1967-patriot-dr-charlotte-nc-28227",
@@ -1669,7 +2023,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "intellicor-international-academy__4301-shamrock-dr-charlotte-nc-28215",
@@ -1683,7 +2040,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "irwin-academic-center__329-n-irwin-av-charlotte-nc-28202",
@@ -1697,7 +2057,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "j-h-gunn-elementary__7400-harrisburg-rd-charlotte-nc-28215",
@@ -1711,7 +2074,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "j-m-alexander-middle__12201-hambright-rd-huntersville-nc-28078",
@@ -1725,7 +2091,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "j-t-williams-secondary-montessori__2400-carmine-st-charlotte-nc-28206",
@@ -1739,7 +2108,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "j-v-washam-elementary__9611-westmoreland-rd-cornelius-nc-28031",
@@ -1753,7 +2125,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "james-martin-middle__6301-university-pointe-bv-charlotte-nc-28262",
@@ -1767,7 +2142,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "jay-m-robinson-middle__5925-ballantyne-commons-py-charlotte-nc-28277",
@@ -1781,7 +2159,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "john-m-morehead-stem-academy__7810-neal-rd-charlotte-nc-28262",
@@ -1795,7 +2176,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "joseph-w-grier-academy__8330-grier-rd-charlotte-nc-28215",
@@ -1809,7 +2193,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "julius-l-chambers-high__7600-ibm-dr-charlotte-nc-28262",
@@ -1823,7 +2210,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "k-2-academy__605-south-st-davidson-nc-28036",
@@ -1837,7 +2227,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kennedy-middle__4000-gallant-ln-charlotte-nc-28273",
@@ -1851,7 +2244,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kennedy-school__1717-sharon-rd-w-charlotte-nc-28210",
@@ -1865,7 +2261,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kent-academy__1819-charlotte-dr-charlotte-nc-28203",
@@ -1879,7 +2278,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kiddie-academy-of-charlotte-blakene__9310-blakeney-centre-dr-charlotte-nc-28277",
@@ -1893,7 +2295,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kids-r-kids-school__6250-blakeney-park-dr-charlotte-nc-28277",
@@ -1907,7 +2312,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kidville-kovar-child-development-center__2624-milton-rd-charlotte-nc-28215",
@@ -1921,7 +2329,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kidz-place-academy-badger__1240-badger-ct-charlotte-nc-28206",
@@ -1935,7 +2346,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "king-s-academy__2022-w-sugar-creek-rd-charlotte-nc-28262",
@@ -1949,7 +2363,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "kipp-charlotte__931-wilann-dr-charlotte-nc-28215",
@@ -1963,7 +2380,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "knowledge-is-power-early-learning-prog__2312-orton-st-charlotte-nc-28208",
@@ -1977,7 +2397,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lake-norman-charter__12435-old-statesville-rd-huntersville-nc-28078",
@@ -1991,7 +2414,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lake-norman-christian-school__251-south-st-davidson-nc-28036",
@@ -2005,7 +2431,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lake-wylie-elementary__13620-erwin-rd-charlotte-nc-28273",
@@ -2019,7 +2448,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lansdowne-elementary",
@@ -2033,7 +2465,10 @@
       "district": null,
       "address_source": "mecklenburg-masteraddress",
       "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/CountyData/MasterAddress/MapServer/0 (joined on parcel id)",
-      "active": true
+      "active": true,
+      "address_cross_checked": false,
+      "address_verified_at": "2026-09-29",
+      "address_note": "Sole address point on the school parcel \u2014 unambiguous, but not corroborated against the school's own site."
     },
     {
       "source_key": "lawrence-orr-elementary__4835-shamrock-dr-charlotte-nc-28215",
@@ -2047,7 +2482,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lebanon-road-elementary__7300-lebanon-rd-mint-hill-nc-28227",
@@ -2061,7 +2499,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "legacy-leadership-academy__2520-ambassador-christian-wy-huntersville-nc-28078",
@@ -2075,7 +2516,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "levine-middle-college-high__2728-campus-ridge-rd-matthews-nc-28105",
@@ -2089,7 +2533,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lincoln-heights-academy__1900-newcastle-st-charlotte-nc-28216",
@@ -2103,7 +2550,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "long-creek-elementary__9425-midas-springs-rd-huntersville-nc-28078",
@@ -2117,7 +2567,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "lorraine-academy__3242-ridge-rd-charlotte-nc-28269",
@@ -2131,7 +2584,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "male-leadership-academy-of-charlotte__5901-nations-ford-rd-charlotte-nc-28217",
@@ -2145,7 +2601,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mallard-creek-elementary__9801-mallard-creek-rd-charlotte-nc-28262",
@@ -2159,7 +2618,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mallard-creek-high__3825-johnston-oehler-rd-charlotte-nc-28269",
@@ -2173,7 +2635,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "manus-academy__6203-carmel-rd-charlotte-nc-28226",
@@ -2187,7 +2652,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "martin-luther-king-jr-middle__500-bilmark-av-charlotte-nc-28213",
@@ -2201,7 +2669,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "matthews-elementary__200-e-mcdowell-st-matthews-nc-28105",
@@ -2215,7 +2686,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mcalpine-elementary__9100-carswell-ln-charlotte-nc-28277",
@@ -2229,7 +2703,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mcclintock-middle__1925-rama-rd-charlotte-nc-28212",
@@ -2243,7 +2720,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mckee-road-elementary__4101-mckee-rd-charlotte-nc-28270",
@@ -2257,7 +2737,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "merancas-middle-college-at-cpcc__11930-verhoeff-dr-huntersville-nc-28078",
@@ -2271,7 +2754,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "merry-oaks-elementary__3508-draper-av-charlotte-nc-28205",
@@ -2285,7 +2771,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "metro-school__405-s-davidson-st-charlotte-nc-28202",
@@ -2299,7 +2788,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "metrolina-regional-scholars-academy__5225-seventy-seven-center-dr-charlotte-nc-28217",
@@ -2313,7 +2805,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "military-and-global-leadership-academy-at-marie-g-davis__3351-griffith-st-charlotte-nc-28203",
@@ -2327,7 +2822,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mint-hill-elementary",
@@ -2335,13 +2833,16 @@
       "kind": "public",
       "level": "elementary",
       "grade_span": "K-5",
-      "address": null,
-      "lat": null,
-      "lng": null,
+      "address": "11615 Idlewild Rd., Matthews, NC 28105",
+      "lat": 35.150859,
+      "lng": -80.69787,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://minthilles.cmsk12.org",
+      "address_cross_checked": true,
+      "address_verified_at": "2026-09-29",
+      "address_note": null
     },
     {
       "source_key": "mint-hill-middle-school__11501-idlewild-rd-matthews-nc-28105",
@@ -2355,7 +2856,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "montclaire-elementary__5801-farmbrook-dr-charlotte-nc-28210",
@@ -2369,7 +2873,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mountain-island-day-school__1209-little-rock-rd-charlotte-nc-28214",
@@ -2383,7 +2890,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "mountain-island-elementary__7905-pleasant-grove-rd-charlotte-nc-28216",
@@ -2397,7 +2907,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "myers-park-high__2400-colony-rd-charlotte-nc-28209",
@@ -2411,7 +2924,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "myers-park-traditional-elementary__2132-radcliffe-av-charlotte-nc-28207",
@@ -2425,7 +2941,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "nathaniel-alexander-elementary__7910-neal-rd-charlotte-nc-28262",
@@ -2439,7 +2958,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "national-child-care-institute__9908-monroe-rd-matthews-nc-28105",
@@ -2453,7 +2975,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "nations-ford-elementary",
@@ -2461,13 +2986,16 @@
       "kind": "public",
       "level": "elementary",
       "grade_span": "K-5",
-      "address": null,
-      "lat": null,
-      "lng": null,
+      "address": "7050 Nations Ford Road, Charlotte, NC 28217-3461",
+      "lat": 35.156049,
+      "lng": -80.906305,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://nationsfordes.cmsk12.org",
+      "address_cross_checked": true,
+      "address_verified_at": "2026-09-29",
+      "address_note": null
     },
     {
       "source_key": "ndc-academy__1025-e-36th-st-charlotte-nc-28205",
@@ -2481,7 +3009,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "new-life-christian-academy__1337-samuel-st-charlotte-nc-28206",
@@ -2495,7 +3026,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "newell-elementary__332-w-rocky-river-rd-charlotte-nc-28213",
@@ -2509,7 +3043,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "north-mecklenburg-high__11201-old-statesville-rd-huntersville-nc-28078",
@@ -2523,7 +3060,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "northeast-middle__5960-brickstone-dr-charlotte-nc-28227",
@@ -2537,7 +3077,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "northridge-middle__7601-the-plaza-charlotte-nc-28215",
@@ -2551,7 +3094,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "northside-christian-academy",
@@ -2563,9 +3109,12 @@
       "lat": null,
       "lng": null,
       "district": null,
-      "active": true,
+      "active": false,
       "address_source": null,
-      "address_source_url": null
+      "address_source_url": null,
+      "address_note": "CLOSED 2024, citing low enrollment after 60+ years (WFAE, WSOC-TV, Charlotte Observer, Christian Post). The lapsed ncaknights.com domain \u2014 now redirecting to an unrelated commercial site \u2014 was the symptom, not the obstacle. A closed school must not be offerable.",
+      "address_cross_checked": null,
+      "address_verified_at": null
     },
     {
       "source_key": "northwest-school-of-the-arts__1415-beatties-ford-rd-charlotte-nc-28216",
@@ -2579,7 +3128,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "oakdale-elementary__1825-oakdale-rd-charlotte-nc-28216",
@@ -2593,7 +3145,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "oakhurst-steam-academy__4511-monroe-rd-charlotte-nc-28205",
@@ -2607,7 +3162,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "oaklawn-language-academy__1810-oaklawn-av-charlotte-nc-28216",
@@ -2621,7 +3179,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "oasis-prforming-arts-school__512-west-bv-charlotte-nc-28203",
@@ -2635,7 +3196,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olde-providence-elementary__3800-rea-rd-charlotte-nc-28226",
@@ -2649,7 +3213,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olympic-biotechnology-health-and-public-administration__4301-sandy-porter-rd-charlotte-nc-28273",
@@ -2663,7 +3230,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olympic-math-engineering-technology-and-science__4301-sandy-porter-rd-charlotte-nc-28273",
@@ -2677,7 +3247,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olympic-renaissance-school-of-arts-and-technology__4301-sandy-porter-rd-charlotte-nc-28273",
@@ -2691,7 +3264,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olympic-school-of-executive-leadership-entrepreneurial-development__4301-sandy-porter-rd-charlotte-nc-28273",
@@ -2705,7 +3281,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "olympic-school-of-technology-entrepreneurship-advanced-manufacturing__4301-sandy-porter-rd-charlotte-nc-28273",
@@ -2719,7 +3298,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "omni-montessori-school__9536-blakeney-heath-rd-charlotte-nc-28277",
@@ -2733,7 +3315,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "one7-academy__2223-eastway-dr-charlotte-nc-28205",
@@ -2747,7 +3332,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "our-lady-of-assumption-catholic__4225-shamrock-dr-charlotte-nc-28215",
@@ -2761,7 +3349,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "palisades-episcopal-school__13120-grand-palisades-py-charlotte-nc-28278",
@@ -2775,7 +3366,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "palisades-high-school",
@@ -2783,13 +3377,16 @@
       "kind": "public",
       "level": "high",
       "grade_span": "9-12",
-      "address": null,
+      "address": "15221 York Road, Charlotte, NC 28278",
       "lat": null,
       "lng": null,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://palisadeshs.cmsk12.org",
+      "address_cross_checked": false,
+      "address_verified_at": "2026-09-29",
+      "address_note": "County address points on this parcel (14947/14971/15215) PREDATE the school, which opened August 2022, so the cross-check disagreed on stale data rather than on the address. Superseded by the school's own site, corroborated independently by its Wikipedia entry carrying the 2022 opening date. Stale data losing to current data is not the contradiction the stop-rule was written for."
     },
     {
       "source_key": "palisades-park-elementary__15321-york-rd-charlotte-nc-28278",
@@ -2803,7 +3400,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "park-road-montessori__3701-haven-dr-charlotte-nc-28209",
@@ -2817,7 +3417,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "parkside-elementary-school__2945-johnston-oehler-rd-charlotte-nc-28269",
@@ -2831,7 +3434,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "paw-creek-christian-academy__5110-tuckaseegee-rd-charlotte-nc-28208",
@@ -2845,7 +3451,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "paw-creek-elementary__1300-cathey-rd-charlotte-nc-28214",
@@ -2859,7 +3468,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "performance-learning-center__2300-w-sugar-creek-rd-charlotte-nc-28262",
@@ -2873,7 +3485,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "performance-learning-center__1400-n-graham-st-charlotte-nc-28206",
@@ -2887,7 +3502,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "philips-academy__3115-providence-rd-charlotte-nc-28211",
@@ -2901,7 +3519,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "phillip-o-berry-academy-of-technology__1430-alleghany-st-charlotte-nc-28208",
@@ -2915,7 +3536,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "phoenix-montessori-academy__12340-mt-holly-huntersville-rd-huntersville-nc-28078",
@@ -2929,7 +3553,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "piedmont-middle-school__1241-e-10th-st-charlotte-nc-28204",
@@ -2943,7 +3570,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "pineville-elementary__204-lowry-st-pineville-nc-28134",
@@ -2957,7 +3587,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "pinewood-elementary__805-seneca-pl-charlotte-nc-28210",
@@ -2971,7 +3604,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "piney-grove-elementary__8801-eaglewind-dr-charlotte-nc-28212",
@@ -2985,7 +3621,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "pioneer-springs-community-school__9132-bob-beatty-rd-charlotte-nc-28269",
@@ -2999,7 +3638,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "plaza-road-academy__6035-hunters-crossing-ln-charlotte-nc-28215",
@@ -3013,7 +3655,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "polo-ridge-elementary__11830-tom-short-rd-charlotte-nc-28277",
@@ -3027,7 +3672,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "presbyterian-academy__200-hawthorne-ln-charlotte-nc-28204",
@@ -3041,7 +3689,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "prosperity-guidpost-montessori__4755-prosperity-church-rd-charlotte-nc-28269",
@@ -3055,7 +3706,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "providence-day-school__5800-sardis-rd-charlotte-nc-28211",
@@ -3069,7 +3723,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "providence-high__1800-pineville-matthews-rd-charlotte-nc-28270",
@@ -3083,7 +3740,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "providence-spring-elementary__10045-providence-church-ln-charlotte-nc-28277",
@@ -3097,7 +3757,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "quail-hollow-middle__2901-smithfield-church-rd-charlotte-nc-28210",
@@ -3111,7 +3774,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "queen-s-grant-community__6400-matthews-mint-hill-rd-mint-hill-nc-28227",
@@ -3125,7 +3791,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "r-c-smith-christian-academy__11901-eastfield-rd-huntersville-nc-28078",
@@ -3139,7 +3808,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "rama-road-elementary__1035-rama-rd-charlotte-nc-28211",
@@ -3153,7 +3825,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "randolph-ib-middle__4400-water-oak-rd-charlotte-nc-28211",
@@ -3167,7 +3842,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ranson-middle__5850-statesville-rd-charlotte-nc-28269",
@@ -3181,7 +3859,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "rea-farms-steam-academy",
@@ -3195,7 +3876,10 @@
       "district": null,
       "address_source": "mecklenburg-masteraddress",
       "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/CountyData/MasterAddress/MapServer/0 (joined on parcel id)",
-      "active": true
+      "active": true,
+      "address_cross_checked": false,
+      "address_verified_at": "2026-09-29",
+      "address_note": "Sole address point on the school parcel \u2014 unambiguous, but not corroborated against the school's own site."
     },
     {
       "source_key": "reedy-creek-elementary__10801-plaza-rd-ext-charlotte-nc-28215",
@@ -3209,7 +3893,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "reid-park-academy__4108-w-tyvola-rd-charlotte-nc-28208",
@@ -3223,7 +3910,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "renaissance-west-steam-academy__3241-new-renaissance-wy-charlotte-nc-28208",
@@ -3237,7 +3927,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "ridge-road-middle__7260-highland-creek-py-charlotte-nc-28269",
@@ -3251,7 +3944,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "river-gate-elementary__15340-smith-rd-charlotte-nc-28273",
@@ -3265,7 +3961,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "river-oaks-academy__1015-mt-holly-huntersville-rd-charlotte-nc-28214",
@@ -3279,7 +3978,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "rocky-river-high-school__10505-clear-creek-commerce-dr-mint-hill-nc-28227",
@@ -3293,7 +3995,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "rod-of-god-christian-academy__7300-s-tryon-st-charlotte-nc-28273",
@@ -3307,7 +4012,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "school-at-thompson__6800-st-peter-s-ln-matthews-nc-28105",
@@ -3321,7 +4029,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sedgefield-elementary__715-hartford-av-charlotte-nc-28209",
@@ -3335,7 +4046,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sedgefield-middle__2700-dorchester-pl-charlotte-nc-28209",
@@ -3349,7 +4063,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sedgefield-school__2830-dorchester-pl-charlotte-nc-28209",
@@ -3363,7 +4080,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "selwyn-elementary__2840-colony-rd-charlotte-nc-28211",
@@ -3377,7 +4097,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "shamrock-gardens-elementary__3301-country-club-dr-charlotte-nc-28205",
@@ -3391,7 +4114,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "shands-school__1315-matthews-mint-hill-rd-matthews-nc-28105",
@@ -3405,7 +4131,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sharon-elementary__4330-foxcroft-rd-charlotte-nc-28211",
@@ -3419,7 +4148,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "shining-stars-academy__14115-lancaster-hy-charlotte-nc-28277",
@@ -3433,7 +4165,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "smithfield-elementary__3200-smithfield-church-rd-charlotte-nc-28210",
@@ -3447,7 +4182,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "soar-academy__2409-plantation-center-dr-matthews-nc-28105",
@@ -3461,7 +4199,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "socrates-academy__3909-weddington-rd-matthews-nc-28105",
@@ -3475,7 +4216,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "south-academy-of-international-languages__8300-nations-ford-rd-charlotte-nc-28217",
@@ -3489,7 +4233,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "south-charlotte-baptist-academy__12416-lancaster-hy-pineville-nc-28134",
@@ -3503,7 +4250,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "south-charlotte-middle__8040-strawberry-ln-charlotte-nc-28277",
@@ -3517,7 +4267,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "south-mecklenburg-high__8900-park-rd-charlotte-nc-28210",
@@ -3531,7 +4284,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "south-mecklenburg-ardrey-kell-relief-high",
@@ -3545,7 +4301,10 @@
       "district": null,
       "active": false,
       "address_source": null,
-      "address_source_url": null
+      "address_source_url": null,
+      "address_note": "Unbuilt CMS relief site \u2014 a planning placeholder, not a building a parent picks.",
+      "address_cross_checked": null,
+      "address_verified_at": null
     },
     {
       "source_key": "south-pine-academy",
@@ -3553,13 +4312,16 @@
       "kind": "public",
       "level": "elementary",
       "grade_span": "K-5",
-      "address": null,
-      "lat": null,
-      "lng": null,
+      "address": "2541 Sandy Porter Road, Charlotte, NC 28273-3162",
+      "lat": 35.136405,
+      "lng": -80.944797,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://southpinees.cmsk12.org/contact",
+      "address_cross_checked": true,
+      "address_verified_at": "2026-09-29",
+      "address_note": null
     },
     {
       "source_key": "southlake-christian-academy__13820-hagers-ferry-rd-huntersville-nc-28078",
@@ -3573,7 +4335,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "southwest-middle-school__13624-steele-creek-rd-charlotte-nc-28278",
@@ -3587,7 +4352,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "st-ann-catholic-school__600-hillside-av-charlotte-nc-28209",
@@ -3601,7 +4369,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "st-gabriel-catholic-school__3028-providence-rd-charlotte-nc-28211",
@@ -3615,7 +4386,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "st-mark-catholic-school__14750-stumptown-rd-huntersville-nc-28078",
@@ -3629,7 +4403,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "st-matthew-catholic-school__8015-ballantyne-commons-py-charlotte-nc-28277",
@@ -3643,7 +4420,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "st-patrick-catholic-school__1125-buchanan-st-charlotte-nc-28203",
@@ -3657,7 +4437,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "starmount-academy-of-excellence__1600-brookdale-av-charlotte-nc-28210",
@@ -3671,7 +4454,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "statesville-road-elementary__5521-milhaven-ln-charlotte-nc-28269",
@@ -3685,7 +4471,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "steele-creek-elementary__4100-gallant-ln-charlotte-nc-28273",
@@ -3699,7 +4488,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "steele-creek-preparatory-academy",
@@ -3713,7 +4505,10 @@
       "district": null,
       "address_source": "mecklenburg-masteraddress",
       "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/CountyData/MasterAddress/MapServer/0 (joined on parcel id)",
-      "active": true
+      "active": true,
+      "address_cross_checked": false,
+      "address_verified_at": "2026-09-29",
+      "address_note": "Sole address point on the school parcel \u2014 unambiguous, but not corroborated against the school's own site."
     },
     {
       "source_key": "sterling-elementary__9601-china-grove-church-rd-pineville-nc-28134",
@@ -3727,7 +4522,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "stoney-creek-elementary__14015-mallard-roost-rd-charlotte-nc-28262",
@@ -3741,7 +4539,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "strategic-academy__1715-sharon-rd-w-charlotte-nc-28210",
@@ -3755,7 +4556,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "student-first-academy__7020-tuckaseegee-rd-charlotte-nc-28214",
@@ -3769,7 +4573,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sugar-creek-charter__4101-n-tryon-st-charlotte-nc-28206",
@@ -3783,7 +4590,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "sugar-creek-charter-high-school__7821-old-concord-rd-charlotte-nc-28213",
@@ -3797,7 +4607,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "t-a-p-s-prepartory-academy__9100-olmsted-dr-charlotte-nc-28262",
@@ -3811,7 +4624,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "talented-tenth-boys-acad-of-nc__1500-w-rocky-river-rd-charlotte-nc-28213",
@@ -3825,7 +4641,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "teaching-achieving-students-acad__9200-university-city-bv-charlotte-nc-28223",
@@ -3839,7 +4658,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "the-john-crosland-school__5146-parkway-plaza-bv-charlotte-nc-28217",
@@ -3853,7 +4675,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "thomasboro-academy__538-bradford-dr-charlotte-nc-28208",
@@ -3867,7 +4692,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "torrence-creek-elementary__14550-ranson-rd-huntersville-nc-28078",
@@ -3881,7 +4709,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "trillium-springs-montessori__9213-beatties-ford-rd-huntersville-nc-28078",
@@ -3895,7 +4726,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "trinity-christian-preparatory-school__7516-e-independence-bv-charlotte-nc-28227",
@@ -3909,7 +4743,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "trinity-episcopal-school__750-e-9th-st-charlotte-nc-28202",
@@ -3923,7 +4760,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "tuckaseegee-elementary__2028-little-rock-rd-charlotte-nc-28214",
@@ -3937,7 +4777,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "turning-point-academy",
@@ -3945,13 +4788,16 @@
       "kind": "public",
       "level": "high",
       "grade_span": "9-12",
-      "address": null,
-      "lat": null,
-      "lng": null,
+      "address": "8701 Moores Chapel Road, Charlotte, NC 28214-1555",
+      "lat": 35.273906,
+      "lng": -80.950573,
       "district": null,
       "active": true,
-      "address_source": null,
-      "address_source_url": null
+      "address_source": "school-site",
+      "address_source_url": "https://turningpointae.cmsk12.org/contact",
+      "address_cross_checked": true,
+      "address_verified_at": "2026-09-29",
+      "address_note": null
     },
     {
       "source_key": "united-faith-christian-academy__8625-providence-rd-charlotte-nc-28270",
@@ -3965,7 +4811,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "university-meadows-elementary__1600-pavilion-bv-charlotte-nc-28262",
@@ -3979,7 +4828,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "university-park-creative-arts__2400-hildebrand-st-charlotte-nc-28216",
@@ -3993,7 +4845,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "victory-christian-center-school__1501-carrier-dr-charlotte-nc-28216",
@@ -4007,7 +4862,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "villa-heights__800-everett-pl-charlotte-nc-28205",
@@ -4021,7 +4879,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "walter-g-byers-school__1415-hamilton-st-charlotte-nc-28206",
@@ -4035,7 +4896,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "west-charlotte-high__2219-senior-dr-charlotte-nc-28216",
@@ -4049,7 +4913,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "west-mecklenburg-high__7400-tuckaseegee-rd-charlotte-nc-28214",
@@ -4063,7 +4930,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "westerly-hills-academy__4420-denver-av-charlotte-nc-28208",
@@ -4077,7 +4947,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "whitewater-academy__11600-white-rapids-rd-charlotte-nc-28214",
@@ -4091,7 +4964,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "whitewater-middle__10201-running-rapids-rd-charlotte-nc-28214",
@@ -4105,7 +4981,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "william-amos-hough-high-school__12420-bailey-rd-cornelius-nc-28031",
@@ -4119,7 +4998,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "wilson-stem-academy__7020-tuckaseegee-rd-charlotte-nc-28214",
@@ -4133,7 +5015,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "winding-springs-elementary__6601-horace-mann-rd-charlotte-nc-28269",
@@ -4147,7 +5032,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "windsor-park-elementary__3910-sudbury-rd-charlotte-nc-28205",
@@ -4161,7 +5049,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "winget-park-elementary__12235-winget-rd-charlotte-nc-28278",
@@ -4175,7 +5066,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     },
     {
       "source_key": "winterfield-elementary__3100-winterfield-pl-charlotte-nc-28205",
@@ -4189,7 +5083,10 @@
       "district": null,
       "active": true,
       "address_source": "charlotte-gis",
-      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query"
+      "address_source_url": "https://gis.charlottenc.gov/arcgis/rest/services/HNS/HousingLocationalToolLayers/MapServer/1/query",
+      "address_cross_checked": null,
+      "address_verified_at": null,
+      "address_note": null
     }
   ]
 }

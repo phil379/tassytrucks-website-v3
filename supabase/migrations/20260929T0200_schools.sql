@@ -121,3 +121,21 @@ comment on column public.schools.address_source_url is
   'The exact URL the address was read from, so a disputed route can be traced.';
 
 notify pgrst, 'reload schema';
+
+-- ── address verification ────────────────────────────────────────────────────
+-- An address with no date is an address nobody has checked, and a single source
+-- that nothing corroborates is the weakest row in the table. Both facts belong
+-- on the row rather than in a commit message.
+alter table public.schools
+  add column if not exists address_verified_at timestamptz,
+  add column if not exists address_cross_checked boolean,
+  add column if not exists address_note text;
+
+comment on column public.schools.address_verified_at is
+  'When the address was last read from its source.';
+comment on column public.schools.address_cross_checked is
+  'True when a second independent source agreed. False = single-sourced.';
+comment on column public.schools.address_note is
+  'Why a row needed judgement — a superseded cross-check, a single source, a closure.';
+
+notify pgrst, 'reload schema';

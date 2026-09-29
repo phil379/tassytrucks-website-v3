@@ -46,6 +46,9 @@ type Row = {
   active: boolean;
   address_source: string | null;
   address_source_url: string | null;
+  address_cross_checked: boolean | null;
+  address_verified_at: string | null;
+  address_note: string | null;
 };
 
 async function main() {
@@ -69,6 +72,14 @@ async function main() {
     active: s.active !== false,
     address_source: s.address_source ?? null,
     address_source_url: s.address_source_url ?? null,
+    /**
+     * Provenance travels with the row, not in a commit message. An address is
+     * the thing a driver acts on, and "who says so, when, and did anything
+     * agree" should be answerable from the table.
+     */
+    address_cross_checked: s.address_cross_checked ?? null,
+    address_verified_at: s.address_verified_at ?? null,
+    address_note: s.address_note ?? null,
   }));
 
   const before = await count();

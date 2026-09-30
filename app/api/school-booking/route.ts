@@ -10,6 +10,7 @@ import {
   type SchoolPlan,
 } from '@/lib/school-plans';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
+import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
@@ -207,6 +208,9 @@ export async function POST(request: Request) {
       contact_name: parentName,
       contact_phone: data.parent.phone,
       contact_email: data.parent.email,
+      // Same rule as /api/trip-request: a plus-tagged parent address is a test
+      // booking and must not reach the dispatch board as a child's ride.
+      is_test_data: looksLikeTestIdentity(data.parent.email),
       pickup_address: schedule.pickup_address,
       dropoff_address: schedule.dropoff_address,
       requested_at: requestedAt,

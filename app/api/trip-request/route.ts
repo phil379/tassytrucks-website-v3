@@ -7,6 +7,7 @@ import {
 } from '@/lib/trip-request';
 import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
+import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
@@ -227,6 +228,12 @@ export async function POST(request: Request) {
         contact_last_name: data.contactLastName,
         contact_phone: data.contactPhone,
         contact_email: data.contactEmail || null,
+        // trip_requests has carried is_test_data since before the dispatch board
+        // shipped, and the board, the KPI counts and the dashboard all filter on
+        // it -- while every booking written here left it to default false. A
+        // plus-tagged address is Phil (or a friend) walking the funnel; keep
+        // those bookings off the board and out of the revenue numbers.
+        is_test_data: looksLikeTestIdentity(data.contactEmail),
         preferred_contact: data.preferredContact,
         pickup_address: data.pickupAddress,
         dropoff_address: data.dropoffAddress,

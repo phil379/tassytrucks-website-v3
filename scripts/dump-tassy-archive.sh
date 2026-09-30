@@ -48,6 +48,38 @@ if [ ! -d "$OUT" ]; then
   exit 1
 fi
 
+# `supabase db dump` shells out to pg_dump INSIDE a container, so the Docker daemon has
+# to be up. Phil hit "Cannot connect to the Docker daemon" on the second run. He has
+# OrbStack; start whichever runtime is installed and wait for it rather than making him
+# find the app, launch it, and re-run this.
+if ! docker info >/dev/null 2>&1; then
+  RUNTIME=""
+  [ -d "/Applications/OrbStack.app" ] && RUNTIME="OrbStack"
+  [ -z "$RUNTIME" ] && [ -d "/Applications/Docker.app" ] && RUNTIME="Docker"
+
+  if [ -z "$RUNTIME" ]; then
+    echo "Docker is not running and neither OrbStack nor Docker Desktop is installed."
+    echo "supabase db dump needs one of them. Install OrbStack:  brew install --cask orbstack"
+    exit 1
+  fi
+
+  echo "=== 0b/3 starting $RUNTIME (the dump runs pg_dump in a container) ==="
+  open -a "$RUNTIME"
+  printf "    waiting for the Docker daemon"
+  for _ in $(seq 1 60); do
+    if docker info >/dev/null 2>&1; then echo " — up."; break; fi
+    printf "."
+    sleep 2
+  done
+  if ! docker info >/dev/null 2>&1; then
+    echo
+    echo "$RUNTIME did not come up within two minutes. Open it manually, wait for it to"
+    echo "finish starting, then run this script again."
+    exit 1
+  fi
+  echo
+fi
+
 echo "=== 1/3 preparing a throwaway folder (no migrations in it) ==="
 rm -rf "$SCRATCH"
 mkdir -p "$SCRATCH"

@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { request } from '@/lib/request-links';
+import {
+  CARE, CARE_WAV, CONCIERGE as CONCIERGE_CARD, RECOVERY, WINNIE as WINNIE_CARD,
+  bandLabel, overBandLabel, roundTripCents, dollars,
+} from '@/lib/quote';
+import { SCHOOL_PLANS, SIBLING_NOTE } from '@/lib/school-plans';
 
 export const metadata: Metadata = {
   title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
@@ -79,34 +84,43 @@ function RateTable({
   );
 }
 
-const MEDICAL: Row[] = [
-  { band: 'Up to 3 miles', a: '$49', b: '$129' },
-  { band: '4 – 7 miles', a: '$59', b: '$149' },
-  { band: '8 – 12 miles', a: '$74', b: '$169' },
-  { band: '13 – 17 miles', a: '$89', b: '$195' },
-  { band: '18 – 22 miles', a: '$109', b: '$225' },
-  { band: '23 – 30 miles', a: '$129', b: '$259' },
-  { band: 'Over 30 miles', a: 'Call us', b: 'Call us' },
-];
+/**
+ * DERIVED, not typed. These tables were hand-written copies of the rate cards
+ * until 2026-09-30, when Winnie was repriced in lib/quote.ts and this page kept
+ * advertising the old fare — the engine said $69, the pricing page said $49,
+ * and the pricing page is the one the customer reads. Two sources of truth for
+ * a price is not a style problem; it is a promise the business cannot keep.
+ *
+ * Everything below now comes from the cards. Reprice in lib/quote.ts and this
+ * page follows on the next build.
+ */
 
-const CONCIERGE: Row[] = [
-  { band: 'Up to 3 miles', a: '$69', b: '$138' },
-  { band: '4 – 7 miles', a: '$89', b: '$178' },
-  { band: '8 – 12 miles', a: '$109', b: '$218' },
-  { band: '13 – 17 miles', a: '$129', b: '$258' },
-  { band: '18 – 22 miles', a: '$155', b: '$310' },
-  { band: '23 – 30 miles', a: '$185', b: '$370' },
-  { band: 'Over 30 miles', a: 'Call us', b: 'Call us' },
-];
+/** Two cards side by side, sharing a band structure (Care one-way vs Recovery). */
+function pairRows(a: typeof CARE, b: typeof RECOVERY): Row[] {
+  const rows: Row[] = a.bands.map((band, i) => ({
+    band: bandLabel(a.bands, i),
+    a: dollars(band.cents),
+    b: b.bands[i] ? dollars(b.bands[i].cents) : 'Call us',
+  }));
+  rows.push({ band: overBandLabel(a.bands), a: 'Call us', b: 'Call us' });
+  return rows;
+}
 
-const WINNIE: Row[] = [
-  { band: 'Up to 5 miles', a: '$49', b: '$89' },
-  { band: '6 – 10 miles', a: '$59', b: '$106' },
-  { band: '11 – 15 miles', a: '$69', b: '$124' },
-  { band: '16 – 20 miles', a: '$79', b: '$142' },
-  { band: '21 – 25 miles', a: '$89', b: '$160' },
-  { band: 'Over 25 miles', a: 'Call us', b: 'Call us' },
-];
+/** One card, one way beside its own return price. */
+function returnRows(card: typeof CONCIERGE_CARD): Row[] {
+  const rows: Row[] = card.bands.map((band, i) => ({
+    band: bandLabel(card.bands, i),
+    a: dollars(band.cents),
+    b: dollars(roundTripCents(card, band.cents)),
+  }));
+  rows.push({ band: overBandLabel(card.bands), a: 'Call us', b: 'Call us' });
+  return rows;
+}
+
+const MEDICAL: Row[] = pairRows(CARE, RECOVERY);
+const CONCIERGE: Row[] = returnRows(CONCIERGE_CARD);
+const WINNIE: Row[] = returnRows(WINNIE_CARD);
+const WAV: Row[] = returnRows(CARE_WAV);
 
 const PLANS = [
   {
@@ -167,35 +181,53 @@ export default function PricingPage() {
               cta="Request a medical ride"
             />
             <div className="flex flex-col gap-6">
-              <div className="card-tile">
-                <h3 className="serif text-xl font-semibold">Travelling in a wheelchair</h3>
-                <p className="ink-soft mt-2 text-sm leading-relaxed">
-                  <strong className="text-ink">Tassy Care WAV</strong> uses a ramp-equipped
-                  vehicle and an operator trained in securement. You stay in your chair for
-                  the whole trip. Those vehicles come from our partner network, so we quote
-                  your route on the call rather than print a rate we cannot hold to. Call
-                  with your two addresses and you will have a price in minutes.
-                </p>
-                <a href="tel:+17049418508" className="btn-gold mt-5 inline-flex items-center gap-2">
-                  Call (704) 941-8508
-                </a>
-              </div>
+              {/* Published from 2026-09-30. This card used to say "we quote your route on
+                  the call rather than print a rate we cannot hold to" — which made the one
+                  passenger least able to chase a phone call the only one who had to. The
+                  vehicles come from the partner network either way; the number is now a
+                  commitment Tassy holds by subcontract instead of a callback. */}
+              <RateTable
+                heading="Travelling in a wheelchair"
+                note="Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement — you stay in your chair for the whole trip. Priced by distance like every other line, so you know the number before you book. 20 minutes of on-site wait included."
+                colA="One way"
+                colASub="ramp-equipped, securement trained"
+                colB="There and back"
+                colBSub="20 min wait included"
+                rows={WAV}
+                href={request.nemt}
+                cta="Request a wheelchair ride"
+              />
               <div className="card-tile">
                 <h3 className="serif text-xl font-semibold">Tassy Scholar</h3>
+                {/* This card carried a THIRD set of Scholar prices — $45 a leg, $20 a
+                    sibling, a $55 route minimum, $660 a month — none of which matched the
+                    plans a parent is actually charged in the booking wizard. Those per-leg
+                    numbers are the institutional route model (and $45 a leg is what
+                    EverDriven paid Phil as a subcontractor, i.e. district money). They are
+                    a different product with a different payer, so they no longer masquerade
+                    as the family price. Family plans are now read from SCHOOL_PLANS, the
+                    same source the wizard charges from. */}
                 <p className="ink-soft mt-2 text-sm leading-relaxed">
-                  School and after-school runs are sold <strong className="text-ink">by the
-                  route and billed monthly</strong>, never per ride — the cost of a school
-                  leg turns on how many stops it has, not how many miles. First child $45 a
-                  leg, each brother or sister at the same address $20, third child at that
-                  address free, with a $55 route minimum.
+                  Sold <strong className="text-ink">by the plan and billed monthly</strong>,
+                  never per ride — one child, one car, the same driver every morning and the
+                  schedule locked for the year.
                 </p>
+                <ul className="mt-3 space-y-1.5 text-sm">
+                  {SCHOOL_PLANS.map((plan) => (
+                    <li key={plan.key} className="flex items-baseline justify-between gap-3">
+                      <span className="ink-soft">{plan.name}</span>
+                      <strong className="text-ink whitespace-nowrap">{plan.price}</strong>
+                    </li>
+                  ))}
+                </ul>
+                <p className="ink-soft mt-2 text-xs">{SIBLING_NOTE}.</p>
                 <p className="ink-soft mt-3 text-sm leading-relaxed">
-                  The after-school run, three days a week, starts at{' '}
-                  <strong className="text-ink">$660 a month</strong>. Schools, districts and
-                  case managers: daily routes quoted on account.
+                  Schools, districts and case managers: daily routes are a different product,
+                  priced per leg by how many stops the route has rather than by the mile, and
+                  quoted on account.
                 </p>
                 <Link href={request.school} className="btn-gold mt-5 inline-flex items-center gap-2">
-                  Get a route quote <ArrowRight size={16} aria-hidden="true" />
+                  See plans and pricing <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </div>

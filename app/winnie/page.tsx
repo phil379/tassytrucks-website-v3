@@ -58,23 +58,23 @@ export default function WinniePage() {
       tiers={[
         {
           name: 'Up to 5 miles',
-          price: '$49',
+          price: '$69',
           cadence: 'one way · $124 there and back',
           features: ['Carrier or harness included', 'Seat protection', '20 min wait on a round trip', 'Second pet $15'],
           cta: { label: 'Request this', href: request.winnie },
         },
         {
           name: '6 to 15 miles',
-          price: '$59–69',
-          cadence: 'one way · $106–124 there and back',
+          price: '$79–89',
+          cadence: 'one way · $142–160 there and back',
           features: ['Everything above', 'Across Mecklenburg County', 'Handover by name at the clinic', 'Text when they are collected'],
           cta: { label: 'Request this', href: request.winnie },
           highlight: true,
         },
         {
           name: '16 to 25 miles',
-          price: '$79–89',
-          cadence: 'one way · $142–160 there and back',
+          price: '$99–109',
+          cadence: 'one way · $178–196 there and back',
           features: ['Everything above', 'Longer runs and out-of-county vets', 'Over 25 miles, call us', 'Monthly plans 10–15% off'],
           cta: { label: 'Request this', href: request.winnie },
         },

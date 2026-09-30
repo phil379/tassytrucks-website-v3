@@ -493,6 +493,42 @@ export const FACILITY_TIERS = [
   { minTripsPerMonth: 25, discount: 0.1 },
 ] as const;
 
+/**
+ * ── PUBLISHED RATE TABLE HELPERS ─────────────────────────────────────────────
+ *
+ * /pricing used to carry its own hand-typed copies of every band. On
+ * 2026-09-30 Winnie was repriced here and the page went on quoting $49 for a
+ * ride the engine charged $69 at -- two sources of truth, and the customer-
+ * facing one was the wrong one. These exist so the page can be DERIVED from the
+ * cards. Never hand-type a fare into a page again.
+ */
+
+/** "Up to 5 miles" for the first rung, "6 – 10 miles" after that. */
+export function bandLabel(bands: readonly Band[], i: number): string {
+  if (i === 0) return `Up to ${bands[0].upToMiles} miles`;
+  return `${bands[i - 1].upToMiles + 1} – ${bands[i].upToMiles} miles`;
+}
+
+/** "Over 30 miles" — the rung past the card, where a person quotes it. */
+export function overBandLabel(bands: readonly Band[]): string {
+  return `Over ${bands[bands.length - 1].upToMiles} miles`;
+}
+
+/**
+ * What the return leg costs, by the card's own rule.
+ * The floor matters: on Winnie 1.8 x $69 = $124.20 and the floor is $124, so
+ * the two agree — but a floor left behind after a reprice is how a round trip
+ * ends up cheaper than the one-way it contains.
+ */
+export function roundTripCents(card: Card, oneWayCents: number): number {
+  return Math.max(Math.round(oneWayCents * card.returnFactor), card.returnFloor);
+}
+
+/** Whole dollars, the way every published table shows them. */
+export function dollars(cents: number): string {
+  return `$${Math.round(cents / 100)}`;
+}
+
 export type Surcharge = { label: string; cents: number };
 
 export type Quote = {

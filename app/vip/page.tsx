@@ -44,7 +44,7 @@ export default function VipPage() {
       tiers={[
         {
           name: 'Up to 7 miles',
-          price: '$69–89',
+          price: '$89–99',
           cadence: 'one way',
           features: ['Reserved for your time', 'Flat rate, no surge', 'Professional driver', 'Full-size SUV'],
           cta: { label: 'Reserve this', href: request.vip },

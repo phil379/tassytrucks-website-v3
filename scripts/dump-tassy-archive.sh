@@ -19,6 +19,12 @@
 
 set -euo pipefail
 
+SCRATCH_TRAP="$HOME/.tassy-dump-scratch"
+# A folder still linked to a production database is a footgun, so remove it on ANY
+# exit -- success, failure, or Ctrl-C. The first run died at the login step and left
+# one behind.
+trap 'cd "$HOME" 2>/dev/null || true; rm -rf "$SCRATCH_TRAP"' EXIT
+
 REF="wbspkoudvkkuknehwuid"                      # the T-Gigs database
 OUT="$HOME/code/tassytrucksops/docs/migrations_pending"
 SCRATCH="$HOME/.tassy-dump-scratch"
@@ -26,6 +32,16 @@ SCRATCH="$HOME/.tassy-dump-scratch"
 if ! command -v supabase >/dev/null 2>&1; then
   echo "supabase CLI not found. Install it with:  brew install supabase/tap/supabase"
   exit 1
+fi
+
+# The CLI needs an account token before it can link. Phil hit this on the first run:
+# "Access token not provided." Do NOT reach for SUPABASE_ACCESS_TOKEN out of
+# .env.local -- that is the sbp_ personal token that has been flagged for revocation
+# since 2026-09-25. `supabase login` opens a browser and stores its own.
+if ! supabase projects list >/dev/null 2>&1; then
+  echo "=== 0/3 signing the Supabase CLI in (a browser window will open) ==="
+  supabase login
+  echo
 fi
 if [ ! -d "$OUT" ]; then
   echo "Can't find $OUT -- is the tassytrucksops repo at ~/code/tassytrucksops ?"
@@ -52,8 +68,7 @@ echo "=== 3/3 dumping the tassy_archive schema ==="
 supabase db dump --linked --schema tassy_archive -f "$OUT/SPLIT_01_schema.sql"
 supabase db dump --linked --schema tassy_archive --data-only -f "$OUT/SPLIT_02_data.sql"
 
-cd "$HOME"
-rm -rf "$SCRATCH"   # a folder still linked to a production database is a footgun
+cd "$HOME"   # the trap removes $SCRATCH on exit
 
 echo
 echo "Done. Two files written:"

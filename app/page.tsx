@@ -36,7 +36,7 @@ const verticals: Vertical[] = [
   {
     slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
     blurb: 'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
-    bullets: ['Flat rates from $49, one way', 'Wheelchair from $89, priced by distance'],
+    bullets: ['Flat rates from $49, one way', 'Wheelchair from $119, priced by distance'],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,
   },
@@ -57,7 +57,7 @@ const verticals: Vertical[] = [
   {
     slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
     blurb: 'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
-    bullets: ['From $69 one way, $124 there and back', 'Carrier or harness included'],
+    bullets: ['From $59 one way, $106 there and back', 'Carrier or harness included'],
     cta: 'Request a Winnie Ride',
     bookHref: request.winnie,
   },

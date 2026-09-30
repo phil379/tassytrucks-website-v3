@@ -277,7 +277,19 @@ export const CONCIERGE: Card = {
 export const WINNIE: Card = {
   label: 'Winnie Ride',
   bands: [
-    { upToMiles: 5, cents: 6900 },
+    // TAPERED 2026-09-30 (second pass). The first reprice put this rung at $69
+    // on one Charlotte comparable. A fuller read found five published rate
+    // sheets clustered far lower at short distance -- Tails On Time (NC) $20,
+    // Furrari $25, Lex's $30, The Fetching Post $30, and a Charlotte market
+    // average of $30 + $0.60/mi -- so $69 was roughly 2x the field on the band
+    // a first-time caller prices you on.
+    //
+    // Those five are pet SITTERS with a car: no 45% driver split, no dispatch
+    // line, no commercial livery. Their cost base is not reachable from here --
+    // at $30 Tassy clears $6.33 against a $16.29 break-even. So the entry rung
+    // comes down to meet them halfway, not down to match them, and the rungs
+    // above hold where that cost structure actually competes.
+    { upToMiles: 5, cents: 5900 },
     { upToMiles: 10, cents: 7900 },
     { upToMiles: 15, cents: 8900 },
     { upToMiles: 20, cents: 9900 },
@@ -286,11 +298,14 @@ export const WINNIE: Card = {
   waitIncludedMin: 15,
   waitOverage: 2500,
   // The driver waits with the animal and brings it back, so the second leg is
-  // discounted 10%. 1.8 x $69 = $124.20.
+  // discounted 10%. 1.8 x $59 = $106.20.
   returnFactor: 1.8,
-  // The floor moves with the card. Left at $89 it would have quietly undercut
-  // the ONE-WAY price of the very same trip.
-  returnFloor: 12400,
+  // The floor tracks the ENTRY band's round trip and has to move every time
+  // that band does. Left at $124 after the entry rung came down to $59, a
+  // five-mile round trip would have been charged $124 for a journey the card
+  // prices at $106 -- the same class of error as a floor left too low, just
+  // pointing the other way.
+  returnFloor: 10600,
   perExtra: 1500,
 };
 
@@ -361,19 +376,34 @@ const WAV_MESSAGE =
  */
 export const CARE_WAV: Card = {
   label: 'Tassy Care WAV',
+  // RAISED 2026-09-30 (second pass) from 89/109/139/169/199/239.
+  //
+  // The first card was anchored to a NATIONAL average base of $88. Capitol
+  // Transportation's PUBLISHED North Carolina schedule is $120 (0-5 mi), $140
+  // (5-10), $160 (10-15), $180 (15-20), then $9/mi -- so Tassy was sitting
+  // 20-25% under a named in-state competitor at every rung, on the one line
+  // where the vehicle is scarce and the operator is trained.
+  //
+  // This is not a line to enter cheap. VA non-emergent WHEELCHAIR transport is
+  // a 100% SDVOSB set-aside under 38 U.S.C. 8127(d), awarded firm-fixed-price:
+  // the number goes in once and holds for the contract term. The card now sits
+  // at or just under Capitol rather than a fifth below it, and still inside the
+  // $80-120 base plus $5-9/mi that NC retail actually runs at.
   bands: [
-    { upToMiles: 3, cents: 8900 },
-    { upToMiles: 7, cents: 10900 },
-    { upToMiles: 12, cents: 13900 },
-    { upToMiles: 17, cents: 16900 },
-    { upToMiles: 22, cents: 19900 },
-    { upToMiles: 30, cents: 23900 },
+    { upToMiles: 3, cents: 11900 },
+    { upToMiles: 7, cents: 13900 },
+    { upToMiles: 12, cents: 16900 },
+    { upToMiles: 17, cents: 19900 },
+    { upToMiles: 22, cents: 22900 },
+    { upToMiles: 30, cents: 26900 },
   ],
   waitIncludedMin: 20,
   waitOverage: 3000,
   perExtra: 0,
   returnFactor: 1.8,
-  returnFloor: 16000,
+  // 1.8 x $119 = $214.20. Moved with the card -- a floor left at $160 would have
+  // made the round trip cheaper than the one-way it contains.
+  returnFloor: 21400,
 };
 
 /**

@@ -11,6 +11,7 @@ import {
 } from '@/lib/school-plans';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { looksLikeTestIdentity } from '@/lib/test-data';
+import { parseLocalDateTime } from '@/lib/time';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
@@ -199,7 +200,15 @@ export async function POST(request: Request) {
   }
 
   // ── 3. the first trip, and the commitment record ──────────────────────────
-  const requestedAt = `${data.starts_on}T${schedule.pickup_time}:00`;
+  // Charlotte wall-clock -> UTC instant. requested_at is timestamptz and the
+  // database session runs in UTC, so the naive string this used to send was
+  // read as 06:45 UTC -- 2:45 in the morning in Charlotte. Every school
+  // booking's first trip landed on the dispatch board four hours early.
+  // /api/trip-request has always used this helper; this route did not.
+  const requestedAt = parseLocalDateTime(`${data.starts_on}T${schedule.pickup_time}:00`)!.toISOString();
+  const returnAt = schedule.return_trip && schedule.return_time
+    ? parseLocalDateTime(`${data.starts_on}T${schedule.return_time}:00`)!.toISOString()
+    : null;
   const { data: trip, error: tripErr } = await db
     .from(TRIP_REQUESTS_TABLE)
     .insert({
@@ -215,7 +224,16 @@ export async function POST(request: Request) {
       dropoff_address: schedule.dropoff_address,
       requested_at: requestedAt,
       return_trip: schedule.return_trip,
+      return_at: returnAt,
+      scheduled_for: requestedAt,
       passengers: 1,
+      // These are real columns, and the recurring engine depends on them. Its
+      // idempotency key is (standing_order_id, requested_at); with the ids
+      // buried in trip_details only, the nightly run had no way to see that day
+      // one already existed and would have booked the child twice.
+      student_id: student.id,
+      standing_order_id: order.id,
+      payer: 'passenger',
       source: `school:${plan.slug}`,
       /**
        * The acknowledgements are a commitment record with legal weight, so they

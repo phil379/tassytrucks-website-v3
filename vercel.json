@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/escalate-stale-requests",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/materialise-standing-orders",
+      "schedule": "10 9 * * *"
     }
   ]
 }

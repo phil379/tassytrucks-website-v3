@@ -3,9 +3,9 @@ import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Concierge — reserved private car, Charlotte | From $69',
+  title: 'Tassy Concierge — reserved private car, Charlotte | From $89',
   description:
-    'Airport runs, golf, dinner, events and client pickups in Charlotte. A reserved vehicle and a professional driver, booked for a time you chose. Flat rates from $69. No surge.',
+    'Airport runs, golf, dinner, events and client pickups in Charlotte. A reserved vehicle and a professional driver, booked for a time you chose. Flat rates from $89. No surge.',
   alternates: { canonical: '/vip' },
   openGraph: { url: '/vip', images: ['/og-image/vip'] },
 };
@@ -16,7 +16,7 @@ export default function VipPage() {
       eyebrow="Tassy Concierge · Premium private transport"
       title="Booked for your time. Not whoever accepts the ping."
       tagline="Airport, golf, dinner, events, and the client you are collecting."
-      description="A reserved vehicle and a professional driver, confirmed in advance for a time you chose. Flat rates by distance — you know the number before you book, and it does not move because it started raining. From $69. Nothing medical about this service; if you need the driver to wait for you after a procedure, that is Tassy Recovery."
+      description="A reserved vehicle and a professional driver, confirmed in advance for a time you chose. Flat rates by distance — you know the number before you book, and it does not move because it started raining. From $89. Nothing medical about this service; if you need the driver to wait for you after a procedure, that is Tassy Recovery."
       bookHref={request.vip}
       bookLabel="Reserve a car"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}

@@ -215,11 +215,23 @@ export const RECOVERY: Card = {
  * Round trip is TWO reserved legs at full price — the driver is released in
  * between. A customer who needs the driver to wait is buying Recovery.
  */
+/**
+ * CONCIERGE short bands lifted 2026-09-30.
+ *
+ * CLT airport is the job, and Charlotte black car prices it at $80+ sedan, $95+
+ * SUV one way. Tassy quoted $69 under 3 miles and $89 under 7 -- in a full-size
+ * Expedition -- undercutting the market floor in a bigger vehicle. Lifted to
+ * $89/$99 so the entry rungs meet the market. Everything past 7 miles was
+ * already competitive and is untouched.
+ *
+ * "No surge, ever" is the differentiator. It is worth money; do not also discount.
+ * The hourly product for airport standby is CONCIERGE_HOURLY below.
+ */
 export const CONCIERGE: Card = {
   label: 'Tassy Concierge',
   bands: [
-    { upToMiles: 3, cents: 6900 },
-    { upToMiles: 7, cents: 8900 },
+    { upToMiles: 3, cents: 8900 },
+    { upToMiles: 7, cents: 9900 },
     { upToMiles: 12, cents: 10900 },
     { upToMiles: 17, cents: 12900 },
     { upToMiles: 22, cents: 15500 },
@@ -245,23 +257,53 @@ export const CONCIERGE: Card = {
  * a FLAT per-trip platform fee ($8-10), never a percentage: an 80/20 split
  * leaves the operator at roughly 18% on a short trip and will not hold.
  */
+/**
+ * REPRICED 2026-09-30 — Winnie was half the market.
+ *
+ * The one direct Charlotte comparable, VIP Pet Transport, charges $95 FLAT for a
+ * one-way direct pickup and drop-off. Winnie's LONGEST ride -- 25 miles -- was
+ * $89. The card's own note called Winnie "the thinnest line, 39.5% left to
+ * Tassy" and suggested handing it to a partner for $8-10 a trip. That was never
+ * a margin problem. It was a price problem wearing a margin costume: same car,
+ * same driver, same 45% split, $20 less on the ticket.
+ *
+ * At $49 Tassy netted $16.23 a trip. At $69 it nets $26.65 -- +64% on identical
+ * work. The card now sits under the $95 comp on short hops, where the trip
+ * genuinely is shorter, and above it past 15 miles where it genuinely is not.
+ *
+ * Launch plan (Phil): 5% off the first month, then the rate holds -- meet the
+ * market, do not undercut it. See WINNIE_LAUNCH_DISCOUNT.
+ */
 export const WINNIE: Card = {
   label: 'Winnie Ride',
   bands: [
-    { upToMiles: 5, cents: 4900 },
-    { upToMiles: 10, cents: 5900 },
-    { upToMiles: 15, cents: 6900 },
-    { upToMiles: 20, cents: 7900 },
-    { upToMiles: 25, cents: 8900 },
+    { upToMiles: 5, cents: 6900 },
+    { upToMiles: 10, cents: 7900 },
+    { upToMiles: 15, cents: 8900 },
+    { upToMiles: 20, cents: 9900 },
+    { upToMiles: 25, cents: 10900 },
   ],
   waitIncludedMin: 15,
   waitOverage: 2500,
   // The driver waits with the animal and brings it back, so the second leg is
-  // discounted 10%. 1.8 x $49 = $88.20, which rounds to the $89 on the card.
+  // discounted 10%. 1.8 x $69 = $124.20.
   returnFactor: 1.8,
-  returnFloor: 8900,
+  // The floor moves with the card. Left at $89 it would have quietly undercut
+  // the ONE-WAY price of the very same trip.
+  returnFloor: 12400,
   perExtra: 1500,
 };
+
+/**
+ * Launch offer, Phil 2026-09-30: 5% off a new customer's first month, then the
+ * rate holds. Deliberately small -- a deep introductory discount teaches a pet
+ * owner to wait for the next one, and it would undo the repricing above.
+ */
+export const WINNIE_LAUNCH_DISCOUNT = {
+  pct: 0.05,
+  months: 1,
+  label: '5% off your first month',
+} as const;
 
 /** Which card prices which service line. Absence here means "a person quotes it". */
 const CARD_FOR_LINE: Partial<Record<ServiceLine, Card>> = {
@@ -350,6 +392,72 @@ export const STANDING_RIDE_PLAN = {
 
 /** Prepaid ride pack, and the Winnie recurring plans. Data only. */
 export const CARE_PACK_10 = { rides: 10, discount: 0.1, validMonths: 12 } as const;
+/**
+ * CONCIERGE HOURLY — airport standby, events, an evening held open.
+ * Priced by Phil 2026-09-30, and he drives CLT himself, so this is operator
+ * knowledge rather than a scrape.
+ *
+ * The market quotes $120/hr for a business sedan and $150/hr for a first-class
+ * SUV, both on a THREE-hour minimum. Phil's read is that the three-hour minimum
+ * is the part that loses the booking, because Uber Black holds a car on two --
+ * so Tassy matches the sedan rate in a full-size SUV and undercuts on the
+ * minimum, which is the term a customer actually feels.
+ *
+ * $120 x 2 = $240 floor. At the Concierge 35% split the driver takes $84 for two
+ * hours, which beats what those hours pay on the distance card, and is why a
+ * driver will hold the slot rather than chase pings.
+ *
+ * NOT wired into the quote engine. The engine prices distance; this is time, and
+ * a half-built hourly path that silently returns a distance quote is the kind of
+ * silent wrong answer that costs a customer. It is quoted by a person until the
+ * hourly flow is built properly.
+ */
+export const CONCIERGE_HOURLY = {
+  centsPerHour: 12000,
+  minimumHours: 2,
+  vehicle: 'Full-size SUV',
+  note: 'Two-hour minimum, not three. No surge, ever.',
+} as const;
+
+/**
+ * TASSY CARE WAV — wheelchair-accessible, ramp-equipped, operator trained in
+ * securement.
+ *
+ * STILL NOT LIVE, and deliberately so: Tassy owns no WAV. These are the numbers
+ * to publish the day one is in the fleet, not before -- a printed rate Tassy
+ * cannot hold to is worse than a quote on the call.
+ *
+ * Anchored to the North Carolina private-pay market: $65-110 base, $3.00-5.50
+ * per mile, against a $88 national average base. The card below tracks the
+ * middle of that range and mirrors Care's band structure so the two read as one
+ * price list rather than two products.
+ *
+ * pay_rates already carries a `care_wav` row at 40% with $8 insurance, flagged
+ * there as an estimate because there is no WAV to insure yet. Both this card and
+ * that row need the real insurance quote before either is trusted -- a WAV
+ * policy is the single biggest unknown in Tassy's cost base.
+ *
+ * The prize this unlocks is not private pay. VA non-emergent WHEELCHAIR
+ * transport is a 100% SDVOSB set-aside under 38 U.S.C. 8127(d) -- competitors
+ * without Phil's certification are barred from bidding. No WAV, no bid.
+ */
+export const CARE_WAV: Card = {
+  label: 'Tassy Care WAV',
+  bands: [
+    { upToMiles: 3, cents: 8900 },
+    { upToMiles: 7, cents: 10900 },
+    { upToMiles: 12, cents: 13900 },
+    { upToMiles: 17, cents: 16900 },
+    { upToMiles: 22, cents: 19900 },
+    { upToMiles: 30, cents: 23900 },
+  ],
+  waitIncludedMin: 20,
+  waitOverage: 3000,
+  perExtra: 0,
+  returnFactor: 1.8,
+  returnFloor: 16000,
+};
+
 export const WINNIE_PLANS = [
   { legs: 4, discount: 0.1, label: '4 rides a month' },
   { legs: 8, discount: 0.15, label: '8 rides a month' },

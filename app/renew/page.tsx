@@ -5,7 +5,7 @@ import { request } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'IV therapy & med-spa rides in Charlotte | Tassy Transportation',
   description:
-    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $69 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
+    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
   alternates: { canonical: '/renew' },
   openGraph: { url: '/renew', images: ['/og-image/renew'] },
 };
@@ -26,7 +26,7 @@ export default function RenewPage() {
       highlights={[
         {
           title: 'Going there and coming back on your own',
-          body: 'An IV drip, a facial, a routine appointment you walk out of feeling fine. That is Tassy Concierge — a reserved car and a professional driver, flat rate from $69 one way. Book the return separately for whenever you expect to be finished.',
+          body: 'An IV drip, a facial, a routine appointment you walk out of feeling fine. That is Tassy Concierge — a reserved car and a professional driver, flat rate from $89 one way. Book the return separately for whenever you expect to be finished.',
         },
         {
           title: 'If you should not be driving afterwards',
@@ -44,7 +44,7 @@ export default function RenewPage() {
       tiers={[
         {
           name: 'Tassy Concierge',
-          price: 'From $69',
+          price: 'From $89',
           cadence: 'one way',
           features: ['Reserved for your time', 'Flat rate, no surge', 'Full-size SUV', 'Book the return separately'],
           cta: { label: 'Reserve a car', href: request.vip },

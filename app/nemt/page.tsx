@@ -42,7 +42,7 @@ export default function NemtPage() {
         },
         {
           title: 'Travelling in a wheelchair',
-          body: 'Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. We quote your route on the call rather than print a rate we cannot hold to.',
+          body: 'Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. Priced by distance like every other line — from $89 — so you know the number before you book.',
         },
         {
           title: 'Veteran-owned, and certified',
@@ -69,7 +69,7 @@ export default function NemtPage() {
           name: '18 to 30 miles',
           price: '$109–129',
           cadence: 'one way',
-          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', 'Wheelchair quoted on the call'],
+          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', 'Wheelchair from $89, priced by distance'],
           cta: { label: 'Request this', href: request.nemt },
         },
       ]}

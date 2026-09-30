@@ -36,7 +36,7 @@ const verticals: Vertical[] = [
   {
     slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
     blurb: 'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
-    bullets: ['Flat rates from $49, one way', 'Wheelchair quoted on the call'],
+    bullets: ['Flat rates from $49, one way', 'Wheelchair from $89, priced by distance'],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,
   },

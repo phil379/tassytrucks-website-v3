@@ -1,4 +1,4 @@
-import type { ServiceLine } from '@/lib/trip-request';
+import { isPetLine, type ServiceLine } from '@/lib/trip-request';
 import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
 import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
 
@@ -338,14 +338,75 @@ const WAV_MESSAGE =
   'Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. We quote your route on the call rather than print a rate we cannot hold to — send the request or call and you will have a price in minutes.';
 
 /**
+ * TASSY CARE WAV — wheelchair-accessible, ramp-equipped, operator trained in
+ * securement.
+ *
+ * STILL NOT LIVE, and deliberately so: Tassy owns no WAV. These are the numbers
+ * to publish the day one is in the fleet, not before -- a printed rate Tassy
+ * cannot hold to is worse than a quote on the call.
+ *
+ * Anchored to the North Carolina private-pay market: $65-110 base, $3.00-5.50
+ * per mile, against a $88 national average base. The card below tracks the
+ * middle of that range and mirrors Care's band structure so the two read as one
+ * price list rather than two products.
+ *
+ * pay_rates already carries a `care_wav` row at 40% with $8 insurance, flagged
+ * there as an estimate because there is no WAV to insure yet. Both this card and
+ * that row need the real insurance quote before either is trusted -- a WAV
+ * policy is the single biggest unknown in Tassy's cost base.
+ *
+ * The prize this unlocks is not private pay. VA non-emergent WHEELCHAIR
+ * transport is a 100% SDVOSB set-aside under 38 U.S.C. 8127(d) -- competitors
+ * without Phil's certification are barred from bidding. No WAV, no bid.
+ */
+export const CARE_WAV: Card = {
+  label: 'Tassy Care WAV',
+  bands: [
+    { upToMiles: 3, cents: 8900 },
+    { upToMiles: 7, cents: 10900 },
+    { upToMiles: 12, cents: 13900 },
+    { upToMiles: 17, cents: 16900 },
+    { upToMiles: 22, cents: 19900 },
+    { upToMiles: 30, cents: 23900 },
+  ],
+  waitIncludedMin: 20,
+  waitOverage: 3000,
+  perExtra: 0,
+  returnFactor: 1.8,
+  returnFloor: 16000,
+};
+
+/**
  * The card a request should be priced on, or null when a person quotes it.
  *
- * Wheelchair is the one place the passenger, not the service line, decides.
- * Someone who chooses Tassy Care and then Wheelchair needs a WAV, and quoting
- * them the ambulatory price is a promise the operation cannot keep.
+ * WHEELCHAIR IS THE ONE PLACE THE PASSENGER, NOT THE SERVICE LINE, DECIDES.
+ * Someone who picks Tassy Care or Tassy Recovery and then says wheelchair needs
+ * a ramp-equipped vehicle and an operator trained in securement. Quoting them
+ * the ambulatory price is a promise the operation cannot keep -- a sedan cannot
+ * carry that passenger at any price.
+ *
+ * CHANGED 2026-09-30: this used to return null for care + wheelchair, sending
+ * every such request to a phone call. It now prices on CARE_WAV, and it covers
+ * RECOVERY too, which it never did -- a post-procedure wheelchair passenger was
+ * being quoted the ambulatory Recovery rate, which is the exact error the
+ * comment above warns about, on the line where the passenger is least able to
+ * absorb it.
+ *
+ * Phil's model is partner-supplied wheelchair vehicles rather than a WAV Tassy
+ * owns, so a published rate IS holdable once a WAV operator is under contract.
+ * Until one is, the rate is a number the operation has to honour by subcontract.
+ * See CARE_WAV for the market anchoring.
  */
 export function cardFor(serviceLine: ServiceLine, mobility?: string | null): Card | null {
-  if (serviceLine === 'care' && mobility === 'wheelchair') return null;
+  // EVERY passenger line, not just Care. mobilityOptionsFor() offers Wheelchair
+  // on Care, Recovery AND Concierge -- so a wheelchair user booking an airport
+  // run was being quoted the ambulatory SUV rate, the same broken promise the
+  // note above describes. Pet lines never reach here; isPetLine gets a different
+  // option set, and a `mobility=wheelchair` pet request is already rejected
+  // upstream rather than dispatched as a wheelchair job for a dog.
+  if (mobility === 'wheelchair' && !isPetLine(serviceLine)) {
+    return CARE_WAV;
+  }
   return CARD_FOR_LINE[serviceLine] ?? null;
 }
 
@@ -355,7 +416,9 @@ export function isQuoteOnly(serviceLine: ServiceLine, mobility?: string | null):
 }
 
 function quoteOnlyMessage(serviceLine: ServiceLine, mobility?: string | null): string {
-  if (serviceLine === 'care' && mobility === 'wheelchair') return WAV_MESSAGE;
+  // Retained for any wheelchair request that still falls through to a person --
+  // a line without a WAV card, or a distance past the last rung.
+  if (mobility === 'wheelchair') return WAV_MESSAGE;
   return (
     QUOTE_ONLY_MESSAGE[serviceLine] ??
     'Send the request and a dispatcher will call you back with a price.'
@@ -419,44 +482,6 @@ export const CONCIERGE_HOURLY = {
   note: 'Two-hour minimum, not three. No surge, ever.',
 } as const;
 
-/**
- * TASSY CARE WAV — wheelchair-accessible, ramp-equipped, operator trained in
- * securement.
- *
- * STILL NOT LIVE, and deliberately so: Tassy owns no WAV. These are the numbers
- * to publish the day one is in the fleet, not before -- a printed rate Tassy
- * cannot hold to is worse than a quote on the call.
- *
- * Anchored to the North Carolina private-pay market: $65-110 base, $3.00-5.50
- * per mile, against a $88 national average base. The card below tracks the
- * middle of that range and mirrors Care's band structure so the two read as one
- * price list rather than two products.
- *
- * pay_rates already carries a `care_wav` row at 40% with $8 insurance, flagged
- * there as an estimate because there is no WAV to insure yet. Both this card and
- * that row need the real insurance quote before either is trusted -- a WAV
- * policy is the single biggest unknown in Tassy's cost base.
- *
- * The prize this unlocks is not private pay. VA non-emergent WHEELCHAIR
- * transport is a 100% SDVOSB set-aside under 38 U.S.C. 8127(d) -- competitors
- * without Phil's certification are barred from bidding. No WAV, no bid.
- */
-export const CARE_WAV: Card = {
-  label: 'Tassy Care WAV',
-  bands: [
-    { upToMiles: 3, cents: 8900 },
-    { upToMiles: 7, cents: 10900 },
-    { upToMiles: 12, cents: 13900 },
-    { upToMiles: 17, cents: 16900 },
-    { upToMiles: 22, cents: 19900 },
-    { upToMiles: 30, cents: 23900 },
-  ],
-  waitIncludedMin: 20,
-  waitOverage: 3000,
-  perExtra: 0,
-  returnFactor: 1.8,
-  returnFloor: 16000,
-};
 
 export const WINNIE_PLANS = [
   { legs: 4, discount: 0.1, label: '4 rides a month' },

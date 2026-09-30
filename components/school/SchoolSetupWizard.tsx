@@ -12,7 +12,7 @@ import {
   SCHOOL_POLICIES,
   STEP_TITLES,
   WEEKDAYS,
-  PRICING_PLACEHOLDER,
+  SIBLING_NOTE,
   SAFETY_NOTE_HINT,
   SAFETY_NOTE_LABEL,
   restoreStep,
@@ -560,7 +560,7 @@ function ScheduleStep({
           />
         </Field>
         <p className="text-xs text-[color:var(--ink-mute)]">
-          Pay upfront for the season — {PRICING_PLACEHOLDER.toLowerCase()}.
+          Pay upfront for the season — {plan.price}, quoted once we have the schedule.
         </p>
       </div>
     );
@@ -665,7 +665,7 @@ function CommitStep({
       <div className="rounded-lg border border-dashed border-[color:var(--line)] px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm font-medium">Your price</span>
-          <span className="serif text-lg">{PRICING_PLACEHOLDER}</span>
+          <span className="serif text-lg">{plan.price}</span>
         </div>
         <p className="mt-1 text-xs text-[color:var(--ink-mute)]">
           Set by school location before your first ride. {plan.billing}.

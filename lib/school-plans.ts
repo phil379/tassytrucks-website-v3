@@ -35,6 +35,10 @@ export interface SchoolPlan {
   includes: string[];
   billing: string;
   badge: string | null;
+  /** Headline price a parent sees on the plan card. */
+  price: string;
+  /** The unit under the headline — what it works out to per ride. */
+  priceNote: string;
 }
 
 export const SCHOOL_PLANS: SchoolPlan[] = [
@@ -53,6 +57,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Annual subscription · biggest per-ride discount',
     badge: 'Best value',
+    price: '$839 / month',
+    priceNote: '$21 per ride · AM + PM every school day',
   },
   {
     key: 'weekly_pattern',
@@ -69,6 +75,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Monthly subscription',
     badge: null,
+    price: '$24 per ride',
+    priceNote: 'Billed monthly for the days you pick',
   },
   {
     key: 'after_school',
@@ -85,6 +93,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Per-program package',
     badge: null,
+    price: '$26 per ride',
+    priceNote: 'Quoted per season once we have the schedule',
   },
 ];
 
@@ -92,6 +102,35 @@ export function planBySlug(slug: string): SchoolPlan | undefined {
   return SCHOOL_PLANS.find((p) => p.slug === slug);
 }
 
+/**
+ * PRICING, set 2026-09-30.
+ *
+ * Grounded, not guessed. Three inputs:
+ *   1. pay_rates.scholar — driver 40%, $6 insurance and $3 dispatch per trip,
+ *      card 2.9% + $0.30. Tassy net per one-way ride is 0.571 x price - $9.30,
+ *      so ANY ride under $16.29 loses money. The per-trip fixed costs were
+ *      modelled for $49 Tassy Care fares and are brutal at school-ride prices.
+ *   2. Charlotte market: Shuttlebee quotes $400-600/month, but that is a SHARED
+ *      route split between families. This product is one child, one car, same
+ *      driver -- a different and more expensive thing, priced accordingly.
+ *   3. Phil's own four years of student transport: EverDriven paid him $45 per
+ *      one-way leg. That is DISTRICT money for mandated transport, not what a
+ *      family pays out of pocket. It is the ceiling of a different market.
+ *
+ * $839/month = 40 rides at $21. Break-even on those 40 rides is $651, so the
+ * plan clears roughly $107/month per child.
+ *
+ * THE SIBLING RATE IS THE REAL MARGIN. A second child in a car that is already
+ * making the trip costs nothing extra -- no second driver, no second insurance
+ * charge, no second dispatch. Half price to the family is nearly all margin to
+ * Tassy, and it puts a two-child household at $1,259 against Shuttlebee's
+ * $800-1,200 for two shared seats. Sell siblings.
+ *
+ * Provisional until Phil reviews with VR&E and his CPCC counsellor.
+ */
+export const SIBLING_NOTE = 'Second child on the same route: 50% off';
+
+/** @deprecated Real prices now live on each plan. Kept so nothing 404s mid-edit. */
 export const PRICING_PLACEHOLDER = 'Pricing varies by school';
 
 export const STEP_TITLES = [

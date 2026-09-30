@@ -123,6 +123,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        {/* Vercel Web Analytics — the tag the @vercel/analytics package renders.
+            Added as a tag, not a dependency: this repo locks with bun.lock and
+            the shell that edits it has no bun, so a package added here could not
+            be locked and would fail the build. Cookieless, no consent banner.
+            Enable Web Analytics on the Vercel project to start collecting. */}
+        <script defer src="/_vercel/insights/script.js" />
       </body>
     </html>
   );

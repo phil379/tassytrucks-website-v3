@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PolicyBody } from '@/components/school/PolicyBody';
-import { PRICING_PLACEHOLDER, SCHOOL_PLANS, SCHOOL_POLICIES } from '@/lib/school-plans';
+import { SCHOOL_PLANS, SCHOOL_POLICIES, SIBLING_NOTE } from '@/lib/school-plans';
 
 export const metadata: Metadata = {
   title: 'Daily school transport in Charlotte NC · Tassy Scholar',
@@ -52,8 +52,10 @@ export default function SchoolBookPage() {
               <div className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--ink-mute)]">
                 Pricing
               </div>
-              <div className="serif text-base">{PRICING_PLACEHOLDER}</div>
-              <div className="text-[11px] text-[color:var(--ink-mute)]">{plan.billing}</div>
+              <div className="serif text-base">{plan.price}</div>
+              <div className="text-[11px] text-[color:var(--ink-mute)]">{plan.priceNote}</div>
+              <div className="mt-1 text-[11px] text-[color:var(--ink-mute)]">{SIBLING_NOTE}</div>
+              <div className="mt-1 text-[11px] text-[color:var(--ink-mute)]">{plan.billing}</div>
             </div>
             <Link href={`/school/book/${plan.slug}`} className="btn-primary mt-5 min-h-[44px] text-center">
               Get started

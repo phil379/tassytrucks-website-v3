@@ -70,12 +70,12 @@ const verticals: Vertical[] = [
   },
   {
     slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
-    blurb: 'Alternative student transportation since 2022 — originally with Alternative School Transportation, continuing today with EverDriven Technologies after their 2023 rebrand. Special needs, McKinney-Vento, foster youth, and at-risk student routes.',
+    blurb: 'Moving students who need more than a bus since 2022 — special needs, McKinney-Vento, foster youth and at-risk routes. Same driver every morning, the schedule locked for the year, and you know who is picking your child up.',
     bullets: [
-      'Subcontractor since 2022 · EverDriven Technologies (formerly Alternative School Transportation)',
-      '5 metros: Charlotte NC · High Point NC · Spartanburg SC · Rock Hill SC · Cincinnati OH',
+      'Four years of student transport · background-checked drivers',
+      'Full year, chosen days, or after-school — from $839/month',
     ],
-    cta: 'Get a route quote',
+    cta: 'See plans and pricing',
     bookHref: request.school,
   },
 ];

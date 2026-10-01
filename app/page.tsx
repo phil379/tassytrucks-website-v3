@@ -353,40 +353,40 @@ export default function HomePage() {
               Community-focused and here to serve those who need us most.
             </p>
 
-            {/* TRACK RECORD, added 2026-10-01 and documented before it shipped.
-                Phil produced the Uber W-9 settings page (entity type Business,
-                business information TASSY TRUCKS LLC, company EIN) and the
-                August 2026 monthly statement, headed TASSY TRUCKS LLC: 221
-                completed trips. The rides are the COMPANY'S -- performed under
-                the LLC, paid to the LLC, taxed as the LLC's income -- so
-                attributing them to Tassy Transportation is accurate, not a
-                stretch.
+            {/* TRACK RECORD. Phil's call, 2026-10-01: the ride COUNT only --
+                no rating, no cancellation rate. One number, no clutter.
 
-                This is the claim FIX_PROD_131 pulled ("15,000+ rides", "4.9
-                stars") in the right form at last: the real number, from the
-                operator's own account, with the document behind it. 7,847 is
-                lifetime since 2023 and will be stale the day it is written --
-                round it DOWN when it is refreshed and never up.
+                15,000+ is BOTH halves of the business and that is why the
+                earlier 7,847 was wrong. 7,847 is the Uber side alone, which is
+                the half with a screenshot: the W-9 settings page shows entity
+                type Business / TASSY TRUCKS LLC / company EIN, and the August
+                2026 statement is headed TASSY TRUCKS LLC with 221 completed
+                trips. The other half is the student-transport subcontract run
+                since 2022 across five metros -- years of school runs, two legs
+                a day per child -- and Phil is the one who has counted them.
 
-                No revenue figures here, and no business address: the statement
-                carries both and neither belongs on a public page. */}
+                So this is the claim FIX_PROD_131 pulled, restored on the
+                operator's own count rather than removed for lacking one.
+                WORTH HAVING WRITTEN DOWN: the Uber half is evidenced on a
+                statement; the student half is not, and a VR&E counsellor or a
+                facility compliance officer asking "how do you know" is exactly
+                who will ask for it.
+
+                If it is ever refreshed, round DOWN. A number that drifts up
+                without something behind it is how the unsourced version got
+                onto this page the first time. */}
             <div className="mt-8 rounded-tile border border-line p-6 max-w-xl">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                {[
-                  ['7,847', 'rides completed'],
-                  ['4.98', 'average rating'],
-                  ['2%', 'cancellation rate'],
-                ].map(([n, l]) => (
-                  <div key={l}>
-                    <div className="serif text-3xl font-semibold" style={{ color: 'var(--gold)' }}>{n}</div>
-                    <div className="text-xs ink-mute uppercase tracking-wider mt-1">{l}</div>
-                  </div>
-                ))}
+              <div className="flex items-baseline gap-4">
+                <div className="serif text-5xl font-semibold" style={{ color: 'var(--gold)' }}>
+                  15,000+
+                </div>
+                <div className="text-xs ink-mute uppercase tracking-wider">
+                  rides completed<br />since 2022
+                </div>
               </div>
               <p className="ink-soft text-sm leading-relaxed mt-5">
-                Three years on the road in Charlotte before we ever asked anyone to trust us with a
-                medical ride. That rating is the average of nearly eight thousand passengers, and it is
-                the standard every driver we hire is held to.
+                Medical runs, school routes and private trips across Charlotte and four other metros
+                &mdash; years on the road before we ever asked anyone to trust us with a ride that mattered.
               </p>
             </div>
 

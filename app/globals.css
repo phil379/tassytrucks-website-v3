@@ -8,6 +8,9 @@
    (cream), and `--on-gold` carries the dark text that sits on gold/cream surfaces. */
 :root {
   --bg: #0d1117;                        /* dark canvas (was #FAF7F0) */
+  /* ⚠ NOT the same as tailwind's `ink` token, which is #1B1A17 (a dark
+     SURFACE). `text-ink` in a class list is that one and is invisible here.
+     For light text in Tailwind use `text-cream-text`. See tailwind.config.ts. */
   --ink: #F4EFE0;                       /* primary TEXT — cream on dark (was #1B1A17) */
   --ink-soft: rgba(244,239,224,0.72);   /* secondary text (was #444239) */
   /* AAA (WCAG 1.4.6, 7:1). Was 0.5 alpha = 4.77:1 on the canvas and 4.67:1 on

@@ -208,7 +208,7 @@ export default function PricingPage() {
                     as the family price. Family plans are now read from SCHOOL_PLANS, the
                     same source the wizard charges from. */}
                 <p className="ink-soft mt-2 text-sm leading-relaxed">
-                  Sold <strong className="text-ink">by the plan and billed monthly</strong>,
+                  Sold <strong className="text-cream-text">by the plan and billed monthly</strong>,
                   never per ride — one child, one car, the same driver every morning and the
                   schedule locked for the year.
                 </p>
@@ -216,7 +216,7 @@ export default function PricingPage() {
                   {SCHOOL_PLANS.map((plan) => (
                     <li key={plan.key} className="flex items-baseline justify-between gap-3">
                       <span className="ink-soft">{plan.name}</span>
-                      <strong className="text-ink whitespace-nowrap">{plan.price}</strong>
+                      <strong className="text-cream-text whitespace-nowrap">{plan.price}</strong>
                     </li>
                   ))}
                 </ul>
@@ -288,19 +288,19 @@ export default function PricingPage() {
             <div>
               <h2 className="serif text-2xl font-semibold">What can change the price</h2>
               <ul className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
-                <li>Before 6am or after 8pm: <strong className="text-ink">+$25</strong></li>
-                <li>Weekends: <strong className="text-ink">+$20</strong></li>
+                <li>Before 6am or after 8pm: <strong className="text-cream-text">+$25</strong></li>
+                <li>Weekends: <strong className="text-cream-text">+$20</strong></li>
                 <li>
-                  Extra passenger: <strong className="text-ink">+$10</strong> on Tassy Care,{' '}
-                  <strong className="text-ink">+$15</strong> on Recovery and Concierge
+                  Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care,{' '}
+                  <strong className="text-cream-text">+$15</strong> on Recovery and Concierge
                 </li>
                 <li>
-                  Tassy Escort on Recovery: <strong className="text-ink">+$45</strong> — your
+                  Tassy Escort on Recovery: <strong className="text-cream-text">+$45</strong> — your
                   driver comes in 15 minutes early and walks them out to the car
                 </li>
                 <li>
                   Wait beyond what is included: quoted to you{' '}
-                  <strong className="text-ink">before</strong> it is charged, never after
+                  <strong className="text-cream-text">before</strong> it is charged, never after
                 </li>
               </ul>
               <p className="ink-soft mt-4 text-sm leading-relaxed">

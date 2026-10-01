@@ -13,6 +13,20 @@ const config: Config = {
       // (text-ink/text-cream usages were swept to text-cream-text).
       colors: {
         bg:         '#0d1117',
+        // ⚠ NAME COLLISION. `ink` here is NOT `var(--ink)` in globals.css.
+        //     tailwind  ink      = #1B1A17  near-black, a SURFACE
+        //     css       var(--ink) = #F4EFE0  cream, the primary TEXT
+        // Same word, opposite colours. Anyone reasoning from the stylesheet
+        // reaches for `text-ink` and gets the inverse of what they meant:
+        // near-black on a #0d1117 canvas, invisible.
+        //
+        // Light text is `text-cream-text`, or `text-[color:var(--ink)]`.
+        // This token is for `bg-ink` / `bg-charcoal` bands and text ON gold.
+        //
+        // The FIX_PROD_007 sweep converted the text-ink usages and missed two
+        // places, both found 2026-10-01: every surcharge amount on /pricing, and
+        // the MOBILE MENU BUTTON in Header.tsx -- an invisible hamburger on
+        // every page of the site below 1024px.
         ink:        '#1B1A17',                  // dark surface / on-gold text (unchanged)
         'ink-soft': 'rgba(244,239,224,0.72)',
         'ink-mute': 'rgba(244,239,224,0.68)',  // AAA 7:1 — see globals.css

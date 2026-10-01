@@ -139,7 +139,7 @@ export default function Header() {
               JS) and gives full nav parity below lg. */}
           <details className="lg:hidden group/m relative">
             <summary
-              className="list-none cursor-pointer inline-flex items-center justify-center h-11 w-11 rounded-md border border-line text-ink [&::-webkit-details-marker]:hidden"
+              className="list-none cursor-pointer inline-flex items-center justify-center h-11 w-11 rounded-md border border-line text-cream-text [&::-webkit-details-marker]:hidden"
               aria-label="Open navigation menu"
             >
               <Menu size={20} className="group-open/m:hidden" aria-hidden="true" />

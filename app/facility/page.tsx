@@ -94,14 +94,15 @@ export default async function FacilityHome() {
       </p>
       <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
         <h1 className="serif text-3xl font-semibold sm:text-4xl">{facility.name}</h1>
-        {/* Points at the PUBLIC request form, not a facility-aware one, because
-            a facility-aware one does not exist yet. Phase 2 of the spec gives
-            /facility/request the quote engine plus facility context so the trip
-            carries facility_id and payer automatically. Until that ships, a
-            coordinator books here and ops attaches the account -- which is
-            honest, and better than a dashboard button that 404s. */}
+        {/* Phase 2, shipped 2026-10-01. This used to point at the PUBLIC
+            /request with the facility's name in a query param, and ops
+            attached the account by hand afterwards -- so the trip landed with
+            facility_id null, never counted toward the month, never joined an
+            invoice, and the three numbers above under-reported what the
+            coordinator had actually booked. /facility/request carries
+            facility_id, facility_user_id and payer from the session. */}
         <Link
-          href={`/request?facility=${encodeURIComponent(facility.name)}`}
+          href="/facility/request"
           className="btn-primary inline-flex min-h-[44px] items-center gap-2"
         >
           Request a ride <ArrowRight size={16} aria-hidden="true" />
@@ -158,10 +159,13 @@ export default async function FacilityHome() {
         {upcoming.length === 0 ? (
           <p className="ink-soft mt-3 text-sm">
             Nothing booked yet.{' '}
-            <Link href={`/request?facility=${encodeURIComponent(facility.name)}`} className="underline">
+            <Link href="/facility/request" className="underline">
               Request a ride
             </Link>{' '}
-            and it will appear here once we have attached it to your account.
+            {/* Was "once we have attached it to your account", which described
+                the hand-attach step Phase 2 removed. A trip booked here arrives
+                with facility_id set, so it shows up as soon as it is saved. */}
+            and it appears here as soon as we have it.
           </p>
         ) : (
           <ul className="mt-3">

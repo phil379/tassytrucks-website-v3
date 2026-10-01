@@ -261,11 +261,27 @@ export const facilityAttributionSchema = z.object({
   referralSource: trimmed(200).optional().nullable(),
 });
 
-/** A ride requested by a facility. Extends the retail trip, never replaces it. */
+/**
+ * A ride requested by a facility. Extends the retail trip, never replaces it.
+ *
+ * NOTE WHAT IS NOT HERE, and keep it that way: no diagnosis, no procedure, no
+ * condition, no medication, no MRN, no insurance member id, no date of birth.
+ * `facilityRef` carries the MRN-shape guard above because a free text box next
+ * to a patient's name is where one gets pasted.
+ *
+ * `facility_id` IS NOT A FIELD. It comes from the session cookie in
+ * /api/trip-request and nowhere else — a facility id accepted from a form body
+ * is one coordinator billing another facility's account.
+ *
+ * `payer` is optional because resolvePayer() already owns the default (the
+ * facility's billing mode) and its signature takes `override?: Payer | null`.
+ * A client that predates the payer toggle must still be able to book; it gets
+ * the facility's default, which is the right answer, not a 400.
+ */
 export const facilityTripExtrasSchema = z.object({
   facilityRef,
   authorizedBy: trimmed(120).optional().nullable(),
-  payer: z.enum(['facility', 'passenger']),
+  payer: z.enum(['facility', 'passenger']).optional().nullable(),
 });
 
 /* ─────────────────────────────────────────────────────────────────── status */

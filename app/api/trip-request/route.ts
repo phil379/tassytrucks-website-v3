@@ -13,6 +13,9 @@ import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { parseLocalDateTime } from '@/lib/time';
+import { currentFacilitySession } from '@/lib/facility-auth';
+import { resolvePayer } from '@/lib/facility.server';
+import { canBook, facilityTripExtrasSchema, initialPaymentStatus } from '@/lib/facility';
 
 /**
  * Submissions allowed per IP per hour.
@@ -31,6 +34,22 @@ import { parseLocalDateTime } from '@/lib/time';
  * lib/rate-limit.ts is explicit about why (per-instance memory on serverless).
  */
 const REQUESTS_PER_IP_PER_HOUR = Number(process.env.TRIP_REQUEST_RATE_LIMIT) || 5;
+
+/**
+ * The same knob for a SIGNED-IN facility, and the reason the note above was
+ * written before there was anything to apply it to.
+ *
+ * Facility Phase 2 made case 1 real: a dialysis centre booking Monday's eight
+ * patients from one building, behind one NAT'd IP, would hit 429 on the sixth
+ * and the coordinator would conclude the portal is broken. Five is a household
+ * limit; this is the partner we are trying to win.
+ *
+ * Claiming to be a facility to get the higher ceiling buys nothing: the
+ * honeypot and the elapsedMs check run first, and a request with the flag and
+ * no valid session is refused at the session check below without writing a row.
+ * The worst a script gains is more rejections per hour.
+ */
+const FACILITY_REQUESTS_PER_HOUR = Number(process.env.FACILITY_TRIP_REQUEST_RATE_LIMIT) || 40;
 
 
 export const runtime = 'nodejs';
@@ -83,8 +102,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, id: null, stored: false });
   }
 
+  // Declared here rather than in the facility block below because the rate
+  // limit has to know, and the rate limit runs first.
+  const wantsFacilityBooking = raw.facilityBooking === true;
+
   const ip = clientIp(request.headers);
-  const limit = rateLimit(`trip-request:${ip}`, REQUESTS_PER_IP_PER_HOUR, 60 * 60 * 1000);
+  // Separate bucket, not just a bigger number: a shared office IP must not be
+  // able to exhaust the retail allowance for everyone else behind it, and the
+  // reverse.
+  const limit = wantsFacilityBooking
+    ? rateLimit(`trip-request:facility:${ip}`, FACILITY_REQUESTS_PER_HOUR, 60 * 60 * 1000)
+    : rateLimit(`trip-request:${ip}`, REQUESTS_PER_IP_PER_HOUR, 60 * 60 * 1000);
   if (!limit.ok) {
     return NextResponse.json(
       { ok: false, error: 'Too many requests. Please call us at (704) 941-8508.' },
@@ -174,6 +202,102 @@ export async function POST(request: Request) {
   // answered nothing", and `{}` reads as neither.
   const tripDetails = Object.keys(detailCheck.values).length > 0 ? detailCheck.values : null;
 
+  // ───────────────────────────────────────────────────────── facility context
+  //
+  // Facility Phase 2. One write path, not two: a facility booking is a retail
+  // booking with an account attached, so it runs through everything above
+  // unchanged and only the columns below differ.
+  //
+  // THREE RULES, each of which is the whole point:
+  //
+  //  1. `facility_id` comes from the SESSION COOKIE, never the body. A facility
+  //     id accepted off a form is one coordinator billing another facility's
+  //     account. facilityTripExtrasSchema has no such field on purpose.
+  //
+  //  2. A facility booking that cannot be attributed FAILS. It is never quietly
+  //     downgraded to retail. The coordinator pressed a button that said "on
+  //     the Memorial account"; storing that trip with payer 'passenger' would
+  //     send a patient an invoice for a ride their clinic agreed to cover, and
+  //     nothing on screen would have said so. An expired session is a 401 they
+  //     can act on.
+  //
+  //  3. The session is only read when the client ASKS for a facility booking.
+  //     currentFacilitySession() calls getUser(), which is a round trip to the
+  //     auth server, and making every retail booking on the public form pay for
+  //     it would be a real latency cost for a case that does not apply. A
+  //     retail POST that sets the flag with no cookie gets a 401, not a
+  //     silently retail row — see rule 2.
+  //
+  // `wantsFacilityBooking` is resolved up with the rate limit, which needs it.
+
+  let facilityColumns: Record<string, unknown> = {};
+  let facilityUserEmail: string | null = null;
+
+  if (wantsFacilityBooking) {
+    const session = await currentFacilitySession();
+    if (!session) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'Your sign-in has expired, so we could not put this on your account. Ask us for a new link, or call (704) 941-8508 and we will book it for you.',
+        },
+        { status: 401 },
+      );
+    }
+
+    // canBook() is the credit decision, and 'pending' + invoice_weekly is the
+    // case it exists for: a stranger must not be able to open a weekly-invoice
+    // account and start accruing charges before anyone has approved it. A
+    // patient_card account carries no credit exposure and is let through.
+    if (!canBook(session.facility)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'Your account is still with us for approval, so it cannot be billed yet. Call (704) 941-8508 and we will take this booking by phone today.',
+        },
+        { status: 403 },
+      );
+    }
+
+    const extras = facilityTripExtrasSchema.safeParse({
+      facilityRef: raw.facilityRef,
+      authorizedBy: raw.authorizedBy,
+      payer: raw.payer,
+    });
+
+    if (!extras.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of extras.error.issues) {
+        const key = issue.path.join('.') || 'form';
+        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      return NextResponse.json(
+        { ok: false, error: 'Please check the form.', fieldErrors },
+        { status: 400 },
+      );
+    }
+
+    // The facility's billing mode decides unless the coordinator overrode it on
+    // this one trip. A dialysis centre has standing patients on account AND
+    // one-off self-payers; that is a per-trip question, not a per-facility
+    // setting the requester cannot see.
+    const payer = resolvePayer(session.facility, extras.data.payer ?? null);
+
+    facilityUserEmail = session.email || null;
+    facilityColumns = {
+      facility_id: session.facilityId,
+      facility_user_id: session.facilityUserId,
+      facility_ref: extras.data.facilityRef || null,
+      payer,
+      // 'on_account' for a facility payer, 'unpaid' for a passenger payer. The
+      // dashboard counts only on-account trips toward what the facility owes,
+      // so getting this wrong is a wrong invoice, not a cosmetic flag.
+      payment_status: initialPaymentStatus(payer),
+    };
+  }
+
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? null;
 
@@ -233,7 +357,12 @@ export async function POST(request: Request) {
         // it -- while every booking written here left it to default false. A
         // plus-tagged address is Phil (or a friend) walking the funnel; keep
         // those bookings off the board and out of the revenue numbers.
-        is_test_data: looksLikeTestIdentity(data.contactEmail),
+        // On a facility booking the contact email is the PASSENGER'S, so the
+        // retail check alone would miss Phil walking the funnel as a test
+        // facility and put the trip on the real dispatch board. Check the
+        // signed-in coordinator too.
+        is_test_data:
+          looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
         preferred_contact: data.preferredContact,
         pickup_address: data.pickupAddress,
         dropoff_address: data.dropoffAddress,
@@ -267,6 +396,10 @@ export async function POST(request: Request) {
         trip_details: tripDetails,
         source,
         user_agent: userAgent,
+        // Empty for every retail booking, so this spread changes nothing there.
+        // See the facility-context block above for where these come from and
+        // why facility_id is not among the fields a form may set.
+        ...facilityColumns,
       })
       .select('id')
       .single();

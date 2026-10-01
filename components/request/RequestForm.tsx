@@ -21,6 +21,7 @@ import {
 import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
+import { facilityTripExtrasSchema } from '@/lib/facility';
 import { SHOW_ESTIMATES, estimateTrip, formatRange } from '@/lib/quote';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
@@ -40,14 +41,35 @@ const labelCls = 'block text-sm font-medium mb-1.5';
  *      reader user is told what happened instead of being silently returned to
  *      the top of a long form.
  */
+/**
+ * Facility context, passed only by /facility/request.
+ *
+ * Resolved SERVER-SIDE from the session cookie and passed down for DISPLAY and
+ * for defaults. The id is not here and must not be: /api/trip-request reads
+ * facility_id off the session itself, so nothing this component renders can
+ * change which account a trip is billed to. All this prop does is tell the
+ * coordinator which account they are on and ask the two questions a facility
+ * booking adds.
+ */
+export type FacilityContext = {
+  name: string;
+  /** 'patient' / 'pet' / 'resident' — wording only, never stored. */
+  passengerNoun: string;
+  /** The facility's default payer, from its billing mode. The toggle's start. */
+  defaultPayer: 'facility' | 'passenger';
+};
+
 export default function RequestForm({
   initialService,
   servicePreselected = false,
   googleMapsApiKey,
+  facility,
 }: {
   initialService: ServiceLine;
   /** True when the URL carried ?service= — see the decided line below. */
   servicePreselected?: boolean;
+  /** Set on /facility/request only. Undefined is the retail form, unchanged. */
+  facility?: FacilityContext;
   /**
    * Passed down from a dynamically-rendered server component rather than read
    * from NEXT_PUBLIC_*, so rotating the key takes effect on the next request
@@ -85,6 +107,18 @@ export default function RequestForm({
     const allowed = mobilityOptionsFor(initialService).map((m) => m.value as string);
     return requested && allowed.includes(requested) ? requested : defaultMobilityFor(initialService);
   });
+
+  /**
+   * Who pays for THIS trip. Starts at the facility's own default and is a
+   * per-trip question, because a dialysis centre has standing patients on
+   * account and one-off self-payers in the same week. The server re-resolves
+   * this against the facility's billing mode either way; the control exists so
+   * the coordinator can see and change the answer, not so the browser decides
+   * it.
+   */
+  const [payer, setPayer] = useState<'facility' | 'passenger'>(
+    facility?.defaultPayer ?? 'facility',
+  );
 
   /**
    * The per-service answers — pet breed, school, who signs the patient out.
@@ -333,14 +367,40 @@ export default function RequestForm({
       // stores only what comes back from it.
       tripDetails: details,
       source,
+      // Facility extras. Sent ONLY on /facility/request. `facilityBooking` is
+      // the explicit ask that makes the server read the session cookie — and if
+      // that session has expired the server returns 401 rather than storing a
+      // retail trip, because a patient must never be invoiced for a ride their
+      // clinic agreed to cover.
+      //
+      // There is no facilityId here. The server takes it from the cookie.
+      ...(facility
+        ? {
+            facilityBooking: true,
+            facilityRef: String(fd.get('facilityRef') ?? '') || null,
+            authorizedBy: String(fd.get('authorizedBy') ?? '') || null,
+            payer,
+          }
+        : {}),
     };
 
     // Client-side validation is a courtesy. The server re-runs this same schema
     // and is the authority.
     const check = tripRequestSchema.safeParse(payload);
     const detailCheck = validateDetails(payload.serviceLine, details);
+    // Same schema the route runs, for the same reason it is shared: the MRN
+    // guard should catch a pasted record number here, in front of the person
+    // who pasted it, rather than after a round trip. The server still enforces
+    // it — this only moves the message earlier.
+    const extrasCheck = facility
+      ? facilityTripExtrasSchema.safeParse({
+          facilityRef: String(fd.get('facilityRef') ?? '') || null,
+          authorizedBy: String(fd.get('authorizedBy') ?? '') || null,
+          payer,
+        })
+      : null;
 
-    if (!check.success || !detailCheck.ok) {
+    if (!check.success || !detailCheck.ok || (extrasCheck && !extrasCheck.success)) {
       const next: Record<string, string> = {};
       if (!check.success) {
         for (const issue of check.error.issues) {
@@ -351,6 +411,12 @@ export default function RequestForm({
       if (!detailCheck.ok) {
         for (const [key, message] of Object.entries(detailCheck.errors)) {
           next[`details.${key}`] = message;
+        }
+      }
+      if (extrasCheck && !extrasCheck.success) {
+        for (const issue of extrasCheck.error.issues) {
+          const key = issue.path.join('.') || 'form';
+          if (!next[key]) next[key] = issue.message;
         }
       }
       announce(next);
@@ -652,6 +718,90 @@ export default function RequestForm({
         </p>
         <FieldError name="vehicleNotes" />
       </div>
+
+      {/* ── facility booking: the two questions an account adds ──────────────
+          NOTE WHAT IS NOT ASKED HERE and keep it that way: no diagnosis, no
+          procedure, no condition, no medication, no insurance member id, no
+          date of birth. `facilityRef` is the facility's OWN job number and
+          carries a server-side guard that rejects anything shaped like a
+          medical record number (lib/facility.ts), because a free text box next
+          to a patient's name is exactly where one gets pasted. The helper text
+          below is the first line of that defence. */}
+      {facility ? (
+        <div className="border-t border-line pt-6 space-y-6">
+          <div>
+            <h2 className="serif text-lg font-semibold">On your account</h2>
+            <p className="ink-soft mt-1 text-xs">
+              Billed to {facility.name}. Optional, and only for your own records.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label className={labelCls} htmlFor="facilityRef">
+                Your reference
+              </label>
+              <input {...fieldProps('facilityRef')} maxLength={80} />
+              <p className="ink-mute mt-1 text-xs">
+                Your job number or shift code &mdash; e.g. DIAL-MWF or PO 4417. Please do not
+                enter a medical record number.
+              </p>
+              <FieldError name="facilityRef" />
+            </div>
+
+            <div>
+              <label className={labelCls} htmlFor="authorizedBy">
+                Authorized by
+              </label>
+              <input {...fieldProps('authorizedBy')} maxLength={120} />
+              <p className="ink-mute mt-1 text-xs">
+                Who at {facility.name} approved this trip.
+              </p>
+              <FieldError name="authorizedBy" />
+            </div>
+          </div>
+
+          <fieldset>
+            <legend className={labelCls}>Who pays for this trip</legend>
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  ['facility', `${facility.name} \u2014 on account`],
+                  ['passenger', `The ${facility.passengerNoun} pays`],
+                ] as const
+              ).map(([value, label]) => (
+                <label
+                  key={value}
+                  className={`cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm transition ${
+                    payer === value
+                      ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/15 font-medium'
+                      : 'border-line'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payer"
+                    value={value}
+                    className="sr-only"
+                    checked={payer === value}
+                    onChange={() => setPayer(value)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="ink-mute mt-2 text-xs">
+              {payer === 'facility'
+                ? 'Added to your weekly invoice. The ' +
+                  facility.passengerNoun +
+                  ' is not asked to pay and never sees your rate.'
+                : 'We take payment from the ' +
+                  facility.passengerNoun +
+                  ' by secure link. It does not reach your invoice, and they never see your rate.'}
+            </p>
+          </fieldset>
+        </div>
+      ) : null}
 
       {/* THE HEADING IS THE FIX. Without it, "First name" sat directly under
           "How does your pet travel?" and read as a request for the dog's name.

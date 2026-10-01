@@ -1,5 +1,10 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { payerFromBillingMode, type Payer } from '@/lib/facility';
+import {
+  payerFromBillingMode,
+  defaultLineForKind,
+  type Payer,
+  type FacilityKind,
+} from '@/lib/facility';
 
 /**
  * SERVER ONLY. Facility reads and writes.
@@ -143,6 +148,12 @@ export async function createOrFindFacility(input: {
   source: string | null;
   /** Rep slug from `?rep=`. Sets BOTH ownership columns. Null is valid. */
   rep?: string | null;
+  /**
+   * Facility kind from `?type=`, already coerced to a FACILITY_KINDS value.
+   * Absent means we genuinely do not know and the column's own default
+   * ('other') is the honest answer — so pass undefined, never a guess.
+   */
+  kind?: FacilityKind;
 }): Promise<{ facilityId: string; userId: string; created: boolean }> {
   const db = supabaseAdmin();
   const email = input.workEmail.trim();
@@ -175,6 +186,13 @@ export async function createOrFindFacility(input: {
         // account changed hands.
         referred_by_rep: input.rep ?? null,
         account_manager: input.rep ?? null,
+        // kind + service_lines are NOT NULL with defaults ('other' and '{}').
+        // Spreading conditionally rather than writing null: an absent `type`
+        // must fall through to the column default, and an explicit null on a
+        // NOT NULL column is an insert error, not a default.
+        ...(input.kind
+          ? { kind: input.kind, service_lines: [defaultLineForKind(input.kind)] }
+          : {}),
       })
       .select('id')
       .single(),

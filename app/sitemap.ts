@@ -35,6 +35,12 @@ const routes: Array<{ path: string; priority: number }> = [
   { path: '/charlotte/calm-pet-transport', priority: 0.8 },
   { path: '/charlotte/dog-grooming-pickup', priority: 0.7 },
   { path: '/compare/winnie-vs-uber-pet-vs-lyft-pet', priority: 0.7 },
+  // Careers hub, 2026-10-01. Indexable: a hiring page is how a driver or CNA
+  // finds us, and the four role forms it links sit on the SaaS behind
+  // rel=noopener links rather than on an indexable marketing URL.
+  // /partners/signup is NOT here on purpose — it is robots noindex, a funnel
+  // endpoint, not a landing page.
+  { path: '/careers', priority: 0.6 },
   // MEGA_TASSY_PUBLISH_READY — legal / trust pages (were footer 404s)
   { path: '/privacy', priority: 0.3 },
   { path: '/terms', priority: 0.3 },

@@ -5,7 +5,8 @@ import {
   HeartPulse, Sparkles, PawPrint, Droplets, Shield, GraduationCap,
   type LucideIcon,
 } from 'lucide-react';
-import { contact, apply } from '@/lib/saas-links';
+import { contact } from '@/lib/saas-links';
+import { partnerSignup } from '@/lib/partner-links';
 import { request } from '@/lib/request-links';
 import CharlotteDayMap from '@/components/CharlotteDayMap';
 
@@ -234,7 +235,9 @@ export default function HomePage() {
               rates from 10 trips a month, contract rates from 25.
             </p>
             <div className="flex flex-wrap gap-3">
-              <a href={apply.facility} className="btn-gold">Request a partnership call</a>
+              <Link href={partnerSignup({ source: 'home-partners' })} className="btn-gold">
+                Request a partnership call
+              </Link>
               <a href={contact.salesEmail} className="btn-ghost" style={{ color: 'var(--cream-text)' }}>
                 Email partnerships →
               </a>

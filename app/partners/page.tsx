@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import { facilityIntake } from '@/lib/saas-links';
+import { partnerSignup } from '@/lib/partner-links';
 
 export const metadata: Metadata = {
   title: 'Facility Transport Partnerships in Charlotte NC',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/partners', images: ['/og-image/partners'] },
 };
 
-const CTA_HREF = facilityIntake({ source: 'partners-page' });
+const CTA_HREF = partnerSignup({ source: 'partners-page' });
 
 export default function PartnersPage() {
   return (

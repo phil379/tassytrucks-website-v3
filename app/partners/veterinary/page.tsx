@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { facilityIntake } from '@/lib/saas-links';
+import { partnerSignup } from '@/lib/partner-links';
 
 export const metadata: Metadata = {
   title: 'Veterinary Partnerships — Pet Transport | Winnie Ride',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { url: '/partners/veterinary', images: ['/og-image/veterinary'] },
 };
 
-const CTA_HREF = facilityIntake({ source: 'vet-partners', type: 'veterinary' });
+const CTA_HREF = partnerSignup({ source: 'vet-partners', type: 'veterinary' });
 
 const inlineLink =
   'underline decoration-[#7C9A5C] underline-offset-2';

@@ -7,22 +7,27 @@
  * links to would fail CI for no reason. Those constants stay in
  * lib/saas-links.ts, unaudited and unused, on purpose.
  *
+ * Rescoped again 2026-10-01 when facility signup moved in-house. The SaaS
+ * facility links are gone from lib/saas-links.ts entirely, so there is nothing
+ * left to probe — check 6 below makes sure they cannot come back.
+ *
  * What this still checks:
- *   1. Dead route      — the facility, careers and subscription links the site
- *                        does render (FIX_PROD_024 shipped 404s here twice)
- *   2. Dropped query   — /facility/intake once 307'd and ate the query string,
- *                        silently killing marketing attribution
+ *   1. Dead route      — the careers and subscription links the site does
+ *                        render (FIX_PROD_024 shipped 404s here twice)
+ *   2. Dropped query   — a 307 that eats the query string silently kills
+ *                        marketing attribution
  *   3. Leaked login    — FIX_PROD_142: portal.* must never be rendered publicly
  *   4. Dead booking    — no file may re-render the book.* / seoBook /
  *                        WINNIE_BOOK_URL surface
  *   5. Bad service     — every /request?service=X must name a requestable line
+ *   6. Dead facility   — no file may link a facility at the SaaS again
  *
- * Checks 3-5 are static and need no network, so they run even if the SaaS is
+ * Checks 3-6 are static and need no network, so they run even if the SaaS is
  * down. Run:  bun run scripts/audit-saas-links.ts
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { subscribe, apply, facilitySignup, facilityIntake } from '../lib/saas-links';
+import { subscribe, apply } from '../lib/saas-links';
 import { SERVICE_LINES } from '../lib/trip-request';
 
 const TIMEOUT_MS = 15_000;
@@ -36,9 +41,6 @@ type Target = { label: string; url: string };
 const targets: Target[] = [
   ...Object.entries(subscribe).map(([k, url]) => ({ label: `subscribe.${k}`, url })),
   ...Object.entries(apply).map(([k, url]) => ({ label: `apply.${k}`, url })),
-  { label: 'facilitySignup()', url: facilitySignup() },
-  { label: 'facilitySignup(veterinary)', url: facilitySignup('veterinary') },
-  { label: 'facilityIntake(attributed)', url: facilityIntake({ source: 'ci-audit', type: 'veterinary' }) },
 ];
 
 const fetchOnce = async (url: string) => {
@@ -140,6 +142,33 @@ if (revived.length) {
   );
 }
 
+// ── the SaaS facility door stays shut ───────────────────────────────────
+/**
+ * Until 2026-10-01 four surfaces linked a prospective facility at the SaaS
+ * /facility/signup. That route inserts into tassy_archive.accounts, and
+ * trip_requests.facility_id is a FOREIGN KEY to public.facilities.id — so the
+ * account it created could never be attached to a ride, appear on /ops/board,
+ * or show in the /facility dashboard. It returned a success screen and a magic
+ * link either way, which is why nobody caught it for three months.
+ *
+ * The signup door is partnerSignup() → /partners/signup. This check fails CI
+ * if any file points a facility back at the SaaS, by helper name or raw URL.
+ */
+const facilityLeaks = sourceFiles.filter((f) => {
+  const src = stripComments(readFileSync(f, 'utf8'));
+  return (
+    /\bfacilityIntake\s*\(|\bfacilitySignup\s*\(|\bapply\.facility\b/.test(src) ||
+    /tassytrucksops[^'"`\s]*\/facility\/(signup|intake)/.test(src)
+  );
+});
+
+if (facilityLeaks.length) {
+  failures.push(
+    'A facility is linked at the SaaS again — signup lives at /partners/signup now:\n    ' +
+      facilityLeaks.join('\n    '),
+  );
+}
+
 // ── every /request?service=X names a line a visitor can actually pick ───
 const requestable = new Set(SERVICE_LINES.map((s) => s.value));
 const badService: string[] = [];
@@ -171,5 +200,5 @@ if (failures.length) {
 
 console.log(
   `\n✅ ${targets.length} rendered SaaS links reachable, attribution intact, ` +
-    `no login leaks, no revived booking links, all service params valid.\n`,
+    `no login leaks, no revived booking or facility links, all service params valid.\n`,
 );

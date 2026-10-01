@@ -19,9 +19,17 @@ import { facilitySignupSchema } from '@/lib/facility';
 export default function FacilitySignupForm({
   source,
   rep,
+  kind,
 }: {
   source?: string;
   rep?: string | null;
+  /**
+   * Already coerced to a FACILITY_KINDS value by the page. Sent so the insert
+   * can set facilities.kind instead of letting it default to 'other' — see
+   * lib/partner-links.ts for why that default was quietly losing the one fact
+   * /partners/veterinary exists to capture.
+   */
+  kind?: string | null;
 }) {
   const [done, setDone] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -47,6 +55,7 @@ export default function FacilitySignupForm({
       elapsedMs: Date.now() - renderedAtRef.current,
       source: source ?? 'partners-signup',
       rep: rep ?? null,
+      kind: kind ?? undefined,
     };
 
     // Validate with the same schema the server uses, so the two can never

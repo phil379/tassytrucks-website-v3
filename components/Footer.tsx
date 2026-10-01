@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
+import { partnerSignup } from '@/lib/partner-links';
 
 // FIX_PROD_131 — footer de-cluttered: 7 columns (~33 SEO-stuffed links) + a
 // redundant facility banner → brand + 4 focused columns. The facility banner was
@@ -79,20 +80,24 @@ export default function Footer() {
             <li><a href={apply.companion} className="hover:text-[color:var(--gold-warm)]">Become a companion</a></li>
             <li><a href={apply.cna} className="hover:text-[color:var(--gold-warm)]">Become a CNA</a></li>
             <li><a href={apply.salesRep} className="hover:text-[color:var(--gold-warm)]">Become a sales rep</a></li>
-            {/* A 404 on every page of the site until 2026-09-24. `/careers`
-                was never built here — the hiring reference doc specifies it as
-                a marketing page and the marketing repo does not have one. Until
-                it does, this points at the careers index that actually answers,
-                so the one link a browsing candidate clicks is not a dead end.
-                Swap it back to a local <Link href="/careers"> the day that page
-                ships. */}
+            {/* Was a 404 until 2026-09-24, then a stopgap pointing at the
+                SaaS careers index with a note saying "swap it back to a local
+                <Link href="/careers"> the day that page ships". 2026-10-01:
+                that page ships. The four role links above still cross to the
+                SaaS forms ON PURPOSE -- they write to
+                tassy_archive.*_applications on the Tassy project (16 real
+                applications live there) and issue the applicant onboarding
+                magic link from @/server/onboarding-tokens. Rebuilding them
+                here would fork that flow for no gain. /careers is the hub that
+                keeps a browsing candidate on tassytrucks.com until they
+                actually apply. */}
             <li>
-              <a
-                href={apply.careers}
+              <Link
+                href="/careers"
                 className="inline-flex items-center gap-1 hover:text-[color:var(--gold-warm)]"
               >
                 View all careers <ArrowRight size={13} />
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -101,7 +106,14 @@ export default function Footer() {
         <div>
           <div className="eyebrow opacity-60 text-current">Partners</div>
           <ul className="mt-3 space-y-2 text-sm">
-            <li><a href={apply.facility} className="hover:text-[color:var(--gold-warm)]">Facility partners</a></li>
+            <li>
+              <Link
+                href={partnerSignup({ source: 'footer' })}
+                className="hover:text-[color:var(--gold-warm)]"
+              >
+                Facility partners
+              </Link>
+            </li>
             <li><Link href="/partners" className="hover:text-[color:var(--gold-warm)]">Partner with Tassy</Link></li>
             {/* FIX_PROD_142 (SECURITY) — removed the "Existing facility" shortcut: it linked
                 straight to the SaaS login (portal.facilityLogin → /login?intent=facility),

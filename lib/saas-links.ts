@@ -31,14 +31,20 @@ export const book = {
   schoolAfterSchool: src('/book/school/after-school/setup'),
 };
 
-/** FIX_PROD_020 self-serve facility magic-link signup. `?type=` is an optional hint
- *  (hospital / veterinary / clinic / school) the signup form can read. */
-/** FIX_PROD_143 — routed through src() so the B2B facility funnel carries the same
- *  `source=web` attribution as every booking CTA. It previously emitted only
- *  `?type=...`, so the four in-body facility CTAs (/nemt, /winnie, /renew, /recover)
- *  landed unattributed. */
-export const facilitySignup = (type?: string) =>
-  type ? src('/facility/signup', { type }) : src('/facility/signup');
+/* REMOVED 2026-10-01 — facilitySignup() and facilityIntake().
+ *
+ * Both pointed at the SaaS /facility/signup, which inserts into
+ * tassy_archive.accounts + tassy_archive.account_invitations. Those rows can
+ * never be attached to a ride: trip_requests.facility_id has a FOREIGN KEY to
+ * public.facilities.id, and nothing joins the archive to it. Measured the day
+ * they were removed — public.facilities: 0 rows. tassy_archive.accounts: 4,
+ * every one a July test.
+ *
+ * The in-repo door is partnerSignup() in lib/partner-links.ts. These two are
+ * DELETED rather than deprecated on purpose: an exported helper with a warning
+ * comment is how this survived three months of audits. There is now nothing to
+ * re-wire.
+ */
 
 export const subscribe = {
   // VIP CAMO-style passes
@@ -73,13 +79,6 @@ export const seoBook = (
   params: Record<string, string>,
 ) => `${SAAS_BASE}/book/${vertical}?${new URLSearchParams(params).toString()}`;
 
-/** B2B facility intake deep link with attribution.
- *  MEGA_TASSY_PUBLISH_READY (2026-07-02): /facility/intake now 307s to /facility/signup
- *  on the SaaS and DROPS the query string → point straight at signup so
- *  source/type attribution survives. */
-export const facilityIntake = (params: Record<string, string>) =>
-  `${SAAS_BASE}/facility/signup?${new URLSearchParams(params).toString()}`;
-
 /** Winnie Ride booking deep link (MEGA_SEO_002 contract). */
 export const WINNIE_BOOK_URL = seoBook('winnie', { source: 'web' });
 
@@ -92,14 +91,23 @@ export const apply = {
   // FIX_PROD_025 — companion (VIP Concierge) + CNA (Tassy Recover) hiring funnels.
   companion: src('/careers/companion'),
   cna: src('/careers/cna'),
-  /**
-   * The careers index. Temporary: the hiring reference doc puts this page on
-   * the marketing site, and it does not exist here yet — the footer's "View all
-   * careers" was a 404 on every page until this line. Delete it, and point the
-   * footer at a local route, the day /careers ships here.
+  /* REMOVED 2026-10-01:
+   *
+   * `careers` — the stopgap index. /careers now exists in this repo and the
+   * footer links to it locally, which is what the note here asked for.
+   *
+   * `facility` — pointed at the SaaS /facility/signup. See the note above
+   * where facilitySignup/facilityIntake used to be: those signups land in
+   * tassy_archive and can never reach a trip. Use partnerSignup() from
+   * lib/partner-links.ts.
+   *
+   * The four role links above STAY. They work end to end: the SaaS careers
+   * routes write to tassy_archive.*_applications on the Tassy project (8
+   * driver, 3 cna, 3 sales_rep, 2 companion as of today) and issue the
+   * applicant onboarding magic link. Unlike facility signup, an application
+   * has no public.* counterpart it is being kept out of — the archive IS the
+   * applications table. Nothing is lost by crossing to the SaaS to apply.
    */
-  careers: src('/careers'),
-  facility: src('/facility/signup'),
 };
 
 // ⚠️ FIX_PROD_142 (SECURITY) — DO NOT render `portal.login` / `portal.facilityLogin`

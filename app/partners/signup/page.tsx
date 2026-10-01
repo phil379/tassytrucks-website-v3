@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import FacilitySignupForm from '@/components/partners/FacilitySignupForm';
+import { coerceFacilityKind } from '@/lib/facility';
 
 export const metadata: Metadata = {
   title: 'Partner with Tassy Transportation — Facility Accounts',
@@ -19,6 +20,11 @@ export default function FacilitySignupPage({
   // No `rep` means nobody is credited — a real outcome, flagged for manual
   // assignment rather than guessed at.
   const rep = searchParams?.rep ?? null;
+  // `type` was declared in this signature from the first commit and then never
+  // read, so /partners/veterinary's `type=veterinary` died here and every
+  // signup stored kind='other'. Coerced, not validated: a bad link falls back
+  // to 'other' rather than turning a partner away.
+  const kind = searchParams?.type ? coerceFacilityKind(searchParams.type) : null;
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
@@ -33,7 +39,7 @@ export default function FacilitySignupPage({
       </p>
 
       <div className="mt-10">
-        <FacilitySignupForm source={source} rep={rep} />
+        <FacilitySignupForm source={source} rep={rep} kind={kind} />
       </div>
 
       <ul className="mx-auto mt-10 grid max-w-lg gap-3 text-sm text-[color:var(--muted)]">

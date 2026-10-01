@@ -34,6 +34,30 @@ export type FacilityKind = (typeof FACILITY_KINDS)[number]['value'];
 
 const KIND_VALUES = FACILITY_KINDS.map((k) => k.value) as [FacilityKind, ...FacilityKind[]];
 
+/**
+ * `?type=` off a marketing URL, turned into a kind we will actually store.
+ *
+ * facilities.kind is NOT NULL DEFAULT 'other'. Before 2026-10-01 the vet
+ * partner page passed `type=veterinary` to the SaaS and nothing on this side
+ * read it, so every signup landed as 'other' with service_lines '{}' — the one
+ * fact the page existed to capture, dropped at the insert.
+ *
+ * An unrecognised value falls back to 'other' instead of failing validation. A
+ * stale or hand-edited link must never be the reason a real facility cannot
+ * sign up; a wrong kind is a one-field correction, a blocked signup is a lost
+ * partner.
+ */
+export function coerceFacilityKind(raw: unknown): FacilityKind {
+  if (typeof raw !== 'string') return 'other';
+  const v = raw.trim().toLowerCase();
+  return (KIND_VALUES as readonly string[]).includes(v) ? (v as FacilityKind) : 'other';
+}
+
+/** The service line a kind starts with, for seeding facilities.service_lines. */
+export function defaultLineForKind(kind: FacilityKind): string {
+  return FACILITY_KINDS.find((k) => k.value === kind)?.defaultLine ?? 'care';
+}
+
 export function facilityKind(value: string) {
   return FACILITY_KINDS.find((k) => k.value === value) ?? FACILITY_KINDS[FACILITY_KINDS.length - 1];
 }
@@ -175,6 +199,19 @@ export const facilitySignupSchema = z.object({
    * Slug-shaped only. A stray value here would otherwise be written straight
    * into the column that drives residual commission.
    */
+  /**
+   * The facility kind, from `/partners/signup?type=<kind>`.
+   *
+   * Lenient on purpose: anything unrecognised becomes 'other' via
+   * coerceFacilityKind rather than failing the form. The visitor did not type
+   * this — it came off a link we control, and a link we got wrong is our
+   * mistake to absorb, not theirs to be blocked by.
+   */
+  kind: z
+    .unknown()
+    .transform(coerceFacilityKind)
+    .optional(),
+
   rep: z
     .string()
     .trim()

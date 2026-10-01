@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check, Loader2, Plus, Trash2 } from 'lucide-react';
 import {
   BILLING_MODES,
@@ -14,6 +14,7 @@ import {
   saveFacilityProfile,
   type ActionResult,
 } from '@/app/facility/welcome/actions';
+import AddressAutocomplete from '@/components/request/AddressAutocomplete';
 
 /**
  * The four screens behind the magic link.
@@ -32,8 +33,16 @@ import {
  * tempts it.
  */
 
-const field =
-  'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
+/**
+ * Was a local copy of the same styling the rest of the site gets from
+ * `.form-field`, and the copy had drifted: a fainter border (--line, 1.34:1)
+ * and no min-height, so these inputs were both harder to see and smaller than
+ * the 44px target WCAG 2.5.5 asks for. Now the shared class, so the wizard
+ * cannot drift from the booking form again -- and so the address field, which
+ * is a shared component and brings `.form-field` with it, matches the fields
+ * above and below it.
+ */
+const field = 'form-field';
 const label = 'block text-sm font-medium mb-1.5';
 const err = 'mt-1.5 text-sm text-[#f87171]';
 
@@ -45,11 +54,35 @@ export default function FacilityWizard({
   facilityName,
   accountManager,
   initialKind,
+  googleMapsApiKey,
 }: {
   facilityName: string;
   accountManager: string | null;
   initialKind: string;
+  /**
+   * Passed down from the server component rather than read from NEXT_PUBLIC_*,
+   * so rotating the key takes effect on the next request. Undefined is a
+   * supported state -- the field degrades to plain text and still saves.
+   */
+  googleMapsApiKey?: string;
 }) {
+  /**
+   * `?debug_maps=1` prints why suggestions are off, same as on /request. Worth
+   * having here precisely because this field is behind a magic link: nobody can
+   * reproduce it without a live session, so the page has to be able to say for
+   * itself whether the key is missing or Google rejected it.
+   *
+   * Read in an effect rather than with useSearchParams(): that hook forces its
+   * page into a Suspense boundary at build time, and putting a build
+   * requirement on a page behind a magic link to carry a debug flag is a bad
+   * trade. An effect also runs only on the client, so there is no hydration
+   * mismatch to warn about.
+   */
+  const [debugMaps, setDebugMaps] = useState(false);
+  useEffect(() => {
+    setDebugMaps(new URLSearchParams(window.location.search).get('debug_maps') === '1');
+  }, []);
+
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -87,7 +120,13 @@ export default function FacilityWizard({
         await saveFacilityProfile({
           kind,
           address: String(fd.get('address') ?? ''),
-          addressPlaceId: null,
+          // AddressAutocomplete posts `${name}PlaceId` as a hidden field, set
+          // ONLY when a suggestion was picked and cleared the moment the text
+          // is edited afterwards. This was hardcoded null while the schema, the
+          // server action and facilities.address_place_id all already accepted
+          // it -- so every facility's own address was stored unmeasurable, and
+          // a trip to or from it could never be priced by road distance.
+          addressPlaceId: String(fd.get('addressPlaceId') ?? '') || null,
           phone: String(fd.get('phone') ?? ''),
           website: String(fd.get('website') ?? '') || null,
           primaryContactName: String(fd.get('primaryContactName') ?? ''),
@@ -180,13 +219,29 @@ export default function FacilityWizard({
             </p>
           </div>
 
+          {/* The same component the booking form uses, for the same reason it
+              exists there: a typed address is a string nobody can measure, and
+              this facility's address is the pickup or the dropoff on most of
+              its trips. It renders its own label and posts addressPlaceId
+              alongside the text. If the key is missing or Google is
+              unreachable it is still a plain text input and the wizard still
+              saves -- see rule 1 at the top of AddressAutocomplete. */}
           <div>
-            <label className={label} htmlFor="address">
-              Address <span aria-hidden="true">*</span>
-              <span className="sr-only">(required)</span>
-            </label>
-            <input id="address" name="address" className={field} autoComplete="street-address" required />
-            {errors.address && <p className={err}>{errors.address}</p>}
+            <AddressAutocomplete
+              name="address"
+              label="Address"
+              apiKey={googleMapsApiKey}
+              autoComplete="street-address"
+              required
+              hasError={Boolean(errors.address)}
+              describedBy={errors.address ? 'address-error' : undefined}
+              debug={debugMaps}
+            />
+            {errors.address && (
+              <p id="address-error" className={err}>
+                {errors.address}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">

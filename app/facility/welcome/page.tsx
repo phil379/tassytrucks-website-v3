@@ -32,6 +32,14 @@ export default async function FacilityWelcomePage() {
    */
   const facility = session.facility;
 
+  /**
+   * Read here rather than from NEXT_PUBLIC_*, so rotating the key takes effect
+   * on the next request instead of needing a rebuild. Same pattern as /request
+   * and /facility/request. Undefined is a supported state: the address field
+   * degrades to a plain text input and the wizard still saves.
+   */
+  const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+
   return (
     <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
       <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
@@ -49,6 +57,7 @@ export default async function FacilityWelcomePage() {
           facilityName={facility.name}
           accountManager={facility.account_manager ?? null}
           initialKind={facility.kind}
+          googleMapsApiKey={googleMapsApiKey}
         />
       </div>
     </div>

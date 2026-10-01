@@ -203,30 +203,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ───────────── HOW IT WORKS ───────────── */}
-      <section id="how" className="bg-cream">
-        <div className="container-x py-24">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="eyebrow mb-3">How it works</div>
-            <h2 className="h-section">Three steps. Zero surprises.</h2>
-          </div>
+      {/* HOW IT WORKS lived here and was DELETED 2026-10-01, not rewritten.
+          It promised four things the business does not do: a driver assigned
+          "within minutes" (the honest answer, eighty lines below, was two
+          hours), real-time tracking, pickup and dropoff alerts to family, and
+          a driver photo by text. None of those exist. It was the pre-
+          FIX_PROD_131 copy describing an Uber-shaped product, and it sat
+          directly above a truthful version of the same three steps.
 
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              { n: 1, t: 'Request', d: 'Tell us where, when, and who. See the price upfront — no surge, no hidden fees, no booking fees.' },
-              { n: 2, t: 'Match', d: "A licensed, insured driver is assigned within minutes. You'll get their name, photo, vehicle, and ETA by text." },
-              { n: 3, t: 'Travel', d: 'Track in real time. Family gets pickup & dropoff alerts. Pay only when the trip completes. Receipt by email.' },
-            ].map((s) => (
-              <div key={s.n}>
-                <span className="number-bullet">{s.n}</span>
-                <h3 className="serif text-2xl font-semibold mt-5 mb-3">{s.t}</h3>
-                <p className="ink-soft leading-relaxed">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+          Two "how it works" sections is a content bug. One of them being
+          untrue is a promise a customer discovers is false after they have
+          already trusted us with their mother. The truthful one survives, in
+          the section below, which is where it always should have been. */}
       {/* ───────────── FACILITIES CTA (DARK) ───────────── */}
       <section id="facilities" className="bg-ink-section">
         <div className="container-x py-24 grid lg:grid-cols-2 gap-16 items-center">
@@ -276,8 +264,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ───────────── TESTIMONIALS ───────────── */}
-      <section className="bg-cream">
+      {/* ───────────── HOW IT WORKS ─────────────
+          Commented TESTIMONIALS until 2026-10-01 and containing no testimonial:
+          it was the honest rewrite of the three steps, parked in the slot meant
+          for customer voices. Renamed to what it is. The social-proof gap that
+          mislabelling hid is real, and is NOT being filled with invented quotes
+          -- see the placeholder below.
+
+          id="how" MOVED HERE from the deleted block. Header.tsx links to /#how
+          from both the desktop dropdown and the mobile menu; losing the anchor
+          would have left "How it works" scrolling nowhere on every page. */}
+      <section id="how" className="bg-cream">
         <div className="container-x py-24">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <div className="eyebrow mb-3">How it works</div>

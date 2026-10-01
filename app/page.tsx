@@ -353,6 +353,43 @@ export default function HomePage() {
               Community-focused and here to serve those who need us most.
             </p>
 
+            {/* TRACK RECORD, added 2026-10-01 and documented before it shipped.
+                Phil produced the Uber W-9 settings page (entity type Business,
+                business information TASSY TRUCKS LLC, company EIN) and the
+                August 2026 monthly statement, headed TASSY TRUCKS LLC: 221
+                completed trips. The rides are the COMPANY'S -- performed under
+                the LLC, paid to the LLC, taxed as the LLC's income -- so
+                attributing them to Tassy Transportation is accurate, not a
+                stretch.
+
+                This is the claim FIX_PROD_131 pulled ("15,000+ rides", "4.9
+                stars") in the right form at last: the real number, from the
+                operator's own account, with the document behind it. 7,847 is
+                lifetime since 2023 and will be stale the day it is written --
+                round it DOWN when it is refreshed and never up.
+
+                No revenue figures here, and no business address: the statement
+                carries both and neither belongs on a public page. */}
+            <div className="mt-8 rounded-tile border border-line p-6 max-w-xl">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                {[
+                  ['7,847', 'rides completed'],
+                  ['4.98', 'average rating'],
+                  ['2%', 'cancellation rate'],
+                ].map(([n, l]) => (
+                  <div key={l}>
+                    <div className="serif text-3xl font-semibold" style={{ color: 'var(--gold)' }}>{n}</div>
+                    <div className="text-xs ink-mute uppercase tracking-wider mt-1">{l}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="ink-soft text-sm leading-relaxed mt-5">
+                Three years on the road in Charlotte before we ever asked anyone to trust us with a
+                medical ride. That rating is the average of nearly eight thousand passengers, and it is
+                the standard every driver we hire is held to.
+              </p>
+            </div>
+
             {/* 2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor.
                 Sits in the founder section rather than the hero trust strip:
                 the strip is deliberately typographic, and a full-colour federal

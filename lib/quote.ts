@@ -376,34 +376,54 @@ const WAV_MESSAGE =
  */
 export const CARE_WAV: Card = {
   label: 'Tassy Care WAV',
-  // RAISED 2026-09-30 (second pass) from 89/109/139/169/199/239.
+  // REPRICED 2026-10-02 by Phil, from 119/139/169/199/229/269 on 0-3/7/12/17/22/30.
   //
-  // The first card was anchored to a NATIONAL average base of $88. Capitol
-  // Transportation's PUBLISHED North Carolina schedule is $120 (0-5 mi), $140
-  // (5-10), $160 (10-15), $180 (15-20), then $9/mi -- so Tassy was sitting
-  // 20-25% under a named in-state competitor at every rung, on the one line
-  // where the vehicle is scarce and the operator is trained.
+  // THE SEPT 30 RAISE COMPARED TWO DIFFERENT THINGS. It anchored this card to
+  // Capitol Transportation's published NC schedule -- $120 for 0-5 mi, $140
+  // (5-10), $160 (10-15), $180 (15-20) -- and concluded $119 for 0-3 mi sat
+  // "at or just under Capitol". It did not. Capitol gives FIVE miles for $120;
+  // the card gave THREE for $119 and then jumped to $139. At 4 miles, an
+  // ordinary Charlotte medical run, Tassy was 16% OVER Capitol, not under it.
   //
-  // This is not a line to enter cheap. VA non-emergent WHEELCHAIR transport is
-  // a 100% SDVOSB set-aside under 38 U.S.C. 8127(d), awarded firm-fixed-price:
-  // the number goes in once and holds for the contract term. The card now sits
-  // at or just under Capitol rather than a fifth below it, and still inside the
-  // $80-120 base plus $5-9/mi that NC retail actually runs at.
+  // Checked again 2026-10-02 against what Charlotte actually publishes:
+  //   Medical Transportation of America (Charlotte, private pay)
+  //       wheelchair $100 one way INCLUDING THE FIRST 3 MILES, $180 round trip,
+  //       +$15 after 7pm, +$30 Sundays and holidays
+  //   Capitol Transportation (NC)   $120 / $140 / $160 / $180, then $9/mi
+  //   Published NC private-pay range  $65-110 base + $3.00-5.50/mi
+  //       (national average base $88)
+  // Against the nearest real comparison the card was 19% high one way AND 19%
+  // high round trip, and above the top of the published NC band.
+  //
+  // THE OTHER HALF OF THE SEPT 30 ERROR, worth naming so it is not repeated:
+  // it justified the raise with the VA set-aside -- non-emergent wheelchair
+  // transport is 100% SDVOSB under 38 U.S.C. 8127(d), awarded firm-fixed-price.
+  // True, and irrelevant here. A VA bid is a sealed number priced against a
+  // government estimate. THE PUBLIC RETAIL CARD IS NOT THE VA BID. Pricing this
+  // card to win facility and private-pay work costs nothing on that contract.
+  // The wrong number was raised to protect the right one.
+  //
+  // Entry rung set at $95 rather than $99: Phil's call, a deliberate step under
+  // MTA's $100, and it buys a FIVE mile band against their three. We still do
+  // not surcharge nights, weekends or holidays, so on the trips that actually
+  // happen the gap is wider than the headline.
   bands: [
-    { upToMiles: 3, cents: 11900 },
-    { upToMiles: 7, cents: 13900 },
-    { upToMiles: 12, cents: 16900 },
-    { upToMiles: 17, cents: 19900 },
-    { upToMiles: 22, cents: 22900 },
-    { upToMiles: 30, cents: 26900 },
+    { upToMiles: 5, cents: 9500 },
+    { upToMiles: 10, cents: 12500 },
+    { upToMiles: 15, cents: 15500 },
+    { upToMiles: 20, cents: 18500 },
+    { upToMiles: 30, cents: 22500 },
   ],
   waitIncludedMin: 20,
   waitOverage: 3000,
   perExtra: 0,
   returnFactor: 1.8,
-  // 1.8 x $119 = $214.20. Moved with the card -- a floor left at $160 would have
-  // made the round trip cheaper than the one-way it contains.
-  returnFloor: 21400,
+  // $180 at the entry rung, matching MTA's published round trip, where 1.8 x $95
+  // alone would give $171. Every rung above clears the floor on the factor
+  // ($125 -> $225, $155 -> $279, $185 -> $333, $225 -> $405), so this sets the
+  // first row and nothing else. Moved WITH the card every time the entry band
+  // moves -- a floor left at 21400 would now exceed the 11-15 mile round trip.
+  returnFloor: 18000,
 };
 
 /**

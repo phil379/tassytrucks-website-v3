@@ -8,6 +8,14 @@ import {
 import { contact } from '@/lib/saas-links';
 import { partnerSignup } from '@/lib/partner-links';
 import { request } from '@/lib/request-links';
+// Entry fares read from the rate cards, never typed. Three places said
+// "Wheelchair from $119" on 2026-10-02 while lib/quote.ts had been repriced to
+// $95 -- the same drift that had /pricing advertising $49 Winnie against a $69
+// engine on 2026-09-30. A headline price is a promise; derive it.
+import { CARE as CARE_CARD, CARE_WAV, dollars } from '@/lib/quote';
+
+const CARE_FROM = dollars(CARE_CARD.bands[0].cents);
+const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 import CharlotteDayMap from '@/components/CharlotteDayMap';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
@@ -37,7 +45,10 @@ const verticals: Vertical[] = [
   {
     slug: '/nemt', name: 'Tassy Care', Icon: HeartPulse, anim: 'svc-anim--heart',
     blurb: 'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
-    bullets: ['Flat rates from $49, one way', 'Wheelchair from $119, priced by distance'],
+    bullets: [
+      `Flat rates from ${CARE_FROM}, one way`,
+      `Wheelchair from ${WAV_FROM}, priced by distance`,
+    ],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,
   },

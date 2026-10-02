@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
+// Derived, never typed — see the note in app/page.tsx.
+import { CARE_WAV, dollars } from '@/lib/quote';
+
+const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 
 export const metadata: Metadata = {
   title: 'Tassy Care — Charlotte medical transport | Flat rates from $49',
@@ -42,7 +46,7 @@ export default function NemtPage() {
         },
         {
           title: 'Travelling in a wheelchair',
-          body: 'Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. Priced by distance like every other line — from $119 — so you know the number before you book.',
+          body: `Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`,
         },
         {
           title: 'Veteran-owned, and certified',
@@ -69,7 +73,7 @@ export default function NemtPage() {
           name: '18 to 30 miles',
           price: '$109–129',
           cadence: 'one way',
-          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', 'Wheelchair from $119, priced by distance'],
+          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', `Wheelchair from ${WAV_FROM}, priced by distance`],
           cta: { label: 'Request this', href: request.nemt },
         },
       ]}

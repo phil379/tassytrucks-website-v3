@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
+import RateTable, { returnRows } from '@/components/pricing/RateTable';
+import { CARE_WAV } from '@/lib/quote';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -12,6 +14,24 @@ export const metadata: Metadata = {
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
+
+/**
+ * The price, on the page the rider actually lands on.
+ *
+ * Added 2026-10-02. This page ranks for "wheelchair transport charlotte" and
+ * sits in the Services menu, and until today it carried no number at all —
+ * neither did any of the other fifteen landing pages. Somebody searching for a
+ * wheelchair ride read about securement and then had to find /pricing, scroll
+ * past a six-row table, and recognise a card headed "Travelling in a
+ * wheelchair" as the thing they were looking for. Most people call instead, and
+ * the card's own note in app/pricing/page.tsx already says why that is the
+ * wrong outcome on this line: quoting on the phone "made the one passenger
+ * least able to chase a phone call the only one who had to".
+ *
+ * Derived from CARE_WAV, never typed. Reprice in lib/quote.ts and this page
+ * follows with /pricing on the next build.
+ */
+const WAV_ROWS = returnRows(CARE_WAV);
 
 export default function WheelchairTransportPage() {
   return (
@@ -156,6 +176,40 @@ export default function WheelchairTransportPage() {
           ),
         },
       ]}
+      beforeFaq={
+        <section className="border-b border-line">
+          <div className="container-x py-12">
+            <h2 className="h-section max-w-2xl">What a wheelchair ride costs</h2>
+            <p className="ink-soft mt-3 max-w-2xl leading-relaxed">
+              Priced by distance, like every other Tassy line. You get the number before you
+              book and it does not move afterwards &mdash; no meter, no surge, and no
+              &ldquo;we&rsquo;ll quote you on the call&rdquo;.
+            </p>
+            <div className="mt-7 max-w-2xl">
+              <RateTable
+                id="wheelchair-pricing"
+                heading="Tassy Care WAV"
+                note="A ramp-equipped vehicle and an operator trained in securement — you stay in your chair for the whole trip. 20 minutes of on-site wait included."
+                colA="One way"
+                colASub="ramp-equipped, securement trained"
+                colB="There and back"
+                colBSub="20 min wait included"
+                rows={WAV_ROWS}
+                href={CTA_HREF}
+                cta="Request a wheelchair ride"
+              />
+            </div>
+            <p className="ink-mute mt-4 max-w-2xl text-sm">
+              Longer trips, standing appointments and facility accounts are quoted on
+              account &mdash;{' '}
+              <Link className="underline" href="/pricing#wheelchair">
+                see full pricing
+              </Link>
+              .
+            </p>
+          </div>
+        </section>
+      }
       faqs={[
         {
           q: 'Do I have to transfer out of my wheelchair during the ride?',

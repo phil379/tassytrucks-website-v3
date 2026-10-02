@@ -4,8 +4,8 @@ import { ArrowRight } from 'lucide-react';
 import { request } from '@/lib/request-links';
 import {
   CARE, CARE_WAV, CONCIERGE as CONCIERGE_CARD, RECOVERY, WINNIE as WINNIE_CARD,
-  bandLabel, overBandLabel, roundTripCents, dollars,
 } from '@/lib/quote';
+import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
 import { SCHOOL_PLANS, SIBLING_NOTE } from '@/lib/school-plans';
 
 export const metadata: Metadata = {
@@ -16,74 +16,6 @@ export const metadata: Metadata = {
   openGraph: { url: '/pricing', images: ['/og-image/pricing'] },
 };
 
-type Row = { band: string; a: string; b: string };
-
-function RateTable({
-  heading,
-  note,
-  colA,
-  colASub,
-  colB,
-  colBSub,
-  rows,
-  href,
-  cta,
-}: {
-  heading: string;
-  note: string;
-  colA: string;
-  colASub: string;
-  colB: string;
-  colBSub: string;
-  rows: Row[];
-  href: string;
-  cta: string;
-}) {
-  return (
-    <div className="card-tile !p-0 overflow-hidden">
-      <div className="p-6 pb-4">
-        <h3 className="serif text-2xl font-semibold">{heading}</h3>
-        <p className="ink-soft mt-2 text-sm leading-relaxed">{note}</p>
-      </div>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-charcoal text-white">
-            <th scope="col" className="text-left px-6 py-3 font-semibold">
-              Distance
-            </th>
-            <th scope="col" className="text-right px-4 py-3 font-semibold">
-              {colA}
-              <span className="block font-normal text-[color:var(--gold)] text-[11px]">
-                {colASub}
-              </span>
-            </th>
-            <th scope="col" className="text-right px-6 py-3 font-semibold">
-              {colB}
-              <span className="block font-normal text-[color:var(--gold)] text-[11px]">
-                {colBSub}
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.band} className="border-b border-line last:border-0">
-              <td className="px-6 py-2.5">{r.band}</td>
-              <td className="px-4 py-2.5 text-right font-semibold tabular-nums">{r.a}</td>
-              <td className="px-6 py-2.5 text-right font-semibold tabular-nums">{r.b}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="p-6 pt-4">
-        <Link href={href} className="btn-gold inline-flex items-center gap-2">
-          {cta} <ArrowRight size={16} aria-hidden="true" />
-        </Link>
-      </div>
-    </div>
-  );
-}
-
 /**
  * DERIVED, not typed. These tables were hand-written copies of the rate cards
  * until 2026-09-30, when Winnie was repriced in lib/quote.ts and this page kept
@@ -91,32 +23,11 @@ function RateTable({
  * and the pricing page is the one the customer reads. Two sources of truth for
  * a price is not a style problem; it is a promise the business cannot keep.
  *
- * Everything below now comes from the cards. Reprice in lib/quote.ts and this
- * page follows on the next build.
+ * RateTable and these row builders moved to components/pricing/RateTable.tsx on
+ * 2026-10-02 so /charlotte/wheelchair-transport can print the same numbers
+ * without a second copy of them. Reprice in lib/quote.ts and every surface
+ * follows on the next build.
  */
-
-/** Two cards side by side, sharing a band structure (Care one-way vs Recovery). */
-function pairRows(a: typeof CARE, b: typeof RECOVERY): Row[] {
-  const rows: Row[] = a.bands.map((band, i) => ({
-    band: bandLabel(a.bands, i),
-    a: dollars(band.cents),
-    b: b.bands[i] ? dollars(b.bands[i].cents) : 'Call us',
-  }));
-  rows.push({ band: overBandLabel(a.bands), a: 'Call us', b: 'Call us' });
-  return rows;
-}
-
-/** One card, one way beside its own return price. */
-function returnRows(card: typeof CONCIERGE_CARD): Row[] {
-  const rows: Row[] = card.bands.map((band, i) => ({
-    band: bandLabel(card.bands, i),
-    a: dollars(band.cents),
-    b: dollars(roundTripCents(card, band.cents)),
-  }));
-  rows.push({ band: overBandLabel(card.bands), a: 'Call us', b: 'Call us' });
-  return rows;
-}
-
 const MEDICAL: Row[] = pairRows(CARE, RECOVERY);
 const CONCIERGE: Row[] = returnRows(CONCIERGE_CARD);
 const WINNIE: Row[] = returnRows(WINNIE_CARD);
@@ -187,7 +98,8 @@ export default function PricingPage() {
                   vehicles come from the partner network either way; the number is now a
                   commitment Tassy holds by subcontract instead of a callback. */}
               <RateTable
-                heading="Travelling in a wheelchair"
+                id="wheelchair"
+                heading="Tassy Care WAV &mdash; wheelchair"
                 note="Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement — you stay in your chair for the whole trip. Priced by distance like every other line, so you know the number before you book. 20 minutes of on-site wait included."
                 colA="One way"
                 colASub="ramp-equipped, securement trained"

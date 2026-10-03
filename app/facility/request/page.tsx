@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import RequestForm from '@/components/request/RequestForm';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import {
@@ -12,6 +11,9 @@ import {
   payerFromBillingMode,
 } from '@/lib/facility';
 import { coerceServiceLine, serviceWasHonoured } from '@/lib/trip-request';
+import { facilityUnreadCount } from '@/lib/facility-console.server';
+import ConsoleShell from '@/components/facility/ConsoleShell';
+import { patientForFacility } from './_patient';
 
 /**
  * Facility Phase 2 — the screen a coordinator books from.
@@ -46,7 +48,7 @@ export const dynamic = 'force-dynamic';
 export default async function FacilityRequestPage({
   searchParams,
 }: {
-  searchParams?: { service?: string };
+  searchParams?: { service?: string; patient?: string };
 }) {
   const session = await currentFacilitySession();
   if (!session) redirect('/facility/link-expired');
@@ -98,17 +100,14 @@ export default async function FacilityRequestPage({
 
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
-  return (
-    <div className="mx-auto max-w-2xl px-5 py-12 sm:py-16">
-      <Link
-        href="/facility"
-        className="ink-mute inline-flex items-center gap-1.5 text-sm hover:underline"
-      >
-        <ArrowLeft size={14} aria-hidden="true" /> Your account
-      </Link>
+  const [patient, unread] = await Promise.all([
+    patientForFacility(facility.id, searchParams?.patient),
+    facilityUnreadCount(facility.id),
+  ]);
 
-      <p className="ink-mute mt-6 text-[11px] uppercase tracking-[0.16em]">{facility.name}</p>
-      <h1 className="serif mt-2 text-3xl font-semibold sm:text-4xl">Request a ride</h1>
+  return (
+    <ConsoleShell facilityName={facility.name} active="request" counts={{ messages: unread }}>
+      <h2 className="serif text-2xl font-semibold">Request a ride</h2>
       <p className="ink-soft mt-3 leading-relaxed">
         A dispatcher confirms every trip by phone or text before it is booked. Four hours&rsquo;
         notice or more, please &mdash; for anything sooner, call{' '}
@@ -131,10 +130,11 @@ export default async function FacilityRequestPage({
               // The server re-resolves it with resolvePayer() regardless, so
               // this is the coordinator's starting point, not the decision.
               defaultPayer: payerFromBillingMode(facility.billing_mode),
+              patient,
             }}
           />
         </Suspense>
       </div>
-    </div>
+    </ConsoleShell>
   );
 }

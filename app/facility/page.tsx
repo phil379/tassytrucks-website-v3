@@ -3,6 +3,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { currentFacilitySession } from '@/lib/facility-auth';
+import {
+  facilityTripCounts, facilityWeek, facilityUnreadCount,
+} from '@/lib/facility-console.server';
+import ConsoleShell from '@/components/facility/ConsoleShell';
 import { facilityDashboard, tripCents, type FacilityTrip } from '@/lib/facility-dashboard.server';
 import { canBook, passengerNoun } from '@/lib/facility';
 import { serviceLabel } from '@/lib/trip-request';
@@ -81,19 +85,22 @@ export default async function FacilityHome() {
     redirect('/facility/welcome');
   }
 
-  const { upcoming, invoices, stats } = await facilityDashboard(
-    facility.id,
-    Number(facility.discount_pct ?? 0),
-  );
+  const [{ upcoming, invoices, stats }, counts, week, unread] = await Promise.all([
+    facilityDashboard(facility.id, Number(facility.discount_pct ?? 0)),
+    facilityTripCounts(facility.id),
+    facilityWeek(facility.id),
+    facilityUnreadCount(facility.id),
+  ]);
   const noun = passengerNoun(facility.kind);
+  const peak = Math.max(1, ...week.map((d) => d.count));
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-12 sm:py-16">
-      <p className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
-        Tassy Transportation
-      </p>
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
-        <h1 className="serif text-3xl font-semibold sm:text-4xl">{facility.name}</h1>
+    <ConsoleShell facilityName={facility.name} active="dashboard" counts={{ messages: unread, trips: counts.today }}>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="serif text-2xl font-semibold">Dashboard</h2>
+          <p className="ink-soft mt-1 text-sm">What is happening on your account today.</p>
+        </div>
         {/* Phase 2, shipped 2026-10-01. This used to point at the PUBLIC
             /request with the facility's name in a query param, and ops
             attached the account by hand afterwards -- so the trip landed with
@@ -115,6 +122,54 @@ export default async function FacilityHome() {
           usually the same working day.
         </p>
       ) : null}
+
+      {/* ── today, and the week ── the walkthrough's top row. "In progress"
+          is assigned-but-not-finished, which is the nearest TRUE statement to
+          its "in progress now · 2 en route · 1 at pickup". There is no GPS
+          feed, so en-route and at-pickup are not claimed. */}
+      <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
+          <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">Today</dt>
+          <dd className="serif mt-1 text-2xl font-semibold">{counts.today}</dd>
+        </div>
+        <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
+          <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">Driver assigned</dt>
+          <dd className="serif mt-1 text-2xl font-semibold">{counts.inProgress}</dd>
+        </div>
+        <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
+          <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">Booked ahead</dt>
+          <dd className="serif mt-1 text-2xl font-semibold">{counts.upcoming}</dd>
+        </div>
+        <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
+          <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">This month</dt>
+          <dd className="serif mt-1 text-2xl font-semibold">{stats.tripsThisMonth}</dd>
+        </div>
+      </dl>
+
+      <section className="mt-8 rounded-xl border border-[color:var(--line)] px-5 py-4">
+        <h3 className="ink-mute text-[11px] uppercase tracking-[0.14em]">This week</h3>
+        <ul className="mt-3 flex items-end justify-between gap-2">
+          {week.map((d) => (
+            <li key={d.label} className="flex flex-1 flex-col items-center gap-1.5">
+              <span className="text-xs tabular-nums">{d.count || ''}</span>
+              <span
+                className="w-full rounded-t"
+                style={{
+                  height: `${Math.max(4, Math.round((d.count / peak) * 48))}px`,
+                  background: d.isToday ? 'var(--gold)' : 'rgba(244,239,224,.16)',
+                }}
+                aria-hidden="true"
+              />
+              <span className={`text-[11px] ${d.isToday ? 'font-semibold' : 'ink-mute'}`}>
+                {d.label}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="sr-only">
+          Trips this week: {week.map((d) => `${d.label} ${d.count}`).join(', ')}.
+        </p>
+      </section>
 
       {/* ── the three numbers a coordinator actually opens this page for ── */}
       <dl className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -217,12 +272,13 @@ export default async function FacilityHome() {
       </section>
 
       <p className="ink-mute mt-12 text-xs">
-        Questions about a ride or a bill? Call{' '}
+        Questions about a ride or a bill?{' '}
+        <Link href="/facility/messages" className="underline">Message dispatch</Link> or call{' '}
         <a href="tel:+17049418508" className="underline">
           (704) 941-8508
         </a>
         . Please do not send medical details by email or in a booking note.
       </p>
-    </div>
+    </ConsoleShell>
   );
 }

@@ -11,6 +11,7 @@ import {
   coerceServiceLine,
   defaultMobilityFor,
   minDateTimeLocal,
+  mobilityLabel,
   mobilityLabelFor,
   mobilityOptionsFor,
   passengerLabelFor,
@@ -57,6 +58,15 @@ export type FacilityContext = {
   passengerNoun: string;
   /** The facility's default payer, from its billing mode. The toggle's start. */
   defaultPayer: 'facility' | 'passenger';
+  /**
+   * A saved passenger, when the coordinator arrived from the Passengers screen.
+   *
+   * Name and mobility only. There is no age, date of birth or record number on
+   * the profile to carry — see lib/facility.ts. The id rides along so the trip
+   * links back and the profile's trip count stays true; the server re-checks it
+   * belongs to this facility before storing it.
+   */
+  patient?: { id: string; name: string; mobility: string | null; ref: string | null } | null;
 };
 
 export default function RequestForm({
@@ -103,7 +113,9 @@ export default function RequestForm({
    * right option selected instead of quietly defaulting to "walks unaided".
    */
   const [mobility, setMobility] = useState<string>(() => {
-    const requested = searchParams.get('mobility');
+    // A saved passenger's mobility wins over the URL: the coordinator picked a
+    // person, and that person's wheelchair is a fact about them, not a hint.
+    const requested = facility?.patient?.mobility ?? searchParams.get('mobility');
     const allowed = mobilityOptionsFor(initialService).map((m) => m.value as string);
     return requested && allowed.includes(requested) ? requested : defaultMobilityFor(initialService);
   });
@@ -377,6 +389,7 @@ export default function RequestForm({
       ...(facility
         ? {
             facilityBooking: true,
+            facilityPatientId: facility.patient?.id ?? null,
             facilityRef: String(fd.get('facilityRef') ?? '') || null,
             authorizedBy: String(fd.get('authorizedBy') ?? '') || null,
             payer,
@@ -734,6 +747,13 @@ export default function RequestForm({
             <p className="ink-soft mt-1 text-xs">
               Billed to {facility.name}. Optional, and only for your own records.
             </p>
+            {facility.patient ? (
+              <p className="mt-2 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs"
+                 style={{ background: 'rgba(200,169,106,.14)', color: 'var(--gold-warm)' }}>
+                Booking for <strong>{facility.patient.name}</strong>
+                {facility.patient.mobility ? ` · ${mobilityLabel(facility.patient.mobility)}` : ''}
+              </p>
+            ) : null}
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -741,7 +761,11 @@ export default function RequestForm({
               <label className={labelCls} htmlFor="facilityRef">
                 Your reference
               </label>
-              <input {...fieldProps('facilityRef')} maxLength={80} />
+              <input
+                {...fieldProps('facilityRef')}
+                maxLength={80}
+                defaultValue={facility.patient?.ref ?? ''}
+              />
               <p className="ink-mute mt-1 text-xs">
                 Your job number or shift code &mdash; e.g. DIAL-MWF or PO 4417. Please do not
                 enter a medical record number.

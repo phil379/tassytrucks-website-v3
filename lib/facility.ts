@@ -1,4 +1,9 @@
 import { z } from 'zod';
+// Mobility vocabulary is owned by the trip pipeline, not duplicated here — a
+// saved passenger's mobility has to be a value the quote engine accepts, or a
+// one-click rebook produces a trip nobody can price. trip-request.ts does not
+// import this file, so there is no cycle.
+import { MOBILITY_VALUES } from '@/lib/trip-request';
 
 /**
  * Facility accounts — the shared domain module.
@@ -302,3 +307,31 @@ export function canBook(facility: { status: string; billing_mode: string }): boo
   if (facility.status === 'pending' && facility.billing_mode === 'patient_card') return true;
   return false;
 }
+
+/* ────────────────────────────────────────────────── saved passenger profiles */
+
+/**
+ * A saved passenger, as the facility console stores one.
+ *
+ * READ THE OMISSIONS. Phil's Facility_Portal_Walkthrough.html listed, against
+ * each named person, "78 · Wheelchair · DOB 1948-03-12 · MRN 442891". There is
+ * no age field here, no date of birth, and no record number, and none should be
+ * added: the standing rule is no diagnosis, procedure, condition, medication,
+ * insurance member id, MRN or DOB anywhere in this system, and the facility
+ * wizard promises exactly that to the customer on screen.
+ *
+ * Nothing operational is lost. A driver needs who is travelling, how they
+ * travel, and where they are going. `facilityRef` carries the facility's own
+ * code and is guarded against an MRN at BOTH ends -- here, and by a CHECK
+ * constraint on the column (FACILITY_03), so a direct insert cannot get one in
+ * either. `accessNotes` is logistics: "meet at the discharge desk", "needs the
+ * ramp not the lift". Not a clinical note, and the label says so.
+ */
+export const facilityPatientSchema = z.object({
+  displayName: trimmed(200).min(2, 'Enter the passenger’s name'),
+  mobility: z.enum(MOBILITY_VALUES).optional().nullable(),
+  facilityRef,
+  accessNotes: trimmed(500).optional().nullable(),
+});
+
+export type FacilityPatientInput = z.infer<typeof facilityPatientSchema>;

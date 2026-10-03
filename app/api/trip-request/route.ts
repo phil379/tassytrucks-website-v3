@@ -285,10 +285,29 @@ export async function POST(request: Request) {
     // setting the requester cannot see.
     const payer = resolvePayer(session.facility, extras.data.payer ?? null);
 
+    // A saved passenger id is accepted only after proving it belongs to THIS
+    // facility. Without that check a guessed id would link one clinic's trip to
+    // another clinic's roster -- the same class of mistake facility_id from the
+    // body would have been.
+    let facilityPatientId: string | null = null;
+    const claimedPatient = typeof raw.facilityPatientId === 'string' ? raw.facilityPatientId : null;
+    if (claimedPatient) {
+      const { data: owned } = await supabaseAdmin()
+        .from('facility_patients')
+        .select('id')
+        .eq('id', claimedPatient)
+        .eq('facility_id', session.facilityId)
+        .maybeSingle();
+      // Silently dropped rather than rejected: an archived or stale profile
+      // must not cost the coordinator the booking. The trip still stores.
+      facilityPatientId = owned?.id ?? null;
+    }
+
     facilityUserEmail = session.email || null;
     facilityColumns = {
       facility_id: session.facilityId,
       facility_user_id: session.facilityUserId,
+      facility_patient_id: facilityPatientId,
       facility_ref: extras.data.facilityRef || null,
       payer,
       // 'on_account' for a facility payer, 'unpaid' for a passenger payer. The

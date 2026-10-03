@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { facilityPatients, facilityUnreadCount } from '@/lib/facility-console.server';
-import { canBook, passengerNoun } from '@/lib/facility';
+import { canBook, passengerNoun, isPetFacility } from '@/lib/facility';
 import { mobilityLabel } from '@/lib/trip-request';
 import ConsoleShell from '@/components/facility/ConsoleShell';
 import PatientForm from '@/components/facility/PatientForm';
@@ -31,6 +31,7 @@ export default async function FacilityPatientsPage() {
     facilityUnreadCount(facility.id),
   ]);
   const noun = passengerNoun(facility.kind);
+  const isPet = isPetFacility(facility.kind);
 
   return (
     <ConsoleShell facilityName={facility.name} active="patients" counts={{ messages: unread }}>
@@ -48,15 +49,20 @@ export default async function FacilityPatientsPage() {
           look. Everything behind it -- the schema, the CHECK constraint, the
           form -- enforces it; this is just where the customer reads it. */}
       <p className="ink-mute mt-5 rounded-lg border border-[color:var(--line)] px-4 py-3 text-xs leading-relaxed">
-        We store a name, how they travel, and your own reference. No date of birth, no medical
-        record number, no diagnosis &mdash; not here and not anywhere in your account.
+        {isPet
+          ? 'We store a name, species and breed, how the animal travels, and your own reference — what we need to send the right vehicle. We never ask why the animal is going to the vet.'
+          : 'We store a name, how they travel, and your own reference. No date of birth, no medical record number, no diagnosis — not here and not anywhere in your account.'}
       </p>
 
       <div className="mt-6">
         {patients.length === 0 ? (
           <Empty
             title={`No saved ${noun}s yet`}
-            body={`Add the people you book for most and their mobility, reference and door instructions come through on every trip without typing them again.`}
+            body={
+              isPet
+                ? 'Add the animals you book for most — species, breed and how they travel come through on every trip without typing them again.'
+                : 'Add the people you book for most and their mobility, reference and door instructions come through on every trip without typing them again.'
+            }
           />
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2">
@@ -72,9 +78,15 @@ export default async function FacilityPatientsPage() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{p.display_name}</p>
+                    {/* Breed leads for a vet account — it is how a coordinator
+                        tells two dogs called Max apart, and it is what sizes
+                        the vehicle. */}
                     <p className="ink-soft text-xs">
-                      {p.mobility ? mobilityLabel(p.mobility) : 'Mobility not set'}
-                      {p.facility_ref ? ` · ${p.facility_ref}` : ''}
+                      {[
+                        p.breed,
+                        p.mobility ? mobilityLabel(p.mobility) : null,
+                        p.facility_ref,
+                      ].filter(Boolean).join(' · ') || 'No details saved yet'}
                     </p>
                   </div>
                 </div>

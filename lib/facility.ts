@@ -3,7 +3,7 @@ import { z } from 'zod';
 // saved passenger's mobility has to be a value the quote engine accepts, or a
 // one-click rebook produces a trip nobody can price. trip-request.ts does not
 // import this file, so there is no cycle.
-import { MOBILITY_VALUES } from '@/lib/trip-request';
+import { MOBILITY_VALUES, isPetLine } from '@/lib/trip-request';
 
 /**
  * Facility accounts — the shared domain module.
@@ -329,9 +329,30 @@ export function canBook(facility: { status: string; billing_mode: string }): boo
  */
 export const facilityPatientSchema = z.object({
   displayName: trimmed(200).min(2, 'Enter the passenger’s name'),
+  /**
+   * Accepts BOTH vocabularies — PASSENGER_MOBILITY_OPTIONS and
+   * PET_MOBILITY_OPTIONS share one enum. The form offers the right list for
+   * the facility's kind; this only has to accept whichever came back.
+   */
   mobility: z.enum(MOBILITY_VALUES).optional().nullable(),
+  /**
+   * Pet fields. Set by a veterinary facility, null everywhere else.
+   *
+   * NOT the clinical-data problem the rest of this module guards against: a
+   * dog's breed sizes the vehicle, it is not protected health information
+   * about a person. There is still deliberately no field for why the animal is
+   * going to the vet.
+   */
+  species: trimmed(40).optional().nullable(),
+  breed: trimmed(80).optional().nullable(),
   facilityRef,
   accessNotes: trimmed(500).optional().nullable(),
 });
+
+/** True when this facility's passengers are animals. Drives which questions the
+ *  console asks and which mobility list it offers. */
+export function isPetFacility(kind: string): boolean {
+  return isPetLine(defaultServiceLineForKind(kind));
+}
 
 export type FacilityPatientInput = z.infer<typeof facilityPatientSchema>;

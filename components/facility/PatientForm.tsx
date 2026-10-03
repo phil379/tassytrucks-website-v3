@@ -3,20 +3,44 @@
 import { useState } from 'react';
 import { Loader2, Plus, X } from 'lucide-react';
 import { savePatient } from '@/app/facility/patients/actions';
-import { facilityPatientSchema, passengerNoun } from '@/lib/facility';
-import { PASSENGER_MOBILITY_OPTIONS } from '@/lib/trip-request';
+import { facilityPatientSchema, passengerNoun, isPetFacility, defaultServiceLineForKind } from '@/lib/facility';
+import { mobilityOptionsFor, mobilityLabelFor } from '@/lib/trip-request';
+import { BREEDS_BY_SPECIES, OTHER_BREED_SENTINEL } from '@/lib/pet-breeds';
+
+const SPECIES = [
+  { value: 'dog', label: 'Dog' },
+  { value: 'cat', label: 'Cat' },
+  { value: 'rabbit', label: 'Rabbit' },
+  { value: 'bird', label: 'Bird' },
+  { value: 'reptile', label: 'Reptile' },
+  { value: 'other', label: 'Other' },
+] as const;
 
 /**
  * Add a saved passenger.
  *
- * WHAT IS NOT ON THIS FORM, deliberately: age, date of birth, medical record
- * number, diagnosis, condition, medication, insurance id. The walkthrough this
- * console came from showed DOB and MRN on every patient card. The helper text
- * under "Your reference" is the first line of defence; lib/facility.ts and a
- * CHECK constraint on the column are the other two.
+ * THE QUESTIONS CHANGE WITH THE FACILITY. A veterinary practice is not a
+ * dialysis centre with different wording: it needs species and breed, and its
+ * mobility list is carrier / leash / needs help getting in and out, not walks
+ * unaided / walker / wheelchair. This form hardcoded the human list until
+ * 2026-10-03, so a vet clinic saving a Labrador was asked whether the dog used
+ * a wheelchair. mobilityOptionsFor() has always known better — the console
+ * just never asked it.
+ *
+ * WHAT IS NOT ON THIS FORM FOR A HUMAN, deliberately: age, date of birth,
+ * medical record number, diagnosis, condition, medication, insurance id. The
+ * walkthrough this console came from showed DOB and MRN on every patient card.
+ * The helper text under "Your reference" is the first line of defence;
+ * facilityPatientSchema and a CHECK constraint on the column are the other two.
+ * A pet's breed is not in that category — it sizes the vehicle.
  */
 export default function PatientForm({ kind }: { kind: string }) {
   const noun = passengerNoun(kind);
+  const isPet = isPetFacility(kind);
+  const line = defaultServiceLineForKind(kind);
+  const mobilityOptions = mobilityOptionsFor(line);
+  const [species, setSpecies] = useState<string>('dog');
+  const err = 'mt-1.5 text-sm text-[#f87171]';
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,6 +53,9 @@ export default function PatientForm({ kind }: { kind: string }) {
     const payload = {
       displayName: String(fd.get('displayName') ?? ''),
       mobility: String(fd.get('mobility') ?? '') || null,
+      // Only a pet facility sends these; everyone else stores null.
+      species: isPet ? String(fd.get('species') ?? '') || null : null,
+      breed: isPet ? String(fd.get('breed') ?? '') || null : null,
       facilityRef: String(fd.get('facilityRef') ?? '') || null,
       accessNotes: String(fd.get('accessNotes') ?? '') || null,
     };
@@ -72,8 +99,6 @@ export default function PatientForm({ kind }: { kind: string }) {
     );
   }
 
-  const err = 'mt-1.5 text-sm text-[#f87171]';
-
   return (
     <form onSubmit={onSubmit} noValidate className="card-tile mt-2 p-6">
       <div className="flex items-start justify-between gap-4">
@@ -95,16 +120,56 @@ export default function PatientForm({ kind }: { kind: string }) {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium" htmlFor="mobility">How they travel</label>
+          <label className="mb-1.5 block text-sm font-medium" htmlFor="mobility">
+            {mobilityLabelFor(line)}
+          </label>
           <select id="mobility" name="mobility" className="form-field" defaultValue="">
             <option value="">Not sure yet</option>
-            {PASSENGER_MOBILITY_OPTIONS.map((m) => (
+            {mobilityOptions.map((m) => (
               <option key={m.value} value={m.value}>{m.label}</option>
             ))}
           </select>
-          <p className="ink-mute mt-1 text-xs">Sets the vehicle. Wheelchair books a ramp-equipped van.</p>
+          <p className="ink-mute mt-1 text-xs">
+            {isPet
+              ? 'Sets the vehicle and how the driver handles the pickup.'
+              : 'Sets the vehicle. Wheelchair books a ramp-equipped van.'}
+          </p>
         </div>
       </div>
+
+      {/* Species and breed, for a veterinary account only. The booking form has
+          always asked per trip; saving them on the profile is what stops a
+          clinic retyping "Labrador Retriever" twice a month. */}
+      {isPet ? (
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium" htmlFor="species">Species</label>
+            <select
+              id="species"
+              name="species"
+              className="form-field"
+              value={species}
+              onChange={(e) => setSpecies(e.target.value)}
+            >
+              {SPECIES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium" htmlFor="breed">Breed</label>
+            {/* A datalist, not a select: the lists are long and nobody's pet is
+                guaranteed to be on one. Type anything, pick from the list if it
+                helps. */}
+            <input id="breed" name="breed" className="form-field" list="breed-options" maxLength={80} />
+            <datalist id="breed-options">
+              {(BREEDS_BY_SPECIES[species] ?? [])
+                .filter((b) => b !== OTHER_BREED_SENTINEL)
+                .map((b) => <option key={b} value={b} />)}
+            </datalist>
+            <p className="ink-mute mt-1 text-xs">Helps us send a vehicle with room for the carrier.</p>
+            {errors.breed && <p className={err}>{errors.breed}</p>}
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">
         <div>
@@ -127,8 +192,9 @@ export default function PatientForm({ kind }: { kind: string }) {
       </div>
 
       <p className="ink-mute mt-5 text-xs leading-relaxed">
-        We never ask for a diagnosis, a procedure, a date of birth or a medical record number
-        &mdash; not here and not anywhere else.
+        {isPet
+          ? 'We never ask why the animal is going to the vet — only what we need to send the right vehicle.'
+          : 'We never ask for a diagnosis, a procedure, a date of birth or a medical record number — not here and not anywhere else.'}
       </p>
 
       <button type="submit" disabled={busy} className="btn-gold mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm">

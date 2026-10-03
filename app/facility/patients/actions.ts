@@ -37,6 +37,8 @@ export async function savePatient(input: unknown): Promise<ActionResult> {
       facility_id: session.facilityId,
       display_name: d.displayName,
       mobility: d.mobility ?? null,
+      species: d.species || null,
+      breed: d.breed || null,
       facility_ref: d.facilityRef || null,
       access_notes: d.accessNotes || null,
     });

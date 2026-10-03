@@ -66,7 +66,14 @@ export type FacilityContext = {
    * links back and the profile's trip count stays true; the server re-checks it
    * belongs to this facility before storing it.
    */
-  patient?: { id: string; name: string; mobility: string | null; ref: string | null } | null;
+  patient?: {
+    id: string;
+    name: string;
+    mobility: string | null;
+    /** Veterinary accounts only. Two dogs on one account are often both "Max". */
+    breed?: string | null;
+    ref: string | null;
+  } | null;
 };
 
 export default function RequestForm({
@@ -751,6 +758,7 @@ export default function RequestForm({
               <p className="mt-2 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs"
                  style={{ background: 'rgba(200,169,106,.14)', color: 'var(--gold-warm)' }}>
                 Booking for <strong>{facility.patient.name}</strong>
+                {facility.patient.breed ? ` · ${facility.patient.breed}` : ''}
                 {facility.patient.mobility ? ` · ${mobilityLabel(facility.patient.mobility)}` : ''}
               </p>
             ) : null}

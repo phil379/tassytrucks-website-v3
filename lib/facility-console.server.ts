@@ -151,6 +151,9 @@ export type FacilityPatient = {
   id: string;
   display_name: string;
   mobility: string | null;
+  /** Veterinary accounts only — null for every human-passenger facility. */
+  species: string | null;
+  breed: string | null;
   facility_ref: string | null;
   access_notes: string | null;
   created_at: string;
@@ -162,7 +165,7 @@ export async function facilityPatients(facilityId: string): Promise<
   const db = supabaseAdmin();
   const patients = ok(
     await db.from(FACILITY_PATIENTS_TABLE)
-      .select('id, display_name, mobility, facility_ref, access_notes, created_at')
+      .select('id, display_name, mobility, species, breed, facility_ref, access_notes, created_at')
       .eq('facility_id', facilityId)
       .is('archived_at', null)
       .order('display_name', { ascending: true })

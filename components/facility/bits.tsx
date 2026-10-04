@@ -77,10 +77,22 @@ export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
           <span className="font-medium">{whenLabel(trip.requested_at)}</span>
           <span className="ink-mute text-xs">{relativeLabel(trip.requested_at)}</span>
         </div>
+        {/* The PASSENGER goes here, not the person who filled the form.
+            contact_name is the coordinator, and printing it in this slot meant
+            a vet clinic's list read "Sarah Coordinator" nine times over with
+            no sign of which animal was moving. The breed follows it for a pet
+            account — it is how a driver knows which crate to bring, the same
+            reason the destination is on this row. Human accounts set no breed. */}
         <div className="ink-soft text-sm">
-          {trip.contact_name}
+          {trip.passenger_name || trip.contact_name}
+          {trip.passenger_detail ? (
+            <span className="ink-mute text-xs"> · {trip.passenger_detail}</span>
+          ) : null}
           {trip.facility_ref ? <span className="ink-mute text-xs"> · {trip.facility_ref}</span> : null}
         </div>
+        {trip.passenger_name && trip.contact_name && trip.passenger_name !== trip.contact_name ? (
+          <div className="ink-mute text-xs">Booked by {trip.contact_name}</div>
+        ) : null}
         <div className="ink-soft truncate text-xs">
           {trip.pickup_address} → {trip.dropoff_address}
         </div>

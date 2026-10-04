@@ -10,7 +10,7 @@ import { partnerSignup } from '@/lib/partner-links';
 // page is orphaned. Motto elevated; single "Sign in" (top nav); legal row tightened.
 export default function Footer() {
   return (
-    <footer className="bg-ink-section">
+    <footer data-site-chrome className="bg-ink-section">
       <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-6 gap-10">
         {/* Brand */}
         <div className="col-span-2">

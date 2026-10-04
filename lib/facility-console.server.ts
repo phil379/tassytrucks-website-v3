@@ -1,6 +1,8 @@
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { applyFacilityDiscount } from '@/lib/facility';
-import { tripCents, type FacilityTrip } from '@/lib/facility-dashboard.server';
+import {
+  tripCents, withPassengerDetail, FACILITY_PATIENTS_TABLE, type FacilityTrip,
+} from '@/lib/facility-dashboard.server';
 
 /**
  * The reads behind the facility console — Active Trips, Patients, Messages,
@@ -19,7 +21,9 @@ import { tripCents, type FacilityTrip } from '@/lib/facility-dashboard.server';
  * clinical claim.
  */
 
-export const FACILITY_PATIENTS_TABLE = 'facility_patients';
+// One name for the table, declared beside the hydration helper that reads it.
+// Re-exported because callers already import it from here.
+export { FACILITY_PATIENTS_TABLE };
 export const FACILITY_MESSAGES_TABLE = 'facility_messages';
 
 /** Charlotte, always — the server runs in UTC and a 6:45am pickup shown in UTC
@@ -48,7 +52,8 @@ function ok<T>(res: { data: T | null; error: { message: string } | null }, what:
 
 const TRIP_COLS =
   'id, service_line, status, contact_name, pickup_address, dropoff_address, requested_at, ' +
-  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id';
+  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id, ' +
+  'facility_patient_id';
 
 export type TripBucket = 'today' | 'upcoming' | 'recent';
 
@@ -81,8 +86,11 @@ export async function facilityTrips(facilityId: string, bucket: TripBucket): Pro
          .order('requested_at', { ascending: false });
   }
 
-  return ok(await q.limit(100), `facility trips (${bucket})`) as unknown as FacilityTrip[];
+  const trips = ok(await q.limit(100), `facility trips (${bucket})`) as unknown as FacilityTrip[];
+  return withPassengerDetail(facilityId, trips);
 }
+
+
 
 export async function facilityTripCounts(facilityId: string) {
   const db = supabaseAdmin();

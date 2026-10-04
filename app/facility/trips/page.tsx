@@ -38,7 +38,7 @@ export default async function FacilityTripsPage({
   const noun = passengerNoun(facility.kind);
 
   return (
-    <ConsoleShell facilityName={facility.name} active="trips" counts={{ messages: unread }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="trips" counts={{ messages: unread }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="serif text-2xl font-semibold">Active trips</h2>

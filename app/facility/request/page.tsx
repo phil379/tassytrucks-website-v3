@@ -115,7 +115,7 @@ export default async function FacilityRequestPage({
   ]);
 
   return (
-    <ConsoleShell facilityName={facility.name} active="request" counts={{ messages: unread }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="request" counts={{ messages: unread }}>
       <h2 className="serif text-2xl font-semibold">Request a ride</h2>
       <p className="ink-soft mt-3 leading-relaxed">
         A dispatcher confirms every trip by phone or text before it is booked. Four hours&rsquo;

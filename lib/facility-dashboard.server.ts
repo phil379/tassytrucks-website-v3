@@ -34,6 +34,24 @@ export type FacilityTrip = {
   quoted_cents: number | null;
   facility_ref: string | null;
   facility_invoice_id: string | null;
+  facility_patient_id: string | null;
+  /**
+   * The saved passenger on this trip, resolved from facility_patients and
+   * attached after the trip read.
+   *
+   * `contact_name` is NOT this. On a facility booking contact_name is whoever
+   * filled the form — "Sarah Coordinator" on all nine of Doggy The Boss's
+   * seeded trips — and Active Trips was printing it in the passenger slot. A
+   * coordinator scanning the list saw their own name nine times and no sign of
+   * which animal was moving.
+   *
+   * `passenger_detail` is the breed for a pet account and null for a human
+   * one. NEVER a condition, a diagnosis, or anything a chart would hold: a
+   * breed is how a driver knows which crate to bring, the same reason the
+   * destination is on this row.
+   */
+  passenger_name?: string | null;
+  passenger_detail?: string | null;
 };
 
 export type FacilityInvoice = {
@@ -53,6 +71,53 @@ const TRIP_COLS =
   'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id';
 
 /** The fare a trip has settled on. Agreed beats quoted; neither means unpriced. */
+export const FACILITY_PATIENTS_TABLE = 'facility_patients';
+
+/**
+ * Attach the saved passenger (and, for a pet account, the breed) to each trip.
+ *
+ * `contact_name` is whoever filled the form, not who is travelling. Both read
+ * paths — the dashboard and Active Trips — were printing it in the passenger
+ * slot, so Doggy The Boss's list read "Sarah Coordinator" nine times with no
+ * sign of which animal was moving.
+ *
+ * Breed ONLY as the detail. The human side of this table holds a mobility
+ * value, and putting that on a shared discharge-desk screen moves it one step
+ * toward the chart data this console refuses to hold. A driver gets mobility
+ * on the dispatch side, where it belongs.
+ *
+ * One extra query per page, scoped to the caller's facility_id like every
+ * other read here.
+ */
+export async function withPassengerDetail(
+  facilityId: string,
+  trips: FacilityTrip[],
+): Promise<FacilityTrip[]> {
+  const ids = Array.from(
+    new Set(trips.map((t) => t.facility_patient_id).filter((x): x is string => !!x)),
+  );
+  if (ids.length === 0) return trips;
+
+  const res = await supabaseAdmin()
+    .from(FACILITY_PATIENTS_TABLE)
+    .select('id, display_name, breed')
+    .eq('facility_id', facilityId)
+    .in('id', ids);
+  // A failure here must not blank the names: the trips are already correct and
+  // the detail is an enrichment. Returning them unhydrated is the honest
+  // degradation; throwing would take the whole dashboard down over a nicety.
+  if (res.error) return trips;
+
+  const byId = new Map(
+    (res.data as unknown as Array<{ id: string; display_name: string | null; breed: string | null }>)
+      .map((r) => [r.id, r]),
+  );
+  return trips.map((t) => {
+    const p = t.facility_patient_id ? byId.get(t.facility_patient_id) : undefined;
+    return { ...t, passenger_name: p?.display_name ?? null, passenger_detail: p?.breed ?? null };
+  });
+}
+
 export function tripCents(t: FacilityTrip): number | null {
   if (typeof t.agreed_cents === 'number') return t.agreed_cents;
   if (typeof t.quoted_cents === 'number') return t.quoted_cents;
@@ -107,7 +172,18 @@ export async function facilityDashboard(facilityId: string, discountPct: number)
       .limit(50),
   ]);
 
-  const upcoming = (upcomingRes.data ?? []) as unknown as FacilityTrip[];
+  // `?? []` was the silent drop all over again: PostgREST does not throw, so a
+  // failed query arrived as an empty array and the dashboard said "no trips
+  // booked" to a coordinator with eleven on the books. Absence of an error is
+  // not success. Fail loudly instead — a 500 gets reported, a confident wrong
+  // "nothing scheduled" does not.
+  const first = [upcomingRes, monthRes, invoiceRes, standingRes].find((r) => r.error);
+  if (first?.error) throw new Error(`facility dashboard: ${first.error.message}`);
+
+  const upcoming = await withPassengerDetail(
+    facilityId,
+    (upcomingRes.data ?? []) as unknown as FacilityTrip[],
+  );
   const month = (monthRes.data ?? []) as unknown as FacilityTrip[];
   const invoices = (invoiceRes.data ?? []) as unknown as FacilityInvoice[];
   const standing = standingRes.data ?? [];

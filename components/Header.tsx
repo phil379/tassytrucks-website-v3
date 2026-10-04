@@ -45,7 +45,7 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
 
 export default function Header() {
   return (
-    <header className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
+    <header data-site-chrome className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
       <div className="container-x py-4 flex items-center justify-between">
         <Link href="/" aria-label="Tassy Transportation home" className="flex items-center gap-3">
           {/* FIX_PROD_137b — doubled again per Phil (was 44/56/64 → now 88/112/128px);

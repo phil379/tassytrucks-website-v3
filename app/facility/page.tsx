@@ -7,7 +7,10 @@ import {
   facilityTripCounts, facilityWeek, facilityUnreadCount,
 } from '@/lib/facility-console.server';
 import ConsoleShell from '@/components/facility/ConsoleShell';
-import { facilityDashboard, tripCents, type FacilityTrip } from '@/lib/facility-dashboard.server';
+// One trip row for the whole console. The dashboard used to carry its own copy,
+// which is how the passenger slot got fixed on Active Trips and stayed wrong here.
+import { TripRow } from '@/components/facility/bits';
+import { facilityDashboard } from '@/lib/facility-dashboard.server';
 import { canBook, passengerNoun } from '@/lib/facility';
 import { serviceLabel } from '@/lib/trip-request';
 
@@ -21,19 +24,6 @@ export const dynamic = 'force-dynamic';
 
 const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
-function whenLabel(iso: string): string {
-  // Charlotte, always. The server runs in UTC and a 6:45am dialysis pickup
-  // rendered in UTC reads as 10:45 — the single most alarming thing a
-  // coordinator could see on this page.
-  return new Date(iso).toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-}
 
 function dayLabel(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -43,34 +33,6 @@ function dayLabel(iso: string): string {
   });
 }
 
-function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
-  const cents = tripCents(trip);
-  return (
-    <li className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[color:var(--line)] py-3 last:border-b-0">
-      <div className="min-w-0">
-        <span className="font-medium">{whenLabel(trip.requested_at)}</span>
-        <span className="ink-soft"> · {trip.contact_name}</span>
-        {trip.facility_ref ? <span className="ink-mute text-xs"> · {trip.facility_ref}</span> : null}
-        <div className="ink-soft truncate text-xs">
-          {trip.pickup_address} → {trip.dropoff_address}
-        </div>
-      </div>
-      <div className="whitespace-nowrap text-sm">
-        <span className="ink-soft">{serviceLabel(trip.service_line)}</span>
-        {trip.payer === 'passenger' ? (
-          // Said plainly, because the difference decides who gets chased for
-          // money. The spec is explicit: the facility never sees the patient's
-          // card and the patient never sees the facility's rate.
-          <span className="ink-mute"> · {noun} pays</span>
-        ) : cents === null ? (
-          <span className="ink-mute"> · price to come</span>
-        ) : (
-          <span className="ink-soft"> · {money(cents)}</span>
-        )}
-      </div>
-    </li>
-  );
-}
 
 export default async function FacilityHome() {
   const session = await currentFacilitySession();
@@ -95,7 +57,7 @@ export default async function FacilityHome() {
   const peak = Math.max(1, ...week.map((d) => d.count));
 
   return (
-    <ConsoleShell facilityName={facility.name} active="dashboard" counts={{ messages: unread, trips: counts.today }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="dashboard" counts={{ messages: unread, trips: counts.today }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="serif text-2xl font-semibold">Dashboard</h2>

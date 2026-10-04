@@ -34,7 +34,7 @@ export default async function FacilityPatientsPage() {
   const isPet = isPetFacility(facility.kind);
 
   return (
-    <ConsoleShell facilityName={facility.name} active="patients" counts={{ messages: unread }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="patients" counts={{ messages: unread }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="serif text-2xl font-semibold capitalize">{noun}s you book for</h2>

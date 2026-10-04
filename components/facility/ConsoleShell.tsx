@@ -46,17 +46,60 @@ export default function ConsoleShell({
   facilityName,
   active,
   counts,
+  signedInAs,
   children,
 }: {
   facilityName: string;
   active: ConsoleTab;
   /** Resolved server-side. Absent keys render no badge rather than a zero. */
   counts?: Partial<Record<ConsoleTab, number>>;
+  /** The signed-in coordinator's email, shown in the console bar. */
+  signedInAs?: string;
   children: React.ReactNode;
 }) {
   return (
+    <>
+      {/* The console is not a marketing page and must not wear the marketing
+          chrome. Until now every facility screen rendered inside the public
+          header — nine nav items, a Services dropdown, and a "Request a Ride"
+          button pointing at the RETAIL form, which is the one place a
+          coordinator must never be sent: it has no account on it, so the trip
+          arrives unattached and unbilled.
+
+          Hidden with CSS rather than a route-group refactor. Header and Footer
+          live in the root layout, a Server Component cannot read the pathname,
+          and making them client components to find out would ship their
+          JavaScript to all 300-odd marketing pages to solve a problem on six.
+          The attribute is set in components/Header.tsx and Footer.tsx. */}
+      <style>{'[data-site-chrome]{display:none!important}'}</style>
+
+      <header className="border-b border-[color:var(--line)]">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+          <Link href="/facility" className="serif text-sm font-semibold tracking-tight">
+            Tassy Transportation
+          </Link>
+          <span className="ink-mute hidden text-xs sm:inline">Partner account</span>
+
+          <div className="ml-auto flex items-center gap-3 text-xs">
+            {signedInAs ? <span className="ink-mute hidden sm:inline">{signedInAs}</span> : null}
+            {/* A form, not a link: GET sign-out gets fired by link prefetch and
+                browser scanners, which logs people out at random. And it must
+                exist at all — a discharge desk is a shared computer, and
+                without this the next person to sit down had the account. */}
+            <form action="/facility/signout" method="post">
+              <button
+                type="submit"
+                className="ink-soft min-h-[32px] rounded-lg px-2.5 transition hover:bg-[color:var(--line)]/40"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
     <div className="mx-auto max-w-6xl px-5 py-8 sm:py-12">
-      <p className="ink-mute text-[11px] uppercase tracking-[0.16em]">Tassy Transportation</p>
+      <p className="ink-mute text-[11px] uppercase tracking-[0.16em]">Partner console</p>
       <h1 className="serif mt-1 text-2xl font-semibold sm:text-3xl">{facilityName}</h1>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[210px_1fr]">
@@ -96,5 +139,16 @@ export default function ConsoleShell({
         <div className="min-w-0">{children}</div>
       </div>
     </div>
+
+      <footer className="mt-4 border-t border-[color:var(--line)]">
+        <div className="ink-mute mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1 px-5 py-6 text-xs">
+          <span>Dispatch: <a className="underline" href="tel:+17049418508">(704) 941-8508</a></span>
+          <span>
+            <a className="underline" href="mailto:book@tassytrucks.com">book@tassytrucks.com</a>
+          </span>
+          <span className="ml-auto">Tassy Transportation &middot; Charlotte, NC &middot; SDVOSB</span>
+        </div>
+      </footer>
+    </>
   );
 }

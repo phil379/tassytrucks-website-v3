@@ -31,7 +31,7 @@ export default async function FacilityMessagesPage() {
   }
 
   return (
-    <ConsoleShell facilityName={facility.name} active="messages" counts={{ messages: 0 }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="messages" counts={{ messages: 0 }}>
       <h2 className="serif text-2xl font-semibold">Messages with dispatch</h2>
       <p className="ink-soft mt-1 text-sm">
         A direct line to the people moving your trips. For anything urgent, call{' '}

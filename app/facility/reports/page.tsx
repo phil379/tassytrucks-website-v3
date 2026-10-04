@@ -30,7 +30,7 @@ export default async function FacilityReportsPage() {
   const peak = Math.max(1, ...rows.map((r) => r.trips));
 
   return (
-    <ConsoleShell facilityName={facility.name} active="reports" counts={{ messages: unread }}>
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} active="reports" counts={{ messages: unread }}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="serif text-2xl font-semibold">Reports</h2>

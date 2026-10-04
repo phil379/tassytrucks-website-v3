@@ -52,6 +52,9 @@ export type FacilityTrip = {
    */
   passenger_name?: string | null;
   passenger_detail?: string | null;
+  /** "dog" / "cat" for a pet account, null for a human one. An animal's species
+   *  is not clinical data; there is no human counterpart to this field. */
+  passenger_species?: string | null;
 };
 
 export type FacilityInvoice = {
@@ -100,7 +103,7 @@ export async function withPassengerDetail(
 
   const res = await supabaseAdmin()
     .from(FACILITY_PATIENTS_TABLE)
-    .select('id, display_name, breed')
+    .select('id, display_name, species, breed')
     .eq('facility_id', facilityId)
     .in('id', ids);
   // A failure here must not blank the names: the trips are already correct and
@@ -109,12 +112,17 @@ export async function withPassengerDetail(
   if (res.error) return trips;
 
   const byId = new Map(
-    (res.data as unknown as Array<{ id: string; display_name: string | null; breed: string | null }>)
+    (res.data as unknown as Array<{ id: string; display_name: string | null; species: string | null; breed: string | null }>)
       .map((r) => [r.id, r]),
   );
   return trips.map((t) => {
     const p = t.facility_patient_id ? byId.get(t.facility_patient_id) : undefined;
-    return { ...t, passenger_name: p?.display_name ?? null, passenger_detail: p?.breed ?? null };
+    return {
+      ...t,
+      passenger_name: p?.display_name ?? null,
+      passenger_detail: p?.breed ?? null,
+      passenger_species: p?.species ?? null,
+    };
   });
 }
 

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { Download } from 'lucide-react';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { facilityMonthlyReport, facilityUnreadCount } from '@/lib/facility-console.server';
-import { canBook } from '@/lib/facility';
+import { canBook, tripNounPlural } from '@/lib/facility';
 import ConsoleShell from '@/components/facility/ConsoleShell';
 import { money, Empty } from '@/components/facility/bits';
 
@@ -26,6 +26,10 @@ export default async function FacilityReportsPage() {
     facilityUnreadCount(facility.id),
   ]);
 
+  // "pickups" for a vet clinic, "trips" for everyone else; see tripNounPlural.
+  const trips = tripNounPlural(facility.kind);
+  const Trips = trips.charAt(0).toUpperCase() + trips.slice(1);
+
   const used = rows.filter((r) => r.trips > 0);
   const peak = Math.max(1, ...rows.map((r) => r.trips));
 
@@ -46,15 +50,15 @@ export default async function FacilityReportsPage() {
       {used.length === 0 ? (
         <div className="mt-6">
           <Empty
-            title="No trips to report yet"
-            body="Once you have booked a few rides this fills in by month, with what each month cost and a CSV your finance team can work from."
+            title={`No ${trips} to report yet`}
+            body={`Once you have booked a few ${trips} this fills in by month, with what each month cost and a CSV your finance team can work from.`}
           />
         </div>
       ) : (
         <>
           <dl className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
-              <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">Trips, 12 months</dt>
+              <dt className="ink-mute text-[11px] uppercase tracking-[0.14em]">{Trips}, 12 months</dt>
               <dd className="serif mt-1 text-2xl font-semibold">{totalTrips}</dd>
             </div>
             <div className="rounded-xl border border-[color:var(--line)] px-5 py-4">
@@ -76,7 +80,7 @@ export default async function FacilityReportsPage() {
             <thead>
               <tr className="border-b border-[color:var(--line)] text-left">
                 <th scope="col" className="py-2 font-semibold">Month</th>
-                <th scope="col" className="py-2 text-right font-semibold">Trips</th>
+                <th scope="col" className="py-2 text-right font-semibold">{Trips}</th>
                 <th scope="col" className="py-2 text-right font-semibold">Completed</th>
                 <th scope="col" className="py-2 text-right font-semibold">Billed</th>
               </tr>

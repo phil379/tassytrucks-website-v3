@@ -77,6 +77,16 @@ export function passengerNoun(kind: string): string {
   return facilityKind(kind).passenger;
 }
 
+/**
+ * What this kind of facility calls one booking, plural: "pickups" for an animal
+ * account, "trips" for a person one. Derived from isPetFacility() -- the same
+ * rule bookableLinesFor() uses -- so there is one definition of pet vs human.
+ * Used to word screens, never to store anything.
+ */
+export function tripNounPlural(kind: string): 'pickups' | 'trips' {
+  return isPetFacility(kind) ? 'pickups' : 'trips';
+}
+
 /* ────────────────────────────────────────────────────────────────── billing */
 
 export const BILLING_MODES = [

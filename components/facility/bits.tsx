@@ -85,6 +85,12 @@ export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
             reason the destination is on this row. Human accounts set no breed. */}
         <div className="ink-soft text-sm">
           {trip.passenger_name || trip.contact_name}
+          {/* Species before breed so a dog and a cat read differently at a
+              glance. Only an animal account has one, so a human row is
+              unchanged. */}
+          {trip.passenger_species ? (
+            <span className="text-xs font-medium capitalize"> · {trip.passenger_species}</span>
+          ) : null}
           {trip.passenger_detail ? (
             <span className="ink-mute text-xs"> · {trip.passenger_detail}</span>
           ) : null}

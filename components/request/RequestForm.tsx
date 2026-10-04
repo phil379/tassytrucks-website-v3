@@ -65,6 +65,17 @@ export type FacilityContext = {
    */
   allowedLines?: readonly { value: string; label: string }[];
   /**
+   * The facility's own address, prefilled into Pickup.
+   *
+   * Almost every facility trip starts at the facility. Prefilling saves the
+   * retyping AND is the difference between a quote appearing and the panel
+   * sitting on "pick an address to see your price" — a coordinator typing
+   * "DaVita Pineville" from memory never includes a ZIP, so the engine has
+   * nothing to measure from. They can still overwrite it; it is a default,
+   * not a lock.
+   */
+  address?: string | null;
+  /**
    * A saved passenger, when the coordinator arrived from the Passengers screen.
    *
    * Name and mobility only. There is no age, date of birth or record number on
@@ -187,7 +198,7 @@ export default function RequestForm({
   const [pickupPlace, setPickupPlace] = useState<ResolvedPlace | null>(null);
   const [dropoffPlace, setDropoffPlace] = useState<ResolvedPlace | null>(null);
   /** Raw field text. Feeds the ZIP fallback when no place could be picked. */
-  const [pickupText, setPickupText] = useState('');
+  const [pickupText, setPickupText] = useState(facility?.address ?? '');
   const [dropoffText, setDropoffText] = useState('');
   const [whenValue, setWhenValue] = useState('');
   const [passengers, setPassengers] = useState(1);
@@ -615,6 +626,7 @@ export default function RequestForm({
         <AddressAutocomplete
           name="pickupAddress"
           label="Pickup address"
+          defaultValue={facility?.address ?? ''}
           apiKey={googleMapsApiKey}
           autoComplete="street-address"
           required
@@ -977,8 +989,13 @@ export default function RequestForm({
             <p className="ink-soft text-sm">{quoted.message}</p>
           ) : (
             <p className="ink-soft text-sm">
-              {/* Never a guess — but a ZIP is enough to stop this being a dead end. */}
-              Add a ZIP code to both addresses to see your price.
+              {/* Never a guess — but a picked suggestion or a ZIP is enough to
+                  stop this being a dead end. The old copy asked only for a ZIP,
+                  which reads as odd next to an address field that offers
+                  suggestions, and left people typing a street with no ZIP and
+                  no price. Name the faster route first. */}
+              Pick each address from the suggestions to see your price — or type the ZIP
+              codes if the address is not listed.
             </p>
           )}
         </div>

@@ -33,6 +33,10 @@ export type FacilityRow = {
   account_manager: string | null;
   referred_by_rep: string | null;
   po_required: boolean;
+  /** Prefilled into Pickup on /facility/request — almost every facility trip
+   *  starts at the facility, and typing it from memory rarely includes the ZIP
+   *  the quote engine needs. */
+  address: string | null;
 };
 
 /** PostgREST does not throw. An ignored error is how rows silently vanish. */
@@ -63,7 +67,7 @@ export async function facilityByEmail(email: string): Promise<{
   const facility = ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities lookup',
@@ -99,7 +103,7 @@ export async function facilityContextByAuthUser(authUserId: string): Promise<{
   const facility = ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities context by auth id',
@@ -124,7 +128,7 @@ export async function facilityByAuthUser(authUserId: string) {
   return ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities by auth id',

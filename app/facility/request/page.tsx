@@ -141,6 +141,7 @@ export default async function FacilityRequestPage({
               defaultPayer: payerFromBillingMode(facility.billing_mode),
               patient,
               allowedLines,
+              address: facility.address,
             }}
           />
         </Suspense>

@@ -59,12 +59,16 @@ export default function ConsoleShell({
       <p className="ink-mute text-[11px] uppercase tracking-[0.16em]">Tassy Transportation</p>
       <h1 className="serif mt-1 text-2xl font-semibold sm:text-3xl">{facilityName}</h1>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[210px_1fr]">
+      <div className="mt-8 grid items-start gap-8 lg:grid-cols-[210px_1fr]">
         {/* Horizontal and scrollable on a phone, a rail on a laptop. A
             coordinator checking a pickup from the discharge desk is on a
             phone, so the tabs must not stack into six full-width rows that
             push the content off the screen. */}
-        <nav aria-label="Facility console">
+        {/* Sticky on a laptop. Without it the rail scrolls away on a long form
+            and the content sits against a huge empty gutter, which is what
+            Phil saw on /facility/request — it reads as a broken layout rather
+            than a page that scrolled. */}
+        <nav aria-label="Facility console" className="lg:sticky lg:top-6 lg:self-start">
           <ul className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:pb-0">
             {TABS.map(({ key, href, label, Icon }) => {
               const on = key === active;

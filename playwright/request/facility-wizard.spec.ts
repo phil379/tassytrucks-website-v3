@@ -254,6 +254,55 @@ test('a magic link opens the wizard on screen 1', async ({ page, playwright }) =
   await api.dispose();
 });
 
+/**
+ * The console must wear the company logo.
+ *
+ * ConsoleShell hides the marketing header (the only place the logo was
+ * rendered) with `[data-site-chrome]{display:none!important}` and draws its own,
+ * which for a while had no image in it: every /facility/* page shipped as an
+ * unbranded text bar and nothing failed. This opens a REAL session, so it
+ * exercises the shell itself rather than a copy of its markup.
+ *
+ * The console header is selected as the <header> WITHOUT data-site-chrome. The
+ * marketing header is still in the DOM, just display:none, and a bare
+ * `header img` would find ITS logo and pass for the wrong reason - which is
+ * exactly the regression. Visibility is asserted, not presence, for the same
+ * reason; and naturalWidth, so a 404ing src fails too.
+ *
+ * Uses the bare variant (/facility/welcome), which is what a new partner's
+ * seeded facility lands on; bare only drops the tab rail and title block, the
+ * header is the same markup for both.
+ */
+test('the console header carries the company logo', async ({ page, playwright }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  const api = await playwright.request.newContext();
+  const { confirmUrl } = await seedAndLink(api, email('logo'));
+
+  await openWizard(page, confirmUrl);
+
+  const consoleHeader = page.locator('header:not([data-site-chrome])');
+  await expect(consoleHeader, 'exactly one console header').toHaveCount(1);
+  // The marketing chrome really is hidden here, so its logo cannot satisfy this.
+  await expect(page.locator('header[data-site-chrome]')).toBeHidden();
+
+  const homeLink = consoleHeader.locator('a[href="/facility"]');
+  const logo = homeLink.locator('img[src^="/brand/logo"]');
+  await expect(logo, 'the console header renders the logo').toBeVisible();
+  await expect
+    .poll(() => logo.evaluate((el) => (el as HTMLImageElement).naturalWidth), {
+      message: 'the logo file actually loads',
+    })
+    .toBeGreaterThan(0);
+
+  // Phil has asked twice for a bigger logo; a favicon-sized one is a miss.
+  const box = await logo.boundingBox();
+  expect(box?.width ?? 0, 'logo is brand-sized, not a favicon').toBeGreaterThanOrEqual(36);
+
+  // And the link is still announced once, not "Tassy Transportation Tassy Transportation".
+  await expect(homeLink).toHaveAccessibleName('Tassy Transportation');
+  await api.dispose();
+});
+
 test('screen 1 stores the facility type and its default service line', async ({ page, playwright }) => {
   test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
   const api = await playwright.request.newContext();

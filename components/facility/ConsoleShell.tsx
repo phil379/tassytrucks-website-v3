@@ -84,8 +84,28 @@ export default function ConsoleShell({
 
       <header className="border-b border-[color:var(--line)]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
-          <Link href="/facility" className="serif text-sm font-semibold tracking-tight">
-            Tassy Transportation
+          {/* The logo lives here and not only in components/Header.tsx. The rule
+              above hides that header on /facility/*, and it is the one place the
+              logo was rendered, so the console shipped as an unbranded text bar.
+              Same asset and the same framed tile as the marketing header (the
+              console is dark too, and the tile edge hides the seam between the
+              art's black and --bg); 44px because Phil has twice asked for the
+              brand to be bigger, not tidier.
+
+              alt="" because the wordmark beside it is live text in the same link:
+              the link's name is "Tassy Transportation" once, not twice.
+              Guarded by playwright/request/facility-wizard.spec.ts. */}
+          <Link href="/facility" className="flex items-center gap-2.5">
+            <span className="block h-11 w-11 shrink-0 overflow-hidden rounded-tile border border-line">
+              <img
+                src="/brand/logo-cream.svg"
+                alt=""
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <span className="serif text-sm font-semibold tracking-tight">Tassy Transportation</span>
           </Link>
           <span className="ink-mute hidden text-xs sm:inline">Partner account</span>
 

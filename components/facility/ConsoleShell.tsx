@@ -47,14 +47,23 @@ export default function ConsoleShell({
   active,
   counts,
   signedInAs,
+  bare = false,
   children,
 }: {
   facilityName: string;
-  active: ConsoleTab;
+  /** Not needed when `bare`: the setup flow has no tab to highlight. */
+  active?: ConsoleTab;
   /** Resolved server-side. Absent keys render no badge rather than a zero. */
   counts?: Partial<Record<ConsoleTab, number>>;
   /** The signed-in coordinator's email, shown in the console bar. */
   signedInAs?: string;
+  /**
+   * Console header and footer only -- no tab rail, no title block. For
+   * /facility/welcome, where the page is a four-step wizard with its own
+   * heading. The tabs would be dead ends there: every one of them redirects a
+   * not-yet-bookable facility straight back to /facility/welcome.
+   */
+  bare?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -98,6 +107,7 @@ export default function ConsoleShell({
         </div>
       </header>
 
+      {bare ? children : (
     <div className="mx-auto max-w-6xl px-5 py-8 sm:py-12">
       <p className="ink-mute text-[11px] uppercase tracking-[0.16em]">Partner console</p>
       <h1 className="serif mt-1 text-2xl font-semibold sm:text-3xl">{facilityName}</h1>
@@ -139,6 +149,7 @@ export default function ConsoleShell({
         <div className="min-w-0">{children}</div>
       </div>
     </div>
+      )}
 
       <footer className="mt-4 border-t border-[color:var(--line)]">
         <div className="ink-mute mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1 px-5 py-6 text-xs">

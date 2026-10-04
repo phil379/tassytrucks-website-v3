@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import FacilityWizard from '@/components/facility/FacilityWizard';
+import ConsoleShell from '@/components/facility/ConsoleShell';
 import { currentFacilitySession } from '@/lib/facility-auth';
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default async function FacilityWelcomePage() {
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   return (
+    <ConsoleShell facilityName={facility.name} signedInAs={session.email} bare>
     <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
       <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
         Tassy Transportation
@@ -61,5 +63,6 @@ export default async function FacilityWelcomePage() {
         />
       </div>
     </div>
+    </ConsoleShell>
   );
 }

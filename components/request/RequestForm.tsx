@@ -59,6 +59,12 @@ export type FacilityContext = {
   /** The facility's default payer, from its billing mode. The toggle's start. */
   defaultPayer: 'facility' | 'passenger';
   /**
+   * The lines this account may book. A vet clinic never sees Tassy Concierge;
+   * a dialysis centre never sees Winnie Ride. Resolved server-side from the
+   * facility's kind — see bookableLinesFor() in lib/facility.ts.
+   */
+  allowedLines?: readonly { value: string; label: string }[];
+  /**
    * A saved passenger, when the coordinator arrived from the Passengers screen.
    *
    * Name and mobility only. There is no age, date of birth or record number on
@@ -109,6 +115,14 @@ export default function RequestForm({
    * parent who realises they actually need Care for a grandparent.
    */
   const [showServicePicker, setShowServicePicker] = useState(!servicePreselected);
+
+  /**
+   * What the picker offers. The full list for a retail visitor; only the lines
+   * whose PASSENGER TYPE matches for a facility — a vet clinic booking an
+   * airport transfer is not a booking anyone wanted, and it reaches a driver
+   * as a job the vehicle cannot do.
+   */
+  const serviceOptions = facility?.allowedLines ?? SERVICE_LINES;
 
   /**
    * Mobility is a function of WHO is travelling, so it has to be state, not a
@@ -568,7 +582,7 @@ export default function RequestForm({
               value={service}
               onChange={(e) => changeService(coerceServiceLine(e.target.value))}
             >
-              {SERVICE_LINES.map((s) => (
+              {serviceOptions.map((s) => (
                 <option key={s.value} value={s.value}>
                   {s.label}
                 </option>

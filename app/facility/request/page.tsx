@@ -6,6 +6,7 @@ import RequestForm from '@/components/request/RequestForm';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import {
   canBook,
+  bookableLinesFor,
   defaultServiceLineForKind,
   passengerNoun,
   payerFromBillingMode,
@@ -93,9 +94,17 @@ export default async function FacilityRequestPage({
    * An explicit ?service= wins, so a link from elsewhere in the portal can
    * preselect and have the form state the decision rather than re-offer it.
    */
-  const fromUrl = serviceWasHonoured(searchParams?.service);
+  const allowedLines = bookableLinesFor(facility.kind);
+
+  // A ?service= from outside this account's passenger type is ignored rather
+  // than honoured. The picker already hides it; this stops a stale or shared
+  // link opening the form on a line the facility cannot book.
+  const requested = searchParams?.service;
+  const fromUrl =
+    serviceWasHonoured(requested) &&
+    allowedLines.some((l) => l.value === coerceServiceLine(requested));
   const initialService = fromUrl
-    ? coerceServiceLine(searchParams?.service)
+    ? coerceServiceLine(requested)
     : coerceServiceLine(defaultServiceLineForKind(facility.kind));
 
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -131,6 +140,7 @@ export default async function FacilityRequestPage({
               // this is the coordinator's starting point, not the decision.
               defaultPayer: payerFromBillingMode(facility.billing_mode),
               patient,
+              allowedLines,
             }}
           />
         </Suspense>

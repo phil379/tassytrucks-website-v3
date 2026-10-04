@@ -15,7 +15,9 @@ import { validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { parseLocalDateTime } from '@/lib/time';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { resolvePayer } from '@/lib/facility.server';
-import { canBook, facilityTripExtrasSchema, initialPaymentStatus } from '@/lib/facility';
+import {
+  bookableLinesFor, canBook, facilityTripExtrasSchema, initialPaymentStatus,
+} from '@/lib/facility';
 
 /**
  * Submissions allowed per IP per hour.
@@ -258,6 +260,22 @@ export async function POST(request: Request) {
             'Your account is still with us for approval, so it cannot be billed yet. Call (704) 941-8508 and we will take this booking by phone today.',
         },
         { status: 403 },
+      );
+    }
+
+    // THE PICKER IS UI; THIS IS THE RULE. A vet clinic must not be able to book
+    // Tassy Concierge, by a stale link, a cached bundle or a hand-crafted POST.
+    // Crossing the passenger type is never a booking anyone wanted and reaches
+    // a driver as a job the vehicle cannot do.
+    if (!bookableLinesFor(session.facility.kind).some((l) => l.value === data.serviceLine)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'That service is not available on your account. Call (704) 941-8508 if you think it should be.',
+          fieldErrors: { serviceLine: 'Not available on this account' },
+        },
+        { status: 400 },
       );
     }
 

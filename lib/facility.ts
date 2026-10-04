@@ -3,7 +3,7 @@ import { z } from 'zod';
 // saved passenger's mobility has to be a value the quote engine accepts, or a
 // one-click rebook produces a trip nobody can price. trip-request.ts does not
 // import this file, so there is no cycle.
-import { MOBILITY_VALUES, isPetLine } from '@/lib/trip-request';
+import { MOBILITY_VALUES, isPetLine, SERVICE_LINES } from '@/lib/trip-request';
 
 /**
  * Facility accounts — the shared domain module.
@@ -353,6 +353,30 @@ export const facilityPatientSchema = z.object({
  *  console asks and which mobility list it offers. */
 export function isPetFacility(kind: string): boolean {
   return isPetLine(defaultServiceLineForKind(kind));
+}
+
+/**
+ * The service lines THIS facility may book.
+ *
+ * Phil, 2026-10-04: "Doggy the boss can't schedule a ride for a golf
+ * tournament for French bulldog." He was right — the console offered the full
+ * picker to every account, so a veterinary clinic could choose Tassy
+ * Concierge.
+ *
+ * THE RULE IS THE PASSENGER, NOT THE FACILITY. A vet clinic moves animals; a
+ * clinic moves people. Crossing that is never a booking anyone wanted, and it
+ * reaches a driver as a job the vehicle cannot do.
+ *
+ * It is deliberately NOT narrowed to facilities.service_lines, which holds one
+ * line seeded from the facility kind. A dialysis centre that also sends a
+ * patient home after a procedure genuinely needs Recovery, and a surgery
+ * centre booking a quiet ride to an appointment genuinely needs Concierge —
+ * making them phone for it is the thing the portal exists to stop. Within the
+ * right passenger type, everything stays available.
+ */
+export function bookableLinesFor(kind: string) {
+  const pet = isPetFacility(kind);
+  return SERVICE_LINES.filter((s) => isPetLine(s.value) === pet);
 }
 
 export type FacilityPatientInput = z.infer<typeof facilityPatientSchema>;

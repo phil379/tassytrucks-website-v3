@@ -27,7 +27,7 @@
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { subscribe, apply } from '../lib/saas-links';
+import { apply } from '../lib/saas-links';
 import { SERVICE_LINES } from '../lib/trip-request';
 
 const TIMEOUT_MS = 15_000;
@@ -38,8 +38,11 @@ type Target = { label: string; url: string };
 // ── only the SaaS URLs the marketing site still renders ─────────────────
 // portal.* is deliberately NOT probed: it must never be rendered at all, which
 // the static leak check below enforces instead.
+// Careers only. `subscribe.*` used to be probed here, which was the same
+// mistake the header calls out about book.*: fifteen product links nothing
+// rendered, failing CI whenever the SaaS had a bad afternoon. They were deleted
+// from lib/saas-links.ts on 2026-10-04; the static check below keeps them out.
 const targets: Target[] = [
-  ...Object.entries(subscribe).map(([k, url]) => ({ label: `subscribe.${k}`, url })),
   ...Object.entries(apply).map(([k, url]) => ({ label: `apply.${k}`, url })),
 ];
 
@@ -101,7 +104,9 @@ for (const { label, url } of targets) {
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((e) => {
     const p = join(dir, e);
-    return statSync(p).isDirectory() ? walk(p) : p.endsWith('.tsx') ? [p] : [];
+    // .ts as well as .tsx: lib/ is where a hand-written SaaS URL would hide,
+    // and it was never scanned.
+    return statSync(p).isDirectory() ? walk(p) : /\.tsx?$/.test(p) ? [p] : [];
   });
 
 // Strip comments first — the whole point of FIX_PROD_142 is documented in
@@ -133,12 +138,34 @@ const sourceFiles = ['app', 'components'].flatMap(walk);
  * winnie, …) and cannot match the start of a new sentence.
  */
 const revived = sourceFiles.filter((f) =>
-  /\bbook\.[a-z]\w*|\bseoBook\s*\(|\bWINNIE_BOOK_URL\b/.test(stripComments(readFileSync(f, 'utf8'))),
+  /\bbook\.[a-z]\w*|\bseoBook\s*\(|\bWINNIE_BOOK_URL\b|\bsubscribe\.[a-z]\w*/.test(
+    stripComments(readFileSync(f, 'utf8')),
+  ),
 );
 
 if (revived.length) {
   failures.push(
     `A SaaS booking deep-link is rendered again — booking lives at /request now:\n    ${revived.join('\n    ')}`,
+  );
+}
+
+// ── and not by raw URL either ───────────────────────────────────────────
+// Deleting the helpers makes the named form a compile error. The raw string is
+// still typable, and a hand-written SaaS booking URL is the same bug: a paying
+// customer priced by a second application, around lib/quote.ts and around
+// /api/trip-request.
+const rawSaasBooking = ['app', 'components', 'lib']
+  .flatMap(walk)
+  .filter((f) =>
+    /tassytrucksops[^'"`\s]*\/(book|subscribe|quick-book|login|driver|sales)\b/.test(
+      stripComments(readFileSync(f, 'utf8')),
+    ),
+  );
+
+if (rawSaasBooking.length) {
+  failures.push(
+    'A SaaS booking/portal URL is written out by hand — booking lives at /request:\n    ' +
+      rawSaasBooking.join('\n    '),
   );
 }
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { facilitySignupSchema } from '@/lib/facility';
+import { facilitySignupSchema, coerceFacilityKind, facilityKind } from '@/lib/facility';
 import { createOrFindFacility, generateFacilityMagicLink } from '@/lib/facility.server';
-import { sendRichEmail } from '@/lib/notifications';
+import { sendRichEmail, notifyOperatorFacilitySignup } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
@@ -109,6 +109,23 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('[facility-signup] magic link/email failed:', err instanceof Error ? err.message : err);
   }
+
+  // Tell Phil. A new facility is PENDING and cannot book until it is approved
+  // by hand, so a signup nobody is told about is a partner who waits forever.
+  // Never throws — see notifyOperatorFacilitySignup. Awaited rather than
+  // fire-and-forget: a serverless function can be frozen the moment it
+  // responds, which kills an un-awaited alert about half the time.
+  await notifyOperatorFacilitySignup({
+    facilityId,
+    facilityName,
+    // Same coercion createOrFindFacility applies: `kind` is optional on the
+    // signup schema and an unrecognised ?type= becomes 'other'. The alert must
+    // name the kind the account was actually saved as.
+    kind: facilityKind(coerceFacilityKind(kind)).label,
+    contactEmail: workEmail,
+    created,
+    emailSent,
+  });
 
   return NextResponse.json({ ok: true, id: facilityId, stored: true, created, emailSent });
 }

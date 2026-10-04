@@ -448,6 +448,85 @@ export async function notifyOperatorUrgent(row: { id: string }): Promise<void> {
 }
 
 /**
+ * A facility signed up. Tell the operator — because nothing else does.
+ *
+ * WHY THIS HAD TO EXIST. /api/facility-signup wrote the account, minted a
+ * magic link and emailed the coordinator, and told Phil nothing at all. But a
+ * new facility lands in `pending` and CANNOT book until it is approved by
+ * hand. So a real clinic could sign up, open its link, reach the welcome
+ * screen, and sit there forever — while the one person able to approve it did
+ * not know it existed. The dead facility door again, one step further along:
+ * the row is now in the right table, and nobody is told to open it.
+ *
+ * `emailSent: false` is the louder case. The account is saved but the
+ * coordinator never got a link, so the follow-up has to come from our side.
+ *
+ * NEVER THROWS. Its caller has already stored the signup and answered 200; an
+ * alert that cannot send must not turn a captured account into a 500 and a
+ * clinic that fills the form in twice.
+ *
+ * PII RULE — see the header. The push carries the business name and nothing
+ * about a person: no coordinator name, no email, no phone. Those are in the
+ * operator email, which is a mailbox rather than a lock-screen.
+ */
+export async function notifyOperatorFacilitySignup(input: {
+  facilityId: string;
+  facilityName: string;
+  kind: string;
+  contactEmail: string;
+  created: boolean;
+  emailSent: boolean;
+}): Promise<void> {
+  const ref = shortRef(input.facilityId);
+  const message: PushMessage = input.emailSent
+    ? {
+        title: 'NEW FACILITY - approve to let them book',
+        body: `${input.facilityName} (${input.kind}) - ref ${ref}`,
+        priority: 'high',
+        tags: ['hospital'],
+      }
+    : {
+        title: 'NEW FACILITY - link did NOT send, call them',
+        body: `${input.facilityName} (${input.kind}) - ref ${ref}`,
+        priority: 'urgent',
+        tags: ['rotating_light'],
+      };
+
+  const lines = [
+    input.emailSent
+      ? 'A facility signed up and has its sign-in link.'
+      : 'A facility signed up but the sign-in link DID NOT SEND. Call them — their account is saved, so do not ask them to fill the form in again.',
+    '',
+    `Facility:  ${input.facilityName}`,
+    `Type:      ${input.kind}`,
+    `Contact:   ${input.contactEmail}`,
+    `Reference: ${ref}`,
+    `Record:    ${input.created ? 'new account' : 'existing account, re-submitted'}`,
+    '',
+    'They are PENDING and cannot book until approved.',
+    `Approve:   ${opsUrl()}`,
+  ].join('\n');
+
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    sendResendEmail({
+      to: process.env.OPERATOR_EMAIL ?? '',
+      subject: input.emailSent
+        ? `New facility: ${input.facilityName} — approve to let them book`
+        : `New facility: ${input.facilityName} — SIGN-IN LINK FAILED, call them`,
+      text: lines,
+    }),
+  ]);
+
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('[facility-signup] alert leg failed for', ref, r.reason);
+    }
+  }
+}
+
+/**
  * The money arrived. Tell the operator.
  *
  * Deliberately UNLIKE notifyOperatorUrgent: this NEVER throws. Its caller is

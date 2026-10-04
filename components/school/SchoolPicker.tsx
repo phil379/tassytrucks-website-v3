@@ -54,6 +54,10 @@ export default function SchoolPicker({
   const [open, setOpen] = useState(false);
   const [unlisted, setUnlisted] = useState(false);
   const [searching, setSearching] = useState(false);
+  // Separate from "no hits". A parent who cannot tell a broken search from a
+  // school we do not have types the name by hand and lands in manual review
+  // for a reason that was never true.
+  const [lookupDown, setLookupDown] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
   // Debounced lookup. Skipped entirely once the parent says it is unlisted —
@@ -68,14 +72,22 @@ export default function SchoolPicker({
       setSearching(true);
       try {
         const res = await fetch(`/api/schools?q=${encodeURIComponent(query.trim())}`);
-        const json = await res.json().catch(() => ({ schools: [] }));
+        const json = await res.json().catch(() => ({ schools: [], ok: false }));
         if (!cancelled) {
-          setHits(json.schools ?? []);
-          setOpen(true);
+          // The route answers 503 with ok:false when the lookup itself broke.
+          // Treating that as zero results is how a hiccup turns into a
+          // hand-typed school name.
+          const down = !res.ok || json.ok === false;
+          setLookupDown(down);
+          setHits(down ? [] : (json.schools ?? []));
+          setOpen(!down);
         }
       } catch {
         // Network failure must not strand the parent: they can still type.
-        if (!cancelled) setHits([]);
+        if (!cancelled) {
+          setHits([]);
+          setLookupDown(true);
+        }
       } finally {
         if (!cancelled) setSearching(false);
       }
@@ -95,6 +107,7 @@ export default function SchoolPicker({
   }, []);
 
   function pick(hit: SchoolHit) {
+    setLookupDown(false);
     setQuery(hit.name);
     setSchoolId(hit.id);
     setPicked(hit);
@@ -155,6 +168,16 @@ export default function SchoolPicker({
       {/* What the form actually submits. */}
       <input type="hidden" name={nameField} value={query} />
       <input type="hidden" name={idField} value={schoolId} />
+
+      {/* Said plainly, because the alternative is a parent concluding we do not
+          serve their child's school. The booking is not blocked — a typed name
+          is accepted and matched by hand. */}
+      {lookupDown && !unlisted && !schoolId ? (
+        <p className="mt-2 text-xs text-[color:var(--ink-mute)]">
+          School search is unavailable right now. Type the school name and we will match
+          it when we confirm your booking.
+        </p>
+      ) : null}
 
       {open && hits.length > 0 && !unlisted && (
         <ul

@@ -37,13 +37,21 @@ export async function GET(request: Request) {
       .order('name')
       .limit(LIMIT);
 
+    // A FAILED LOOKUP IS NOT AN EMPTY RESULT. This used to answer 200 with
+    // `{ schools: [] }`, which the picker cannot tell apart from "we have no
+    // school by that name" — so a parent typing "Ardrey Kell" during a database
+    // hiccup saw no suggestions, typed the name by hand, and the booking landed
+    // with school_id null. It still goes through (that is deliberate), but it
+    // joins the manual-review pile for a reason that was never true.
+    //
+    // 503 so the picker can say the search is down and keep the parent moving.
     if (error) {
       console.error('[schools] lookup failed:', error.message);
-      return NextResponse.json({ schools: [] });
+      return NextResponse.json({ schools: [], ok: false }, { status: 503 });
     }
-    return NextResponse.json({ schools: data ?? [] });
+    return NextResponse.json({ schools: data ?? [], ok: true });
   } catch (e) {
     console.error('[schools] lookup threw:', e instanceof Error ? e.message : e);
-    return NextResponse.json({ schools: [] });
+    return NextResponse.json({ schools: [], ok: false }, { status: 503 });
   }
 }

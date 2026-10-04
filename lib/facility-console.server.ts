@@ -107,6 +107,14 @@ export async function facilityTripCounts(facilityId: string) {
       .gte('requested_at', dayEnd.toISOString()),
   ]);
 
+  // Neither response was checked. A failed count arrives as data:null/count:null
+  // and this returned a confident `today: 0` — the dashboard badge and the
+  // "nothing scheduled today" copy both read from here, so a coordinator with
+  // three pickups on the books was told there were none. Same silent drop as
+  // everywhere else: PostgREST does not throw, so it has to be asked.
+  if (today.error) throw new Error(`facility trip counts (today): ${today.error.message}`);
+  if (upcoming.error) throw new Error(`facility trip counts (upcoming): ${upcoming.error.message}`);
+
   const todayRows = (today.data ?? []) as { status: string }[];
   return {
     today: today.count ?? todayRows.length,

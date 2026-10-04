@@ -35,6 +35,11 @@ export default function FacilitySignupForm({
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    // The API answers emailSent:false when the account saved but the magic link
+  // never went out. This form used to ignore it and show "Check your inbox"
+  // regardless — so a clinic that signed up during a Resend outage sat waiting
+  // for an email nobody had sent, and nothing on our side said to follow up.
+  const [emailSent, setEmailSent] = useState(true);
   const [sentTo, setSentTo] = useState('');
 
   /** When the form was rendered. The difference at submit is the bot signal. */
@@ -91,6 +96,9 @@ export default function FacilitySignupForm({
       }
 
       setSentTo(payload.workEmail);
+      // Default to false: a response that does not say the mail went is not a
+      // response that says it did.
+      setEmailSent(json.emailSent === true);
       setDone(json.id);
     } catch {
       setFormError('We could not reach the server. Please call (704) 941-8508.');
@@ -100,6 +108,27 @@ export default function FacilitySignupForm({
   }
 
   if (done) {
+    // The account is saved either way — that is settled before the email is
+    // attempted, and a delivery failure must never read as a lost signup. But
+    // it must not read as a delivered email either.
+    if (!emailSent) {
+      return (
+        <div className="card-tile p-8 text-center" role="status" aria-live="polite">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />
+          <h2 className="serif text-2xl font-semibold mt-4">Your account is saved</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+            We have everything we need, but we could not send your sign-in link to{' '}
+            <strong>{sentTo}</strong> just now. Nothing is lost — call dispatch on{' '}
+            <a className="underline" href="tel:+17049418508">(704) 941-8508</a> and we
+            will send it while you are on the phone, or set you up there and then.
+          </p>
+          <p className="mt-4 text-sm text-[color:var(--muted)]">
+            Do not fill this form in again — your account is already on our side.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="card-tile p-8 text-center" role="status" aria-live="polite">
         <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />

@@ -1,132 +1,51 @@
-// All deep-links from the marketing site into the SaaS.
-// Every CTA passes through these so we can change the destination
-// (subdomain swap, A/B test, etc.) in ONE place.
+/**
+ * The ONLY two things the marketing site still links into the SaaS: careers,
+ * and the phone/email contact details.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * WHAT WAS DELETED, AND WHY IT HAD TO BE
+ *
+ * This file used to hold 30-odd deep links into tassytrucksops: `book.nemt`,
+ * `book.vip`, `book.ride`, `book.school*`, fifteen `subscribe.*` product
+ * links, `seoBook()`, `WINNIE_BOOK_URL`, and `portal.*`. Every one of them was
+ * already dead — nothing imported them — because booking moved into this app:
+ *   • retail booking      → lib/request-links.ts    (/request)
+ *   • facility signup     → lib/partner-links.ts    (/partners/signup)
+ *   • the facility console→ /facility
+ *
+ * Dead was not safe enough. A URL named `book.nemt` sitting in the links file
+ * is an invitation: the next CTA wired to it sends a paying customer to a
+ * second application with its own prices and its own database, around the V3
+ * quote engine and around /api/trip-request — the single write path that
+ * attaches the account, applies the discount and derives the fare from
+ * lib/quote.ts. That is not a broken link, it is a booking we never see and a
+ * price that does not match the invoice.
+ *
+ * So they are gone. Wiring the wrong destination now requires writing the URL
+ * out by hand, which is a decision rather than an autocomplete.
+ *
+ * CAREERS STAYS. Those routes are not a duplicate of anything here: they write
+ * to tassy_archive.*_applications on the live project — 16 real applications —
+ * and mint the onboarding magic links. The archive IS the applications table.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 
 export const SAAS_BASE = 'https://tassytrucksops.vercel.app';
 
-/** Source param added to every CTA so we can attribute marketing-driven bookings. */
+/** Source param on every link, so SaaS-side attribution still works. */
 const src = (path: string, extra: Record<string, string> = {}) => {
   const params = new URLSearchParams({ source: 'web', ...extra });
   return `${SAAS_BASE}${path}?${params.toString()}`;
 };
 
-export const book = {
-  nemt: src('/book/nemt'),
-  vip: src('/book/vip'),
-  winnie: src('/book/winnie'),
-  renew: src('/book/renew'),
-  recover: src('/book/recover'),
-  // FIX_PROD_024 — PUBLIC 6-service picker. THE destination for every "Book a Ride" CTA.
-  ride: src('/book'),
-  // ⚠️ /quick-book is the AUTHENTICATED admin "log a one-off for a walk-in" tool — it
-  // renders the persona sidebar/admin shell. NEVER link a public CTA here. (kept for
-  // reference only; no public CTA should use it.)
-  quick: src('/quick-book'),
-  // FIX_PROD_021 — Tassy School parent-direct subscription (FIX_PROD_008/010). The
-  // landing + the three plan-setup deep links (slugs verified live: full-year / weekly
-  // / after-school). This is the connection the marketing /school page was missing.
-  school: src('/book/school'),
-  schoolFullYear: src('/book/school/full-year/setup'),
-  schoolWeekly: src('/book/school/weekly/setup'),
-  schoolAfterSchool: src('/book/school/after-school/setup'),
-};
-
-/* REMOVED 2026-10-01 — facilitySignup() and facilityIntake().
- *
- * Both pointed at the SaaS /facility/signup, which inserts into
- * tassy_archive.accounts + tassy_archive.account_invitations. Those rows can
- * never be attached to a ride: trip_requests.facility_id has a FOREIGN KEY to
- * public.facilities.id, and nothing joins the archive to it. Measured the day
- * they were removed — public.facilities: 0 rows. tassy_archive.accounts: 4,
- * every one a July test.
- *
- * The in-repo door is partnerSignup() in lib/partner-links.ts. These two are
- * DELETED rather than deprecated on purpose: an exported helper with a warning
- * comment is how this survived three months of audits. There is now nothing to
- * re-wire.
- */
-
-export const subscribe = {
-  // VIP CAMO-style passes
-  vipCompanion: src('/subscribe', { product: 'vip_companion_pass' }),
-  vipConcierge: src('/subscribe', { product: 'vip_concierge_pass' }),
-  vipRecovery: src('/subscribe', { product: 'vip_recovery_pass' }),
-  // Winnie Ride B2C
-  winnieStarter: src('/subscribe', { product: 'winnie_starter' }),
-  winnieStandard: src('/subscribe', { product: 'winnie_standard' }),
-  winniePremium: src('/subscribe', { product: 'winnie_premium' }),
-  // Winnie Ride B2B (facility)
-  winnieB2BStarter: src('/subscribe', { product: 'winnie_b2b_starter' }),
-  winnieB2BStandard: src('/subscribe', { product: 'winnie_b2b_standard' }),
-  winnieB2BPremium: src('/subscribe', { product: 'winnie_b2b_premium' }),
-  // Renew (wellness)
-  renewEssential: src('/subscribe', { product: 'renew_essential' }),
-  renewSignature: src('/subscribe', { product: 'renew_signature' }),
-  renewElite: src('/subscribe', { product: 'renew_elite' }),
-  // Recover (oncology)
-  recoverEssential: src('/subscribe', { product: 'recover_essential' }),
-  recoverSignature: src('/subscribe', { product: 'recover_signature' }),
-  recoverElite: src('/subscribe', { product: 'recover_elite' }),
-};
-
 /**
- * SEO landing-page deep links. Each SEO page passes its own `source` (and any
- * wizard prefill params) so marketing attribution survives into the SaaS.
- * Example: seoBook('nemt', { source: 'seo-dialysis', recurring: '1' })
+ * The four hiring funnels, on the SaaS. Linked from /careers and the footer.
  */
-export const seoBook = (
-  vertical: 'nemt' | 'vip' | 'winnie' | 'renew' | 'recover',
-  params: Record<string, string>,
-) => `${SAAS_BASE}/book/${vertical}?${new URLSearchParams(params).toString()}`;
-
-/** Winnie Ride booking deep link (MEGA_SEO_002 contract). */
-export const WINNIE_BOOK_URL = seoBook('winnie', { source: 'web' });
-
 export const apply = {
-  // FIX_PROD_024 — /driver-apply + /sales-rep-apply were 404s. These now point at the
-  // PUBLIC SaaS careers lead-capture routes. /facility-partners/request-access was also a
-  // 404 → collapsed to the one facility front door, /facility/signup.
   driver: src('/careers/driver'),
   salesRep: src('/careers/sales-rep'),
-  // FIX_PROD_025 — companion (VIP Concierge) + CNA (Tassy Recover) hiring funnels.
   companion: src('/careers/companion'),
   cna: src('/careers/cna'),
-  /* REMOVED 2026-10-01:
-   *
-   * `careers` — the stopgap index. /careers now exists in this repo and the
-   * footer links to it locally, which is what the note here asked for.
-   *
-   * `facility` — pointed at the SaaS /facility/signup. See the note above
-   * where facilitySignup/facilityIntake used to be: those signups land in
-   * tassy_archive and can never reach a trip. Use partnerSignup() from
-   * lib/partner-links.ts.
-   *
-   * The four role links above STAY. They work end to end: the SaaS careers
-   * routes write to tassy_archive.*_applications on the Tassy project (8
-   * driver, 3 cna, 3 sales_rep, 2 companion as of today) and issue the
-   * applicant onboarding magic link. Unlike facility signup, an application
-   * has no public.* counterpart it is being kept out of — the archive IS the
-   * applications table. Nothing is lost by crossing to the SaaS to apply.
-   */
-};
-
-// ⚠️ FIX_PROD_142 (SECURITY) — DO NOT render `portal.login` / `portal.facilityLogin`
-// (or any /login deep-link) from a public marketing surface (Header/Footer/CTA/body).
-// A public, crawl-indexable link to the SaaS login exposes an internal admin/facility
-// entry point. Onboarded users already have the app URL. These are kept only for
-// non-public/internal use; the marketing funnel points at booking + /facility/signup.
-export const portal = {
-  login: src('/login'),
-  // FIX_PROD_024 — net-new facilities go to /facility/signup (apply.facility). EXISTING
-  // facilities sign in here (intent=facility lets /login tailor the copy). The bare
-  // /facility portal auth-walls a public visitor, so we no longer link to it directly.
-  // FIX_PROD_142 — no longer linked from any marketing surface (security).
-  facilityLogin: src('/login', { intent: 'facility' }),
-  facility: src('/facility'),
-  // MEGA_TASSY_PUBLISH_READY (2026-07-02): /driver-app + /sales-app were 404s on the
-  // SaaS. Real persona hubs are /driver and /sales (verified 200 live).
-  driver: src('/driver'),
-  sales: src('/sales'),
 };
 
 export const contact = {

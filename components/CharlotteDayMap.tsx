@@ -33,15 +33,18 @@ type Service = {
   /** Hours of the day this line runs, as [from, to) in 24h decimal. */
   windows: [number, number][];
   when: string;
+  /** How many vehicles are drawn on this line's route. */
   dots: number;
+  /** Body shape: the SUV lines (Concierge, Recovery) are full-size, the rest are sedans. */
+  vehicle: 'suv' | 'sedan';
 };
 
 const SERVICES: Service[] = [
-  { id: 'concierge', name: 'Tassy Concierge', color: 'var(--gold)', windows: [[4, 8.5], [17, 20]], when: '4–8 AM · eve', dots: 2 },
-  { id: 'scholar',   name: 'Tassy Scholar',   color: '#E08A3C',     windows: [[7, 9], [14, 16]],   when: '7–9 · 2–4',   dots: 1 },
-  { id: 'care',      name: 'Tassy Care',      color: '#5B9DD9',     windows: [[9, 16.5]],          when: '9–4:30',      dots: 2 },
-  { id: 'recovery',  name: 'Tassy Recovery',  color: '#8A78D9',     windows: [[10, 17]],           when: '10–5',        dots: 1 },
-  { id: 'winnie',    name: 'Winnie Ride',     color: '#4FB286',     windows: [[9, 16]],            when: '9–4',         dots: 1 },
+  { id: 'concierge', name: 'Tassy Concierge', color: 'var(--gold)', windows: [[4, 8.5], [17, 20]], when: '4–8 AM · eve', dots: 2, vehicle: 'suv' },
+  { id: 'scholar',   name: 'Tassy Scholar',   color: '#E08A3C',     windows: [[7, 9], [14, 16]],   when: '7–9 · 2–4',   dots: 1, vehicle: 'sedan' },
+  { id: 'care',      name: 'Tassy Care',      color: '#5B9DD9',     windows: [[9, 16.5]],          when: '9–4:30',      dots: 2, vehicle: 'sedan' },
+  { id: 'recovery',  name: 'Tassy Recovery',  color: '#8A78D9',     windows: [[10, 17]],           when: '10–5',        dots: 1, vehicle: 'suv' },
+  { id: 'winnie',    name: 'Winnie Ride',     color: '#4FB286',     windows: [[9, 16]],            when: '9–4',         dots: 1, vehicle: 'sedan' },
 ];
 
 const ROUTES: Record<string, string> = {
@@ -75,6 +78,33 @@ function phaseFor(h: number) {
 }
 
 const isActive = (s: Service, h: number) => s.windows.some(([a, b]) => h >= a && h < b);
+
+/**
+ * A vehicle seen from above, nose pointing along +x (the parent rotates it to the
+ * direction of travel). Two body shapes: a full-size SUV for Concierge and Recovery,
+ * a sedan for the rest. Drawn in the service colour with dark glass, so it reads as
+ * a car at 15px and still belongs to its line.
+ */
+function Vehicle({ color, kind }: { color: string; kind: 'suv' | 'sedan' }) {
+  const L = kind === 'suv' ? 17 : 15;      // length
+  const W = kind === 'suv' ? 8 : 7;        // width
+  const x0 = -L / 2;
+  const glass = '#0E1115';
+  return (
+    <g transform="scale(1.3)">
+      {/* body */}
+      <rect x={x0} y={-W / 2} width={L} height={W} rx={kind === 'suv' ? 2.4 : 3.2} fill={color} />
+      {/* windscreen and rear window */}
+      <path d={`M${x0 + L * 0.58} ${-W / 2 + 1.1} L${x0 + L * 0.72} ${-W / 2 + 1.7} L${x0 + L * 0.72} ${W / 2 - 1.7} L${x0 + L * 0.58} ${W / 2 - 1.1} Z`} fill={glass} opacity=".72" />
+      <path d={`M${x0 + L * 0.2} ${-W / 2 + 1.5} L${x0 + L * 0.3} ${-W / 2 + 1.2} L${x0 + L * 0.3} ${W / 2 - 1.2} L${x0 + L * 0.2} ${W / 2 - 1.5} Z`} fill={glass} opacity=".6" />
+      {/* roof */}
+      <rect x={x0 + L * 0.31} y={-W / 2 + 1.1} width={L * 0.26} height={W - 2.2} rx="0.9" fill={glass} opacity=".22" />
+      {/* headlights */}
+      <rect x={x0 + L - 1.1} y={-W / 2 + 0.9} width="1.1" height="1.5" rx=".4" fill="#F2EEE4" opacity=".9" />
+      <rect x={x0 + L - 1.1} y={W / 2 - 2.4} width="1.1" height="1.5" rx=".4" fill="#F2EEE4" opacity=".9" />
+    </g>
+  );
+}
 
 export default function CharlotteDayMap() {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -110,8 +140,16 @@ export default function CharlotteDayMap() {
         if (!g) continue;
         if (!on) { g.setAttribute('opacity', '0'); continue; }
         const p = ((elapsed / 9) + i / s.dots) % 1;
-        const pt = path.getPointAtLength(p * len);
-        g.setAttribute('transform', `translate(${pt.x.toFixed(2)},${pt.y.toFixed(2)})`);
+        const at = p * len;
+        const pt = path.getPointAtLength(at);
+        // Face the direction of travel: look a little way down the road.
+        const ahead = path.getPointAtLength(Math.min(len, at + 2));
+        const behind = path.getPointAtLength(Math.max(0, at - 2));
+        const deg = (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI;
+        g.setAttribute(
+          'transform',
+          `translate(${pt.x.toFixed(2)},${pt.y.toFixed(2)}) rotate(${deg.toFixed(1)})`,
+        );
         const fade = p < 0.08 ? p / 0.08 : p > 0.92 ? (1 - p) / 0.08 : 1;
         g.setAttribute('opacity', fade.toFixed(2));
       }
@@ -177,7 +215,7 @@ export default function CharlotteDayMap() {
           viewBox="0 0 400 320"
           preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label="Schematic map of Charlotte showing which Tassy service line runs at each hour of the day"
+          aria-label="Schematic map of Charlotte showing which Tassy service line runs at each hour of the day, with vehicles on each active route"
         >
           <ellipse className="cdm-road" cx="205" cy="165" rx="150" ry="122" strokeWidth="1.1" strokeDasharray="3 5" />
           <path className="cdm-road" d="M186 18 C 178 88, 178 216, 202 305" strokeWidth="2.2" />
@@ -221,8 +259,8 @@ export default function CharlotteDayMap() {
           {SERVICES.flatMap((s) =>
             Array.from({ length: s.dots }, (_, i) => (
               <g key={`${s.id}-${i}`} id={`cdm-dot-${s.id}-${i}`} opacity="0">
-                <circle r="7" fill={s.color} opacity=".13" />
-                <circle r="3.1" fill={s.color} />
+                <circle r="13" fill={s.color} opacity=".12" />
+                <Vehicle color={s.color} kind={s.vehicle} />
               </g>
             )),
           )}

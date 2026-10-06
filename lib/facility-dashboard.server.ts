@@ -55,6 +55,20 @@ export type FacilityTrip = {
   /** "dog" / "cat" for a pet account, null for a human one. An animal's species
    *  is not clinical data; there is no human counterpart to this field. */
   passenger_species?: string | null;
+  /** Raw assignment columns on trip_requests. `driver_id` is the truth that a
+   *  driver exists; `driver_name` is free text and is NOT used to decide that. */
+  driver_id?: string | null;
+  vehicle_id?: string | null;
+  vehicle_description?: string | null;
+  /**
+   * Who is driving and in what, resolved by withAssignmentDetail(). Both null
+   * means nobody is assigned yet, which TripRow says plainly rather than
+   * leaving a "Driver assigned" label to imply otherwise. First name and last
+   * initial only: a facility needs to recognise the person at the door, and
+   * does not need their phone, pay or address.
+   */
+  driver_label?: string | null;
+  vehicle_label?: string | null;
 };
 
 export type FacilityInvoice = {
@@ -71,7 +85,8 @@ export type FacilityInvoice = {
 
 const TRIP_COLS =
   'id, service_line, status, contact_name, pickup_address, dropoff_address, requested_at, ' +
-  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id';
+  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id, ' +
+  'driver_id, vehicle_id, vehicle_description';
 
 /** The fare a trip has settled on. Agreed beats quoted; neither means unpriced. */
 export const FACILITY_PATIENTS_TABLE = 'facility_patients';
@@ -124,6 +139,83 @@ export async function withPassengerDetail(
       passenger_species: p?.species ?? null,
     };
   });
+}
+
+/**
+ * Attach who is driving, and in what, to each trip.
+ *
+ * Same shape as withPassengerDetail, with one deliberate difference: a failed
+ * read THROWS. That helper returns the trips unhydrated on error, which blanks
+ * names and is survivable. Here an unhydrated trip is indistinguishable from
+ * "no driver yet", so swallowing the error would tell a clinic nobody is
+ * coming for a trip that has a driver. A 500 gets noticed; that does not.
+ *
+ * Reads only the public-facing slice of drivers and vehicles. No query at all
+ * when no trip has a driver or vehicle, which is every trip today.
+ */
+export async function withAssignmentDetail(trips: FacilityTrip[]): Promise<FacilityTrip[]> {
+  const pick = (k: 'driver_id' | 'vehicle_id') =>
+    Array.from(new Set(trips.map((t) => t[k]).filter((x): x is string => !!x)));
+  const driverIds = pick('driver_id');
+  const vehicleIds = pick('vehicle_id');
+  if (driverIds.length === 0 && vehicleIds.length === 0) {
+    return trips.map((t) => ({ ...t, driver_label: null, vehicle_label: null }));
+  }
+
+  const db = supabaseAdmin();
+  const [dRes, vRes] = await Promise.all([
+    driverIds.length
+      ? db.from('drivers').select('id, first_name, last_name').in('id', driverIds)
+      : Promise.resolve({ data: [], error: null }),
+    vehicleIds.length
+      ? db.from('vehicles').select('id, make, model, color, plate').in('id', vehicleIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  if (dRes.error) throw new Error(`facility trips (drivers): ${dRes.error.message}`);
+  if (vRes.error) throw new Error(`facility trips (vehicles): ${vRes.error.message}`);
+
+  const drivers = new Map(
+    ((dRes.data ?? []) as unknown as Array<{ id: string; first_name: string | null; last_name: string | null }>)
+      .map((r) => [r.id, r]),
+  );
+  const vehicles = new Map(
+    ((vRes.data ?? []) as unknown as Array<{
+      id: string; make: string | null; model: string | null; color: string | null; plate: string | null;
+    }>).map((r) => [r.id, r]),
+  );
+
+  return trips.map((t) => {
+    const d = t.driver_id ? drivers.get(t.driver_id) : undefined;
+    const v = t.vehicle_id ? vehicles.get(t.vehicle_id) : undefined;
+    return {
+      ...t,
+      driver_label: t.driver_id ? driverLabel(d) : null,
+      vehicle_label: vehicleLabel(v, t.vehicle_description),
+    };
+  });
+}
+
+/** "Maria T." A driver_id with no readable row still counts as a driver, so it
+ *  says so instead of reverting to "not assigned". */
+export function driverLabel(
+  d: { first_name: string | null; last_name: string | null } | undefined,
+): string {
+  const first = d?.first_name?.trim();
+  if (!first) return 'Driver assigned';
+  const initial = d?.last_name?.trim()?.[0];
+  return initial ? `${first} ${initial.toUpperCase()}.` : first;
+}
+
+/** "Silver Toyota Sienna · ABC1234", falling back to the free-text description
+ *  dispatch typed on the trip. Null when neither exists. */
+export function vehicleLabel(
+  v: { make: string | null; model: string | null; color: string | null; plate: string | null } | undefined,
+  description: string | null | undefined,
+): string | null {
+  const parts = [v?.color, v?.make, v?.model].map((x) => x?.trim()).filter(Boolean);
+  const plate = v?.plate?.trim();
+  if (parts.length) return plate ? `${parts.join(' ')} · ${plate}` : parts.join(' ');
+  return description?.trim() || null;
 }
 
 export function tripCents(t: FacilityTrip): number | null {
@@ -188,9 +280,11 @@ export async function facilityDashboard(facilityId: string, discountPct: number)
   const first = [upcomingRes, monthRes, invoiceRes, standingRes].find((r) => r.error);
   if (first?.error) throw new Error(`facility dashboard: ${first.error.message}`);
 
-  const upcoming = await withPassengerDetail(
-    facilityId,
-    (upcomingRes.data ?? []) as unknown as FacilityTrip[],
+  const upcoming = await withAssignmentDetail(
+    await withPassengerDetail(
+      facilityId,
+      (upcomingRes.data ?? []) as unknown as FacilityTrip[],
+    ),
   );
   const month = (monthRes.data ?? []) as unknown as FacilityTrip[];
   const invoices = (invoiceRes.data ?? []) as unknown as FacilityInvoice[];

@@ -68,8 +68,36 @@ export function StatusPill({ status }: { status: string }) {
   );
 }
 
+/**
+ * Who is coming, said only as far as it is known.
+ *
+ * `assigned` used to render "Driver assigned" on its own, which was a promise
+ * the data did not back: the one-tap advance wrote the status and no driver.
+ * The driver and vehicle now come from the trip itself.
+ */
+function AssignmentLine({ trip }: { trip: FacilityTrip }) {
+  if (trip.driver_label || trip.vehicle_label) {
+    return (
+      <div className="ink-soft text-xs">
+        {trip.driver_label ? <>Driver: <span className="font-medium">{trip.driver_label}</span></> : null}
+        {trip.driver_label && trip.vehicle_label ? ' · ' : null}
+        {trip.vehicle_label ? <>Vehicle: {trip.vehicle_label}</> : null}
+      </div>
+    );
+  }
+  if (trip.status === 'cancelled') return null;
+  if (trip.status === 'completed' || trip.status === 'closed') {
+    return <div className="ink-mute text-xs">No driver on record</div>;
+  }
+  return <div className="ink-mute text-xs">Driver not yet assigned</div>;
+}
+
 export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
   const cents = tripCents(trip);
+  // A row stored as `assigned` with no driver (written before the ops console
+  // refused that) must not read "Driver assigned". It is confirmed, no more.
+  const shownStatus =
+    trip.status === 'assigned' && !trip.driver_label ? 'confirmed' : trip.status;
   return (
     <li className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5 border-b border-[color:var(--line)] py-3 last:border-b-0">
       <div className="min-w-0 flex-1">
@@ -102,6 +130,7 @@ export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
         <div className="ink-soft truncate text-xs">
           {trip.pickup_address} → {trip.dropoff_address}
         </div>
+        <AssignmentLine trip={trip} />
       </div>
       <div className="flex shrink-0 items-center gap-3 text-sm">
         <span className="ink-soft">{serviceLabel(trip.service_line)}</span>
@@ -115,7 +144,7 @@ export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
         ) : (
           <span className="ink-soft tabular-nums">{money(cents)}</span>
         )}
-        <StatusPill status={trip.status} />
+        <StatusPill status={shownStatus} />
       </div>
     </li>
   );

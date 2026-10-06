@@ -1,7 +1,7 @@
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { applyFacilityDiscount } from '@/lib/facility';
 import {
-  tripCents, withPassengerDetail, FACILITY_PATIENTS_TABLE, type FacilityTrip,
+  tripCents, withPassengerDetail, withAssignmentDetail, FACILITY_PATIENTS_TABLE, type FacilityTrip,
 } from '@/lib/facility-dashboard.server';
 
 /**
@@ -53,7 +53,7 @@ function ok<T>(res: { data: T | null; error: { message: string } | null }, what:
 const TRIP_COLS =
   'id, service_line, status, contact_name, pickup_address, dropoff_address, requested_at, ' +
   'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id, ' +
-  'facility_patient_id';
+  'facility_patient_id, driver_id, vehicle_id, vehicle_description';
 
 export type TripBucket = 'today' | 'upcoming' | 'recent';
 
@@ -87,7 +87,7 @@ export async function facilityTrips(facilityId: string, bucket: TripBucket): Pro
   }
 
   const trips = ok(await q.limit(100), `facility trips (${bucket})`) as unknown as FacilityTrip[];
-  return withPassengerDetail(facilityId, trips);
+  return withAssignmentDetail(await withPassengerDetail(facilityId, trips));
 }
 
 

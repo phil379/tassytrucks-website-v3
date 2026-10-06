@@ -98,6 +98,7 @@ const NODES: Node[] = [
   { id: 'myerspark',  label: 'Myers Park HS',   x: 248, y: 262, line: 'scholar',   anchor: 'start',  dx: 8, dy: 3 },
   { id: 'latin',      label: 'Charlotte Latin', x: 332, y: 268, line: 'scholar',   anchor: 'start',  dx: 7, dy: 3 },
   { id: 'provday',    label: 'Providence Day',  x: 338, y: 348, line: 'scholar',   anchor: 'start',  dx: 7, dy: -5 },
+  { id: 'catholic',   label: 'Charlotte Catholic', x: 314, y: 395, line: 'scholar', anchor: 'start', dx: 7, dy: 3 },
   { id: 'ardrey',     label: 'Ardrey Kell HS',  x: 338, y: 418, line: 'scholar',   anchor: 'start',  dx: 7, dy: 3 },
   // Winnie: pet places. CityVet is a real Uptown clinic (Brooklyn Village); the rest are generic.
   { id: 'cityvet',    label: 'CityVet Uptown',  x: 206, y: 219, line: 'winnie',    anchor: 'end',    dx: -8, dy: 3 },
@@ -115,7 +116,7 @@ const NODE = Object.fromEntries(NODES.map((n) => [n.id, n])) as Record<string, N
  */
 const LEGS: Record<LineId, [string, string][]> = {
   concierge: [['airport', 'uptown'], ['uptown', 'quail'], ['southend', 'airport'], ['southpark', 'airport'], ['uptown', 'ballantyne'], ['quail', 'southpark']],
-  scholar:   [['ballantyne', 'ardrey'], ['southpark', 'myerspark'], ['matthews', 'latin'], ['southpark', 'provday'], ['uptown', 'myerspark'], ['quail', 'provday']],
+  scholar:   [['ballantyne', 'ardrey'], ['southpark', 'myerspark'], ['matthews', 'latin'], ['southpark', 'provday'], ['uptown', 'myerspark'], ['quail', 'provday'], ['southpark', 'catholic'], ['ballantyne', 'catholic']],
   care:      [['matthews', 'cmc'], ['pineville', 'cmc'], ['university', 'presby'], ['southend', 'cmc'], ['huntersville', 'presby'], ['uptown', 'university']],
   recovery:  [['cmc', 'matthews'], ['presby', 'southpark'], ['cmc', 'ballantyne'], ['presby', 'university']],
   winnie:    [['southend', 'cityvet'], ['pineville', 'groomer'], ['cityvet', 'petstore'], ['southpark', 'vet'], ['uptown', 'cityvet'], ['pineville', 'boarding']],

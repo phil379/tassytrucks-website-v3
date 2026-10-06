@@ -50,7 +50,7 @@ The SEO pages under `app/charlotte/` carry a **second, separate** cluster (`Atri
 | `98%` (+ label `On-time arrival`) | `app/page.tsx` | 286, 287 | `<section id="facilities">` — stat block |
 | `&lt; 30 min` | `app/page.tsx` | 282 | `<section id="facilities">` — stat block |
 | `Dispatchers online now · Avg. response 8 min` | `app/page.tsx` | 114 | Hero — live-status strip |
-| `2 min early` | `app/page.tsx` | 176 | Hero visual — floating stat card |
+| ~~`2 min early`~~ | `app/page.tsx` | — | REMOVED Oct 2026: hero stat card deleted (it also covered the map) |
 | `hundreds of clients` | `app/page.tsx` | 368 | `<section id="founder">` — founder bio prose |
 | `On-time, every time` | `app/nemt/page.tsx` | 35 | NEMT feature card title |
 | `On-time, every time` | `app/page.tsx` | 320 | `testimonials` array (inside Marcus T. quote) |

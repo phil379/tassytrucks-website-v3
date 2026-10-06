@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Check,
+  ArrowRight,
   HeartPulse, Sparkles, PawPrint, Droplets, Shield, GraduationCap,
   type LucideIcon,
 } from 'lucide-react';
@@ -97,7 +97,7 @@ export default function HomePage() {
     <>
       {/* ───────────── HERO ───────────── */}
       <section className="relative">
-        <div className="container-x pt-20 pb-24 grid lg:grid-cols-[1.1fr_1fr] gap-14 items-center">
+        <div className="mx-auto max-w-[90rem] px-6 lg:px-10 pt-20 pb-24 grid lg:grid-cols-[1fr_1.3fr] gap-10 xl:gap-14 items-center">
           <div>
             <div className="pill pill-vet mb-6">
               <span>★</span>
@@ -154,19 +154,6 @@ export default function HomePage() {
                 "LIVE TRIP BOARD · En route" card for trips that were not
                 happening; see components/CharlotteDayMap.tsx. */}
             <CharlotteDayMap />
-
-            {/* Floating stat card */}
-            <div className="absolute -top-6 -left-6 bg-surface border border-line rounded-2xl p-4 shadow-xl animate-float-slow hidden md:block">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-ink flex items-center justify-center">
-                  <Check size={20} className="text-[color:var(--gold)]" />
-                </div>
-                <div>
-                  <div className="text-xs ink-mute uppercase tracking-wider">Average pickup</div>
-                  <div className="serif text-xl font-semibold">2 min early</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

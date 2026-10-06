@@ -29,7 +29,7 @@ import { useEffect, useRef, useState } from 'react';
  *   Winnie     green   vet, groomer, boarding, pet store
  *
  * Place names are landmarks for orientation. They are not partners and the
- * caption says so. Pet places are generic on purpose.
+ * caption says so. Only CityVet Uptown is a named pet place; the rest are generic on purpose.
  *
  * Hand-drawn SVG and one rAF loop: no Mapbox, no map tiles, no API key, no
  * per-view billing. The whole panel is lighter than a single map tile.
@@ -99,7 +99,8 @@ const NODES: Node[] = [
   { id: 'latin',      label: 'Charlotte Latin', x: 332, y: 268, line: 'scholar',   anchor: 'start',  dx: 7, dy: 3 },
   { id: 'provday',    label: 'Providence Day',  x: 338, y: 348, line: 'scholar',   anchor: 'start',  dx: 7, dy: -5 },
   { id: 'ardrey',     label: 'Ardrey Kell HS',  x: 338, y: 418, line: 'scholar',   anchor: 'start',  dx: 7, dy: 3 },
-  // Winnie: pet places (generic)
+  // Winnie: pet places. CityVet is a real Uptown clinic (Brooklyn Village); the rest are generic.
+  { id: 'cityvet',    label: 'CityVet Uptown',  x: 206, y: 219, line: 'winnie',    anchor: 'end',    dx: -8, dy: 3 },
   { id: 'vet',        label: 'Vet clinic',      x: 140, y: 318, line: 'winnie',    anchor: 'start',  dx: 8, dy: 3 },
   { id: 'groomer',    label: 'Groomer',         x: 96,  y: 356, line: 'winnie',    anchor: 'start',  dx: 8, dy: 3 },
   { id: 'boarding',   label: 'Pet boarding',    x: 176, y: 368, line: 'winnie',    anchor: 'start',  dx: 8, dy: 3 },
@@ -117,7 +118,7 @@ const LEGS: Record<LineId, [string, string][]> = {
   scholar:   [['ballantyne', 'ardrey'], ['southpark', 'myerspark'], ['matthews', 'latin'], ['southpark', 'provday'], ['uptown', 'myerspark'], ['quail', 'provday']],
   care:      [['matthews', 'cmc'], ['pineville', 'cmc'], ['university', 'presby'], ['southend', 'cmc'], ['huntersville', 'presby'], ['uptown', 'university']],
   recovery:  [['cmc', 'matthews'], ['presby', 'southpark'], ['cmc', 'ballantyne'], ['presby', 'university']],
-  winnie:    [['southend', 'vet'], ['pineville', 'groomer'], ['southpark', 'petstore'], ['uptown', 'boarding'], ['pineville', 'boarding']],
+  winnie:    [['southend', 'cityvet'], ['pineville', 'groomer'], ['cityvet', 'petstore'], ['southpark', 'vet'], ['uptown', 'cityvet'], ['pineville', 'boarding']],
 };
 
 /** Soft hotspot glows behind each cluster, lit while their line is running. */

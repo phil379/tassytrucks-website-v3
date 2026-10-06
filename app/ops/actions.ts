@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { OPS_COOKIE, isOpsAuthed, passwordMatches, sessionToken } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES } from '@/lib/supabase-admin';
-import { ADVANCE } from '@/lib/ops-status';
+import { ADVANCE, assignmentBlocker } from '@/lib/ops-status';
 import { generateConfirmationCode } from '@/lib/confirmation';
 import {
   confirmationHtml,
@@ -48,6 +48,22 @@ export async function logout() {
 }
 
 /**
+ * Refuse a move to `assigned` for a row with no driver_id. Read from the row,
+ * never from the form: the browser does not get to say a driver exists.
+ */
+async function requireDriver(id: string, to: string) {
+  if (to !== 'assigned') return;
+  const { data, error } = await supabaseAdmin()
+    .from(TRIP_REQUESTS_TABLE)
+    .select('driver_id')
+    .eq('id', id)
+    .single();
+  if (error) throw new Error(error.message);
+  const reason = assignmentBlocker(to, (data as { driver_id: string | null } | null)?.driver_id);
+  if (reason) throw new Error(reason);
+}
+
+/**
  * One save per row: status, quote, and internal notes travel together, because
  * on a phone you change them in one pass and press Save once.
  */
@@ -78,6 +94,13 @@ export async function updateRow(formData: FormData) {
     patch.quoted_cents = Math.round(dollars * 100);
   }
 
+  // The select form can set any status, so it needs the same refusal as the
+  // one-tap advance. Only checked when the target IS `assigned`, so saving a
+  // note on an already-assigned trip is unaffected.
+  if (status === 'assigned') {
+    await requireDriver(id, status);
+  }
+
   const { error } = await supabaseAdmin().from(TRIP_REQUESTS_TABLE).update(patch).eq('id', id);
   if (error) throw new Error(error.message);
 
@@ -100,6 +123,11 @@ export async function advanceStatus(formData: FormData) {
 
   const to = ADVANCE[from];
   if (!to) throw new Error(`No advance step from "${from}"`);
+
+  // confirmed -> assigned is the step that claims a person exists. Without a
+  // driver_id this used to succeed and the facility console then said "Driver
+  // assigned" about a trip nobody was driving. Reject it instead.
+  await requireDriver(id, to);
 
   // Guarded on the current value: if someone else moved the row first, this
   // updates nothing rather than dragging it backwards.

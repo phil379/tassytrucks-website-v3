@@ -7,6 +7,7 @@ import {
 } from '@/lib/trip-request';
 import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
+import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
@@ -382,6 +383,8 @@ export async function POST(request: Request) {
       .from(TRIP_REQUESTS_TABLE)
       .insert({
         service_line: data.serviceLine,
+        // Human-friendly reference, assigned here (see lib/trip-number.ts).
+        trip_number: await nextTripNumber(),
         // contact_name stays the combined value: /ops, the notification
         // templates and every row written before the split all read it.
         contact_name: fullName(data),

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { verifyWebhookSignature } from '@/lib/stripe';
-import { notifyOperatorPaid } from '@/lib/notifications';
+import { notifyOperatorPaid, sendRichEmail } from '@/lib/notifications';
+import { receiptSubject, receiptHtml, receiptText, type ReceiptData } from '@/lib/receipt-email';
 
 /**
  * POST /api/stripe/webhook — Stripe tells us the money arrived.
@@ -115,6 +116,45 @@ export async function POST(request: Request) {
   // The money is recorded. Only now does anyone get told — and a failed alert
   // must not undo a stored payment.
   await notifyOperatorPaid({ id: data[0].id });
+
+  // The customer's RECEIPT — best-effort. A receipt failure must never undo a
+  // recorded payment, so it is caught and logged, never thrown.
+  try {
+    const { data: rows } = await db
+      .from(TRIP_REQUESTS_TABLE)
+      .select('*')
+      .eq('id', data[0].id as string)
+      .limit(1);
+    const r = (rows?.[0] ?? {}) as unknown as Record<string, unknown>;
+    const email = (r.contact_email as string | null) ?? null;
+    if (email) {
+      const receipt: ReceiptData = {
+        tripNumber: (r.trip_number as string | null) ?? null,
+        confirmationCode: (r.confirmation_code as string | null) ?? null,
+        serviceLine: r.service_line as string,
+        contactFirstName: (r.contact_first_name as string | null) ?? null,
+        contactName: (r.contact_name as string | null) ?? null,
+        contactPhone: (r.contact_phone as string | null) ?? null,
+        contactEmail: email,
+        pickupAddress: (r.pickup_address as string | null) ?? null,
+        dropoffAddress: (r.dropoff_address as string | null) ?? null,
+        requestedAt: (r.requested_at as string | null) ?? null,
+        amountCents:
+          (r.agreed_cents as number | null) ??
+          (r.quoted_cents as number | null) ??
+          (session.amount_total ?? 0),
+        paidAt: (r.paid_at as string | null) ?? new Date().toISOString(),
+      };
+      await sendRichEmail({
+        to: email,
+        subject: receiptSubject(receipt),
+        html: receiptHtml(receipt),
+        text: receiptText(receipt),
+      });
+    }
+  } catch (e) {
+    console.error('[stripe] receipt email failed (payment still recorded):', e);
+  }
 
   return NextResponse.json({ ok: true, updated: data.length });
 }

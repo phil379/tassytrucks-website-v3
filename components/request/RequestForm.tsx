@@ -209,6 +209,8 @@ export default function RequestForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  // What the confirmation screen echoes back, so a visitor can see exactly what was captured.
+  const [receipt, setReceipt] = useState<{ tripNumber: string | null; when: string | null } | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
@@ -497,6 +499,20 @@ export default function RequestForm({
         return;
       }
 
+      // `requestedAt` is a naive Charlotte wall-clock string ("2026-10-09T10:00"); format the
+      // parts directly so the browser's own time zone can never shift what the visitor typed.
+      const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(payload.requestedAt);
+      const when = m
+        ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5])).toLocaleString('en-US', {
+            timeZone: 'UTC',
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          })
+        : null;
+      setReceipt({ tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null, when });
       setDone(json.id);
     } catch {
       announce({}, 'We could not reach the server. Please call (704) 941-8508.');
@@ -510,6 +526,13 @@ export default function RequestForm({
       <div className="card-tile p-8 text-center" role="status" aria-live="polite">
         <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />
         <h2 className="serif text-2xl font-semibold mt-4">Request received</h2>
+        {receipt?.tripNumber || receipt?.when ? (
+          <p className="ink-soft mt-3 text-sm">
+            {receipt.tripNumber ? <>Reference <strong>{receipt.tripNumber}</strong></> : null}
+            {receipt.tripNumber && receipt.when ? ' · ' : null}
+            {receipt.when ? <>Pickup requested for <strong>{receipt.when}</strong> (Charlotte time)</> : null}
+          </p>
+        ) : null}
         <p className="ink-soft mt-3 max-w-md mx-auto">{COPY.confirmation}</p>
         <p className="ink-soft text-sm mt-4">
           Need us sooner? Call{' '}

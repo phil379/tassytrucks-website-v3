@@ -475,7 +475,7 @@ export async function POST(request: Request) {
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  });
+  }, tripNumber);
 
   return NextResponse.json({ ok: true, id, tripNumber, notifications }, { status: 200 });
 }

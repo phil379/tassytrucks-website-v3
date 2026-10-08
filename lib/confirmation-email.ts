@@ -119,7 +119,11 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
       You're booked, ${esc(data.contactFirstName)}.
     </h1>
     <p style="margin:0;color:${MUTE};font-size:15px;line-height:1.55;">
-      A driver is assigned to your ${esc(serviceShortName(data.serviceLine))} trip. Keep this
+      ${
+        t.driverName
+          ? `A driver is assigned to your ${esc(serviceShortName(data.serviceLine))} trip.`
+          : `Your ${esc(serviceShortName(data.serviceLine))} trip is confirmed. We will text you your driver's name before pickup.`
+      } Keep this
       email — the confirmation number below is all we need to find you.
     </p>
   </td></tr>

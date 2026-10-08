@@ -202,6 +202,7 @@ export async function confirmAndSend(formData: FormData) {
       serviceName: serviceShortName(row.service_line),
       confirmationCode: code,
       tripRequestId: id,
+      serviceLine: row.service_line,
     });
     payUrl = link.url;
     payLinkId = link.id;

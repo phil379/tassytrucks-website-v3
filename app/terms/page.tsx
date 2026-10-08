@@ -36,6 +36,13 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     ],
   },
   {
+    h: 'Text messaging (SMS)',
+    body: [
+      'We run a text-messaging program for people who opt in — applicants who check the SMS consent box on a careers form, and riders or booking parties who ask to receive trip updates. By opting in you agree to receive SMS from Tassy Transportation about your application and onboarding, or your booking and trip status. Consent is not a condition of applying or of purchasing any service.',
+      'Message frequency varies. Message and data rates may apply. Reply STOP to opt out at any time, or HELP for help. We do not share mobile opt-in information or phone numbers with third parties or affiliates for marketing; numbers are used only to send our own messages through our messaging provider. Mobile carriers are not liable for delayed or undelivered messages.',
+    ],
+  },
+  {
     h: 'Liability',
     body: [
       'We carry commercial auto and general liability insurance as required for our operating authority. To the extent permitted by law, our liability for any claim arising from a trip is limited to the amount paid for that trip, except where the law provides otherwise.',
@@ -55,7 +62,7 @@ export default function TermsPage() {
       <div className="container-x py-16 lg:py-24 max-w-3xl">
         <div className="eyebrow">Legal</div>
         <h1 className="h-section mt-3">Terms of Service</h1>
-        <p className="mt-3 text-sm ink-mute">Last updated: July 2, 2026</p>
+        <p className="mt-3 text-sm ink-mute">Last updated: October 8, 2026</p>
         <div className="mt-8 space-y-10">
           {SECTIONS.map((s) => (
             <div key={s.h}>

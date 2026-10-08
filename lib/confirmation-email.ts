@@ -27,6 +27,8 @@ const MUTE = '#6B6455';
 
 export type ConfirmedTrip = {
   confirmationCode: string;
+  /** Human-friendly trip number (T-YYYYMMDD-NNNN). */
+  tripNumber?: string | null;
   agreedCents: number;
   /** Set only when the fare was reduced; drives the savings line. */
   discountLabel?: string | null;
@@ -158,6 +160,7 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
     <div style="color:${INK};font-size:13px;font-weight:700;letter-spacing:0.5px;
                 text-transform:uppercase;margin-bottom:6px;">Your trip</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      ${t.tripNumber ? row('Trip number', t.tripNumber) : ''}
       ${row('Pickup time', fmtWhen(data.requestedAt))}
       ${row('Pickup', data.pickupAddress)}
       ${row('Destination', data.dropoffAddress)}
@@ -232,6 +235,7 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
   const lines = [
     `YOU'RE BOOKED, ${data.contactFirstName.toUpperCase()}.`,
     '',
+    t.tripNumber ? `TRIP NUMBER:          ${t.tripNumber}` : '',
     `CONFIRMATION NUMBER:  ${t.confirmationCode}`,
     `YOUR PRICE:           ${formatUsd(t.agreedCents)}`,
   ];

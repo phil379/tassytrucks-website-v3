@@ -51,9 +51,9 @@ export default function PartnersPage() {
                 leaving chemotherapy is not a typical passenger, and that the ride
                 home is part of the care experience, not an afterthought. Our{' '}
                 <Link href="/recover" className="underline decoration-[color:var(--gold)] underline-offset-2">
-                  Tassy Guardian
+                  Tassy Recovery
                 </Link>{' '}
-                vertical was built specifically around that reality.
+                service was built specifically around that reality.
               </p>
               <p>
                 We also work with VA Community Care providers coordinating rides

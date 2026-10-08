@@ -39,7 +39,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     h: 'Text messaging (SMS)',
     body: [
       'We run a text-messaging program for people who opt in — applicants who check the SMS consent box on a careers form, and riders or booking parties who ask to receive trip updates. By opting in you agree to receive SMS from Tassy Transportation about your application and onboarding, or your booking and trip status. Consent is not a condition of applying or of purchasing any service.',
-      'Message frequency varies. Message and data rates may apply. Reply STOP to opt out at any time, or HELP for help. We do not share mobile opt-in information or phone numbers with third parties or affiliates for marketing; numbers are used only to send our own messages through our messaging provider. Mobile carriers are not liable for delayed or undelivered messages.',
+      'Message frequency varies. Message and data rates may apply. Reply STOP to opt out at any time, or HELP for help. No mobile information will be shared with third parties or affiliates for marketing or promotional purposes, and text messaging opt-in data and consent will not be shared with any third parties. Mobile carriers are not liable for delayed or undelivered messages.',
     ],
   },
   {

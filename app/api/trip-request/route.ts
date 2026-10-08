@@ -461,7 +461,18 @@ export async function POST(request: Request) {
   // The alert gets the VALIDATED details, the same object that went into the
   // row — never the raw body, or a dispatcher's email could be made to print
   // whatever a script chose to post.
-  const notifications = await fireNotifications(id, { ...data, tripDetails });
+  // The form's datetime-local values are naive Charlotte wall-clock strings.
+  // The notification templates call `new Date(...)`, which on Vercel (UTC)
+  // reads them 4-5 hours early ("6:00 AM" for a 10:00 AM pickup). Hand them real
+  // instants, exactly as the stored row does, so every email agrees with /ops.
+  const notifications = await fireNotifications(id, {
+    ...data,
+    requestedAt: parseLocalDateTime(data.requestedAt)?.toISOString() ?? data.requestedAt,
+    returnAt: data.returnAt
+      ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
+      : data.returnAt,
+    tripDetails,
+  });
 
   return NextResponse.json({ ok: true, id, notifications }, { status: 200 });
 }

@@ -232,6 +232,10 @@ export default function RequestForm({
 
   const [minDateTime, setMinDateTime] = useState('');
   useEffect(() => setMinDateTime(minDateTimeLocal()), []);
+  // The confirmation replaces a long form: bring it to the top so the heading is not hidden behind the sticky header.
+  useEffect(() => {
+    if (done) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [done]);
 
   /** `source` = page path + any utm params, stamped on the row. */
   const source = useMemo(() => {

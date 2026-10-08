@@ -5,6 +5,7 @@ import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES, type TripRequestRow 
 import { mobilityLabel, serviceLabel } from '@/lib/trip-request';
 import { describeDetails } from '@/lib/trip-details';
 import { login, logout, updateRow, advanceStatus, confirmAndSend } from './actions';
+import { PendingButton } from '@/components/ops/PendingButton';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
 
@@ -313,12 +314,12 @@ export default async function OpsPage({
                     On account — invoice monthly, no payment link
                   </label>
 
-                  <button
-                    type="submit"
-                    className="btn-gold mt-3 w-full justify-center min-h-[52px] text-base"
+                  <PendingButton
+                    className="btn-gold mt-3 w-full justify-center min-h-[52px] text-base disabled:opacity-60"
+                    pendingLabel="Sending… (takes a few seconds)"
                   >
                     {row.confirmation_code ? 'Resend confirmation' : 'Confirm & send payment link'}
-                  </button>
+                  </PendingButton>
 
                   {row.confirmation_code && (
                     <p className="ink-mute mt-2 text-xs">

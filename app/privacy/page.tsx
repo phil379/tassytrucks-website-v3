@@ -30,7 +30,8 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     body: [
       'If you check the "Text me" box on an application or booking form, or otherwise give us your mobile number and opt in, we send you text messages about what you asked about — your job application and onboarding, or your booking, trip status, and driver ETAs. Giving consent to texts is never a condition of applying for a role or booking a ride.',
       'Message frequency varies. Message and data rates may apply. Reply STOP at any time to stop texts, or HELP for help. We honor opt-out requests and keep a record of consent and opt-out.',
-      'We do not sell your personal information, and we do not share mobile opt-in information or your phone number with third parties or affiliates for their marketing. Phone numbers are shared only with the messaging provider that helps us deliver our own texts to you, and only for that purpose. Mobile carriers are not liable for delayed or undelivered messages.',
+      'No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text messaging originator opt-in data and consent will not be shared with any third parties. We do not sell your personal information.',
+      'You can opt out of texts at any time by replying STOP, and you can still apply for a role or book a ride without agreeing to receive texts. Mobile carriers are not liable for delayed or undelivered messages. Questions about our text program? Email book@tassytrucks.com.',
     ],
   },
   {

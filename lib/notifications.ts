@@ -334,7 +334,7 @@ function detailLines(serviceLine: string, stored: unknown): string[] {
  * the clock (see callbackPromise). It asserts nothing about tracking, and it
  * carries no marketing language.
  */
-async function notifyRequester(id: string, data: TripRequestInput): Promise<void> {
+async function notifyRequester(id: string, data: TripRequestInput, tripNumber?: string | null): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
   // The form collects the given name directly now, so the greeting no longer
@@ -352,12 +352,12 @@ async function notifyRequester(id: string, data: TripRequestInput): Promise<void
     'Nothing is booked and nothing is charged until you agree to that price.',
     '',
     '— Tassy Transportation',
-    `Reference: ${shortRef(id)}`,
+    `Reference: ${tripNumber ?? shortRef(id)}`,
   ].join('\n');
 
   await sendResendEmail({
     to: data.contactEmail,
-    subject: `We have your request — ref ${shortRef(id)}`,
+    subject: `We have your request — ref ${tripNumber ?? shortRef(id)}`,
     text,
   });
 }
@@ -392,7 +392,11 @@ async function runLeg(id: string, label: string, fn: () => Promise<LegOutcome | 
  * Fires every leg concurrently. Always resolves — never throws, never rejects.
  * The caller returns 200 regardless of what happened here.
  */
-export async function fireNotifications(id: string, data: TripRequestInput): Promise<NotificationOutcome> {
+export async function fireNotifications(
+  id: string,
+  data: TripRequestInput,
+  tripNumber?: string | null,
+): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
     title: `New ${serviceShortName(data.serviceLine)} request`,
@@ -405,7 +409,7 @@ export async function fireNotifications(id: string, data: TripRequestInput): Pro
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
     runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data)),
     data.contactEmail
-      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data))
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber))
       : Promise.resolve<LegOutcome>('skipped'),
   ]);
 

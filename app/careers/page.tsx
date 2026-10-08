@@ -125,7 +125,7 @@ export default function CareersPage() {
           <h2 className="serif text-xl font-semibold">What happens after you apply</h2>
           <ol className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
             <li>
-              <strong>1.</strong> You get an emailed link to the onboarding steps for your role.
+              <strong>1.</strong> If it looks like a fit, we email you a link to the onboarding steps for your role.
               Open it when you have ten minutes — there is no password.
             </li>
             <li>

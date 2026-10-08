@@ -173,6 +173,11 @@ export default async function OpsPage({
                 <div>
                   <p className="text-xs uppercase tracking-wider ink-mute">{serviceLabel(row.service_line)}</p>
                   <h2 className="serif text-xl font-semibold mt-0.5">{row.contact_name}</h2>
+                  {row.trip_number && (
+                    <p className="mt-1 font-mono text-sm ink-soft">
+                      Trip <span className="font-semibold ink">{row.trip_number}</span>
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   {row.status === 'new' && <ElapsedSince iso={row.created_at} />}

@@ -169,7 +169,7 @@ export const COPY = {
   medicalWarning:
     'Please do not include medical details, diagnoses, or procedure names.',
   confirmation:
-    'We confirm every request by phone or text within 2 hours during business hours. Pricing is quoted before your trip is confirmed.',
+    'We confirm every request by phone or text within 2 hours during business hours. The estimate you saw is confirmed (or adjusted for tolls or extra wait) before your trip is booked.',
   waitTime:
     'Tassy Recovery covers the trip there, the wait, and the trip home, with 20 minutes of on-site wait included. Longer than that is $35 per extra half hour — quoted to you before it is charged, never after.',
 } as const;

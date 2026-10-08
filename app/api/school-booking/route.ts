@@ -10,6 +10,7 @@ import {
   type SchoolPlan,
 } from '@/lib/school-plans';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
+import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
 import { parseLocalDateTime } from '@/lib/time';
 import { fireNotifications } from '@/lib/notifications';
@@ -213,6 +214,7 @@ export async function POST(request: Request) {
     .from(TRIP_REQUESTS_TABLE)
     .insert({
       service_line: 'scholar',
+      trip_number: await nextTripNumber(db),
       status: 'new',
       contact_name: parentName,
       contact_phone: data.parent.phone,

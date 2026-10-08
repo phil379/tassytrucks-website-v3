@@ -48,6 +48,8 @@ export type TripRequestRow = {
   created_at: string;
   updated_at: string;
   service_line: string;
+  /** Human-facing reference, e.g. T-20261008-0001. Set app-side at request time. */
+  trip_number: string | null;
   status: string;
   contact_name: string;
   contact_phone: string;

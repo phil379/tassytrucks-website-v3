@@ -26,6 +26,14 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     ],
   },
   {
+    h: 'Text messages (SMS)',
+    body: [
+      'If you check the "Text me" box on an application or booking form, or otherwise give us your mobile number and opt in, we send you text messages about what you asked about — your job application and onboarding, or your booking, trip status, and driver ETAs. Giving consent to texts is never a condition of applying for a role or booking a ride.',
+      'Message frequency varies. Message and data rates may apply. Reply STOP at any time to stop texts, or HELP for help. We honor opt-out requests and keep a record of consent and opt-out.',
+      'We do not sell your personal information, and we do not share mobile opt-in information or your phone number with third parties or affiliates for their marketing. Phone numbers are shared only with the messaging provider that helps us deliver our own texts to you, and only for that purpose. Mobile carriers are not liable for delayed or undelivered messages.',
+    ],
+  },
+  {
     h: 'Safety recordings',
     body: [
       'Vehicles may be equipped with in-vehicle recording for rider and driver safety — including on student transportation, where recordings are retained for your protection and reviewed only when a safety concern is raised.',
@@ -51,7 +59,7 @@ export default function PrivacyPage() {
       <div className="container-x py-16 lg:py-24 max-w-3xl">
         <div className="eyebrow">Legal</div>
         <h1 className="h-section mt-3">Privacy Policy</h1>
-        <p className="mt-3 text-sm ink-mute">Last updated: July 2, 2026</p>
+        <p className="mt-3 text-sm ink-mute">Last updated: October 8, 2026</p>
         <div className="mt-8 space-y-10">
           {SECTIONS.map((s) => (
             <div key={s.h}>

@@ -79,6 +79,85 @@ async function post<T>(path: string, fields: Record<string, FormValue>): Promise
   }
 }
 
+async function get<T>(path: string): Promise<T> {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error('STRIPE_SECRET_KEY is not set on this deployment');
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API}${path}`, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: { Authorization: `Bearer ${key}` },
+    });
+    const json = (await response.json()) as Record<string, unknown>;
+    if (!response.ok) {
+      const message =
+        (json.error as { message?: string } | undefined)?.message ?? `HTTP ${response.status}`;
+      throw new Error(`Stripe: ${message}`);
+    }
+    return json as T;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * The seeded catalog (scripts/seed-stripe-catalog.ts) creates one Product per
+ * service line, tagged `business=tassy-transport`. Connecting each trip's charge
+ * to its Product means Stripe reports revenue by line instead of as hundreds of
+ * one-off products, and keeps the three businesses on this one account cleanly
+ * separated by the `business` tag.
+ */
+const STRIPE_BUSINESS = 'tassy-transport';
+const CATALOG_KEY_META = 'tassy_catalog_key';
+
+/** A trip's `service_line` value → the seeded catalog key. */
+function catalogKeyForLine(serviceLine: string | null | undefined): string | null {
+  switch (serviceLine) {
+    case 'care':
+      return 'care';
+    case 'recovery':
+      return 'recovery';
+    case 'concierge':
+      return 'concierge';
+    case 'winnie':
+    case 'pet':
+      return 'winnie';
+    case 'scholar':
+      return 'scholar';
+    // care_wav is chosen by passenger mobility upstream, not by service_line, so
+    // it falls through to the inline-product fallback. Unknown lines too.
+    default:
+      return null;
+  }
+}
+
+/**
+ * Resolve the seeded Product id for a catalog key, cached for the lambda's life.
+ * Stripe cannot filter a product list by metadata, so this lists once and matches
+ * client-side. Returns null when the catalog has not been seeded yet — the caller
+ * then falls back to an inline product, so payments never block on the seed.
+ */
+const productIdCache = new Map<string, string | null>();
+async function seededProductId(catalogKey: string): Promise<string | null> {
+  const cached = productIdCache.get(catalogKey);
+  if (cached !== undefined) return cached;
+  const list = await get<{ data: Array<{ id: string; metadata?: Record<string, string> }> }>(
+    '/products?limit=100&active=true',
+  );
+  let found: string | null = null;
+  for (const p of list.data) {
+    if (p.metadata?.business === STRIPE_BUSINESS && p.metadata?.[CATALOG_KEY_META] === catalogKey) {
+      found = p.id;
+      break;
+    }
+  }
+  productIdCache.set(catalogKey, found);
+  return found;
+}
+
 export type PaymentLink = { id: string; url: string };
 
 /**
@@ -95,20 +174,39 @@ export async function createTripPaymentLink(input: {
   serviceName: string;
   confirmationCode: string;
   tripRequestId: string;
+  /** The trip's service_line, used to connect the charge to the seeded Product. */
+  serviceLine?: string | null;
 }): Promise<PaymentLink> {
   if (!Number.isInteger(input.amountCents) || input.amountCents < 50) {
     throw new Error('A payment link needs a whole amount of at least $0.50');
   }
 
-  const price = await post<{ id: string }>('/prices', {
+  // Connect the charge to the seeded service-line Product when the catalog has
+  // been seeded; otherwise fall back to a one-off inline product so a payment is
+  // never blocked on the seed having run.
+  const catalogKey = catalogKeyForLine(input.serviceLine);
+  const productId = catalogKey ? await seededProductId(catalogKey).catch(() => null) : null;
+
+  const priceFields: Record<string, FormValue> = {
     currency: 'usd',
     unit_amount: input.amountCents,
-    'product_data[name]': `${input.serviceName} · ${input.confirmationCode}`,
-  });
+    'metadata[business]': STRIPE_BUSINESS,
+  };
+  if (productId) {
+    priceFields.product = productId;
+    // Keeps the confirmation code on the price even though the Product name is
+    // now the customer-facing line label.
+    priceFields.nickname = `${input.serviceName} · ${input.confirmationCode}`;
+  } else {
+    priceFields['product_data[name]'] = `${input.serviceName} · ${input.confirmationCode}`;
+    priceFields['product_data[metadata][business]'] = STRIPE_BUSINESS;
+  }
+  const price = await post<{ id: string }>('/prices', priceFields);
 
   return post<PaymentLink>('/payment_links', {
     'line_items[0][price]': price.id,
     'line_items[0][quantity]': 1,
+    'metadata[business]': STRIPE_BUSINESS,
     // Read back by the webhook. Stripe copies a payment link's metadata onto
     // the Checkout Session it creates, and the link id is matched as a fallback
     // in case that ever stops being true.

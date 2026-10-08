@@ -378,13 +378,16 @@ export async function POST(request: Request) {
   const estimate = quoted?.kind === 'estimate' ? quoted : null;
 
   let id: string;
+  // Assigned before the insert so the same reference can be echoed on the confirmation screen.
+  let tripNumber: string | null = null;
   try {
+    tripNumber = await nextTripNumber();
     const { data: inserted, error } = await supabaseAdmin()
       .from(TRIP_REQUESTS_TABLE)
       .insert({
         service_line: data.serviceLine,
         // Human-friendly reference, assigned here (see lib/trip-number.ts).
-        trip_number: await nextTripNumber(),
+        trip_number: tripNumber,
         // contact_name stays the combined value: /ops, the notification
         // templates and every row written before the split all read it.
         contact_name: fullName(data),
@@ -474,5 +477,5 @@ export async function POST(request: Request) {
     tripDetails,
   });
 
-  return NextResponse.json({ ok: true, id, notifications }, { status: 200 });
+  return NextResponse.json({ ok: true, id, tripNumber, notifications }, { status: 200 });
 }

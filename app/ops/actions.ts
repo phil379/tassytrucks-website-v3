@@ -15,6 +15,7 @@ import {
 } from '@/lib/confirmation-email';
 import { sendRichEmail } from '@/lib/notifications';
 import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
+import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
 import { serviceShortName } from '@/lib/trip-request';
 
 /**
@@ -138,6 +139,39 @@ export async function advanceStatus(formData: FormData) {
     .eq('status', from);
 
   if (error) throw new Error(error.message);
+
+  // Post-ride RATING request — best-effort. A feedback email failure must
+  // never undo a completed-status change.
+  if (to === 'completed') {
+    try {
+      const { data: rows } = await supabaseAdmin()
+        .from(TRIP_REQUESTS_TABLE)
+        .select('*')
+        .eq('id', id)
+        .limit(1);
+      const r = (rows?.[0] ?? {}) as unknown as Record<string, unknown>;
+      const email = (r.contact_email as string | null) ?? null;
+      if (email) {
+        const data: RatingEmailData = {
+          tripId: id,
+          tripNumber: (r.trip_number as string | null) ?? null,
+          driverName: (r.driver_name as string | null) ?? null,
+          serviceLine: (r.service_line as string) ?? '',
+          contactFirstName: (r.contact_first_name as string | null) ?? null,
+          contactName: (r.contact_name as string | null) ?? null,
+        };
+        await sendRichEmail({
+          to: email,
+          subject: ratingSubject(data),
+          html: ratingHtml(data),
+          text: ratingText(data),
+        });
+      }
+    } catch (e) {
+      console.error('[ops] rating email failed (status still advanced):', e);
+    }
+  }
+
   revalidatePath('/ops');
 }
 
@@ -210,6 +244,7 @@ export async function confirmAndSend(formData: FormData) {
 
   const confirmed: ConfirmedTrip = {
     confirmationCode: code,
+    tripNumber: (row as unknown as { trip_number?: string | null }).trip_number ?? null,
     agreedCents,
     driverName: row.driver_name ?? null,
     vehicleDescription: row.vehicle_description ?? null,

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import SchoolSetupWizard from '@/components/school/SchoolSetupWizard';
+import SchoolEligibilityGate from '@/components/school/SchoolEligibilityGate';
 import { SCHOOL_PLANS, planBySlug } from '@/lib/school-plans';
 
 export const dynamic = 'force-dynamic';
@@ -49,7 +49,7 @@ export default function SchoolPlanSetupPage({ params }: { params: { plan: string
       <p className="mt-3 text-center text-sm text-[color:var(--ink-soft)]">{plan.commitment}</p>
 
       <div className="mt-10">
-        <SchoolSetupWizard plan={plan} googleMapsApiKey={googleMapsApiKey} />
+        <SchoolEligibilityGate plan={plan} googleMapsApiKey={googleMapsApiKey} />
       </div>
     </div>
   );

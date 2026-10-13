@@ -48,6 +48,7 @@ function payload(over: Record<string, unknown> = {}) {
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
     starts_on: '2026-08-24',
+    standard_household_confirmed: true,
     hp_token: '',
     elapsedMs: 9000,
     ...over,
@@ -103,6 +104,17 @@ test('a legacy ?plan= link still resolves to the wizard', async ({ page }) => {
 
 /* ── the wizard ───────────────────────────────────────────────────────────── */
 
+/**
+ * The wizard sits behind the household check (SchoolEligibilityGate): one
+ * child, one address, one school, standard schedule. A family that ticks
+ * nothing and clicks through reaches the wizard exactly as before.
+ */
+async function gotoWizard(page: Page, slug = 'full-year') {
+  await page.goto(`/school/book/${slug}`);
+  await page.getByTestId('school-gate-continue').click();
+  await expect(page.getByRole('heading', { name: 'About you' })).toBeVisible();
+}
+
 async function fillStep1(page: Page, addr = '1200 Elizabeth Ave, Charlotte NC') {
   await page.locator('#parentFirst').fill('Dana');
   await page.locator('#parentLast').fill('Reed');
@@ -134,7 +146,7 @@ async function fillStep3FullYear(page: Page) {
 }
 
 test('all seven policies must be accepted before step 5 unlocks', async ({ page }) => {
-  await page.goto('/school/book/full-year');
+  await gotoWizard(page);
   await fillStep1(page);
   await fillStep2(page);
   await fillStep3FullYear(page);
@@ -154,7 +166,7 @@ test('all seven policies must be accepted before step 5 unlocks', async ({ page 
 });
 
 test('sessionStorage resumes steps 1-5 and never step 6', async ({ page }) => {
-  await page.goto('/school/book/full-year');
+  await gotoWizard(page);
   await fillStep1(page);
   await fillStep2(page);
   await expect(page.getByRole('heading', { name: 'Schedule' })).toBeVisible();
@@ -188,7 +200,7 @@ test('restoreStep never returns a submitted or invalid step', () => {
 /* ── THE regression guard ─────────────────────────────────────────────────── */
 
 test('a failed booking never says "You\'re all set"', async ({ page }) => {
-  await page.goto('/school/book/full-year');
+  await gotoWizard(page);
 
   /**
    * Reply with the EXACT shape the TassyOps route returned on failure:
@@ -332,7 +344,7 @@ test('the payload accepts no medication, diagnosis or condition field', async ({
 
 test('the wizard asks for nothing clinical', async ({ page }) => {
   const clinical = /allerg|medication|diagnos|condition|IEP|504|prescription/i;
-  await page.goto('/school/book/full-year');
+  await gotoWizard(page);
   await fillStep1(page);
 
   // The layout owns the page's single <main id="main"> landmark, so scope to it

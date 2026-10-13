@@ -26,7 +26,9 @@ import { createHmac, timingSafeEqual } from 'crypto';
  * and never sent to the browser. Everything in this file runs server-side.
  */
 
-const API = 'https://api.stripe.com/v1';
+const DEFAULT_API = 'https://api.stripe.com/v1';
+/** Overridable so the test suite can point at a local fake. Never set in production. */
+const apiBase = () => process.env.STRIPE_API_BASE || DEFAULT_API;
 const TIMEOUT_MS = 10_000;
 
 /** Reject a replayed webhook older than this. Stripe's own recommendation. */
@@ -55,7 +57,7 @@ async function post<T>(path: string, fields: Record<string, FormValue>): Promise
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const response = await fetch(`${API}${path}`, {
+    const response = await fetch(`${apiBase()}${path}`, {
       method: 'POST',
       signal: controller.signal,
       headers: {
@@ -86,7 +88,7 @@ async function get<T>(path: string): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const response = await fetch(`${API}${path}`, {
+    const response = await fetch(`${apiBase()}${path}`, {
       method: 'GET',
       signal: controller.signal,
       headers: { Authorization: `Bearer ${key}` },
@@ -263,4 +265,85 @@ export function verifyWebhookSignature(
     if (candidateBuf.length !== expectedBuf.length) return false;
     return timingSafeEqual(candidateBuf, expectedBuf);
   });
+}
+
+
+/* ───────────────────────────────────────────────────────── Tassy Scholar: card on file */
+
+/**
+ * A Stripe Customer for one Scholar parent, so a saved card has an owner.
+ * Metadata carries the standing order so the card can always be traced back from
+ * the Stripe dashboard even if a database write is missed.
+ */
+export async function createStripeCustomer(input: {
+  email: string;
+  name: string;
+  phone?: string;
+  metadata: Record<string, string>;
+}): Promise<{ id: string }> {
+  const fields: Record<string, FormValue> = {
+    email: input.email,
+    name: input.name,
+    phone: input.phone,
+    'metadata[business]': STRIPE_BUSINESS,
+  };
+  for (const [k, v] of Object.entries(input.metadata)) fields[`metadata[${k}]`] = v;
+  return post<{ id: string }>('/customers', fields);
+}
+
+/**
+ * Stripe-hosted page that SAVES a card and charges nothing (mode=setup).
+ *
+ * The success URL carries Stripe's {CHECKOUT_SESSION_ID} placeholder; Stripe fills it
+ * in after decoding the form body. Sessions expire, which is fine here: a parent who
+ * walks away is sent a fresh one from /api/school-card.
+ */
+export async function createCardSetupSession(input: {
+  customerId: string;
+  standingOrderId: string;
+  studentId: string;
+  planKey: string;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<{ id: string; url: string }> {
+  const session = await post<{ id: string; url?: string }>('/checkout/sessions', {
+    mode: 'setup',
+    customer: input.customerId,
+    'payment_method_types[0]': 'card',
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    'custom_text[submit][message]':
+      'Your card is saved, not charged. Tassy confirms your price and driver before your first ride.',
+    'metadata[business]': STRIPE_BUSINESS,
+    'metadata[purpose]': 'scholar_card_on_file',
+    'metadata[standing_order_id]': input.standingOrderId,
+    'metadata[student_id]': input.studentId,
+    'metadata[plan]': input.planKey,
+    'setup_intent_data[metadata][business]': STRIPE_BUSINESS,
+    'setup_intent_data[metadata][standing_order_id]': input.standingOrderId,
+  });
+  if (!session.url) throw new Error('Stripe: checkout session came back without a URL');
+  return { id: session.id, url: session.url };
+}
+
+export type CheckoutSessionSummary = {
+  id: string;
+  mode?: string;
+  status?: string;
+  customer?: string | null;
+  metadata?: Record<string, string> | null;
+  setup_intent?: { id: string; status?: string; payment_method?: string | null } | string | null;
+};
+
+/** Read one Checkout Session back, with its SetupIntent expanded. */
+export function getCheckoutSession(sessionId: string): Promise<CheckoutSessionSummary> {
+  return get<CheckoutSessionSummary>(
+    `/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=setup_intent`,
+  );
+}
+
+export function getPaymentMethod(
+  paymentMethodId: string,
+): Promise<{ id: string; card?: { brand?: string; last4?: string } }> {
+  return get(`/payment_methods/${encodeURIComponent(paymentMethodId)}`);
 }

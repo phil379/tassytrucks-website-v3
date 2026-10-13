@@ -34,6 +34,7 @@ function filterRows(rows, params) {
   for (const [k, v] of params) {
     if (['select', 'order', 'limit', 'offset', 'on_conflict'].includes(k)) continue;
     if (v.startsWith('eq.')) out = out.filter((r) => String(r[k]) === v.slice(3));
+    else if (v.startsWith('neq.')) out = out.filter((r) => String(r[k]) !== v.slice(4));
     else if (v.startsWith('like.') || v.startsWith('ilike.')) {
       const ci = v.startsWith('ilike.');
       const pat = v.slice(ci ? 6 : 5);

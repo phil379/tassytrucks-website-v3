@@ -304,7 +304,7 @@ test('the booking stores the school\'s own address, not a blank', async ({ page,
    */
   await page.waitForTimeout(3200);
 
-  await page.getByRole('button', { name: 'Confirm commitment' }).click();
+  await page.getByTestId('confirm-commitment').click();
   await expect(page.getByRole('heading', { name: /You.re all set/i })).toBeVisible();
 
   const rows = await api.get(

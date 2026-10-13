@@ -6,6 +6,7 @@ import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
 import { notifyOperatorPaid, notifyOperatorPaymentMismatch, sendRichEmail } from '@/lib/notifications';
 import { checkPaidAmount } from '@/lib/payment-check';
 import { closePaymentAttempt, findPaymentAttempt, type PaymentAttempt } from '@/lib/payment-attempts';
+import { CARD_SETUP_PURPOSE, recordCardFromSession } from '@/lib/school-billing';
 import { receiptSubject, receiptHtml, receiptText, type ReceiptData } from '@/lib/receipt-email';
 
 /**
@@ -29,9 +30,13 @@ import { receiptSubject, receiptHtml, receiptText, type ReceiptData } from '@/li
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Next caches identical GET fetches (Supabase reads, Stripe lookups) even here, so a repeat
+// request can see a stale card status. Billing state must always be read live.
+export const fetchCache = 'force-no-store';
 
 type CheckoutSession = {
   id?: string;
+  mode?: string;
   payment_status?: string;
   amount_total?: number;
   currency?: string;
@@ -66,6 +71,22 @@ export async function POST(request: Request) {
   }
 
   const session = event.data?.object ?? {};
+
+  // A Tassy Scholar parent saved a card (setup mode). No money moved, so this is NOT a
+  // payment: it only records that a verified card is on file. Handled before the paid
+  // check because a setup session is never 'paid'.
+  if (session.mode === 'setup') {
+    if (session.metadata?.purpose !== CARD_SETUP_PURPOSE || !session.id) {
+      return NextResponse.json({ ok: true, ignored: 'setup session not ours' });
+    }
+    const saved = await recordCardFromSession(supabaseAdmin(), session.id);
+    if (!saved.ok && saved.retry) {
+      // Worth a retry: Stripe will send it again.
+      return NextResponse.json({ ok: false, error: 'Could not record card' }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, card: saved.ok ? 'recorded' : saved.reason });
+  }
+
   if (session.payment_status !== 'paid') {
     return NextResponse.json({ ok: true, ignored: 'session not paid' });
   }

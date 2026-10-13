@@ -304,6 +304,8 @@ export const schoolBookingSchema = z.object({
     email: z.string().trim().email('Please check the email address'),
     phone: z.string().trim().min(7, 'Please add a phone number we can reach you on'),
     home_address: z.string().trim().min(3, 'Please add your home address'),
+    /** Optional, unchecked by default. See PARENT_SMS_CONSENT_* in lib/sms-consent. */
+    sms_consent: z.boolean().optional(),
   }),
   child: z.object({
     first_name: z.string().trim().min(1, "Please add your child's first name"),

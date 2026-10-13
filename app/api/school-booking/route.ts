@@ -15,6 +15,7 @@ import { looksLikeTestIdentity } from '@/lib/test-data';
 import { parseLocalDateTime } from '@/lib/time';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { classifyHousehold, householdRequestHref } from '@/lib/school-household';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -82,6 +83,26 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { ok: false, error: 'Too many attempts. Please call us at (704) 941-8508.' },
       { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
+    );
+  }
+
+  /**
+   * The standard booking is one child, one address, one school, a standard
+   * schedule. A request that names any reason it is not -- or that omits the
+   * household confirmation altogether (schema, below) -- is NOT stored here.
+   * 409 carries the custom-request URL so a client can send the family there.
+   * Nothing is written, charged or reserved on this path.
+   */
+  const household = classifyHousehold(raw.household_reasons);
+  if (household.path === 'custom') {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'This booking is for one child, one school and one pickup address. Please send a custom household request instead.',
+        redirect: householdRequestHref(household.reasons, typeof raw.plan === 'string' ? raw.plan : null),
+      },
+      { status: 409 },
     );
   }
 

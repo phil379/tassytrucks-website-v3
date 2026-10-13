@@ -82,7 +82,7 @@ const verticals: Vertical[] = [
   },
   {
     slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
-    blurb: 'Moving students who need more than a bus since 2022 — special needs, McKinney-Vento, foster youth and at-risk routes. Same driver every morning, the schedule locked for the year, and you know who is picking your child up.',
+    blurb: 'Moving students who need more than a bus since 2022 — special needs, McKinney-Vento, foster youth and at-risk routes. We aim to provide consistent driver assignments whenever operationally possible, and your recurring schedule is reviewed and confirmed before service begins.',
     bullets: [
       'Four years of student transport · background-checked drivers',
       'Full year, chosen days, or after-school — from $839/month',

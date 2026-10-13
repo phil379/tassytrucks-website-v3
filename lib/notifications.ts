@@ -531,6 +531,68 @@ export async function notifyOperatorFacilitySignup(input: {
 }
 
 /**
+ * A family sent a Custom Household Request. Tell the operator.
+ *
+ * Never throws -- the row is already stored and an alert is only an alert.
+ * PII RULE: the push carries the reference and the number of children only.
+ * The email goes to OPERATOR_EMAIL (a mailbox we control) and carries detail.
+ *
+ * There is deliberately NO message to the family from here. The confirmation
+ * on screen is the acknowledgement; a follow-up email or text is a person's
+ * job once the request has been read, and sending one automatically would
+ * promise a response time nobody has agreed to.
+ */
+export async function notifyOperatorHouseholdRequest(input: {
+  id: string;
+  guardianName: string;
+  email: string;
+  phone: string;
+  childCount: number;
+  reasons: string[];
+  desiredStart: string;
+}): Promise<void> {
+  const ref = shortRef(input.id);
+  const message: PushMessage = {
+    title: 'NEW SCHOOL HOUSEHOLD REQUEST - review, do not quote yet',
+    body: `${input.childCount} child${input.childCount === 1 ? '' : 'ren'} - ref ${ref}`,
+    priority: 'high',
+    tags: ['school_satchel'],
+  };
+
+  const lines = [
+    'A family sent a Custom Household Request. It is PENDING REVIEW.',
+    'Nothing was booked, charged or promised: no reservation, no subscription, no price, no driver, no start date.',
+    '',
+    `Guardian:  ${input.guardianName}`,
+    `Email:     ${input.email}`,
+    `Mobile:    ${input.phone}`,
+    `Children:  ${input.childCount}`,
+    `Why here:  ${input.reasons.length ? input.reasons.join(', ') : 'chose the custom request directly'}`,
+    `Wants:     start around ${input.desiredStart}`,
+    `Reference: ${ref}`,
+    '',
+    'Bell times are not in the database -- check school start/dismissal by hand before offering a plan.',
+    `Review:    ${opsUrl()}`,
+  ].join('\n');
+
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    sendResendEmail({
+      to: process.env.OPERATOR_EMAIL ?? '',
+      subject: `School household request (${input.childCount} child${input.childCount === 1 ? '' : 'ren'}) - pending review`,
+      text: lines,
+    }),
+  ]);
+
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('[household-request] alert leg failed for', ref, r.reason);
+    }
+  }
+}
+
+/**
  * The money arrived. Tell the operator.
  *
  * Deliberately UNLIKE notifyOperatorUrgent: this NEVER throws. Its caller is

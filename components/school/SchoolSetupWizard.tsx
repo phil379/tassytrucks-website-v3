@@ -12,7 +12,6 @@ import {
   SCHOOL_POLICIES,
   STEP_TITLES,
   WEEKDAYS,
-  SIBLING_NOTE,
   SAFETY_NOTE_HINT,
   SAFETY_NOTE_LABEL,
   restoreStep,
@@ -74,9 +73,16 @@ type SchedForm = {
 export default function SchoolSetupWizard({
   plan,
   googleMapsApiKey,
+  standardHouseholdConfirmed,
 }: {
   plan: SchoolPlan;
   googleMapsApiKey: string | undefined;
+  /**
+   * True only when the parent has passed the household check in
+   * SchoolEligibilityGate (one child, one address, one school, standard
+   * schedule). Sent to the server, which refuses the booking without it.
+   */
+  standardHouseholdConfirmed: boolean;
 }) {
   const router = useRouter();
   // Restore a prior in-progress snapshot for THIS plan. Read once, on mount.
@@ -210,6 +216,7 @@ export default function SchoolSetupWizard({
             SCHOOL_POLICIES.map((p) => [p.key, { accepted: true as const, ts }]),
           ),
           starts_on: nextSchoolStart(),
+          standard_household_confirmed: standardHouseholdConfirmed,
           hp_token: '',
           elapsedMs: Date.now() - startedAt,
         }),

@@ -341,7 +341,7 @@ const CARD_FOR_LINE: Partial<Record<ServiceLine, Card>> = {
  */
 const QUOTE_ONLY_MESSAGE: Partial<Record<ServiceLine, string>> = {
   scholar:
-    'Tassy Scholar is priced per route for the school year, not per ride — how many children, how many stops, how far. Send the request and we will quote yours, including the sibling rate if you have more than one child at the same address.',
+    'Tassy Scholar is priced per route for the school year, not per ride — how many children, how many stops, how far. Send the request and we will quote yours.',
   wellness:
     'Send the request and a dispatcher will call you back with a price.',
   guardian:

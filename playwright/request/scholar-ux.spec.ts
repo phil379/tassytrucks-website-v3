@@ -192,6 +192,8 @@ const schoolBox = (page: import('@playwright/test').Page) =>
 /** The school picker lives on step 2, so step 1 has to be walked first. */
 async function openChildStep(page: import('@playwright/test').Page) {
   await page.goto('/school/book/full-year');
+  // One child, one school, one address: through the household check to the wizard.
+  await page.getByTestId('school-gate-continue').click();
   await page.locator('#parentFirst').fill('Dana');
   await page.locator('#parentLast').fill('Reed');
   await page.locator('#parentEmail').fill(`pw-addr-${Date.now()}@pw-school.invalid`);
@@ -265,6 +267,8 @@ test('the booking stores the school\'s own address, not a blank', async ({ page,
   const parentEmail = `pw-sch-addr-${Date.now()}@pw-school.invalid`;
 
   await page.goto('/school/book/full-year');
+  // One child, one school, one address: through the household check to the wizard.
+  await page.getByTestId('school-gate-continue').click();
   await page.locator('#parentFirst').fill('Dana');
   await page.locator('#parentLast').fill('Reed');
   await page.locator('#parentEmail').fill(parentEmail);

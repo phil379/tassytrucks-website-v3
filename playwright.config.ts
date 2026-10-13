@@ -90,6 +90,15 @@ export default defineConfig({
        * dashboard must show zero sends for the window.
        */
       RESEND_API_KEY: '',
+      /**
+       * NO REAL STRIPE CUSTOMERS FROM THE TEST SUITE.
+       *
+       * A Full Year booking now creates a Stripe customer and a card page. .env.local can hold
+       * a real key, so without this every school spec would write to the live account.
+       * Empty means stripeConfigured() is false and the booking simply skips the card step.
+       * The card specs use their own server (3945) pointed at a local fake.
+       */
+      STRIPE_SECRET_KEY: '',
       },
     },
     {
@@ -119,6 +128,29 @@ export default defineConfig({
          * hold the real key. Nothing here sends mail today, which is exactly
          * the state 3941 was in before a spec was added that did.
          */
+        RESEND_API_KEY: '',
+        /** Same reason as 3941: the webhook rig must never hold a real Stripe key. */
+        STRIPE_SECRET_KEY: '',
+      },
+    },
+    {
+      /**
+       * The card-on-file rig: a fake Stripe key and STRIPE_API_BASE pointing at
+       * playwright/support/stub-stripe.mjs on 3944, which the card spec starts itself.
+       * Nothing here can reach api.stripe.com.
+       */
+      command: 'bunx next start -p 3945',
+      port: 3945,
+      reuseExistingServer: true,
+      timeout: 60_000,
+      env: {
+        STRIPE_SECRET_KEY: 'sk_test_pw_stub_not_real',
+        STRIPE_API_BASE: 'http://127.0.0.1:3944/v1',
+        STRIPE_WEBHOOK_SECRET: 'whsec_pw_test_secret',
+        SCHOOL_BOOKING_RATE_LIMIT: '1000',
+        SCHOOL_CARD_RATE_LIMIT: '1000',
+        NTFY_TOPIC: 'pw-test-topic',
+        NTFY_BASE_URL: 'http://127.0.0.1:3942',
         RESEND_API_KEY: '',
       },
     },

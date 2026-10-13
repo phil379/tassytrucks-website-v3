@@ -224,7 +224,7 @@ test('a failed booking never says "You\'re all set"', async ({ page }) => {
   }
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.locator('input[type="checkbox"]').first().check();
-  await page.getByRole('button', { name: 'Confirm commitment' }).click();
+  await page.getByTestId('confirm-commitment').click();
 
   /**
    * Scoped by text: Next renders its own <div role="alert"

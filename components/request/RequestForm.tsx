@@ -1,5 +1,6 @@
 'use client';
 
+import { SMS_CONSENT_LABEL, SMS_CONSENT_DISCLOSURE } from '@/lib/sms-consent';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle2 } from 'lucide-react';
@@ -411,6 +412,7 @@ export default function RequestForm({
       contactPhone: String(fd.get('contactPhone') ?? ''),
       contactEmail: String(fd.get('contactEmail') ?? '') || null,
       preferredContact: String(fd.get('preferredContact') ?? 'phone'),
+      smsConsent: !facility && fd.get('smsConsent') === 'on',
       hp_token: String(fd.get('hp_token') ?? ''),
       elapsedMs: Date.now() - renderedAtRef.current,
       // Raw strings. The server re-validates them against the same spec and
@@ -964,6 +966,28 @@ export default function RequestForm({
           ))}
         </div>
       </fieldset>
+
+      {/* Text updates opt-in. Unchecked by default and never required. Hidden on a facility booking,
+          where the phone is the passenger's and a coordinator cannot consent for them. */}
+      {!facility && (
+        <div>
+          <label className="flex items-start gap-3 cursor-pointer min-h-[44px]">
+            <input
+              type="checkbox"
+              name="smsConsent"
+              data-testid="sms-consent"
+              className="mt-1 h-5 w-5 shrink-0"
+            />
+            <span className="text-sm">
+              <span className="font-medium">{SMS_CONSENT_LABEL}</span>
+              <span className="ink-soft block mt-1 text-xs leading-relaxed">
+                {SMS_CONSENT_DISCLOSURE}{' '}
+                <a href="/privacy" className="underline">Privacy</a> · <a href="/terms" className="underline">Terms</a>
+              </span>
+            </span>
+          </label>
+        </div>
+      )}
 
       {estimatesEnabled && (
         <div

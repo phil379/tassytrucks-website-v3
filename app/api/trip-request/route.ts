@@ -13,6 +13,7 @@ import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
+import { buildSmsConsent } from '@/lib/sms-consent';
 import { parseLocalDateTime } from '@/lib/time';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { resolvePayer } from '@/lib/facility.server';
@@ -203,7 +204,12 @@ export async function POST(request: Request) {
   // An empty object is stored as NULL, not as `{}`. A dispatcher scanning the
   // queue should be able to tell "this line asks nothing extra" from "they
   // answered nothing", and `{}` reads as neither.
-  const tripDetails = Object.keys(detailCheck.values).length > 0 ? detailCheck.values : null;
+  const validatedDetails = Object.keys(detailCheck.values).length > 0 ? detailCheck.values : null;
+  // Text-message opt-in. Ignored on a facility booking: there the phone is the PASSENGER's, and a
+  // coordinator ticking a box cannot consent for them. Merged AFTER validation because
+  // validateDetails() drops keys it does not know, which is right for answers and wrong here.
+  const smsConsent = wantsFacilityBooking ? null : buildSmsConsent(data.smsConsent, data.contactPhone);
+  const tripDetails = smsConsent ? { ...(validatedDetails ?? {}), ...smsConsent } : validatedDetails;
 
   // ───────────────────────────────────────────────────────── facility context
   //

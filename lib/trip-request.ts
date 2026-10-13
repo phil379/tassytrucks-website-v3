@@ -238,6 +238,13 @@ const tripRequestObject = z
     preferredContact: z.enum(PREFERRED_CONTACT).default('phone'),
 
     /**
+     * Optional, unchecked by default. See lib/sms-consent.ts. A strict boolean on purpose:
+     * z.coerce.boolean() would turn the string "false" into true, and a text sent to
+     * someone who said no is a TCPA problem, not a bug.
+     */
+    smsConsent: z.boolean().optional().default(false),
+
+    /**
      * The per-service answers, as raw strings off the form.
      *
      * Deliberately UNTYPED here. The shape depends on the service line, and the

@@ -75,11 +75,11 @@ test.describe("Phil's approved entry prices", () => {
       expect(b.cents, `rung ${i}`).toBeLessThan(CONCIERGE.bands[i]!.cents * 2);
     });
   });
-  test('Tassy Concierge starts at $69, not $79', () => {
-    expect(CONCIERGE.bands[0]!.cents).toBe(6900);
+  test('Tassy Concierge starts at $89 (lifted from $69 on 2026-09-30 to meet the market floor)', () => {
+    expect(CONCIERGE.bands[0]!.cents).toBe(8900);
   });
-  test('Winnie Ride is exactly $49 / $59 / $69 / $79 / $89', () => {
-    expect(WINNIE.bands.map((b) => b.cents)).toEqual([4900, 5900, 6900, 7900, 8900]);
+  test('Winnie Ride is exactly $59 / $79 / $89 / $99 / $109', () => {
+    expect(WINNIE.bands.map((b) => b.cents)).toEqual([5900, 7900, 8900, 9900, 10900]);
   });
   test('every band on every card is ascending, and none is free', () => {
     for (const card of [CARE, RECOVERY, CONCIERGE, WINNIE]) {
@@ -226,9 +226,11 @@ test.describe('bands', () => {
   });
 });
 
-test.describe('Care WAV is quoted, never priced', () => {
-  test('a wheelchair passenger on Tassy Care gets a quote, not a number', () => {
-    const q = asQuoteOnly(
+test.describe('Care WAV is priced on its own card', () => {
+  // Changed 2026-09-30: Care WAV is published, so a wheelchair passenger on
+  // Tassy Care gets a number from the WAV card, not a call-us message.
+  test('a wheelchair passenger on Tassy Care is priced on the Care WAV card', () => {
+    const q = asEstimate(
       estimateTrip({
         serviceLine: 'care',
         pickup: UPTOWN,
@@ -237,8 +239,7 @@ test.describe('Care WAV is quoted, never priced', () => {
         mobility: 'wheelchair',
       }),
     );
-    expect(q.reason).toBe('wheelchair');
-    expect(q.message).toContain('ramp-equipped');
+    expect(q.cardLabel).toBe('Tassy Care WAV');
   });
   test('an ambulatory passenger on the same trip gets a price', () => {
     const q = asEstimate(
@@ -291,7 +292,7 @@ test.describe('Recovery and Concierge are different products', () => {
         returnTrip: true,
       }),
     );
-    expect(one.lowCents).toBe(6900);
+    expect(one.lowCents).toBe(8900);
     expect(two.lowCents).toBe(one.lowCents * 2);
     expect(one.waitIncludedMin).toBe(0);
   });
@@ -322,7 +323,7 @@ test.describe('round trips', () => {
     );
     expect(two.lowCents).toBe(one.lowCents * 2);
   });
-  test('Winnie round trip is $89 on the entry band, with a longer wait', () => {
+  test('Winnie round trip is $106 on the entry band (1.8 x $59), with a longer wait', () => {
     const q = asEstimate(
       estimateTrip({
         serviceLine: 'pet',
@@ -332,7 +333,7 @@ test.describe('round trips', () => {
         returnTrip: true,
       }),
     );
-    expect(q.lowCents).toBe(8900);
+    expect(q.lowCents).toBe(10600);
     expect(q.waitIncludedMin).toBe(20);
   });
   test('a Winnie round trip is cheaper than two one-ways', () => {
@@ -648,8 +649,8 @@ test.describe('measured driving distance', () => {
         requestedAt: WEEKDAY_MIDDAY,
       }),
     );
-    expect(stadium.lowCents).toBe(6900);
-    expect(pruitt.lowCents).toBe(5900);
+    expect(stadium.lowCents).toBe(8900);
+    expect(pruitt.lowCents).toBe(7900);
     expect(stadium.lowCents).toBeGreaterThan(pruitt.lowCents);
   });
 

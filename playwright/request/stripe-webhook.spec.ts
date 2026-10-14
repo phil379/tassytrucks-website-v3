@@ -221,6 +221,7 @@ test('a replayed session changes nothing and does not alert again', async ({ req
 /* ── the unmatched session ────────────────────────────────────────────────── */
 
 test('a session matching no request is acknowledged, not retried', async ({ request }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (the handler looks the request up and answers 500 without them)');
   const body = paidSession({ metadata: { trip_request_id: '00000000-0000-0000-0000-000000000000' } });
   const res = await request.post(`${WEBHOOK_ORIGIN}/api/stripe/webhook`, {
     headers: { 'stripe-signature': sign(body), 'Content-Type': 'application/json' },

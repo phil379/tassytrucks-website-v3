@@ -104,6 +104,7 @@ test('the type-ahead resolves a real school', async ({ request }) => {
 });
 
 test('the lookup degrades to empty rather than erroring', async ({ request }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (the route answers 503 without them)');
   // A reference list must never be able to break the form. Short, empty and
   // hostile inputs all answer 200 with a list.
   for (const q of ['', 'a', '%', '*', "'); drop table schools;--", '()']) {

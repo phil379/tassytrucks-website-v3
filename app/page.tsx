@@ -190,15 +190,17 @@ export default function HomePage() {
                 {/* FIX_PROD_132 — bare semantic icon + hairline gold accent (was a
                     placeholder letter chip). Per-service one-shot hover animation. */}
                 {v.image ? (
-                  <Image
-                    src={v.image.src}
-                    alt={v.image.alt}
-                    width={v.image.width}
-                    height={v.image.height}
-                    sizes="(min-width: 1024px) 280px, 240px"
-                    className={`svc-icon svc-mascot ${v.anim}`}
-                    priority={false}
-                  />
+                  <div className="svc-slot">
+                    <Image
+                      src={v.image.src}
+                      alt={v.image.alt}
+                      width={v.image.width}
+                      height={v.image.height}
+                      sizes="(min-width: 1024px) 280px, 240px"
+                      className={`svc-icon svc-mascot ${v.image.width > v.image.height ? 'svc-mascot--wide' : ''} ${v.anim}`}
+                      priority={false}
+                    />
+                  </div>
                 ) : (
                   <v.Icon
                     size={32}

@@ -250,7 +250,11 @@ export const CONCIERGE: Card = {
   ],
   waitIncludedMin: 0,
   waitOverage: 3500,
-  perExtra: 1500,
+  // Phil 2026-10-14: no per-person charge on Concierge. The car is a black
+  // sedan or black SUV and the card price covers everyone who fits in it, the
+  // way a black fare does elsewhere. Nobody should be billed $15 for a spouse
+  // or a child on the way to dinner. Groups over the seats: call us.
+  perExtra: 0,
   returnFactor: 2,
   returnFloor: 0,
 };

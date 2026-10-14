@@ -211,7 +211,8 @@ export default function PricingPage() {
                 </li>
                 <li>
                   Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care,{' '}
-                  <strong className="text-cream-text">+$15</strong> on Recovery and Concierge
+                  <strong className="text-cream-text">+$15</strong> on Recovery. Tassy Concierge has no
+                  per-person charge: the price covers everyone who fits in the car.
                 </li>
                 <li>
                   Tassy Escort on Recovery: <strong className="text-cream-text">+$45</strong> — your

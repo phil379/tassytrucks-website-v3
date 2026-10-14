@@ -491,6 +491,22 @@ test.describe('extra passengers', () => {
     );
     expect(three.lowCents - one.lowCents).toBe(2 * CARE.perExtra);
   });
+
+  test('Concierge has no per-person charge: the card price covers the car', () => {
+    const quote = (passengers: number) =>
+      asEstimate(
+        estimateTrip({
+          serviceLine: 'concierge',
+          pickup: UPTOWN,
+          dropoff: CMC,
+          requestedAt: WEEKDAY_MIDDAY,
+          passengers,
+        }),
+      );
+    expect(CONCIERGE.perExtra).toBe(0);
+    expect(quote(5).lowCents).toBe(quote(1).lowCents);
+    expect(quote(5).highCents).toBe(quote(1).highCents);
+  });
 });
 
 test.describe('it never quotes what it cannot measure', () => {

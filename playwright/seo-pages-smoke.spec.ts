@@ -14,7 +14,7 @@ type PageSpec = {
 
 const PAGES: PageSpec[] = [
   // MEGA_SEO_001
-  { path: '/partners', h1: 'partner with tassy transportation', cta: ['facility/signup', 'source=partners-page'] },
+  { path: '/partners', h1: 'partner with tassy transportation', cta: ['partners/signup', 'source=partners-page'] },
   { path: '/charlotte/nemt-rides', h1: 'nemt in charlotte', cta: ['service=care', 'utm_source=seo-nemt'] },
   { path: '/charlotte/dialysis-transport', h1: 'dialysis transport in charlotte', cta: ['service=care', 'utm_source=seo-dialysis', 'recurring=1'] },
   { path: '/charlotte/post-surgery-transport', h1: 'post-surgery transport in charlotte', cta: ['service=recovery', 'utm_source=seo-postop'] },
@@ -25,7 +25,7 @@ const PAGES: PageSpec[] = [
   { path: '/charlotte/family-medical-rides', h1: 'request a medical ride for someone else', cta: ['service=care', 'utm_source=seo-family'] },
   { path: '/compare/tassy-vs-uber-health-vs-lyft-healthcare', h1: 'uber health', cta: ['service=care', 'utm_source=seo-compare'], table: true },
   // MEGA_SEO_002
-  { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['facility/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
+  { path: '/partners/veterinary', h1: 'partner with winnie ride', cta: ['partners/signup', 'source=vet-partners', 'type=veterinary'], winnie: true },
   { path: '/charlotte/pet-transport', h1: 'pet transport in charlotte', cta: ['service=winnie', 'utm_source=seo-pet'], winnie: true },
   { path: '/charlotte/vet-appointment-rides', h1: 'rides to the vet in charlotte', cta: ['service=winnie', 'utm_source=seo-vet', 'purpose=vet'], winnie: true },
   { path: '/charlotte/post-surgery-pet-transport', h1: 'post-surgery pet transport in charlotte', cta: ['service=winnie', 'utm_source=seo-postop', 'sedated=1'], winnie: true },
@@ -80,13 +80,14 @@ for (const spec of PAGES) {
       const href = await page
         .locator('[data-testid="primary-cta"]')
         .getAttribute('href');
-      // Ride CTAs now point at the in-repo request pipeline. The B2B facility
-      // CTAs still deep-link into the SaaS signup, which is unchanged.
+      // Ride CTAs point at the in-repo request pipeline. Partner (B2B) CTAs
+      // point at the in-repo /partners/signup form, which replaced the deep
+      // link into the SaaS signup.
       const isRideCta = (href ?? '').startsWith('/request');
-      const isFacilityCta = (href ?? '').includes('tassytrucksops.vercel.app/facility/signup');
+      const isFacilityCta = (href ?? '').startsWith('/partners/signup');
       expect(
         isRideCta || isFacilityCta,
-        `CTA is a /request link or a facility signup link — got ${href}`,
+        `CTA is a /request link or a partner signup link — got ${href}`,
       ).toBe(true);
 
       for (const fragment of spec.cta) {

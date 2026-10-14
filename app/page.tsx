@@ -190,7 +190,7 @@ export default function HomePage() {
                     alt={v.image.alt}
                     width={v.image.width}
                     height={v.image.height}
-                    sizes="(min-width: 1024px) 220px, 180px"
+                    sizes="(min-width: 1024px) 200px, 170px"
                     className={`svc-icon svc-mascot ${v.anim}`}
                     priority={false}
                   />

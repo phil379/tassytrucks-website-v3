@@ -13,14 +13,15 @@ test('heading reads Six lines of care', async ({ page }) => {
   ).toContainText('Six lines of care');
 });
 
-test('6th card is Tassy Scholar with EverDriven context', async ({ page }) => {
+test('6th card is Tassy Scholar and links to the plans page', async ({ page }) => {
   await page.goto('/');
   const card = page.locator('#services a.card-tile').nth(5);
   await expect(card).toContainText('Tassy Scholar');
-  await expect(card).toContainText('EverDriven');
+  // The card no longer names the district contractor (EverDriven) and no longer
+  // advertises a route quote: it sells family plans. Price is not asserted here
+  // on purpose, so a price change does not break a layout test.
   await expect(card).toContainText('2022');
-  await expect(card).toContainText('5 metros');
-  await expect(card).toContainText('Get a route quote');
+  await expect(card).toContainText('See plans and pricing');
   await expect(card).toHaveAttribute('href', '/school');
 });
 

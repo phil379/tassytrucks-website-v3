@@ -33,6 +33,12 @@ import { canBook } from '@/lib/facility';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const dbConfigured = Boolean(SUPABASE_URL && SERVICE_KEY);
+// Facility sessions are read with the public Supabase settings, which are baked in at build time.
+// Without them /facility/* fails closed with an error page instead of redirecting, so these two
+// gate tests only mean something when the build had them.
+const sessionsConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+);
 
 const TEST_DOMAIN = 'pw-facility.invalid';
 const h = () => ({ apikey: SERVICE_KEY!, Authorization: `Bearer ${SERVICE_KEY!}` });
@@ -174,12 +180,14 @@ test.afterAll(async ({ playwright }) => {
 // ── The gate ─────────────────────────────────────────────────────────────────
 
 test('the wizard is not reachable without a session', async ({ page }) => {
+  test.skip(!sessionsConfigured, 'needs NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY at build time');
   await page.goto('/facility/welcome');
   await expect(page).toHaveURL(/\/facility\/link-expired/);
   await expect(page.getByRole('heading', { name: /link has expired/i })).toBeVisible();
 });
 
 test('confirm rejects a missing or bogus token without leaking why', async ({ page }) => {
+  test.skip(!sessionsConfigured, 'needs NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY at build time');
   for (const url of [
     '/facility/confirm',
     '/facility/confirm?token_hash=not-a-real-token&type=magiclink',

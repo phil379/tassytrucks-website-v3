@@ -30,7 +30,7 @@
  *     aggregates by line instead of showing hundreds of one-off products.
  *   • The Tassy Scholar PRICES — the one part of the catalog that is genuinely
  *     fixed:
- *       scholar_full_year_monthly       $839/mo  recurring (a real subscription)
+ *       scholar_full_year_monthly       $850/mo  recurring (a real subscription)
  *       scholar_weekly_per_ride         $24      one-time unit, billed monthly ×N
  *       scholar_after_school_per_ride   $26      one-time unit, billed monthly ×N
  *
@@ -132,7 +132,7 @@ const SCHOLAR_PRICES: ReadonlyArray<{
   nickname: string;
   recurring_interval?: 'month';
 }> = [
-  { lookup_key: 'scholar_full_year_monthly', unit_amount: 83900, nickname: 'Scholar Full Year — $839/mo', recurring_interval: 'month' },
+  { lookup_key: 'scholar_full_year_monthly', unit_amount: 85000, nickname: 'Scholar Full Year — $850/mo', recurring_interval: 'month' },
   { lookup_key: 'scholar_weekly_per_ride', unit_amount: 2400, nickname: 'Scholar Weekly — $24 per ride' },
   { lookup_key: 'scholar_after_school_per_ride', unit_amount: 2600, nickname: 'Scholar After-School — $26 per ride' },
 ];

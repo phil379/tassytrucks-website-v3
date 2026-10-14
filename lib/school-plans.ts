@@ -57,8 +57,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Annual subscription · biggest per-ride discount',
     badge: 'Best value',
-    price: '$839 / month',
-    priceNote: '$21 per ride · AM + PM every school day',
+    price: '$850 / month',
+    priceNote: '$21.25 per ride · AM + PM every school day',
   },
   {
     key: 'weekly_pattern',
@@ -117,8 +117,11 @@ export function planBySlug(slug: string): SchoolPlan | undefined {
  *      one-way leg. That is DISTRICT money for mandated transport, not what a
  *      family pays out of pocket. It is the ceiling of a different market.
  *
- * $839/month = 40 rides at $21. Break-even on those 40 rides is $651, so the
- * plan clears roughly $107/month per child.
+ * $850/month = 40 rides at $21.25 (Phil, 2026-10-14; was $839 at $21). The
+ * break-even figure below, $651 for 40 rides, was worked out at $839 and has
+ * not been redone: at $850 the plan clears roughly $11 a month more per child.
+ * Whether $850 still holds with leg length and insurance is the open Scholar
+ * margin decision, so treat this price as Phil's call and not a derived one.
  *
  * THE SIBLING RATE IS THE REAL MARGIN. A second child in a car that is already
  * making the trip costs nothing extra -- no second driver, no second insurance

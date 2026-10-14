@@ -40,7 +40,8 @@ type Vertical = {
   Icon: LucideIcon;
   /** FIX_PROD_132 — per-service one-shot hover animation class (see globals.css). */
   anim: string;
-  /** Optional mascot illustration shown in place of the line icon (Winnie). */
+  /** Illustration shown in place of the line icon (Phil's set, 2026-10-14). The
+      lucide Icon stays as the typed fallback for any card without one. */
   image?: { src: string; alt: string; width: number; height: number };
 };
 
@@ -54,6 +55,7 @@ const verticals: Vertical[] = [
     ],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,
+    image: { src: '/brand/care-mascot.webp', alt: 'A heart with a steady heartbeat line', width: 960, height: 593 },
   },
   {
     slug: '/recover', name: 'Tassy Recovery', Icon: Shield, anim: 'svc-anim--shield',
@@ -61,6 +63,7 @@ const verticals: Vertical[] = [
     bullets: ['From $129 — there, the wait, and home', 'One pharmacy stop included'],
     cta: 'Book your ride home',
     bookHref: request.recover,
+    image: { src: '/brand/recovery-mascot.webp', alt: 'A heart with crossed bandages', width: 960, height: 706 },
   },
   {
     slug: '/vip', name: 'Tassy Concierge', Icon: Sparkles, anim: 'svc-anim--spark',
@@ -68,11 +71,11 @@ const verticals: Vertical[] = [
     bullets: ['Flat rates from $89 — no surge, ever', 'Full-size SUV, room for luggage'],
     cta: 'Reserve a car',
     bookHref: request.vip,
+    image: { src: '/brand/concierge-mascot.webp', alt: 'A plane, a golf flag and a martini glass', width: 960, height: 678 },
   },
   {
     slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
-    // Winnie herself, drawn from Phil's photo (2026-10-14). The paw icon stays
-    // as the typed fallback; the card renders the illustration when present.
+    // Winnie herself, drawn from Phil's photo (2026-10-14).
     image: { src: '/brand/winnie-mascot.webp', alt: 'Winnie, the Tassy French bulldog, in reindeer antlers', width: 960, height: 1036 },
     blurb: 'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
     bullets: ['From $59 one way, $106 there and back', 'Carrier or harness included'],
@@ -85,6 +88,7 @@ const verticals: Vertical[] = [
     bullets: ['Concierge from $89 one way', 'Recovery from $129 both ways'],
     cta: 'See which one you need',
     bookHref: request.renew,
+    image: { src: '/brand/wellness-mascot.webp', alt: 'A lotus flower under a water drop', width: 960, height: 687 },
   },
   {
     slug: '/school', name: 'Tassy Scholar', Icon: GraduationCap, anim: 'svc-anim--cap',
@@ -95,6 +99,7 @@ const verticals: Vertical[] = [
     ],
     cta: 'See plans and pricing',
     bookHref: request.school,
+    image: { src: '/brand/scholar-mascot.webp', alt: 'A graduation cap over an open book', width: 960, height: 637 },
   },
 ];
 
@@ -190,7 +195,7 @@ export default function HomePage() {
                     alt={v.image.alt}
                     width={v.image.width}
                     height={v.image.height}
-                    sizes="(min-width: 1024px) 200px, 170px"
+                    sizes="(min-width: 1024px) 280px, 240px"
                     className={`svc-icon svc-mascot ${v.anim}`}
                     priority={false}
                   />

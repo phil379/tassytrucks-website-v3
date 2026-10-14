@@ -85,7 +85,7 @@ const verticals: Vertical[] = [
     blurb: 'Moving students who need more than a bus since 2022 — special needs, McKinney-Vento, foster youth and at-risk routes. Same driver every morning, the schedule locked for the year, and you know who is picking your child up.',
     bullets: [
       'Four years of student transport · background-checked drivers',
-      'Full year, chosen days, or after-school — from $839/month',
+      'Full year, chosen days, or after-school — from $850/month',
     ],
     cta: 'See plans and pricing',
     bookHref: request.school,

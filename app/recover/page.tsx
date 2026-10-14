@@ -5,7 +5,7 @@ import { request } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Tassy Recovery — ride home after surgery or sedation | Charlotte',
   description:
-    'Charlotte rides home after outpatient surgery, sedation, dental work or a hospital discharge. We meet you at the discharge desk, wait, and take you home. From $145, both directions.',
+    'Charlotte rides home after outpatient surgery, sedation, dental work or a hospital discharge. We meet you at the discharge desk, wait, and take you home. From $129, both directions.',
   alternates: { canonical: '/recover' },
   openGraph: { url: '/recover', images: ['/og-image/recover'] },
 };
@@ -28,7 +28,7 @@ export default function RecoverPage() {
       eyebrow="Tassy Recovery · After a procedure"
       title="They won't discharge you without someone to take you home."
       tagline="We come inside and wait."
-      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Your Tassy driver comes to the discharge desk, waits while the paperwork catches up, and takes you home — with one pharmacy stop on the way. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $145."
+      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Your Tassy driver comes to the discharge desk, waits while the paperwork catches up, and takes you home — with one pharmacy stop on the way. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $129."
       bookHref={request.recover}
       bookLabel="Book your ride home"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
@@ -68,14 +68,14 @@ export default function RecoverPage() {
       tiers={[
         {
           name: 'Up to 3 miles',
-          price: '$145',
+          price: '$129',
           cadence: 'there, the wait, and home',
           features: ['Pickup at the discharge desk', '20 minutes of wait included', 'One pharmacy stop', 'Same driver both ways'],
           cta: { label: 'Book this', href: request.recover },
         },
         {
           name: '4 to 12 miles',
-          price: '$170–190',
+          price: '$149–169',
           cadence: 'there, the wait, and home',
           features: ['Everything above', 'Full-size SUV', 'Wheelchair to the car and to your door', 'Family text on pickup and arrival'],
           cta: { label: 'Book this', href: request.recover },
@@ -83,7 +83,7 @@ export default function RecoverPage() {
         },
         {
           name: '13 to 30 miles',
-          price: '$220–295',
+          price: '$195–259',
           cadence: 'there, the wait, and home',
           features: ['Everything above', 'Longer routes across Mecklenburg', 'Extra wait $35 per half hour, quoted first', 'Over 30 miles, call us'],
           cta: { label: 'Book this', href: request.recover },

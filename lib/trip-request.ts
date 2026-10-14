@@ -133,6 +133,11 @@ export function mobilityLabelFor(service: string): string {
 }
 
 /** "Passengers" is the wrong noun for a crate of cats. */
+/** Most riders one booking can carry. Concierge is a black sedan or SUV: 6, then call us. */
+export function maxPassengersFor(service: string): number {
+  return service === 'concierge' ? 6 : 8;
+}
+
 export function passengerLabelFor(service: string): string {
   return isPetLine(service) ? 'Pets' : 'Passengers';
 }
@@ -302,6 +307,16 @@ const tripRequestObject = z
         code: 'custom',
         path: ['contactEmail'],
         message: 'Add an email address, or choose phone or text instead',
+      });
+    }
+
+    // Concierge carries up to 6 riders (Phil, 2026-10-14). The form caps the
+    // input, but a hand-built POST could still send 8.
+    if (data.serviceLine === 'concierge' && (data.passengers ?? 1) > 6) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['passengers'],
+        message: 'Call us for groups over 6',
       });
     }
 

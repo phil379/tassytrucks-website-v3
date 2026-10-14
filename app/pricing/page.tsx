@@ -11,7 +11,7 @@ import { SCHOOL_PLANS, SIBLING_NOTE } from '@/lib/school-plans';
 export const metadata: Metadata = {
   title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
   description:
-    'Charlotte medical, pet and premium transport priced by distance, not by meter. Tassy Care from $49, Recovery from $145, Concierge from $89, Winnie Ride from $59. No surge.',
+    'Charlotte medical, pet and premium transport priced by distance, not by meter. Tassy Care from $49, Recovery from $129, Concierge from $89, Winnie Ride from $59. No surge.',
   alternates: { canonical: '/pricing' },
   openGraph: { url: '/pricing', images: ['/og-image/pricing'] },
 };
@@ -210,9 +210,9 @@ export default function PricingPage() {
                   <strong className="text-cream-text">+$45</strong>, in place of the weekend charge
                 </li>
                 <li>
-                  Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care,{' '}
-                  <strong className="text-cream-text">+$15</strong> on Recovery. Tassy Concierge has no
-                  per-person charge: the price covers everyone who fits in the car.
+                  Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care.
+                  Recovery and Tassy Concierge have no per-person charge: the price covers everyone
+                  riding with you (Concierge seats up to 6; larger groups, call us).
                 </li>
                 <li>
                   Tassy Escort on Recovery: <strong className="text-cream-text">+$45</strong> — your

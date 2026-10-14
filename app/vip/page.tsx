@@ -61,7 +61,7 @@ export default function VipPage() {
           name: '18 to 30 miles',
           price: '$155–185',
           cadence: 'one way',
-          features: ['Everything above', 'Longer runs across the metro', 'Everyone in the car included, no per-person charge', 'Over 30 miles, call us'],
+          features: ['Everything above', 'Longer runs across the metro', 'Up to 6 riders included, no per-person charge', 'Over 30 miles, call us'],
           cta: { label: 'Reserve this', href: request.vip },
         },
       ]}

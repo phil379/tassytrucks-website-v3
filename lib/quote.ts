@@ -23,7 +23,7 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
  * ─────────────────────────────────────────────────────────────────────────────
  *   Tassy Care        one way, ambulatory medical              from $49
  *   Tassy Care WAV    wheelchair — QUOTED, not published        see below
- *   Tassy Recovery    round trip + wait, after a procedure     from $145
+ *   Tassy Recovery    round trip + wait, after a procedure     from $129
  *   Tassy Concierge   one way, premium, nothing medical        from $69
  *   Winnie Ride       pet transport, owner not travelling      from $49
  *   Tassy Scholar     by the route, billed monthly            quoted
@@ -185,29 +185,31 @@ export const CARE: Card = {
  * the scheduled time, so the 20 minutes is a buffer that is rarely spent.
  */
 /**
- * RECOVERY LAUNCH LADDER, Phil 2026-10-14 (was 129/149/169/195/225/259).
+ * RECOVERY PRICES HELD AT LAUNCH, Phil 2026-10-14.
  *
- * About 13% higher, rounded to the nearest $5. It was the one price that read
- * low against the market and against Uber's own ladder, and the driver share
- * moves from 55% to 60% with it (pay_rates, separate migration), so the extra
- * goes to the driver: at 13-17 miles the driver earns about $132 instead of
- * $107 and Tassy keeps about $70, the same dollars as before. Every band stays
- * below the Concierge round trip. A second step to 160/185/210/240/275/320
- * (driver 62%) is held for after proof; do not make it without a decision.
+ * Bands are the published card (129/149/169/195/225/259). A higher ladder
+ * (145/170/190/220/255/295) was drafted and NOT taken: Phil chose to launch at
+ * today's prices and review about 90 days after go-live, on evidence (trips
+ * completed, facility feedback, on-time, trips turned away). Do not raise
+ * without a decision. Driver share is capped at 55% (PAY_04).
+ *
+ * No per-person charge on Recovery either (Phil, 2026-10-14): the patient's
+ * companion rides home with them, and a $15 line on a discharge day is the
+ * wrong note. Tassy Escort (+$45) is a different product and is unchanged.
  */
 export const RECOVERY: Card = {
   label: 'Tassy Recovery',
   bands: [
-    { upToMiles: 3, cents: 14500 },
-    { upToMiles: 7, cents: 17000 },
-    { upToMiles: 12, cents: 19000 },
-    { upToMiles: 17, cents: 22000 },
-    { upToMiles: 22, cents: 25500 },
-    { upToMiles: 30, cents: 29500 },
+    { upToMiles: 3, cents: 12900 },
+    { upToMiles: 7, cents: 14900 },
+    { upToMiles: 12, cents: 16900 },
+    { upToMiles: 17, cents: 19500 },
+    { upToMiles: 22, cents: 22500 },
+    { upToMiles: 30, cents: 25900 },
   ],
   waitIncludedMin: 20,
   waitOverage: 3500,
-  perExtra: 1500,
+  perExtra: 0,
   returnFactor: 1,
   returnFloor: 0,
 };
@@ -253,7 +255,7 @@ export const CONCIERGE: Card = {
   // Phil 2026-10-14: no per-person charge on Concierge. The car is a black
   // sedan or black SUV and the card price covers everyone who fits in it, the
   // way a black fare does elsewhere. Nobody should be billed $15 for a spouse
-  // or a child on the way to dinner. Groups over the seats: call us.
+  // or a child on the way to dinner. Up to 6 riders; larger groups call us.
   perExtra: 0,
   returnFactor: 2,
   returnFloor: 0,

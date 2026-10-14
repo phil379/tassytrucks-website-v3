@@ -15,6 +15,7 @@ import {
   mobilityLabel,
   mobilityLabelFor,
   mobilityOptionsFor,
+  maxPassengersFor,
   passengerLabelFor,
   tripRequestSchema,
   type ServiceLine,
@@ -735,9 +736,9 @@ export default function RequestForm({
             {...fieldProps('passengers')}
             type="number"
             min={1}
-            max={8}
-            value={passengers}
-            onChange={(e) => setPassengers(Math.max(1, Math.min(8, Number(e.target.value) || 1)))}
+            max={maxPassengersFor(service)}
+            value={Math.min(passengers, maxPassengersFor(service))}
+            onChange={(e) => setPassengers(Math.max(1, Math.min(maxPassengersFor(service), Number(e.target.value) || 1)))}
           />
           <FieldError name="passengers" />
         </div>

@@ -63,12 +63,12 @@ test.describe("Phil's approved entry prices", () => {
   test('Tassy Care starts at $49', () => {
     expect(CARE.bands[0]!.cents).toBe(4900);
   });
-  test('Tassy Recovery starts at $145 and includes 20 minutes of wait', () => {
-    expect(RECOVERY.bands[0]!.cents).toBe(14500);
+  test('Tassy Recovery starts at $129 and includes 20 minutes of wait', () => {
+    expect(RECOVERY.bands[0]!.cents).toBe(12900);
     expect(RECOVERY.waitIncludedMin).toBe(20);
   });
-  test('the Recovery launch ladder is exactly $145 / $170 / $190 / $220 / $255 / $295', () => {
-    expect(RECOVERY.bands.map((b) => b.cents)).toEqual([14500, 17000, 19000, 22000, 25500, 29500]);
+  test('Recovery is held at the published card: $129 / $149 / $169 / $195 / $225 / $259', () => {
+    expect(RECOVERY.bands.map((b) => b.cents)).toEqual([12900, 14900, 16900, 19500, 22500, 25900]);
   });
   test('every Recovery band stays below the matching Concierge round trip', () => {
     RECOVERY.bands.forEach((b, i) => {
@@ -490,6 +490,21 @@ test.describe('extra passengers', () => {
       }),
     );
     expect(three.lowCents - one.lowCents).toBe(2 * CARE.perExtra);
+  });
+
+  test('Recovery has no per-person charge', () => {
+    const quote = (passengers: number) =>
+      asEstimate(
+        estimateTrip({
+          serviceLine: 'recovery',
+          pickup: UPTOWN,
+          dropoff: CMC,
+          requestedAt: WEEKDAY_MIDDAY,
+          passengers,
+        }),
+      );
+    expect(RECOVERY.perExtra).toBe(0);
+    expect(quote(3).lowCents).toBe(quote(1).lowCents);
   });
 
   test('Concierge has no per-person charge: the card price covers the car', () => {

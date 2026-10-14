@@ -200,11 +200,19 @@ export default function PricingPage() {
             <div>
               <h2 className="serif text-2xl font-semibold">What can change the price</h2>
               <ul className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
-                <li>Before 6am or after 8pm: <strong className="text-cream-text">+$25</strong></li>
+                <li>
+                  Before 6am or after 8pm: <strong className="text-cream-text">+$25</strong>
+                  {' '}(not on Tassy Concierge)
+                </li>
                 <li>Weekends: <strong className="text-cream-text">+$20</strong></li>
                 <li>
-                  Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care,{' '}
-                  <strong className="text-cream-text">+$15</strong> on Recovery and Concierge
+                  New Year&apos;s Day, Memorial Day, July 4, Labor Day, Thanksgiving and Christmas Day:{' '}
+                  <strong className="text-cream-text">+$45</strong>, in place of the weekend charge
+                </li>
+                <li>
+                  Extra passenger: <strong className="text-cream-text">+$10</strong> on Tassy Care.
+                  Recovery and Tassy Concierge have no per-person charge: the price covers everyone
+                  riding with you (Concierge seats up to 6; larger groups, call us).
                 </li>
                 <li>
                   Tassy Escort on Recovery: <strong className="text-cream-text">+$45</strong> — your

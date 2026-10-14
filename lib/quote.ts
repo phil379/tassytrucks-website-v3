@@ -184,6 +184,19 @@ export const CARE: Card = {
  * happens. The operating fix is to dispatch on the facility's call rather than
  * the scheduled time, so the 20 minutes is a buffer that is rarely spent.
  */
+/**
+ * RECOVERY PRICES HELD AT LAUNCH, Phil 2026-10-14.
+ *
+ * Bands are the published card (129/149/169/195/225/259). A higher ladder
+ * (145/170/190/220/255/295) was drafted and NOT taken: Phil chose to launch at
+ * today's prices and review about 90 days after go-live, on evidence (trips
+ * completed, facility feedback, on-time, trips turned away). Do not raise
+ * without a decision. Driver share is capped at 55% (PAY_04).
+ *
+ * No per-person charge on Recovery either (Phil, 2026-10-14): the patient's
+ * companion rides home with them, and a $15 line on a discharge day is the
+ * wrong note. Tassy Escort (+$45) is a different product and is unchanged.
+ */
 export const RECOVERY: Card = {
   label: 'Tassy Recovery',
   bands: [
@@ -196,7 +209,7 @@ export const RECOVERY: Card = {
   ],
   waitIncludedMin: 20,
   waitOverage: 3500,
-  perExtra: 1500,
+  perExtra: 0,
   returnFactor: 1,
   returnFloor: 0,
 };
@@ -239,7 +252,11 @@ export const CONCIERGE: Card = {
   ],
   waitIncludedMin: 0,
   waitOverage: 3500,
-  perExtra: 1500,
+  // Phil 2026-10-14: no per-person charge on Concierge. The car is a black
+  // sedan or black SUV and the card price covers everyone who fits in it, the
+  // way a black fare does elsewhere. Nobody should be billed $15 for a spouse
+  // or a child on the way to dinner. Up to 6 riders; larger groups call us.
+  perExtra: 0,
   returnFactor: 2,
   returnFloor: 0,
 };
@@ -482,7 +499,44 @@ function quoteOnlyMessage(serviceLine: ServiceLine, mobility?: string | null): s
 export const SURCHARGES = {
   afterHours: 2500,
   weekend: 2000,
+  /**
+   * Added 2026-10-14. A flat charge on six major holidays, IN PLACE OF the
+   * weekend charge (a holiday that lands on a Saturday is charged once, at the
+   * holiday rate). After hours still stacks. Local operators publish it:
+   * Charlotte Metro Transportation $175 holiday vs $120 weekday ($55 more) and
+   * Medical Transportation of America +$30 on Sundays and holidays; the
+   * national template page shows +50% to +100%. $45 sits in the local range
+   * and matches the escort price, so the pricing page stays one flat list.
+   */
+  holiday: 4500,
 } as const;
+
+/** Day of month of the nth `weekday` (0 = Sun) in a month; n = -1 means the last. */
+function nthWeekdayOfMonth(year: number, month: number, weekday: number, n: number): number {
+  if (n > 0) {
+    const firstDow = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+    return 1 + ((weekday - firstDow + 7) % 7) + (n - 1) * 7;
+  }
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const lastDow = new Date(Date.UTC(year, month - 1, lastDay)).getUTCDay();
+  return lastDay - ((lastDow - weekday + 7) % 7);
+}
+
+/**
+ * The holiday this local calendar date falls on, or null. Six days only:
+ * New Year's Day, Memorial Day, Independence Day, Labor Day, Thanksgiving and
+ * Christmas Day. The actual date is used, not the "observed" Friday or Monday.
+ * Extending the list is a pricing decision, not a code fix.
+ */
+export function holidayName(year: number, month: number, day: number): string | null {
+  if (month === 1 && day === 1) return "New Year's Day";
+  if (month === 5 && day === nthWeekdayOfMonth(year, 5, 1, -1)) return 'Memorial Day';
+  if (month === 7 && day === 4) return 'Independence Day';
+  if (month === 9 && day === nthWeekdayOfMonth(year, 9, 1, 1)) return 'Labor Day';
+  if (month === 11 && day === nthWeekdayOfMonth(year, 11, 4, 4)) return 'Thanksgiving Day';
+  if (month === 12 && day === 25) return 'Christmas Day';
+  return null;
+}
 
 /** Before this hour, or at/after the evening one, counts as after hours. */
 const DAY_STARTS_HOUR = 6;
@@ -643,7 +697,10 @@ export function bandFor(card: Card, miles: number): Band | null {
 }
 
 /** Which surcharges a Charlotte-local pickup time attracts. */
-export function surchargesFor(requestedAt: string | null | undefined): Surcharge[] {
+export function surchargesFor(
+  requestedAt: string | null | undefined,
+  serviceLine?: ServiceLine | null,
+): Surcharge[] {
   const when = parseLocalDateTime(requestedAt);
   if (!when) return [];
 
@@ -652,16 +709,27 @@ export function surchargesFor(requestedAt: string | null | undefined): Surcharge
     hour12: false,
     hour: '2-digit',
     weekday: 'short',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
   }).formatToParts(when);
 
   const hour = Number(parts.find((p) => p.type === 'hour')?.value ?? 12) % 24;
   const weekday = parts.find((p) => p.type === 'weekday')?.value ?? '';
+  const year = Number(parts.find((p) => p.type === 'year')?.value ?? 0);
+  const month = Number(parts.find((p) => p.type === 'month')?.value ?? 0);
+  const day = Number(parts.find((p) => p.type === 'day')?.value ?? 0);
 
   const out: Surcharge[] = [];
-  if (hour < DAY_STARTS_HOUR || hour >= DAY_ENDS_HOUR) {
+  // Concierge carries no separate early or late charge (Phil, 2026-10-14): the
+  // airport run is the job, and a 4:40 AM trip should cost what the card says.
+  if (serviceLine !== 'concierge' && (hour < DAY_STARTS_HOUR || hour >= DAY_ENDS_HOUR)) {
     out.push({ label: 'After hours', cents: SURCHARGES.afterHours });
   }
-  if (weekday === 'Sat' || weekday === 'Sun') {
+  // A listed holiday replaces the weekend charge; it is never charged on top.
+  if (holidayName(year, month, day)) {
+    out.push({ label: 'Holiday', cents: SURCHARGES.holiday });
+  } else if (weekday === 'Sat' || weekday === 'Sun') {
     out.push({ label: 'Weekend', cents: SURCHARGES.weekend });
   }
   return out;
@@ -774,7 +842,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const lowBand = bandFor(card, milesLow) ?? card.bands[0]!;
   const highBand = bandFor(card, milesHigh) ?? card.bands[card.bands.length - 1]!;
 
-  const surcharges = surchargesFor(input.requestedAt);
+  const surcharges = surchargesFor(input.requestedAt, input.serviceLine);
   const surchargeTotal = surcharges.reduce((sum, s) => sum + s.cents, 0);
   const extras = Math.max(0, (input.passengers ?? 1) - 1) * card.perExtra;
 

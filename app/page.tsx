@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   HeartPulse, Sparkles, PawPrint, Droplets, Shield, GraduationCap,
@@ -39,6 +40,8 @@ type Vertical = {
   Icon: LucideIcon;
   /** FIX_PROD_132 — per-service one-shot hover animation class (see globals.css). */
   anim: string;
+  /** Optional mascot illustration shown in place of the line icon (Winnie). */
+  image?: { src: string; alt: string; width: number; height: number };
 };
 
 const verticals: Vertical[] = [
@@ -68,6 +71,9 @@ const verticals: Vertical[] = [
   },
   {
     slug: '/winnie', name: 'Winnie Ride', Icon: PawPrint, anim: 'svc-anim--paw',
+    // Winnie herself, drawn from Phil's photo (2026-10-14). The paw icon stays
+    // as the typed fallback; the card renders the illustration when present.
+    image: { src: '/brand/winnie-mascot.webp', alt: 'Winnie, the Tassy French bulldog, in reindeer antlers', width: 960, height: 1036 },
     blurb: 'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
     bullets: ['From $59 one way, $106 there and back', 'Carrier or harness included'],
     cta: 'Request a Winnie Ride',
@@ -178,12 +184,24 @@ export default function HomePage() {
               <Link key={v.slug} href={v.slug} className="card-tile group">
                 {/* FIX_PROD_132 — bare semantic icon + hairline gold accent (was a
                     placeholder letter chip). Per-service one-shot hover animation. */}
-                <v.Icon
-                  size={32}
-                  strokeWidth={1.75}
-                  className={`text-[color:var(--gold)] svc-icon ${v.anim}`}
-                  aria-hidden="true"
-                />
+                {v.image ? (
+                  <Image
+                    src={v.image.src}
+                    alt={v.image.alt}
+                    width={v.image.width}
+                    height={v.image.height}
+                    sizes="(min-width: 1024px) 200px, 170px"
+                    className={`svc-icon svc-mascot ${v.anim}`}
+                    priority={false}
+                  />
+                ) : (
+                  <v.Icon
+                    size={32}
+                    strokeWidth={1.75}
+                    className={`text-[color:var(--gold)] svc-icon ${v.anim}`}
+                    aria-hidden="true"
+                  />
+                )}
                 <div className={`svc-underline mt-6 mb-6 ${v.anim}-line`} />
                 <div className="eyebrow">Service line</div>
                 <h3 className="serif text-xl font-semibold mt-1 mb-3">{v.name}</h3>

@@ -320,6 +320,9 @@ body {
 
 /* Per-service one-shot hover micro-motion (runs once, no infinite loop). */
 .svc-icon { transition: transform 200ms ease-out; transform-origin: center; will-change: transform; }
+/* Winnie mascot: sits in the icon slot, bottom-aligned with the other cards' icons. */
+.svc-mascot { height: 160px; width: auto; max-width: 100%; align-self: flex-start; object-fit: contain; margin-top: -0.5rem; margin-left: -0.25rem; transform-origin: bottom center; }
+@media (min-width: 1024px) { .svc-mascot { height: 180px; } }
 .card-tile:hover .svc-anim--heart  { animation: svcHeart 1.4s ease-in-out; }
 .card-tile:hover .svc-anim--spark  { animation: svcSpark 800ms ease-in-out; }
 .card-tile:hover .svc-anim--paw    { animation: svcPaw 600ms ease-in-out; }

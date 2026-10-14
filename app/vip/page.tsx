@@ -26,7 +26,7 @@ export default function VipPage() {
       highlights={[
         {
           title: 'No surge, ever',
-          body: 'A 5am airport run costs what the card says it costs. Flat rates by distance, agreed before the trip, and they do not move for weather, demand or a holiday weekend.',
+          body: 'A 5am airport run costs what the card says it costs. Flat rates by distance, agreed before the trip, and they do not move for weather or demand. The only add-ons are the published ones: weekends and six listed holidays, shown before you book.',
         },
         {
           title: 'Reserved, not dispatched',

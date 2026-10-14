@@ -63,9 +63,17 @@ test.describe("Phil's approved entry prices", () => {
   test('Tassy Care starts at $49', () => {
     expect(CARE.bands[0]!.cents).toBe(4900);
   });
-  test('Tassy Recovery starts at $129 and includes 20 minutes of wait', () => {
-    expect(RECOVERY.bands[0]!.cents).toBe(12900);
+  test('Tassy Recovery starts at $145 and includes 20 minutes of wait', () => {
+    expect(RECOVERY.bands[0]!.cents).toBe(14500);
     expect(RECOVERY.waitIncludedMin).toBe(20);
+  });
+  test('the Recovery launch ladder is exactly $145 / $170 / $190 / $220 / $255 / $295', () => {
+    expect(RECOVERY.bands.map((b) => b.cents)).toEqual([14500, 17000, 19000, 22000, 25500, 29500]);
+  });
+  test('every Recovery band stays below the matching Concierge round trip', () => {
+    RECOVERY.bands.forEach((b, i) => {
+      expect(b.cents, `rung ${i}`).toBeLessThan(CONCIERGE.bands[i]!.cents * 2);
+    });
   });
   test('Tassy Concierge starts at $69, not $79', () => {
     expect(CONCIERGE.bands[0]!.cents).toBe(6900);
@@ -398,6 +406,66 @@ test.describe('surcharges', () => {
   test('an unparseable time attracts nothing rather than guessing', () => {
     expect(surchargesFor(null)).toEqual([]);
     expect(surchargesFor('not a date')).toEqual([]);
+  });
+});
+
+test.describe('holiday charge', () => {
+  const labels = (t: string, line?: Parameters<typeof surchargesFor>[1]) =>
+    surchargesFor(t, line).map((x) => x.label);
+
+  test('the six listed holidays carry a $45 holiday charge in 2026', () => {
+    for (const d of [
+      '2026-01-01', // New Year's Day (Thursday)
+      '2026-05-25', // Memorial Day, last Monday of May
+      '2026-07-04', // Independence Day (Saturday)
+      '2026-09-07', // Labor Day, first Monday of September
+      '2026-11-26', // Thanksgiving, fourth Thursday of November
+      '2026-12-25', // Christmas Day (Friday)
+    ]) {
+      const s = surchargesFor(`${d}T13:00`);
+      expect(s.map((x) => x.label), d).toEqual(['Holiday']);
+      expect(s[0]!.cents, d).toBe(4500);
+    }
+  });
+  test('the day before and after Thanksgiving are ordinary days', () => {
+    expect(labels('2026-11-25T13:00')).toEqual([]);
+    expect(labels('2026-11-27T13:00')).toEqual([]);
+  });
+  test('floating holidays move with the calendar', () => {
+    expect(labels('2027-05-31T13:00')).toEqual(['Holiday']); // Memorial Day 2027
+    expect(labels('2027-09-06T13:00')).toEqual(['Holiday']); // Labor Day 2027
+    expect(labels('2027-11-25T13:00')).toEqual(['Holiday']); // Thanksgiving 2027
+  });
+  test('a holiday on a weekend is charged once, at the holiday rate, never with the weekend charge', () => {
+    expect(labels('2026-07-04T13:00')).toEqual(['Holiday']);
+  });
+  test('a holiday at night stacks with after hours', () => {
+    expect(labels('2026-12-25T22:00')).toEqual(['After hours', 'Holiday']);
+  });
+  test('Concierge carries no separate early or late charge, but does carry weekends and holidays', () => {
+    expect(labels('2026-10-07T05:00', 'concierge')).toEqual([]);
+    expect(labels('2026-10-07T05:00', 'care')).toEqual(['After hours']);
+    expect(labels('2026-10-10T13:00', 'concierge')).toEqual(['Weekend']);
+    expect(labels('2026-11-26T13:00', 'concierge')).toEqual(['Holiday']);
+  });
+  test('the holiday charge lands on the fare once, also on a round trip', () => {
+    const plain = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: '2026-11-25T13:00' }),
+    );
+    const holiday = asEstimate(
+      estimateTrip({ serviceLine: 'care', pickup: UPTOWN, dropoff: CMC, requestedAt: '2026-11-26T13:00' }),
+    );
+    expect(holiday.lowCents - plain.lowCents).toBe(4500);
+    const round = asEstimate(
+      estimateTrip({
+        serviceLine: 'care',
+        pickup: UPTOWN,
+        dropoff: CMC,
+        requestedAt: '2026-11-26T13:00',
+        returnTrip: true,
+      }),
+    );
+    expect(round.lowCents).toBe((holiday.lowCents - 4500) * 2 + 4500);
   });
 });
 

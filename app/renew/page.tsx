@@ -5,7 +5,7 @@ import { request } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'IV therapy & med-spa rides in Charlotte | Tassy Transportation',
   description:
-    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
+    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way — or from $145 both ways with the driver waiting, if the procedure leaves you unable to drive.',
   alternates: { canonical: '/renew' },
   openGraph: { url: '/renew', images: ['/og-image/renew'] },
 };
@@ -30,7 +30,7 @@ export default function RenewPage() {
         },
         {
           title: 'If you should not be driving afterwards',
-          body: 'Sedation, anything that leaves you groggy, or a clinic that asks you to arrange a ride home. That is Tassy Recovery — from $129 for the trip there, the wait, and the trip home, with one pharmacy stop on the way.',
+          body: 'Sedation, anything that leaves you groggy, or a clinic that asks you to arrange a ride home. That is Tassy Recovery — from $145 for the trip there, the wait, and the trip home, with one pharmacy stop on the way.',
         },
         {
           title: 'Ask us which one you need',
@@ -51,7 +51,7 @@ export default function RenewPage() {
         },
         {
           name: 'Tassy Recovery',
-          price: 'From $129',
+          price: 'From $145',
           cadence: 'there, the wait, and home',
           features: ['Driver waits 20 minutes', 'One pharmacy stop included', 'Help to the car and to your door', 'Family text on the way home'],
           cta: { label: 'Book the round trip', href: request.recover },

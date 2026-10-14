@@ -55,7 +55,7 @@ const verticals: Vertical[] = [
   {
     slug: '/recover', name: 'Tassy Recovery', Icon: Shield, anim: 'svc-anim--shield',
     blurb: 'Most surgery centers will not discharge you without a responsible adult. We meet you at the desk, wait, and take you home — with one pharmacy stop on the way.',
-    bullets: ['From $129 — there, the wait, and home', 'One pharmacy stop included'],
+    bullets: ['From $145 — there, the wait, and home', 'One pharmacy stop included'],
     cta: 'Book your ride home',
     bookHref: request.recover,
   },
@@ -76,7 +76,7 @@ const verticals: Vertical[] = [
   {
     slug: '/renew', name: 'Wellness & med-spa', Icon: Droplets, anim: 'svc-anim--drip',
     blurb: 'IV therapy, med-spa and aesthetic appointments. Concierge if you are fine to travel alone, Recovery if the procedure means you should not be driving.',
-    bullets: ['Concierge from $89 one way', 'Recovery from $129 both ways'],
+    bullets: ['Concierge from $89 one way', 'Recovery from $145 both ways'],
     cta: 'See which one you need',
     bookHref: request.renew,
   },

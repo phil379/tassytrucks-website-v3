@@ -1,4 +1,9 @@
--- PAY_04 -- cap the driver share at 55% on every service line. PROPOSED 2026-10-14. NOT APPLIED.
+-- PAY_04 -- cap the driver share at 55% on every service line.
+--
+-- STATUS: APPLIED 2026-10-14 13:41 UTC to project knllznbdpejoaiexmdea (Supabase migration
+-- name pay_04_cap_driver_share_55), on Phil's explicit "merge and apply" after website PR #4
+-- merged. Read back afterwards: care 55, care_wav 55, concierge 55, recovery 55, scholar 40,
+-- winnie 55. Do NOT run it again; it is kept here as the record of what ran.
 --
 -- Phil, 2026-10-14: "cap the driver share to 55 for all the different service
 -- lines ... our pay is good ... mine will be at the difference", out of which
@@ -24,9 +29,8 @@
 -- vehicles; 55% may be hard to recruit against. Check driver-facing pay copy
 -- (careers page) before running.
 --
--- ORDER OF OPERATIONS: pay % is frozen at assignment, so trips already assigned
--- keep their share. Run after the website change is merged, in the same hour.
--- Run only on Phil's explicit yes.
+-- ORDER OF OPERATIONS (as it ran): pay % is frozen at assignment, so trips already assigned
+-- keep their share. Run after the website change was merged, in the same hour.
 
 update public.pay_rates set
   driver_pct = 55,
@@ -34,5 +38,5 @@ update public.pay_rates set
   updated_at = now()
 where service_line in ('care_wav', 'concierge');
 
--- Check after running (expect care 55, care_wav 55, concierge 55, recovery 55, scholar 40, winnie 55):
+-- Check used after running (expect care 55, care_wav 55, concierge 55, recovery 55, scholar 40, winnie 55):
 -- select service_line, driver_pct, updated_at from public.pay_rates order by service_line;

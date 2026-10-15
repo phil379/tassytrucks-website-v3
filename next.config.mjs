@@ -9,6 +9,21 @@ const nextConfig = {
       { protocol: 'https', hostname: 'tassytrucksops.vercel.app' },
     ],
   },
+  /**
+   * Keep every *.vercel.app copy of the site out of search results. The real site lives at
+   * www.tassytrucks.com; an indexed sandbox copy would compete with it for the same pages.
+   * Host-scoped, so it switches itself off for www.tassytrucks.com at the domain cutover.
+   * (Noindex does not stop anyone from visiting the sandbox.)
+   */
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(.*)\\.vercel\\.app' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
   // Permanent redirects so old URLs keep working after we cut over from v2 landing
   async redirects() {
     return [

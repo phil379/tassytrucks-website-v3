@@ -66,6 +66,36 @@ async function requireDriver(id: string, to: string) {
 }
 
 /**
+ * The phone path to "confirmed" (record the price, or tap Advance) has no email step, so it used to
+ * confirm the trip and tell the rider nothing. Give it what the email path gives: a confirmation
+ * code and confirmed_at if missing, then the same best-effort ping so TassyOps can send the
+ * "your ride is confirmed" text. TassyOps still decides consent, quiet hours and dedupe, and
+ * dedupes confirmations per trip, so calling this twice never texts twice. Never throws: the status
+ * change has already been saved.
+ */
+async function afterConfirmedByPhone(id: string): Promise<void> {
+  try {
+    const db = supabaseAdmin();
+    const { data } = await db
+      .from(TRIP_REQUESTS_TABLE)
+      .select('confirmation_code,confirmed_at')
+      .eq('id', id)
+      .single();
+    const row = (data ?? {}) as { confirmation_code?: string | null; confirmed_at?: string | null };
+    const patch: Record<string, unknown> = {};
+    if (!row.confirmation_code) patch.confirmation_code = generateConfirmationCode();
+    if (!row.confirmed_at) patch.confirmed_at = new Date().toISOString();
+    if (Object.keys(patch).length > 0) {
+      const { error } = await db.from(TRIP_REQUESTS_TABLE).update(patch).eq('id', id);
+      if (error) throw new Error(error.message);
+    }
+    await pingTassyOpsConfirmed(id);
+  } catch (e) {
+    console.error('[ops] confirmed-text step failed (status still saved):', e);
+  }
+}
+
+/**
  * One save per row: status, quote, and internal notes travel together, because
  * on a phone you change them in one pass and press Save once.
  */
@@ -103,8 +133,22 @@ export async function updateRow(formData: FormData) {
     await requireDriver(id, status);
   }
 
+  let previousStatus: string | null = null;
+  if (status === 'confirmed') {
+    const { data: before } = await supabaseAdmin()
+      .from(TRIP_REQUESTS_TABLE)
+      .select('status')
+      .eq('id', id)
+      .single();
+    previousStatus = (before as { status?: string } | null)?.status ?? null;
+  }
+
   const { error } = await supabaseAdmin().from(TRIP_REQUESTS_TABLE).update(patch).eq('id', id);
   if (error) throw new Error(error.message);
+
+  if (status === 'confirmed' && previousStatus !== 'confirmed') {
+    await afterConfirmedByPhone(id);
+  }
 
   revalidatePath('/ops');
 }
@@ -140,6 +184,10 @@ export async function advanceStatus(formData: FormData) {
     .eq('status', from);
 
   if (error) throw new Error(error.message);
+
+  if (to === 'confirmed') {
+    await afterConfirmedByPhone(id);
+  }
 
   // Post-ride RATING request — best-effort. A feedback email failure must
   // never undo a completed-status change.

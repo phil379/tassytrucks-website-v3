@@ -17,6 +17,7 @@ import { sendRichEmail } from '@/lib/notifications';
 import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
 import { serviceShortName } from '@/lib/trip-request';
+import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
 
 /**
  * Every mutation re-checks the cookie. A server action is a public HTTP endpoint —
@@ -292,6 +293,9 @@ export async function confirmAndSend(formData: FormData) {
     })
     .eq('id', id);
   if (writeError) throw new Error(writeError.message);
+
+  // Rider text (booking confirmed + payment link). Best effort, after everything is saved and emailed.
+  await pingTassyOpsConfirmed(id);
 
   revalidatePath('/ops');
 }

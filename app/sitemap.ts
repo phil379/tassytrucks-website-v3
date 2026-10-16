@@ -19,6 +19,7 @@ const routes: Array<{ path: string; priority: number }> = [
   { path: '/partners', priority: 0.9 },
   { path: '/charlotte/nemt-rides', priority: 0.8 },
   { path: '/charlotte/dialysis-transport', priority: 0.8 },
+  { path: '/charlotte/chemotherapy-transport', priority: 0.8 },
   { path: '/charlotte/post-surgery-transport', priority: 0.8 },
   { path: '/charlotte/wheelchair-transport', priority: 0.8 },
   { path: '/charlotte/veteran-transport', priority: 0.8 },

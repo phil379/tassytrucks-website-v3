@@ -3,24 +3,26 @@
 import {
   CARE_CONSENT_CLAUSES,
   CARE_CONSENT_VERSION,
-  CARE_PAYERS,
+  CARE_PAYMENT_OPTIONS,
   CARE_PEDIATRIC_PHONE,
   checkAdult,
 } from '@/lib/care-intake';
+import type { CarePaymentValue } from '@/lib/care-intake';
 
 /**
- * The medical-billing questions on a Tassy Care request.
+ * Payment method and age check on a Tassy Care request.
  *
- * Shown only on Tassy Care. "Paying myself" asks nothing more. Picking a payer
- * opens the date of birth (18+), the plan details, and the privacy / transport
- * consent with a typed signature. This is the same record the TassyOps guest
- * wizard used to collect, now collected once, here.
+ * Today only card (Stripe) is selectable; Medicaid, insurance and VA are listed
+ * as "coming soon" and disabled (lib/care-intake.ts decides, one flag each). The
+ * patient's date of birth is asked on every ride for the 18+ rule. The plan
+ * details and privacy / transport consent below only appear for a plan payer, so
+ * they stay hidden until one is enabled.
  *
  * NOT ASKED, on purpose: diagnosis, procedure, condition, medication.
  */
 
 export type CareIntakeValues = {
-  payer: 'self' | (typeof CARE_PAYERS)[number]['value'];
+  payer: CarePaymentValue;
   medicaidBroker: string;
   memberId: string;
   authorizationNumber: string;
@@ -42,10 +44,6 @@ export const EMPTY_CARE_INTAKE: CareIntakeValues = {
 };
 
 const labelCls = 'block text-sm font-medium mb-1.5';
-const pill = (on: boolean) =>
-  `cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm transition ${
-    on ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/15 font-medium' : 'border-line'
-  }`;
 
 export default function CareIntakeFields({
   values,
@@ -71,59 +69,59 @@ export default function CareIntakeFields({
 
   return (
     <div className="border-t border-line pt-6 space-y-6" data-testid="care-intake">
-      <fieldset>
-        <legend className={labelCls}>How will this ride be paid?</legend>
-        <div className="flex flex-wrap gap-2">
-          {([{ value: 'self', label: 'I will pay' }, ...CARE_PAYERS] as const).map((p) => (
-            <label key={p.value} className={pill(values.payer === p.value)}>
-              <input
-                type="radio"
-                name="careIntakePayer"
-                value={p.value}
-                className="sr-only"
-                checked={values.payer === p.value}
-                onChange={() => onChange({ payer: p.value })}
-              />
-              {p.label}
-            </label>
-          ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label className={labelCls} htmlFor="careIntake-payer">
+            How will this ride be paid?
+          </label>
+          <select
+            id="careIntake-payer"
+            className="form-field"
+            value={values.payer}
+            onChange={(e) => onChange({ payer: e.target.value as CarePaymentValue })}
+          >
+            {CARE_PAYMENT_OPTIONS.map((p) => (
+              <option key={p.value} value={p.value} disabled={!p.enabled}>
+                {p.enabled ? p.label : `${p.label} (coming soon)`}
+              </option>
+            ))}
+          </select>
+          <p className="ink-soft mt-1.5 text-xs">
+            We confirm your price first, then send a secure link to pay. No card is taken on this form.
+          </p>
         </div>
-        <p className="ink-soft mt-2 text-xs">
-          {medical
-            ? 'We confirm eligibility with your plan before the trip. Nothing is charged to a card for a plan-billed ride.'
-            : 'We confirm your price first, then send a secure link to pay. No card is taken on this form.'}
-        </p>
-      </fieldset>
+
+        <div>
+          <label className={labelCls} htmlFor="careIntake-dob">
+            Patient date of birth <span aria-hidden="true">*</span>
+            <span className="sr-only">(required)</span>
+          </label>
+          <input
+            id="careIntake-dob"
+            type="date"
+            className="form-field"
+            value={values.dob}
+            onChange={(e) => onChange({ dob: e.target.value })}
+            autoComplete="off"
+            aria-invalid={dobMessage ? true : undefined}
+            aria-describedby={dobMessage ? 'careIntake-dob-error' : undefined}
+          />
+          {dobMessage ? (
+            <p id="careIntake-dob-error" className="form-error">
+              {dobMessage}
+            </p>
+          ) : (
+            <p className="ink-soft text-xs mt-1.5">
+              Patients must be 18 or older. For pediatric rides call {CARE_PEDIATRIC_PHONE}. We check it and do not keep the date.
+            </p>
+          )}
+          <Err k="payer" />
+        </div>
+      </div>
 
       {medical ? (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label className={labelCls} htmlFor="careIntake-dob">
-                Patient date of birth <span aria-hidden="true">*</span>
-                <span className="sr-only">(required)</span>
-              </label>
-              <input
-                id="careIntake-dob"
-                type="date"
-                className="form-field"
-                value={values.dob}
-                onChange={(e) => onChange({ dob: e.target.value })}
-                autoComplete="bday"
-                aria-invalid={dobMessage ? true : undefined}
-                aria-describedby={dobMessage ? 'careIntake-dob-error' : undefined}
-              />
-              {dobMessage ? (
-                <p id="careIntake-dob-error" className="form-error">
-                  {dobMessage}
-                </p>
-              ) : (
-                <p className="ink-soft text-xs mt-1.5">
-                  Patients must be 18 or older. For pediatric rides call {CARE_PEDIATRIC_PHONE}.
-                </p>
-              )}
-            </div>
-
             {values.payer === 'medicaid' ? (
               <div>
                 <label className={labelCls} htmlFor="careIntake-broker">

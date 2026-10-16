@@ -14,7 +14,9 @@ import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { createHash } from 'node:crypto';
-import { buildCareConsentText, buildCareIntakeRecord, careIntakeSchema } from '@/lib/care-intake';
+import {
+  buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isPayerEnabled,
+} from '@/lib/care-intake';
 import { buildSmsConsent } from '@/lib/sms-consent';
 import { parseLocalDateTime } from '@/lib/time';
 import { currentFacilitySession } from '@/lib/facility-auth';
@@ -203,9 +205,9 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  // Tassy Care medical intake. Only a Tassy Care ride billed to a payer carries
-  // it; a self-pay ride sends nothing and stores NULL. When it IS sent it must
-  // be complete: 18+ DOB, both consent boxes, a typed signature. The consent
+  // Tassy Care intake. The form sends it on every Care ride: card (the only
+  // enabled payment today) needs just an 18+ date of birth, which is checked and
+  // NOT stored. A plan payer would need the full intake, but plans are disabled. The consent
   // text and hash are built HERE from the version in lib/care-intake.ts - the
   // browser only says which boxes were ticked - and the signing IP / agent /
   // time are stamped by the server, so the record proves what was shown.
@@ -226,8 +228,16 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({ ok: false, error: 'Please check the form.', fieldErrors }, { status: 400 });
     }
+    // Plan billing is switched off (lib/care-intake.ts). The form disables these
+    // options, so only a hand-built POST gets here: refuse it, never store it.
+    if (!isPayerEnabled(intake.data.payer)) {
+      return NextResponse.json(
+        { ok: false, error: CARE_PLAN_NOT_AVAILABLE, fieldErrors: { 'careIntake.payer': CARE_PLAN_NOT_AVAILABLE } },
+        { status: 400 },
+      );
+    }
     careIntake = buildCareIntakeRecord(intake.data, {
-      textHash: 'sha256:' + createHash('sha256').update(buildCareConsentText(intake.data.signerName)).digest('hex'),
+      textHash: 'sha256:' + createHash('sha256').update(buildCareConsentText(intake.data.signerName ?? '')).digest('hex'),
       signedAt: new Date().toISOString(),
       ip: ip || null,
       ua: request.headers.get('user-agent')?.slice(0, 500) ?? null,

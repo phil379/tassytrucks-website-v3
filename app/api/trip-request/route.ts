@@ -13,6 +13,8 @@ import { fireNotifications, type FacilityAlertContext } from '@/lib/notification
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
+import { createHash } from 'node:crypto';
+import { buildCareConsentText, buildCareIntakeRecord, careIntakeSchema } from '@/lib/care-intake';
 import { buildSmsConsent } from '@/lib/sms-consent';
 import { parseLocalDateTime } from '@/lib/time';
 import { currentFacilitySession } from '@/lib/facility-auth';
@@ -200,6 +202,36 @@ export async function POST(request: Request) {
       { ok: false, error: 'Please check the form.', fieldErrors },
       { status: 400 },
     );
+  }
+  // Tassy Care medical intake. Only a Tassy Care ride billed to a payer carries
+  // it; a self-pay ride sends nothing and stores NULL. When it IS sent it must
+  // be complete: 18+ DOB, both consent boxes, a typed signature. The consent
+  // text and hash are built HERE from the version in lib/care-intake.ts - the
+  // browser only says which boxes were ticked - and the signing IP / agent /
+  // time are stamped by the server, so the record proves what was shown.
+  let careIntake: ReturnType<typeof buildCareIntakeRecord> | null = null;
+  if (data.careIntake !== undefined && data.careIntake !== null) {
+    if (data.serviceLine !== 'care' || wantsFacilityBooking) {
+      return NextResponse.json(
+        { ok: false, error: 'Please check the form.', fieldErrors: { careIntake: 'Not used for this booking' } },
+        { status: 400 },
+      );
+    }
+    const intake = careIntakeSchema.safeParse(data.careIntake);
+    if (!intake.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of intake.error.issues) {
+        const key = `careIntake.${issue.path.join('.') || 'form'}`;
+        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      return NextResponse.json({ ok: false, error: 'Please check the form.', fieldErrors }, { status: 400 });
+    }
+    careIntake = buildCareIntakeRecord(intake.data, {
+      textHash: 'sha256:' + createHash('sha256').update(buildCareConsentText(intake.data.signerName)).digest('hex'),
+      signedAt: new Date().toISOString(),
+      ip: ip || null,
+      ua: request.headers.get('user-agent')?.slice(0, 500) ?? null,
+    });
   }
   // An empty object is stored as NULL, not as `{}`. A dispatcher scanning the
   // queue should be able to tell "this line asks nothing extra" from "they
@@ -445,6 +477,8 @@ export async function POST(request: Request) {
         vehicle_notes: data.vehicleNotes || null,
         // Validated above, never the raw body. See lib/trip-details.ts.
         trip_details: tripDetails,
+        // Null unless a payer-billed Tassy Care ride. See the block above.
+        care_intake: careIntake,
         source,
         user_agent: userAgent,
         // Empty for every retail booking, so this spread changes nothing there.

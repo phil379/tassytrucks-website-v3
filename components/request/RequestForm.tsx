@@ -26,6 +26,8 @@ import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
 import { SHOW_ESTIMATES, estimateTrip, formatRange } from '@/lib/quote';
+import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
+import { careIntakeSchema } from '@/lib/care-intake';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -172,6 +174,8 @@ export default function RequestForm({
    * the form and the server agree on what a number or a date means.
    */
   const [details, setDetails] = useState<Record<string, string>>({});
+  /** Tassy Care medical billing. Only sent when a payer is chosen on a Care ride. */
+  const [care, setCare] = useState<CareIntakeValues>(EMPTY_CARE_INTAKE);
 
   function changeService(next: ServiceLine) {
     setService(next);
@@ -419,6 +423,20 @@ export default function RequestForm({
       // Raw strings. The server re-validates them against the same spec and
       // stores only what comes back from it.
       tripDetails: details,
+      // Null for self-pay and for every other service line, so those bookings are unchanged.
+      careIntake:
+        !facility && String(fd.get('serviceLine') ?? '') === 'care' && care.payer !== 'self'
+          ? {
+              payer: care.payer,
+              medicaidBroker: care.medicaidBroker || null,
+              memberId: care.memberId || null,
+              authorizationNumber: care.authorizationNumber || null,
+              dob: care.dob,
+              hipaa: care.hipaa,
+              transportConsent: care.transportConsent,
+              signerName: care.signerName,
+            }
+          : null,
       source,
       // Facility extras. Sent ONLY on /facility/request. `facilityBooking` is
       // the explicit ask that makes the server read the session cookie — and if
@@ -454,8 +472,16 @@ export default function RequestForm({
         })
       : null;
 
-    if (!check.success || !detailCheck.ok || (extrasCheck && !extrasCheck.success)) {
+    const careCheck = payload.careIntake ? careIntakeSchema.safeParse(payload.careIntake) : null;
+
+    if (!check.success || !detailCheck.ok || (extrasCheck && !extrasCheck.success) || (careCheck && !careCheck.success)) {
       const next: Record<string, string> = {};
+      if (careCheck && !careCheck.success) {
+        for (const issue of careCheck.error.issues) {
+          const key = `careIntake.${issue.path.join('.') || 'form'}`;
+          if (!next[key]) next[key] = issue.message;
+        }
+      }
       if (!check.success) {
         for (const issue of check.error.issues) {
           const key = issue.path.join('.') || 'form';
@@ -794,6 +820,14 @@ export default function RequestForm({
         </p>
         <FieldError name="vehicleNotes" />
       </div>
+
+      {service === 'care' && !facility ? (
+        <CareIntakeFields
+          values={care}
+          errors={errors}
+          onChange={(patch) => setCare((current) => ({ ...current, ...patch }))}
+        />
+      ) : null}
 
       {/* ── facility booking: the two questions an account adds ──────────────
           NOTE WHAT IS NOT ASKED HERE and keep it that way: no diagnosis, no

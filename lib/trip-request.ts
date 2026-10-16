@@ -261,6 +261,13 @@ const tripRequestObject = z
     tripDetails: z.unknown().optional().nullable(),
 
     /**
+     * Tassy Care medical-booking intake (DOB, payer, consent). Untyped here for
+     * the same reason as tripDetails: lib/care-intake.ts is the one authority and
+     * the route runs it separately, so the rules live in one place.
+     */
+    careIntake: z.unknown().optional().nullable(),
+
+    /**
      * Honeypot — must stay empty.
      *
      * NOT named "company". `company`/`organization` is an autofill CATEGORY:

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { formatRepName, legacySlugName } from '@/lib/rep-name';
 import {
   payerFromBillingMode,
   defaultLineForKind,
@@ -337,4 +338,24 @@ export async function linkAuthUser(facilityUserId: string, authUserId: string): 
  */
 export function resolvePayer(facility: { billing_mode: string }, override?: Payer | null): Payer {
   return override ?? payerFromBillingMode(facility.billing_mode);
+}
+
+
+/**
+ * Display name for the account manager shown on /facility/welcome. Best effort:
+ * any failure returns null and the page falls back to "we are assigning your
+ * account manager". Read-only; nothing here touches commission fields.
+ */
+export async function accountManagerDisplayName(slug: string | null): Promise<string | null> {
+  if (!slug) return null;
+  try {
+    const { data } = await supabaseAdmin()
+      .from('sales_rep_profiles')
+      .select('full_name')
+      .eq('rep_slug', slug)
+      .maybeSingle();
+    return formatRepName((data as { full_name?: string } | null)?.full_name) ?? legacySlugName(slug);
+  } catch {
+    return legacySlugName(slug);
+  }
 }

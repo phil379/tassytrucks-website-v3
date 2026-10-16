@@ -5,7 +5,6 @@ import { Check, Loader2, Plus, Trash2 } from 'lucide-react';
 import {
   BILLING_MODES,
   FACILITY_KINDS,
-  facilityKind,
   passengerNoun,
 } from '@/lib/facility';
 import {
@@ -98,7 +97,6 @@ export default function FacilityWizard({
   const [bridge, setBridge] = useState(false);
 
   const noun = useMemo(() => passengerNoun(kind), [kind]);
-  const defaultLine = useMemo(() => facilityKind(kind).defaultLine, [kind]);
 
   function handle(result: ActionResult, onOk: () => void) {
     if (result.ok) {
@@ -474,7 +472,7 @@ export default function FacilityWizard({
                 email to show and no service promise we can stand behind. */}
             {accountManager ? (
               <p className="mt-2">
-                Your account manager is <strong>{titleCase(accountManager)}</strong>.
+                Your account manager is <strong>{accountManager}</strong>.
               </p>
             ) : (
               <p className="mt-2 text-[color:var(--ink-soft)]">
@@ -505,18 +503,9 @@ export default function FacilityWizard({
 
       <p className="mt-8 text-xs text-[color:var(--ink-mute)]">
         We never ask for a diagnosis, a procedure, a date of birth or a medical record number —
-        on this form or any other. Default service line for a {facilityKind(kind).label.toLowerCase()}:{' '}
-        {defaultLine}.
+        on this form or any other.
       </p>
     </div>
   );
 }
 
-/** `marcus-bell` → `Marcus Bell`. Best available until a staff table exists. */
-function titleCase(slug: string): string {
-  return slug
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((w) => w[0]!.toUpperCase() + w.slice(1))
-    .join(' ');
-}

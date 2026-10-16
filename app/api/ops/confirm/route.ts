@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       ok: true,
       confirmationCode: result.confirmationCode,
       hasPayLink: Boolean(result.payUrl),
+      textSent: result.textSent,
     });
   } catch (e) {
     console.error('[ops-bridge] confirm failed:', e);

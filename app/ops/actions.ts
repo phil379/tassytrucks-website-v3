@@ -7,18 +7,10 @@ import { OPS_COOKIE, isOpsAuthed, passwordMatches, sessionToken } from '@/lib/op
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES } from '@/lib/supabase-admin';
 import { ADVANCE, assignmentBlocker } from '@/lib/ops-status';
 import { generateConfirmationCode } from '@/lib/confirmation';
-import {
-  confirmationHtml,
-  confirmationSubject,
-  confirmationText,
-  type ConfirmedTrip,
-} from '@/lib/confirmation-email';
 import { sendRichEmail } from '@/lib/notifications';
-import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
-import { serviceShortName } from '@/lib/trip-request';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
-import { recordPaymentAttempt } from '@/lib/payment-attempts';
+import { confirmTrip } from '@/lib/ops-confirm';
 
 /**
  * Every mutation re-checks the cookie. A server action is a public HTTP endpoint —
@@ -267,108 +259,19 @@ export async function confirmAndSend(formData: FormData) {
   if (rawAgreed === '' || !Number.isFinite(dollars) || dollars <= 0) {
     backWithNotice('no_price');
   }
-  const agreedCents = Math.round(dollars * 100);
 
   // Facility accounts are invoiced monthly and must NOT be sent a card link.
   const onAccount = formData.get('onAccount') === 'on';
 
-  const db = supabaseAdmin();
-  const { data: row, error: readError } = await db
-    .from(TRIP_REQUESTS_TABLE)
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (readError) throw new Error(readError.message);
-  if (!row) throw new Error('Request not found');
-  if (!row.contact_email) {
-    backWithNotice('no_email');
-  }
-
-  const code = row.confirmation_code || generateConfirmationCode();
-
-  let payUrl: string | null = row.payment_link_url ?? null;
-  let payLinkId: string | null = row.stripe_payment_link_id ?? null;
-
-  if (!onAccount && !payUrl && stripeConfigured()) {
-    let link: Awaited<ReturnType<typeof createTripPaymentLink>> | null = null;
-    try {
-      link = await createTripPaymentLink({
-        amountCents: agreedCents,
-        serviceName: serviceShortName(row.service_line),
-        confirmationCode: code,
-        tripRequestId: id,
-        serviceLine: row.service_line,
-      });
-    } catch (e) {
-      console.error('[ops] payment link failed (trip left unchanged):', e);
+  // The work itself lives in lib/ops-confirm.ts, shared with the TassyOps one-tap confirm.
+  const result = await confirmTrip({ id, agreedCents: Math.round(dollars * 100), onAccount });
+  if (!result.ok) {
+    if (result.code === 'not_found') throw new Error('Request not found');
+    if (result.code === 'no_price' || result.code === 'no_email' || result.code === 'link_failed' || result.code === 'email_failed') {
+      backWithNotice(result.code);
     }
-    if (!link) backWithNotice('link_failed');
-    payUrl = link.url;
-    payLinkId = link.id;
-    // Remember what this link asked for, so the Stripe webhook can check the amount collected.
-    await recordPaymentAttempt(db, { tripId: id, linkId: link.id, amountCents: agreedCents });
+    throw new Error(result.code);
   }
-
-  const confirmed: ConfirmedTrip = {
-    confirmationCode: code,
-    tripNumber: (row as unknown as { trip_number?: string | null }).trip_number ?? null,
-    agreedCents,
-    driverName: row.driver_name ?? null,
-    vehicleDescription: row.vehicle_description ?? null,
-    discountLabel: row.discount_label ?? null,
-    discountCents: row.discount_cents ?? null,
-    payUrl,
-  };
-
-  // The shape the email templates read. Built from the stored row rather than
-  // a form, so what the customer is sent is what the database actually holds.
-  const trip = {
-    serviceLine: row.service_line,
-    contactFirstName: row.contact_first_name ?? (row.contact_name ?? '').split(' ')[0] ?? '',
-    contactLastName: row.contact_last_name ?? '',
-    contactPhone: row.contact_phone,
-    contactEmail: row.contact_email,
-    pickupAddress: row.pickup_address,
-    dropoffAddress: row.dropoff_address,
-    requestedAt: row.requested_at,
-    returnTrip: Boolean(row.return_trip),
-    returnAt: row.return_at,
-    passengers: row.passengers ?? 1,
-    mobility: row.mobility,
-  } as Parameters<typeof confirmationHtml>[1];
-
-  let emailed = true;
-  try {
-    await sendRichEmail({
-      to: row.contact_email,
-      subject: confirmationSubject(confirmed, trip),
-      html: confirmationHtml(confirmed, trip),
-      text: confirmationText(confirmed, trip),
-    });
-  } catch (e) {
-    emailed = false;
-    console.error('[ops] confirmation email failed (trip left unchanged):', e);
-  }
-  if (!emailed) backWithNotice('email_failed');
-
-  const { error: writeError } = await db
-    .from(TRIP_REQUESTS_TABLE)
-    .update({
-      status: 'confirmed',
-      confirmation_code: code,
-      confirmed_at: row.confirmed_at ?? new Date().toISOString(),
-      agreed_cents: agreedCents,
-      payment_link_url: payUrl,
-      stripe_payment_link_id: payLinkId,
-      // `unpaid` until Stripe says otherwise; `on_account` is a decision, not a
-      // guess, so it is recorded as one. The webhook owns `paid`.
-      payment_status: onAccount ? 'on_account' : (row.payment_status ?? 'unpaid'),
-    })
-    .eq('id', id);
-  if (writeError) throw new Error(writeError.message);
-
-  // Rider text (booking confirmed + payment link). Best effort, after everything is saved and emailed.
-  await pingTassyOpsConfirmed(id);
 
   revalidatePath('/ops');
 }

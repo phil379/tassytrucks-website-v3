@@ -4,6 +4,7 @@ import FacilityWizard from '@/components/facility/FacilityWizard';
 import ConsoleShell from '@/components/facility/ConsoleShell';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { canBook } from '@/lib/facility';
+import { accountManagerDisplayName } from '@/lib/facility.server';
 
 export const metadata: Metadata = {
   title: 'Finish setting up your account — Tassy Transportation',
@@ -80,6 +81,7 @@ export default async function FacilityWelcomePage({
    * degrades to a plain text input and the wizard still saves.
    */
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const managerName = await accountManagerDisplayName(facility.account_manager ?? null);
 
   return (
     <ConsoleShell facilityName={facility.name} signedInAs={session.email} bare>
@@ -97,7 +99,7 @@ export default async function FacilityWelcomePage({
       <div className="mt-10">
         <FacilityWizard
           facilityName={facility.name}
-          accountManager={facility.account_manager ?? null}
+          accountManager={managerName}
           initialKind={facility.kind}
           googleMapsApiKey={googleMapsApiKey}
         />

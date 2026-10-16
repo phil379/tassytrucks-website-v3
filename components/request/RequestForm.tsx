@@ -423,9 +423,9 @@ export default function RequestForm({
       // Raw strings. The server re-validates them against the same spec and
       // stores only what comes back from it.
       tripDetails: details,
-      // Null for self-pay and for every other service line, so those bookings are unchanged.
+      // Every Tassy Care ride (card today). Null on other lines, so those are unchanged.
       careIntake:
-        !facility && String(fd.get('serviceLine') ?? '') === 'care' && care.payer !== 'self'
+        !facility && String(fd.get('serviceLine') ?? '') === 'care'
           ? {
               payer: care.payer,
               medicaidBroker: care.medicaidBroker || null,

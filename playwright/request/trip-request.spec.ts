@@ -105,6 +105,10 @@ async function fillMinimalValidForm(page: import('@playwright/test').Page) {
   // `details-<key>` (components/request/TripDetailsFields.tsx:90).
   await page.locator('#details-rider_is').selectOption('self');
   await page.locator('#details-assistance').selectOption('curb');
+  // Tassy Care asks the patient's date of birth (18+ rule). Other lines do not.
+  if (await page.locator('#careIntake-dob').count()) {
+    await page.locator('#careIntake-dob').fill('1950-03-02');
+  }
 }
 
 // ── Form rendering ───────────────────────────────────────────────────────────
@@ -206,6 +210,56 @@ test('a hand-crafted POST with service=guardian is rejected', async ({ request }
   const body = await res.json();
   expect(body.ok).toBe(false);
   expect(body.error).toContain('not currently accepting requests');
+});
+
+// Tassy Care payment: card is the only enabled method today (lib/care-intake.ts).
+// These all fail validation BEFORE any insert, so they need no database.
+test.describe('Care payment method', () => {
+  const plan = {
+    payer: 'medicaid', dob: '1950-03-02', medicaidBroker: 'Healthy Blue',
+    hipaa: true, transportConsent: true, signerName: 'Maria Santos',
+  };
+
+  test('a hand-crafted POST choosing Medicaid is refused while plan billing is off', async ({ request }) => {
+    const res = await request.post('/api/trip-request', {
+      data: { ...validPayload('pw-plan-refused'), careIntake: plan },
+    });
+    expect(res.status()).toBe(400);
+    const body = await res.json();
+    expect(body.ok).toBe(false);
+    expect(body.fieldErrors['careIntake.payer']).toContain('not available yet');
+  });
+
+  test('a minor date of birth is refused on a Care request', async ({ request }) => {
+    const res = await request.post('/api/trip-request', {
+      data: { ...validPayload('pw-minor-refused'), careIntake: { payer: 'self', dob: '2015-05-05' } },
+    });
+    expect(res.status()).toBe(400);
+    const body = await res.json();
+    expect(body.fieldErrors['careIntake.dob']).toContain('18 or older');
+  });
+
+  test('care intake is refused on any other service line', async ({ request }) => {
+    const res = await request.post('/api/trip-request', {
+      data: { ...validPayload('pw-wrong-line'), serviceLine: 'recovery', careIntake: { payer: 'self', dob: '1950-03-02' } },
+    });
+    expect(res.status()).toBe(400);
+  });
+
+  test('the form offers card, with Medicaid, insurance and VA disabled', async ({ page }) => {
+    await page.goto('/request?service=care');
+    const options = await page.locator('#careIntake-payer option').evaluateAll((opts) =>
+      opts.map((o) => ({ value: (o as HTMLOptionElement).value, disabled: (o as HTMLOptionElement).disabled })),
+    );
+    expect(options).toEqual([
+      { value: 'self', disabled: false },
+      { value: 'medicaid', disabled: true },
+      { value: 'insurance', disabled: true },
+      { value: 'va', disabled: true },
+    ]);
+    await expect(page.locator('#careIntake-dob')).toBeVisible();
+    await expect(page.locator('[data-attestation]')).toHaveCount(0);
+  });
 });
 
 test('/recover is now Tassy Recovery and is bookable', async ({ page }) => {

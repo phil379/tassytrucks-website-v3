@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import {
   CARE,
+  TREATMENT_DAY,
+  treatmentDayAvailable,
   RECOVERY,
   CONCIERGE,
   WINNIE,
@@ -774,5 +776,83 @@ test.describe('Tassy Escort', () => {
   test('the price is the one the rate card publishes', () => {
     // /pricing and /recover both print $45. If this changes, they change too.
     expect(ESCORT_CENTS).toBe(4500);
+  });
+});
+
+/**
+ * Tassy Care, Treatment Day — a flat round trip priced from its own card.
+ * Phil said "go" on 2026-10-16 and will adjust the numbers later: these tests
+ * pin the BEHAVIOUR (one price, never doubled, Care only) and bound the premium
+ * over two Care legs, so a future price edit in TREATMENT_DAY stays honest.
+ */
+test.describe('Treatment Day', () => {
+  const TRIP = {
+    serviceLine: 'care' as const,
+    pickup: UPTOWN,
+    dropoff: CMC,
+    requestedAt: WEEKDAY_MIDDAY,
+    treatmentDay: true,
+  };
+  const MILES_IN_RUNG = [2, 5, 10, 15, 20, 28];
+
+  test('each rung prices from the Treatment Day card, both legs included', () => {
+    TREATMENT_DAY.bands.forEach((band, i) => {
+      const q = asEstimate(estimateTrip({ ...TRIP, roadMiles: MILES_IN_RUNG[i] }));
+      expect(q.lowCents).toBe(band.cents);
+      expect(q.highCents).toBe(band.cents);
+      expect(q.roundTrip).toBe(true);
+      expect(q.cardLabel).toBe('Tassy Care · Treatment Day');
+    });
+  });
+
+  test('it is above two Care legs but by a bounded premium', () => {
+    TREATMENT_DAY.bands.forEach((band, i) => {
+      const twoCareLegs = CARE.bands[i].cents * 2;
+      expect(band.cents, `rung ${i}`).toBeGreaterThan(twoCareLegs);
+      expect(band.cents - twoCareLegs, `rung ${i}`).toBeLessThanOrEqual(2000);
+    });
+    expect(TREATMENT_DAY.bands.map((b) => b.upToMiles)).toEqual(CARE.bands.map((b) => b.upToMiles));
+  });
+
+  test('ticking return trip never doubles it', () => {
+    const one = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5 }));
+    const both = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5, returnTrip: true }));
+    expect(both.lowCents).toBe(one.lowCents);
+  });
+
+  test('a companion rides free', () => {
+    const solo = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5 }));
+    const three = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5, passengers: 3 }));
+    expect(three.lowCents).toBe(solo.lowCents);
+  });
+
+  test('flat add-ons still apply once, like every Tassy ride', () => {
+    const weekday = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5 }));
+    const saturday = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5, requestedAt: SATURDAY_MIDDAY }));
+    expect(saturday.lowCents - weekday.lowCents).toBe(2000);
+  });
+
+  test('it is ignored everywhere but ambulatory Care', () => {
+    for (const line of ['recovery', 'concierge', 'winnie'] as const) {
+      const plain = asEstimate(estimateTrip({ serviceLine: line, pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY, roadMiles: 5 }));
+      const asked = asEstimate(estimateTrip({ serviceLine: line, pickup: UPTOWN, dropoff: CMC, requestedAt: WEEKDAY_MIDDAY, roadMiles: 5, treatmentDay: true }));
+      expect(asked.lowCents, line).toBe(plain.lowCents);
+    }
+    const wav = asEstimate(estimateTrip({ ...TRIP, roadMiles: 5, mobility: 'wheelchair' }));
+    expect(wav.cardLabel).not.toBe('Tassy Care · Treatment Day');
+    expect(treatmentDayAvailable('care', 'wheelchair')).toBe(false);
+    expect(treatmentDayAvailable('care', 'ambulatory')).toBe(true);
+    expect(treatmentDayAvailable('recovery', null)).toBe(false);
+  });
+
+  test('without the flag a Care ride is untouched', () => {
+    const plain = asEstimate(estimateTrip({ ...TRIP, treatmentDay: false, roadMiles: 5 }));
+    expect(plain.lowCents).toBe(CARE.bands[1].cents);
+    expect(plain.cardLabel).toBe(CARE.label);
+  });
+
+  test('past 30 miles it is a phone call, not an extrapolation', () => {
+    const q = asQuoteOnly(estimateTrip({ ...TRIP, dropoff: WINSTON }));
+    expect(q.reason).toBe('beyond-bands');
   });
 });

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { request } from '@/lib/request-links';
+import { request, seoRequest } from '@/lib/request-links';
 import {
-  CARE, CARE_WAV, CONCIERGE as CONCIERGE_CARD, RECOVERY, WINNIE as WINNIE_CARD,
+  CARE, CARE_WAV, CONCIERGE as CONCIERGE_CARD, RECOVERY, TREATMENT_DAY, WINNIE as WINNIE_CARD,
+  bandLabel, dollars, overBandLabel, roundTripCents,
 } from '@/lib/quote';
 import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
 import { SCHOOL_PLANS, SIBLING_NOTE } from '@/lib/school-plans';
@@ -32,6 +33,17 @@ const MEDICAL: Row[] = pairRows(CARE, RECOVERY);
 const CONCIERGE: Row[] = returnRows(CONCIERGE_CARD);
 const WINNIE: Row[] = returnRows(WINNIE_CARD);
 const WAV: Row[] = returnRows(CARE_WAV);
+// Treatment Day beside two ordinary Care legs, both read from lib/quote.ts: the
+// premium is visible and cannot drift from what the request form charges.
+const TREATMENT_ROWS: Row[] = [
+  ...TREATMENT_DAY.bands.map((band, i) => ({
+    band: bandLabel(TREATMENT_DAY.bands, i),
+    a: dollars(roundTripCents(CARE, CARE.bands[i]!.cents)),
+    b: dollars(band.cents),
+  })),
+  { band: overBandLabel(TREATMENT_DAY.bands), a: 'Call us', b: 'Call us' },
+];
+const TREATMENT_HREF = seoRequest('nemt', { source: 'pricing', flat: '1' });
 
 const PLANS = [
   {
@@ -97,6 +109,18 @@ export default function PricingPage() {
                   passenger least able to chase a phone call the only one who had to. The
                   vehicles come from the partner network either way; the number is now a
                   commitment Tassy holds by subcontract instead of a callback. */}
+              <RateTable
+                id="treatment-day"
+                heading="Tassy Care &mdash; Treatment Day"
+                note="One flat price for the round trip to recurring visits, in a late-model SUV that is wiped down before your ride. Your driver takes you there and comes back when you call, so a long day costs nothing extra. A companion rides free. Add-ons for early mornings, nights, weekends and holidays are shown before you book."
+                colA="Two Care rides"
+                colASub="there, then back"
+                colB="Treatment Day"
+                colBSub="round trip, one flat price"
+                rows={TREATMENT_ROWS}
+                href={TREATMENT_HREF}
+                cta="Set up flat-price rides"
+              />
               <RateTable
                 id="wheelchair"
                 heading="Tassy Care WAV &mdash; wheelchair"

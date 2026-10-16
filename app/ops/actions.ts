@@ -27,6 +27,15 @@ function assertAuthed() {
   if (!isOpsAuthed()) throw new Error('Not authorised');
 }
 
+/**
+ * A dispatcher's mistake (no price, no email) or a failed outside call should show a plain
+ * message on the queue, not the framework crash page. Codes, not free text, so the URL can
+ * never be used to put arbitrary words on the ops screen.
+ */
+function backWithNotice(code: 'no_price' | 'no_email' | 'link_failed' | 'email_failed'): never {
+  redirect(`/ops?notice=${code}`);
+}
+
 export async function login(formData: FormData) {
   const password = String(formData.get('password') ?? '');
 
@@ -255,7 +264,7 @@ export async function confirmAndSend(formData: FormData) {
   const rawAgreed = String(formData.get('agreedDollars') ?? '').trim();
   const dollars = Number(rawAgreed);
   if (rawAgreed === '' || !Number.isFinite(dollars) || dollars <= 0) {
-    throw new Error('Enter the agreed price before confirming');
+    backWithNotice('no_price');
   }
   const agreedCents = Math.round(dollars * 100);
 
@@ -271,7 +280,7 @@ export async function confirmAndSend(formData: FormData) {
   if (readError) throw new Error(readError.message);
   if (!row) throw new Error('Request not found');
   if (!row.contact_email) {
-    throw new Error('No email on this request — confirm it by phone and record the price instead');
+    backWithNotice('no_email');
   }
 
   const code = row.confirmation_code || generateConfirmationCode();
@@ -280,13 +289,19 @@ export async function confirmAndSend(formData: FormData) {
   let payLinkId: string | null = row.stripe_payment_link_id ?? null;
 
   if (!onAccount && !payUrl && stripeConfigured()) {
-    const link = await createTripPaymentLink({
-      amountCents: agreedCents,
-      serviceName: serviceShortName(row.service_line),
-      confirmationCode: code,
-      tripRequestId: id,
-      serviceLine: row.service_line,
-    });
+    let link: Awaited<ReturnType<typeof createTripPaymentLink>> | null = null;
+    try {
+      link = await createTripPaymentLink({
+        amountCents: agreedCents,
+        serviceName: serviceShortName(row.service_line),
+        confirmationCode: code,
+        tripRequestId: id,
+        serviceLine: row.service_line,
+      });
+    } catch (e) {
+      console.error('[ops] payment link failed (trip left unchanged):', e);
+    }
+    if (!link) backWithNotice('link_failed');
     payUrl = link.url;
     payLinkId = link.id;
   }
@@ -319,12 +334,19 @@ export async function confirmAndSend(formData: FormData) {
     mobility: row.mobility,
   } as Parameters<typeof confirmationHtml>[1];
 
-  await sendRichEmail({
-    to: row.contact_email,
-    subject: confirmationSubject(confirmed, trip),
-    html: confirmationHtml(confirmed, trip),
-    text: confirmationText(confirmed, trip),
-  });
+  let emailed = true;
+  try {
+    await sendRichEmail({
+      to: row.contact_email,
+      subject: confirmationSubject(confirmed, trip),
+      html: confirmationHtml(confirmed, trip),
+      text: confirmationText(confirmed, trip),
+    });
+  } catch (e) {
+    emailed = false;
+    console.error('[ops] confirmation email failed (trip left unchanged):', e);
+  }
+  if (!emailed) backWithNotice('email_failed');
 
   const { error: writeError } = await db
     .from(TRIP_REQUESTS_TABLE)

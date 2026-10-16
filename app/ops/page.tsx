@@ -68,10 +68,18 @@ function LoginGate({ error }: { error?: string }) {
   );
 }
 
+const NOTICES: Record<string, string> = {
+  no_price: 'Enter the agreed price first, then tap Confirm & send.',
+  no_email:
+    'That request has no email address, so no payment link can be sent. Confirm it by phone: record the price and tap Mark confirmed instead. Nothing was changed.',
+  link_failed: 'The payment link could not be created, so nothing was sent and the trip was not changed. Try again in a minute.',
+  email_failed: 'The confirmation email could not be sent, so the trip was not changed. Try again in a minute.',
+};
+
 export default async function OpsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; error?: string };
+  searchParams: { status?: string; error?: string; notice?: string };
 }) {
   if (!isOpsAuthed()) return <LoginGate error={searchParams.error} />;
 
@@ -124,6 +132,12 @@ export default async function OpsPage({
             </button>
           </form>
         </div>
+
+        {searchParams.notice && NOTICES[searchParams.notice] && (
+          <p role="alert" className="form-error mt-4">
+            {NOTICES[searchParams.notice]}
+          </p>
+        )}
 
         {/* Status filter — large tap targets, horizontally scrollable on a phone. */}
         <nav className="mt-4 -mx-4 px-4 overflow-x-auto">

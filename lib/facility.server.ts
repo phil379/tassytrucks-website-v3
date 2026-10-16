@@ -224,6 +224,31 @@ export async function createOrFindFacility(input: {
 }
 
 /**
+ * Tie a prospect-list row (public.sales_prospects) to the facility that signed up from its link.
+ * Only fills an empty facility_id, so a prospect already linked is never re-pointed. Best effort: a
+ * failure is logged and swallowed, because the signup is already stored and must not turn into a 500.
+ * Commission is NOT decided here; referred_by_rep comes from `?rep=` alone.
+ */
+export async function linkProspectToFacility(prospectId: string, facilityId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseAdmin()
+      .from('sales_prospects')
+      .update({ facility_id: facilityId })
+      .eq('id', prospectId)
+      .is('facility_id', null)
+      .select('id');
+    if (error) {
+      console.error('[facility-signup] could not link prospect:', error.message);
+      return false;
+    }
+    return (data?.length ?? 0) > 0;
+  } catch (e) {
+    console.error('[facility-signup] could not link prospect:', e instanceof Error ? e.message : e);
+    return false;
+  }
+}
+
+/**
  * A Supabase magic link for this email, generated with the service role.
  *
  * Returns the URL for the caller to put in a Resend email rather than using

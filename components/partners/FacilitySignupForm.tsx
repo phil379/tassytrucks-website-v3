@@ -20,9 +20,12 @@ export default function FacilitySignupForm({
   source,
   rep,
   kind,
+  prospect,
 }: {
   source?: string;
   rep?: string | null;
+  /** Prospect list row from `?src=`, already checked to be a uuid by the page. */
+  prospect?: string | null;
   /**
    * Already coerced to a FACILITY_KINDS value by the page. Sent so the insert
    * can set facilities.kind instead of letting it default to 'other' — see
@@ -60,6 +63,7 @@ export default function FacilitySignupForm({
       elapsedMs: Date.now() - renderedAtRef.current,
       source: source ?? 'partners-signup',
       rep: rep ?? null,
+      prospect: prospect ?? undefined,
       kind: kind ?? undefined,
     };
 

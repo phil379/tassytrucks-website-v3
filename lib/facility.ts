@@ -234,7 +234,26 @@ export const facilitySignupSchema = z.object({
     .regex(/^[a-z0-9][a-z0-9-]{0,48}[a-z0-9]$/, 'Unrecognised referral link')
     .optional()
     .nullable(),
+
+  /**
+   * The prospect list row this signup came from, `/partners/signup?rep=<slug>&src=<prospect id>`.
+   *
+   * Lets the owner's pipeline show "this prospect became this facility". Lenient on purpose, like
+   * `kind`: it came off a link we generated, and anything that is not a uuid becomes null instead of
+   * blocking the visitor. It never touches commission: `rep` alone drives referred_by_rep.
+   */
+  prospect: z
+    .unknown()
+    .transform((v) => (typeof v === 'string' && PROSPECT_ID_RE.test(v.trim()) ? v.trim().toLowerCase() : null))
+    .optional(),
 });
+
+const PROSPECT_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** For the page and the tests: a prospect id from the URL, or null. */
+export function coerceProspectId(v: unknown): string | null {
+  return typeof v === 'string' && PROSPECT_ID_RE.test(v.trim()) ? v.trim().toLowerCase() : null;
+}
 
 export type FacilitySignupInput = z.infer<typeof facilitySignupSchema>;
 

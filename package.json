@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test:unit": "bun run scripts/test-discounts.ts && bun run scripts/test-payments.ts && bun run scripts/test-care-intake.ts",
+    "test:unit": "bun run scripts/test-discounts.ts && bun run scripts/test-payments.ts && bun run scripts/test-care-intake.ts && bun run scripts/test-ops-bridge.ts",
     "test:smoke": "playwright test",
     "audit:links": "bun run scripts/audit-saas-links.ts",
     "verify": "bun run typecheck && bun run build && bun run test:smoke && bun run audit:links"

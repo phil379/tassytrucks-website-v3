@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import FacilitySignupForm from '@/components/partners/FacilitySignupForm';
-import { coerceFacilityKind } from '@/lib/facility';
+import { coerceFacilityKind, coerceProspectId } from '@/lib/facility';
 
 export const metadata: Metadata = {
   title: 'Partner with Tassy Transportation — Facility Accounts',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function FacilitySignupPage({
   searchParams,
 }: {
-  searchParams?: { source?: string; type?: string; rep?: string };
+  searchParams?: { source?: string; type?: string; rep?: string; src?: string };
 }) {
   const source = searchParams?.source ?? 'partners-signup';
   // No `rep` means nobody is credited — a real outcome, flagged for manual
@@ -39,7 +39,7 @@ export default function FacilitySignupPage({
       </p>
 
       <div className="mt-10">
-        <FacilitySignupForm source={source} rep={rep} kind={kind} />
+        <FacilitySignupForm source={source} rep={rep} kind={kind} prospect={coerceProspectId(searchParams?.src)} />
       </div>
 
       <ul className="mx-auto mt-10 grid max-w-lg gap-3 text-sm text-[color:var(--muted)]">

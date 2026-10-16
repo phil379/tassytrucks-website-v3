@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { facilitySignupSchema, coerceFacilityKind, facilityKind } from '@/lib/facility';
-import { createOrFindFacility, generateFacilityMagicLink } from '@/lib/facility.server';
+import { createOrFindFacility, generateFacilityMagicLink, linkProspectToFacility } from '@/lib/facility.server';
 import { sendRichEmail, notifyOperatorFacilitySignup } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'Please check the form.', fieldErrors }, { status: 400 });
   }
 
-  const { facilityName, workEmail, rep, kind } = parsed.data;
+  const { facilityName, workEmail, rep, kind, prospect } = parsed.data;
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
 
   let facilityId: string;
@@ -84,6 +84,9 @@ export async function POST(request: Request) {
     const result = await createOrFindFacility({ facilityName, workEmail, source, rep, kind });
     facilityId = result.facilityId;
     created = result.created;
+    // Pipeline link: which prospect-list row this new facility came from. Best effort, never throws,
+    // and only for a brand-new facility (a returning email must not re-point someone else's prospect).
+    if (created && prospect) await linkProspectToFacility(prospect, facilityId);
   } catch (err) {
     console.error('[facility-signup] INSERT FAILED:', err instanceof Error ? err.message : err);
     return NextResponse.json(

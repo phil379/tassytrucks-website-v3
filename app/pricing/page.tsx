@@ -6,7 +6,8 @@ import {
   CARE, CARE_WAV, CONCIERGE as CONCIERGE_CARD, RECOVERY, WINNIE as WINNIE_CARD,
 } from '@/lib/quote';
 import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
-import { SCHOOL_PLANS, SIBLING_NOTE } from '@/lib/school-plans';
+import { SCHOOL_PLANS } from '@/lib/school-plans';
+import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
 
 export const metadata: Metadata = {
   title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
@@ -121,8 +122,8 @@ export default function PricingPage() {
                     same source the wizard charges from. */}
                 <p className="ink-soft mt-2 text-sm leading-relaxed">
                   Sold <strong className="text-cream-text">by the plan and billed monthly</strong>,
-                  never per ride — one child, one car, the same driver every morning and the
-                  schedule locked for the year.
+                  never per ride — one child, one car, on a recurring schedule reviewed and
+                  confirmed before service begins.
                 </p>
                 <ul className="mt-3 space-y-1.5 text-sm">
                   {SCHOOL_PLANS.map((plan) => (
@@ -132,7 +133,14 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
-                <p className="ink-soft mt-2 text-xs">{SIBLING_NOTE}.</p>
+                <p className="ink-soft mt-3 text-xs leading-relaxed" data-testid="household-prompt">
+                  <strong className="text-cream-text">{HOUSEHOLD_PROMPT_TITLE}</strong>{' '}
+                  {HOUSEHOLD_PROMPT_BODY}{' '}
+                  <Link href={householdRequestHref([], null)} className="underline">
+                    Tell us about your family
+                  </Link>
+                  .
+                </p>
                 <p className="ink-soft mt-3 text-sm leading-relaxed">
                   Schools, districts and case managers: daily routes are a different product,
                   priced per leg by how many stops the route has rather than by the mile, and

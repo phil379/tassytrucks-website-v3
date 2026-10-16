@@ -3,11 +3,16 @@ import Link from 'next/link';
 import { ArrowRight, Phone, Check } from 'lucide-react';
 import { contact } from '@/lib/saas-links';
 import { request, scholarPlan } from '@/lib/request-links';
+import {
+  HOUSEHOLD_PROMPT_BODY,
+  HOUSEHOLD_PROMPT_TITLE,
+  householdRequestHref,
+} from '@/lib/school-household';
 
 export const metadata: Metadata = {
   title: 'Tassy Scholar — daily student transport',
   description:
-    'Parent-direct school transport across Charlotte: choose one of three plans (Full Year, Weekly, After-School) with the same trusted driver every day.',
+    'Parent-direct school transport across Charlotte: choose one of three plans (Full Year, Weekly, After-School) for one child, with a recurring schedule confirmed before service begins.',
   alternates: { canonical: '/school' },
   openGraph: { url: '/school', images: ['/og-image/school'] },
 };
@@ -18,7 +23,7 @@ const serviceLd = {
   name: 'Tassy Scholar — Student Transportation',
   serviceType: 'School Transportation',
   description:
-    'Parent-direct daily school transport with a committed schedule and the same trusted driver. Also operates alternative student routes as an EverDriven Technologies subcontractor.',
+    'Parent-direct daily school transport with a recurring schedule reviewed and confirmed before service begins. Also operates alternative student routes as an EverDriven Technologies subcontractor.',
   provider: {
     '@type': 'LocalBusiness',
     name: 'Tassy Transportation',
@@ -38,7 +43,7 @@ const PLANS = [
     name: 'Full School Year',
     badge: 'Best value',
     cadence: 'Daily AM + PM · Mon–Fri · Aug–May',
-    features: ['AM + PM every school day', 'Same trusted driver', 'Schedule locked for the year', 'Priority on weather days'],
+    features: ['AM + PM every school day', 'Consistent driver assignments whenever operationally possible', 'Recurring schedule reviewed and confirmed before service begins', 'Priority on weather days'],
     href: scholarPlan('full-year'),
     highlight: true,
   },
@@ -46,7 +51,7 @@ const PLANS = [
     name: 'Weekly Pattern',
     badge: null,
     cadence: 'Pick your days · e.g. Tue / Wed / Thu',
-    features: ['Choose the days that fit', 'AM and/or PM per day', 'Same trusted driver', 'Locked monthly schedule'],
+    features: ['Choose the days that fit', 'AM and/or PM per day', 'Consistent driver assignments whenever operationally possible', 'Recurring schedule reviewed and confirmed before service begins'],
     href: scholarPlan('weekly'),
     highlight: false,
   },
@@ -54,7 +59,7 @@ const PLANS = [
     name: 'After-School Activities',
     badge: null,
     cadence: 'Sports · clubs · programs',
-    features: ['Per-program scheduling', 'Sports, clubs & enrichment', 'Pay upfront for the season', 'Locked, predictable schedule'],
+    features: ['Per-program scheduling', 'Sports, clubs & enrichment', 'Pay upfront for the season', 'Recurring schedule reviewed and confirmed before service begins'],
     href: scholarPlan('after-school'),
     highlight: false,
   },
@@ -65,9 +70,9 @@ const STANDARDS = [
   ['5-minute no-show', 'Driver waits, then calls you — your child is never abandoned at a curb.'],
   ['Hygiene', 'Clean, climate-controlled vehicles maintained on our medical-fleet schedule.'],
   ['Trusted handoff', 'Released only to an approved adult or school staff on your list.'],
-  ['Professional conduct', 'Vetted, fingerprinted drivers held to a written code of conduct.'],
-  ['Recorded for safety', 'In-vehicle recording on every ride, retained for your protection.'],
-  ['Known driver', 'The same friendly face every day — continuity that matters most for kids.'],
+  ['Professional conduct', 'Driver screening and onboarding requirements apply before service assignment.'],
+  ['Safety practices', 'Safety practices and vehicle procedures are designed to support a secure ride experience.'],
+  ['Consistent driver assignments', 'We aim to provide consistent driver assignments whenever operationally possible.'],
 ];
 
 const METROS = [
@@ -91,8 +96,8 @@ export default function SchoolPage() {
             Daily school transport. <span className="serif italic gold-text">Committed.</span> Trusted.
           </h1>
           <p className="mt-5 text-xl lg:text-2xl ink-soft serif max-w-2xl">
-            The same trusted driver, every school day. Parents commit to one of three plans —
-            predictable rides, the same friendly face, all year.
+            Parents commit to one of three plans for one child — predictable rides on a recurring
+            schedule that is reviewed and confirmed before service begins.
           </p>
           <div className="mt-9 flex gap-3 flex-wrap">
             <a href={request.school} className="btn-gold">Choose your plan <ArrowRight size={16} /></a>
@@ -143,6 +148,17 @@ export default function SchoolPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* CUSTOM HOUSEHOLD REQUEST — anything beyond one child / one school / one address */}
+      <section className="bg-cream border-t border-line">
+        <div className="container-x py-12 text-center" data-testid="household-prompt">
+          <h2 className="serif text-2xl font-semibold max-w-2xl mx-auto">{HOUSEHOLD_PROMPT_TITLE}</h2>
+          <p className="mt-3 text-sm ink-soft max-w-xl mx-auto">{HOUSEHOLD_PROMPT_BODY}</p>
+          <Link href={householdRequestHref([], null)} className="btn-gold mt-5 inline-flex text-sm">
+            Tell us about your family <ArrowRight size={16} />
+          </Link>
         </div>
       </section>
 

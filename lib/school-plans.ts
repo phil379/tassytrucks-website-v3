@@ -51,8 +51,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     commitment: 'Daily morning and afternoon pickup, Monday–Friday, the entire school year.',
     includes: [
       'AM + PM every school day',
-      'Same trusted driver all year',
-      'Schedule locked for the year',
+      'Consistent driver assignments whenever operationally possible',
+      'Recurring schedule reviewed and confirmed before service begins',
       'Priority weather rerouting',
     ],
     billing: 'Annual subscription · biggest per-ride discount',
@@ -70,8 +70,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     includes: [
       'Choose the days that fit',
       'AM and/or PM per day',
-      'Same driver on your days',
-      'Schedule locked monthly',
+      'Consistent driver assignments whenever operationally possible',
+      'Recurring schedule reviewed and confirmed before service begins',
     ],
     billing: 'Monthly subscription',
     badge: null,
@@ -89,7 +89,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
       'Per-program scheduling',
       'Sports, clubs, tutoring',
       'Pay upfront for the season',
-      'Schedule locked per program',
+      'Recurring schedule reviewed and confirmed before service begins',
     ],
     billing: 'Per-program package',
     badge: null,
@@ -123,15 +123,17 @@ export function planBySlug(slug: string): SchoolPlan | undefined {
  * Whether $850 still holds with leg length and insurance is the open Scholar
  * margin decision, so treat this price as Phil's call and not a derived one.
  *
- * THE SIBLING RATE IS THE REAL MARGIN. A second child in a car that is already
- * making the trip costs nothing extra -- no second driver, no second insurance
- * charge, no second dispatch. Half price to the family is nearly all margin to
- * Tassy, and it puts a two-child household at $1,259 against Shuttlebee's
- * $800-1,200 for two shared seats. Sell siblings.
+ * NO SIBLING DISCOUNT. Decision 2026-10-13: the old "second child 50% off" line
+ * is removed everywhere. Under the live pay engine every trip carries $9 of fixed
+ * fees (insurance $6 + dispatch $3) and the driver is paid per child-trip, so a
+ * half-price second child earns Tassy about -$2/month. Households with more than
+ * one child, school, address or destination go to the Custom Household Request
+ * (lib/school-household.ts) and are priced by hand. A shared-drive model
+ * ("Option A") is deferred until there is recurring demand and shared-drive
+ * detection exists; see the project doc scholar-sibling-options-A-B-2026-10-13.
  *
  * Provisional until Phil reviews with VR&E and his CPCC counsellor.
  */
-export const SIBLING_NOTE = 'Second child on the same route: 50% off';
 
 /** @deprecated Real prices now live on each plan. Kept so nothing 404s mid-edit. */
 export const PRICING_PLACEHOLDER = 'Pricing varies by school';
@@ -153,7 +155,7 @@ export type PolicyKey =
   | 'hygiene'
   | 'trusted_handoff'
   | 'professional_conduct'
-  | 'recorded_safety'
+  | 'safety_practices'
   | 'known_driver';
 
 export interface PolicyDef {
@@ -198,14 +200,14 @@ export const SCHOOL_POLICIES: PolicyDef[] = [
     body: "Your driver follows the planned route — no detours, no stops, no errands. They don't touch your child, don't fasten seatbelts, don't engage in personal conversations. **Professional, quiet, focused on safety.**",
   },
   {
-    key: 'recorded_safety',
-    title: 'Recorded for safety',
-    body: "Every trip is recorded — video and audio inside the cabin — and reviewed only if there's a concern. Footage is kept 30 days, then deleted. **You can request your child's footage within that window.**",
+    key: 'safety_practices',
+    title: 'Safety practices',
+    body: 'Safety practices and vehicle procedures are designed to support a secure ride experience.',
   },
   {
     key: 'known_driver',
-    title: 'Known driver, every trip',
-    body: "Before pickup, you see your driver's name, photo, vehicle make and license plate. We assign the same driver to your family whenever we can. **Predictability is part of the safety promise.**",
+    title: 'Consistent driver assignments',
+    body: "Before pickup, you see your driver's name, photo, vehicle make and license plate. We aim to provide consistent driver assignments whenever operationally possible.",
   },
 ];
 
@@ -217,7 +219,7 @@ export const SCHOOL_POLICIES: PolicyDef[] = [
  * refers to has moved on. This is the cheap half of making an acknowledgement
  * mean something.
  */
-export const POLICY_VERSION = '2026-09-29';
+export const POLICY_VERSION = '2026-10-13';
 
 /* ───────────────────────────────────────────────────── schedule vocabulary */
 
@@ -343,10 +345,23 @@ export const schoolBookingSchema = z.object({
     hygiene: policyAck,
     trusted_handoff: policyAck,
     professional_conduct: policyAck,
-    recorded_safety: policyAck,
+    safety_practices: policyAck,
     known_driver: policyAck,
   }),
   starts_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Please pick a start date'),
+  /**
+   * The parent's own answer to the household check that precedes this wizard:
+   * one child, one pickup address, one school, a standard recurring schedule.
+   * Required, because a household that is none of those must not become a
+   * standing order with a card-less, unreviewed nightly ride. It is an
+   * attestation, not a detector -- the server cannot see how many children a
+   * family has -- so the route also rejects any request that names reasons.
+   */
+  standard_household_confirmed: z.literal(true, {
+    error: 'Please confirm this is one child, one school and one address, or send a custom request.',
+  }),
+  /** Anything the gate recorded as nonstandard. Non-empty means "not this form". */
+  household_reasons: z.array(z.string()).optional(),
   hp_token: z.string().optional(),
   elapsedMs: z.number().optional(),
 });

@@ -1,12 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PolicyBody } from '@/components/school/PolicyBody';
-import { SCHOOL_PLANS, SCHOOL_POLICIES, SIBLING_NOTE } from '@/lib/school-plans';
+import { SCHOOL_PLANS, SCHOOL_POLICIES } from '@/lib/school-plans';
+import {
+  HOUSEHOLD_PROMPT_BODY,
+  HOUSEHOLD_PROMPT_TITLE,
+  householdRequestHref,
+} from '@/lib/school-household';
 
 export const metadata: Metadata = {
   title: 'Daily school transport in Charlotte NC · Tassy Scholar',
   description:
-    'Committed daily school transport in Charlotte. Three plans, the same trusted driver every school day, and a locked schedule. Pricing varies by school.',
+    'Committed daily school transport in Charlotte. Three recurring plans for one child, with a schedule reviewed and confirmed before service begins. Pricing varies by school.',
   alternates: { canonical: '/school/book' },
 };
 
@@ -28,9 +33,9 @@ export default function SchoolBookPage() {
         Daily school transport. Committed.
       </h1>
       <p className="mx-auto mt-4 max-w-2xl text-center text-[color:var(--ink-soft)]">
-        The same trusted driver, every school day. Parents commit to one of three plans — that
-        commitment is what keeps your child&rsquo;s ride reliable, on-time, and the same friendly
-        face all year.
+        Parents commit to one of three plans for one child, one school and one pickup address.
+        That commitment is what keeps your child&rsquo;s ride reliable and on time. We aim to
+        provide consistent driver assignments whenever operationally possible.
       </p>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-3">
@@ -54,7 +59,6 @@ export default function SchoolBookPage() {
               </div>
               <div className="serif text-base">{plan.price}</div>
               <div className="text-[11px] text-[color:var(--ink-mute)]">{plan.priceNote}</div>
-              <div className="mt-1 text-[11px] text-[color:var(--ink-mute)]">{SIBLING_NOTE}</div>
               <div className="mt-1 text-[11px] text-[color:var(--ink-mute)]">{plan.billing}</div>
             </div>
             <Link href={`/school/book/${plan.slug}`} className="btn-primary mt-5 min-h-[44px] text-center">
@@ -62,6 +66,14 @@ export default function SchoolBookPage() {
             </Link>
           </div>
         ))}
+      </div>
+
+      <div className="card-tile mt-10 p-6" data-testid="household-prompt">
+        <h2 className="serif text-xl font-semibold">{HOUSEHOLD_PROMPT_TITLE}</h2>
+        <p className="mt-2 text-sm text-[color:var(--ink-soft)]">{HOUSEHOLD_PROMPT_BODY}</p>
+        <Link href={householdRequestHref([], null)} className="btn-primary mt-4 inline-flex min-h-[44px] items-center">
+          Tell us about your family
+        </Link>
       </div>
 
       <h2 className="serif mt-16 text-2xl font-semibold">How it works</h2>
@@ -81,9 +93,9 @@ export default function SchoolBookPage() {
           We don&rsquo;t do random one-off school rides.
         </h3>
         <p className="mt-2 text-sm text-[color:var(--ink-soft)]">
-          Tassy school transport is a committed service. A locked schedule is how we promise the
-          same trusted driver, on-time, every day — and how we keep your child safe with someone who
-          knows their routine. Need a single ride instead?{' '}
+          Tassy school transport is a committed service. Your recurring transportation schedule is
+          reviewed and confirmed before service begins, so your driver knows your child&rsquo;s
+          routine. Need a single ride instead?{' '}
           <Link href="/request?service=scholar" className="underline">
             Request a one-off ride
           </Link>

@@ -64,6 +64,8 @@ export default defineConfig({
       FACILITY_SIGNUP_RATE_LIMIT: '1000',
       /** Same reason, third route — the school specs post more than 5 times. */
       SCHOOL_BOOKING_RATE_LIMIT: '1000',
+      /** Same reason, fourth route — the household specs post more than 5 times. */
+      SCHOOL_HOUSEHOLD_RATE_LIMIT: '1000',
       /**
        * NO REAL EMAIL FROM THE TEST SUITE.
        *

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
-import { verifyWebhookSignature } from '@/lib/stripe';
+import { getPaymentMethodLabel, verifyWebhookSignature } from '@/lib/stripe';
+import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
+import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
 import { notifyOperatorPaid, notifyOperatorPaymentMismatch, sendRichEmail } from '@/lib/notifications';
 import { checkPaidAmount } from '@/lib/payment-check';
 import { closePaymentAttempt, findPaymentAttempt, type PaymentAttempt } from '@/lib/payment-attempts';
@@ -159,6 +161,17 @@ export async function POST(request: Request) {
     const r = (rows?.[0] ?? {}) as unknown as Record<string, unknown>;
     const email = (r.contact_email as string | null) ?? null;
     if (email) {
+      // The private receipt page + the card used. Both best effort: a missing piece is left off the
+      // receipt, never a reason to skip it. Old trips (paid on a link made before receipts existed)
+      // get their token here.
+      const token = await ensureReceiptToken(db, data[0].id as string, r.receipt_token as string | null);
+      let cardLabelText = (r.payment_method_label as string | null) ?? null;
+      if (!cardLabelText && session.id) {
+        cardLabelText = await getPaymentMethodLabel(session.id);
+        if (cardLabelText) {
+          await db.from(TRIP_REQUESTS_TABLE).update({ payment_method_label: cardLabelText }).eq('id', data[0].id as string);
+        }
+      }
       const receipt: ReceiptData = {
         tripNumber: (r.trip_number as string | null) ?? null,
         confirmationCode: (r.confirmation_code as string | null) ?? null,
@@ -175,6 +188,8 @@ export async function POST(request: Request) {
           (r.quoted_cents as number | null) ??
           (session.amount_total ?? 0),
         paidAt: (r.paid_at as string | null) ?? new Date().toISOString(),
+        paymentMethodLabel: cardLabelText,
+        receiptUrl: token ? receiptUrlFor(token) : null,
       };
       await sendRichEmail({
         to: email,
@@ -185,6 +200,15 @@ export async function POST(request: Request) {
     }
   } catch (e) {
     console.error('[stripe] receipt email failed (payment still recorded):', e);
+  }
+
+  // The rider's text with the same receipt link. TassyOps decides whether a text really goes out
+  // (texting on, consent given, quiet hours, once per trip); this only reports that the trip is paid.
+  // Own try/catch: it never throws, and never undoes a recorded payment.
+  try {
+    await pingTassyOpsEvent(data[0].id as string, 'paid');
+  } catch (e) {
+    console.error('[stripe] could not tell TassyOps the trip is paid:', e);
   }
 
   return NextResponse.json({ ok: true, updated: data.length });

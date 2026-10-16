@@ -176,6 +176,11 @@ export async function createTripPaymentLink(input: {
   tripRequestId: string;
   /** The trip's service_line, used to connect the charge to the seeded Product. */
   serviceLine?: string | null;
+  /**
+   * The private receipt page (https://…/r/<token>). When given, Stripe sends the customer there the
+   * moment they pay instead of showing its own generic thank-you.
+   */
+  receiptUrl?: string | null;
 }): Promise<PaymentLink> {
   if (!Number.isInteger(input.amountCents) || input.amountCents < 50) {
     throw new Error('A payment link needs a whole amount of at least $0.50');
@@ -203,6 +208,20 @@ export async function createTripPaymentLink(input: {
   }
   const price = await post<{ id: string }>('/prices', priceFields);
 
+  // After payment: straight to the private receipt page when we have one (it waits for the webhook if
+  // Stripe's redirect beats it), otherwise Stripe's own thank-you page as before.
+  const afterPayment: Record<string, FormValue> = input.receiptUrl
+    ? {
+        'after_completion[type]': 'redirect',
+        'after_completion[redirect][url]': input.receiptUrl,
+      }
+    : {
+        'after_completion[type]': 'hosted_confirmation',
+        'after_completion[hosted_confirmation][custom_message]':
+          `Thank you — your trip is paid. Keep ${input.confirmationCode} handy; ` +
+          'quote it to dispatch on (704) 941-8508 and we will have your trip on screen.',
+      };
+
   return post<PaymentLink>('/payment_links', {
     'line_items[0][price]': price.id,
     'line_items[0][quantity]': 1,
@@ -212,11 +231,46 @@ export async function createTripPaymentLink(input: {
     // in case that ever stops being true.
     'metadata[trip_request_id]': input.tripRequestId,
     'metadata[confirmation_code]': input.confirmationCode,
-    'after_completion[type]': 'hosted_confirmation',
-    'after_completion[hosted_confirmation][custom_message]':
-      `Thank you — your trip is paid. Keep ${input.confirmationCode} handy; ` +
-      'quote it to dispatch on (704) 941-8508 and we will have your trip on screen.',
+    ...afterPayment,
   });
+}
+
+const CARD_BRANDS: Record<string, string> = {
+  visa: 'Visa',
+  mastercard: 'Mastercard',
+  amex: 'American Express',
+  discover: 'Discover',
+  diners: 'Diners Club',
+  jcb: 'JCB',
+  unionpay: 'UnionPay',
+};
+
+/** "Visa •••• 4242". Brand and last four only — nothing else about the card is ever kept. */
+export function cardLabel(brand: string | null | undefined, last4: string | null | undefined): string | null {
+  if (!last4 || !/^\d{4}$/.test(last4)) return null;
+  const b = (brand ?? '').toLowerCase();
+  const name = CARD_BRANDS[b] ?? (b ? b.charAt(0).toUpperCase() + b.slice(1) : 'Card');
+  return `${name} •••• ${last4}`;
+}
+
+/**
+ * What the customer paid with, for the receipt. Best effort: any failure returns null and the receipt
+ * simply leaves the line out.
+ */
+export async function getPaymentMethodLabel(checkoutSessionId: string): Promise<string | null> {
+  try {
+    const s = await get<{
+      payment_intent?: { payment_method?: { card?: { brand?: string; last4?: string } } | string | null } | string | null;
+    }>(`/checkout/sessions/${encodeURIComponent(checkoutSessionId)}?expand%5B%5D=payment_intent.payment_method`);
+    const pi = s.payment_intent;
+    if (!pi || typeof pi === 'string') return null;
+    const pm = pi.payment_method;
+    if (!pm || typeof pm === 'string') return null;
+    return cardLabel(pm.card?.brand, pm.card?.last4);
+  } catch (e) {
+    console.error('[stripe] could not read the card for the receipt:', (e as Error).message);
+    return null;
+  }
 }
 
 /**

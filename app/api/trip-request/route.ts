@@ -408,6 +408,8 @@ export async function POST(request: Request) {
     // Read from the VALIDATED details, so the stored estimate matches the one
     // on screen. The engine ignores it off Recovery.
     escort: tripDetails?.escort === 'yes',
+    // Same rule as the form: read from the VALIDATED details, Care ambulatory only.
+    treatmentDay: tripDetails?.flat_round_trip === 'yes',
     pickup: { lat: data.pickupLat, lng: data.pickupLng },
     dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
     // The typed addresses are passed too, so a row with no picked place still

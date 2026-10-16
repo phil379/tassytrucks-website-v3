@@ -231,6 +231,25 @@ const CARE: DetailSection = {
       options: YES_NO_UNSURE,
       half: true,
     },
+    {
+      /**
+       * THE TREATMENT DAY CARD (lib/quote.ts, TREATMENT_DAY). A product choice,
+       * like picking Recovery over Care: it is priced from its own flat
+       * round-trip card. The field is named for the PRODUCT, never the reason
+       * for the ride: the tripwire in playwright/request/trip-details.spec.ts
+       * bans "treatment", "condition" and friends from every key, label and
+       * option, and that is correct. The answer stores only yes or no.
+       * Ambulatory only: a wheelchair request is quoted on its own card.
+       */
+      key: 'flat_round_trip',
+      label: 'Flat-price round trip?',
+      type: 'select',
+      options: [
+        { value: 'no', label: 'No — a regular ride' },
+        { value: 'yes', label: 'Yes — one flat price for both legs, clean-ride SUV' },
+      ],
+      help: 'Best for recurring visits. Both legs are included, and your driver comes back when you call. Not available for wheelchair rides.',
+    },
   ],
 };
 

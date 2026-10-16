@@ -215,6 +215,61 @@ export const RECOVERY: Card = {
 };
 
 /**
+ * TASSY CARE, TREATMENT DAY — proposed 2026-10-16, Phil: "go".
+ *
+ * A flat, all-in ROUND TRIP for recurring treatment visits (infusion, radiation,
+ * dialysis, therapy). It is a variant of Care, not a new service line: same
+ * driver pay model, same dispatch, same ops queue row (service_line stays
+ * 'care'), priced from its own card. The customer picks it with one yes/no on
+ * the Care form; nothing about WHY they ride is asked or stored.
+ *
+ * WHY NOT RECOVERY. Recovery assumes the driver waits about 20 minutes and
+ * brings the patient home. An infusion is two to eight hours, so the driver is
+ * released and the return leg is dispatched when the patient calls. That is the
+ * model Charlotte and Baltimore competitors both sell ("call when ready").
+ *
+ * THE PRICE. Two Care legs plus about $11: the $11 pays for a pre-ride wipe-down
+ * (about five minutes of driver time plus supplies) and a late-model SUV. The
+ * ladder is Care's own, doubled, then lifted: 98/118/148/178/218/258 -> 109/129/
+ * 159/189/229/269. Estimated contribution 27-30% against a 25% floor and a 30%
+ * target (docs: margin-targets-by-line). The model is back-solved and insurance
+ * and dispatch per leg are still unverified. Phil said he will adjust the price
+ * later: change the numbers HERE, regenerate nothing else, and the form, the
+ * chemo page and the server all follow because every one of them reads this card.
+ *
+ * `returnFactor: 1` — the band IS the round trip, exactly like Recovery, so
+ * ticking "return trip" can never double it. No per-person charge: a companion
+ * rides free. The standing ride plan (15% off, 8+ legs a month) is still sold
+ * on the phone; it is not wired into the estimator.
+ *
+ * CLAIMS. The ride standard is stated as PRACTICES (wipe-down, mask, sick-driver
+ * rule). Never copy "sterile", "prevents infection" or "safe for the
+ * immunocompromised" onto any surface: the insurer and counsel have not cleared
+ * health-protection wording.
+ */
+export const TREATMENT_DAY: Card = {
+  label: 'Tassy Care · Treatment Day',
+  bands: [
+    { upToMiles: 3, cents: 10900 },
+    { upToMiles: 7, cents: 12900 },
+    { upToMiles: 12, cents: 15900 },
+    { upToMiles: 17, cents: 18900 },
+    { upToMiles: 22, cents: 22900 },
+    { upToMiles: 30, cents: 26900 },
+  ],
+  waitIncludedMin: 0,
+  waitOverage: 2000,
+  perExtra: 0,
+  returnFactor: 1,
+  returnFloor: 0,
+};
+
+/** Treatment Day exists on Tassy Care, ambulatory only. Wheelchair is quoted on its own card. */
+export function treatmentDayAvailable(serviceLine: string, mobility?: string | null): boolean {
+  return serviceLine === 'care' && mobility !== 'wheelchair';
+}
+
+/**
  * Tassy Concierge — premium, one way, nothing medical.
  * Airport, golf, dinner, events, collecting a client from their hotel.
  *
@@ -767,6 +822,12 @@ export type QuoteInput = {
    * $45 to a pet ride.
    */
   escort?: boolean | null;
+  /**
+   * Tassy Care, Treatment Day — a flat round trip from TREATMENT_DAY. Ignored on
+   * every line but ambulatory Care, so a stale query string cannot reprice a
+   * Recovery, Concierge or pet ride.
+   */
+  treatmentDay?: boolean | null;
 };
 
 /**
@@ -800,7 +861,10 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const to = resolvePoint(input.dropoff, input.dropoffAddress);
   if (!from || !to) return null;
 
-  const card = cardFor(input.serviceLine, input.mobility);
+  const card =
+    input.treatmentDay && treatmentDayAvailable(input.serviceLine, input.mobility)
+      ? TREATMENT_DAY
+      : cardFor(input.serviceLine, input.mobility);
   if (!card) return null;
 
   // A measured road distance ends the guessing. Both ends of the range become

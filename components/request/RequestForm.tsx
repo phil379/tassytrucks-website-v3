@@ -173,7 +173,10 @@ export default function RequestForm({
    * Kept as plain strings here and coerced once, by the shared validator, so
    * the form and the server agree on what a number or a date means.
    */
-  const [details, setDetails] = useState<Record<string, string>>({});
+  const [details, setDetails] = useState<Record<string, string>>((): Record<string, string> =>
+    // ?flat=1 (the treatment-day landing page) pre-selects the flat round trip on Care.
+    initialService === 'care' && searchParams.get('flat') === '1' ? { flat_round_trip: 'yes' } : {},
+  );
   /** Tassy Care medical billing. Only sent when a payer is chosen on a Care ride. */
   const [care, setCare] = useState<CareIntakeValues>(EMPTY_CARE_INTAKE);
 
@@ -328,6 +331,9 @@ export default function RequestForm({
       // The one detail answer that moves the price. The engine ignores it on
       // every line but Recovery, so switching service cannot carry $45 across.
       escort: details.escort === 'yes',
+      // Treatment Day: its own flat round-trip card, Care only. The engine ignores
+      // it everywhere else, so switching service cannot carry it across.
+      treatmentDay: details.flat_round_trip === 'yes',
       pickup: pickupPlace,
       dropoff: dropoffPlace,
       // The raw text matters even when a place was picked: with no Maps key
@@ -344,6 +350,7 @@ export default function RequestForm({
     estimatesEnabled,
     roadMiles,
     details.escort,
+    details.flat_round_trip,
     service,
     pickupPlace,
     dropoffPlace,

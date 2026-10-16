@@ -37,6 +37,9 @@ export type FacilityRow = {
    *  starts at the facility, and typing it from memory rarely includes the ZIP
    *  the quote engine needs. */
   address: string | null;
+  /** Set when the wizard's billing step is finished. A pending facility with
+   *  an address AND a billing email has done its part and is waiting on us. */
+  billing_email: string | null;
 };
 
 /** PostgREST does not throw. An ignored error is how rows silently vanish. */
@@ -67,7 +70,7 @@ export async function facilityByEmail(email: string): Promise<{
   const facility = ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address, billing_email')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities lookup',
@@ -103,7 +106,7 @@ export async function facilityContextByAuthUser(authUserId: string): Promise<{
   const facility = ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address, billing_email')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities context by auth id',
@@ -128,7 +131,7 @@ export async function facilityByAuthUser(authUserId: string) {
   return ok<FacilityRow | null>(
     await db
       .from(FACILITIES_TABLE)
-      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address')
+      .select('id, name, kind, status, billing_mode, discount_pct, account_manager, referred_by_rep, po_required, address, billing_email')
       .eq('id', user.facility_id)
       .maybeSingle(),
     'facilities by auth id',

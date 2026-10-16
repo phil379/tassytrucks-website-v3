@@ -6,6 +6,7 @@ import {
   type TripRequestInput,
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
+import { SAAS_BASE } from './saas-links';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -264,7 +265,18 @@ export async function sendRichEmail(payload: {
 }
 
 /** Full detail to the operator's own mailbox, plain text. */
-async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<void> {
+/**
+ * Who a facility booking is for. Absent for every retail request, so the alert
+ * for a normal customer is unchanged. Names the facility in the subject so a
+ * dispatcher reading a lock-screen can tell a clinic's job from a walk-in.
+ */
+export type FacilityAlertContext = {
+  facilityName: string;
+  facilityRef?: string | null;
+  payer?: string | null;
+};
+
+async function notifyOperatorEmail(id: string, data: TripRequestInput, facility?: FacilityAlertContext): Promise<void> {
   const to = process.env.OPERATOR_EMAIL;
   if (!to) throw new Error('OPERATOR_EMAIL is not set');
 
@@ -281,6 +293,14 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
     `Request ID:        ${id}`,
     `Service:           ${serviceShortName(data.serviceLine)}`,
     '',
+    ...(facility
+      ? [
+          `Facility:          ${facility.facilityName}`,
+          `Billed to:         ${facility.payer === 'facility' ? 'the facility, on account' : 'the passenger'}`,
+          `Their reference:   ${facility.facilityRef || '—'}`,
+          '',
+        ]
+      : []),
     `Name:              ${fullName(data)}`,
     `Phone:             ${data.contactPhone}`,
     `Email:             ${data.contactEmail || '—'}`,
@@ -304,7 +324,9 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput): Promise<
 
   await sendResendEmail({
     to,
-    subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}`,
+    subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}${
+      facility ? ` (${facility.facilityName}${facility.payer === 'facility' ? ', on account' : ''})` : ''
+    }`,
     text: lines.join('\n'),
   });
 }
@@ -396,6 +418,7 @@ export async function fireNotifications(
   id: string,
   data: TripRequestInput,
   tripNumber?: string | null,
+  facility?: FacilityAlertContext,
 ): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
@@ -407,7 +430,7 @@ export async function fireNotifications(
   const [push, pushFallback, operatorEmail, requesterEmail] = await Promise.all([
     runLeg(id, 'ntfy', () => pushToNtfy(message)),
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
-    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data)),
+    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility)),
     data.contactEmail
       ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber))
       : Promise.resolve<LegOutcome>('skipped'),
@@ -508,7 +531,8 @@ export async function notifyOperatorFacilitySignup(input: {
     `Record:    ${input.created ? 'new account' : 'existing account, re-submitted'}`,
     '',
     'They are PENDING and cannot book until approved.',
-    `Approve:   ${opsUrl()}`,
+    // Approval lives in TassyOps, not in this site's /ops (which has no facility screens).
+    `Approve:   ${SAAS_BASE}/ops/facilities/${input.facilityId}`,
   ].join('\n');
 
   const results = await Promise.allSettled([

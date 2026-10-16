@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import FacilityWizard from '@/components/facility/FacilityWizard';
 import ConsoleShell from '@/components/facility/ConsoleShell';
 import { currentFacilitySession } from '@/lib/facility-auth';
+import { canBook } from '@/lib/facility';
 
 export const metadata: Metadata = {
   title: 'Finish setting up your account — Tassy Transportation',
@@ -20,7 +21,11 @@ export const dynamic = 'force-dynamic';
  * that explains how to get another link beats an empty wizard that fails on
  * submit.
  */
-export default async function FacilityWelcomePage() {
+export default async function FacilityWelcomePage({
+  searchParams,
+}: {
+  searchParams?: { edit?: string };
+}) {
   const session = await currentFacilitySession();
   if (!session) redirect('/facility/link-expired');
 
@@ -32,6 +37,41 @@ export default async function FacilityWelcomePage() {
    * /facility/link-expired. See FacilitySession.facility.
    */
   const facility = session.facility;
+
+  /**
+   * A facility that finished the wizard on weekly invoice is waiting on US, not
+   * the other way round. Every /facility page redirects here while a pending
+   * facility cannot book, and before this the wizard simply started again at a
+   * blank step 1 -- which read as "your answers were lost". Show a holding page
+   * instead. `?edit=1` re-opens the wizard (for example to switch to
+   * passenger-pays so they can book before approval).
+   */
+  const finishedWizard = Boolean(facility.address && facility.billing_email);
+  if (facility.status === 'pending' && !canBook(facility) && finishedWizard && searchParams?.edit !== '1') {
+    return (
+      <ConsoleShell facilityName={facility.name} signedInAs={session.email} bare>
+        <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+          <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
+            Tassy Transportation
+          </p>
+          <h1 className="serif mt-3 text-center text-3xl font-semibold sm:text-4xl">
+            {facility.name} is set up
+          </h1>
+          <p className="mt-4 text-center text-[color:var(--ink-soft)]">
+            Weekly invoicing is a credit account, so we open it by hand. We usually do that the same
+            business day, and we will email you the moment your account is open.
+          </p>
+          <p className="mt-4 text-center text-[color:var(--ink-soft)]">
+            Need a ride before then? Call dispatch on{' '}
+            <a className="underline" href="tel:+17049418508">(704) 941-8508</a> and we will book it by phone.
+          </p>
+          <p className="mt-6 text-center text-sm">
+            <a className="underline" href="/facility/welcome?edit=1">Change your details or how you pay</a>
+          </p>
+        </div>
+      </ConsoleShell>
+    );
+  }
 
   /**
    * Read here rather than from NEXT_PUBLIC_*, so rotating the key takes effect

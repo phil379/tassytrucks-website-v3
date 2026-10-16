@@ -9,7 +9,7 @@ import { estimateTrip } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
-import { fireNotifications } from '@/lib/notifications';
+import { fireNotifications, type FacilityAlertContext } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
@@ -241,6 +241,7 @@ export async function POST(request: Request) {
 
   let facilityColumns: Record<string, unknown> = {};
   let facilityUserEmail: string | null = null;
+  let facilityAlert: FacilityAlertContext | undefined;
 
   if (wantsFacilityBooking) {
     const session = await currentFacilitySession();
@@ -329,6 +330,7 @@ export async function POST(request: Request) {
     }
 
     facilityUserEmail = session.email || null;
+    facilityAlert = { facilityName: session.facility.name, facilityRef: extras.data.facilityRef || null, payer };
     facilityColumns = {
       facility_id: session.facilityId,
       facility_user_id: session.facilityUserId,
@@ -481,7 +483,7 @@ export async function POST(request: Request) {
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  }, tripNumber);
+  }, tripNumber, facilityAlert);
 
   return NextResponse.json({ ok: true, id, tripNumber, notifications }, { status: 200 });
 }

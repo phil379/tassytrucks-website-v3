@@ -35,7 +35,7 @@ export type ConfirmFailure =
   | 'already_confirmed';
 
 export type ConfirmResult =
-  | { ok: true; confirmationCode: string; payUrl: string | null }
+  | { ok: true; confirmationCode: string; payUrl: string | null; textSent: boolean }
   | { ok: false; code: ConfirmFailure };
 
 const CLOSED_STATUSES = ['cancelled', 'completed', 'no_show'];
@@ -149,7 +149,7 @@ export async function confirmTrip(args: {
   if (writeError) throw new Error(writeError.message);
 
   // Rider text (booking confirmed + payment link). Best effort, after everything is saved and emailed.
-  await pingTassyOpsConfirmed(id);
+  const textSent = await pingTassyOpsConfirmed(id);
 
-  return { ok: true, confirmationCode: code, payUrl };
+  return { ok: true, confirmationCode: code, payUrl, textSent };
 }

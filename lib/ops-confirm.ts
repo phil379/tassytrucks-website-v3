@@ -11,6 +11,7 @@ import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { serviceShortName } from '@/lib/trip-request';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
 import { recordPaymentAttempt } from '@/lib/payment-attempts';
+import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
 
 /**
  * The one place a trip becomes "confirmed": issue a code, take an agreed price, create the Stripe
@@ -74,6 +75,9 @@ export async function confirmTrip(args: {
   let payLinkId: string | null = row.stripe_payment_link_id ?? null;
 
   if (!onAccount && !payUrl && stripeConfigured()) {
+    // The private receipt address is issued BEFORE the link, so Stripe can send the customer straight
+    // to it after paying. Best effort: with no token the link falls back to Stripe's own thank-you.
+    const receiptToken = await ensureReceiptToken(db, id, (row as { receipt_token?: string | null }).receipt_token);
     let link: Awaited<ReturnType<typeof createTripPaymentLink>> | null = null;
     try {
       link = await createTripPaymentLink({
@@ -82,6 +86,7 @@ export async function confirmTrip(args: {
         confirmationCode: code,
         tripRequestId: id,
         serviceLine: row.service_line,
+        receiptUrl: receiptToken ? receiptUrlFor(receiptToken) : null,
       });
     } catch (e) {
       console.error('[ops] payment link failed (trip left unchanged):', e);

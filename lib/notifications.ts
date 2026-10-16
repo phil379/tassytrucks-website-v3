@@ -580,3 +580,22 @@ export async function notifyOperatorPaid(row: { id: string }): Promise<void> {
     }
   }
 }
+
+/**
+ * Stripe collected an amount that does not match the payment link we issued (or the link was
+ * already replaced). The trip is NOT marked paid; someone must look. NEVER throws (webhook caller).
+ * PII RULE: ref only, no name, no amount.
+ */
+export async function notifyOperatorPaymentMismatch(row: { id: string }, kind: string): Promise<void> {
+  const ref = shortRef(row.id);
+  const message: PushMessage = {
+    title: 'PAYMENT NEEDS A LOOK - not marked paid',
+    body: `Ref ${ref} - ${kind}. Open Stripe and the trip.`,
+    priority: 'urgent',
+    tags: ['warning'],
+  };
+  const results = await Promise.allSettled([pushToNtfy(message), pushToZapier(ref, message)]);
+  for (const r of results) {
+    if (r.status === 'rejected') console.error('[stripe] mismatch alert leg failed for', ref, r.reason);
+  }
+}

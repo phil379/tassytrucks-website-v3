@@ -18,6 +18,7 @@ import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
 import { serviceShortName } from '@/lib/trip-request';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
+import { recordPaymentAttempt } from '@/lib/payment-attempts';
 
 /**
  * Every mutation re-checks the cookie. A server action is a public HTTP endpoint —
@@ -304,6 +305,8 @@ export async function confirmAndSend(formData: FormData) {
     if (!link) backWithNotice('link_failed');
     payUrl = link.url;
     payLinkId = link.id;
+    // Remember what this link asked for, so the Stripe webhook can check the amount collected.
+    await recordPaymentAttempt(db, { tripId: id, linkId: link.id, amountCents: agreedCents });
   }
 
   const confirmed: ConfirmedTrip = {

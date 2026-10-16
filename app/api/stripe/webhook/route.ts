@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { verifyWebhookSignature } from '@/lib/stripe';
-import { notifyOperatorPaid, sendRichEmail } from '@/lib/notifications';
+import { notifyOperatorPaid, notifyOperatorPaymentMismatch, sendRichEmail } from '@/lib/notifications';
+import { checkPaidAmount } from '@/lib/payment-check';
+import { closePaymentAttempt, findPaymentAttempt, type PaymentAttempt } from '@/lib/payment-attempts';
 import { receiptSubject, receiptHtml, receiptText, type ReceiptData } from '@/lib/receipt-email';
 
 /**
@@ -30,6 +32,7 @@ type CheckoutSession = {
   id?: string;
   payment_status?: string;
   amount_total?: number;
+  currency?: string;
   payment_link?: string;
   metadata?: Record<string, string> | null;
 };
@@ -66,6 +69,32 @@ export async function POST(request: Request) {
   }
 
   const db = supabaseAdmin();
+
+  // AMOUNT CHECK. If we issued this link through payment_attempts, what Stripe collected must equal
+  // what we asked for, in the same currency. Otherwise the trip is NOT marked paid: a stale or
+  // replaced link, or a wrong amount, needs a person. Links minted before payment_attempts existed
+  // have no row and behave exactly as before.
+  let attempt: PaymentAttempt | null = null;
+  if (session.payment_link) {
+    attempt = await findPaymentAttempt(db, session.payment_link);
+    if (attempt) {
+      const verdict = checkPaidAmount({
+        amountTotal: session.amount_total,
+        currency: session.currency,
+        expectedCents: attempt.amount_cents,
+        expectedCurrency: attempt.currency,
+      });
+      if (verdict !== 'match' || attempt.status === 'superseded') {
+        const kind = attempt.status === 'superseded' ? 'paid on a replaced link' : verdict;
+        console.error('[stripe] payment NOT recorded -', kind, 'session', session.id, 'trip', attempt.trip_id);
+        await closePaymentAttempt(db, attempt.id, attempt.status === 'superseded' ? 'paid_on_superseded' : 'amount_mismatch', `${kind}; session ${session.id ?? ''}`);
+        await notifyOperatorPaymentMismatch({ id: attempt.trip_id }, kind);
+        // 200 so Stripe stops retrying; the alert is how a person finds out.
+        return NextResponse.json({ ok: true, ignored: 'payment_needs_review' });
+      }
+    }
+  }
+
   const patch = {
     payment_status: 'paid',
     paid_at: new Date().toISOString(),
@@ -112,6 +141,8 @@ export async function POST(request: Request) {
     console.error('[stripe] paid session matched no request:', session.id);
     return NextResponse.json({ ok: true, ignored: 'no matching request' });
   }
+
+  if (attempt) await closePaymentAttempt(db, attempt.id, 'paid');
 
   // The money is recorded. Only now does anyone get told — and a failed alert
   // must not undo a stored payment.

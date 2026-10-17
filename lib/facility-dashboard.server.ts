@@ -32,6 +32,9 @@ export type FacilityTrip = {
   payment_status: string | null;
   agreed_cents: number | null;
   quoted_cents: number | null;
+  /** The range shown at booking. Display only: it is never billed, and dispatch's price (agreed or quoted) replaces it. */
+  estimate_low_cents?: number | null;
+  estimate_high_cents?: number | null;
   facility_ref: string | null;
   facility_invoice_id: string | null;
   facility_patient_id: string | null;
@@ -85,7 +88,7 @@ export type FacilityInvoice = {
 
 const TRIP_COLS =
   'id, service_line, status, contact_name, pickup_address, dropoff_address, requested_at, ' +
-  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id, ' +
+  'return_trip, payer, payment_status, agreed_cents, quoted_cents, estimate_low_cents, estimate_high_cents, facility_ref, facility_invoice_id, ' +
   'driver_id, vehicle_id, vehicle_description';
 
 /** The fare a trip has settled on. Agreed beats quoted; neither means unpriced. */
@@ -222,6 +225,19 @@ export function tripCents(t: FacilityTrip): number | null {
   if (typeof t.agreed_cents === 'number') return t.agreed_cents;
   if (typeof t.quoted_cents === 'number') return t.quoted_cents;
   return null;
+}
+
+/**
+ * The estimate a coordinator saw when booking, as [low, high] cents, or null.
+ * Shown only while the trip has no real price, so the list says "est. $49"
+ * instead of "price to come". Never counted toward an invoice.
+ */
+export function tripEstimate(t: FacilityTrip): [number, number] | null {
+  if (tripCents(t) !== null) return null;
+  const lo = t.estimate_low_cents;
+  const hi = t.estimate_high_cents;
+  if (typeof lo !== 'number' || lo <= 0) return null;
+  return [lo, typeof hi === 'number' && hi >= lo ? hi : lo];
 }
 
 /** Charlotte's day boundaries, not the server's. A trip at 11pm on the 31st

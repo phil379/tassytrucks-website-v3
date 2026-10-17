@@ -80,6 +80,12 @@ export type FacilityContext = {
    */
   address?: string | null;
   /**
+   * The signed-in coordinator's own details, prefilled into "the person we call
+   * back" so they are not retyped on every ride. Defaults only; all four fields
+   * stay editable, and any that is empty leaves the input blank.
+   */
+  contact?: { firstName: string; lastName: string; phone: string; email: string };
+  /**
    * A saved passenger, when the coordinator arrived from the Passengers screen.
    *
    * Name and mobility only. There is no age, date of birth or record number on
@@ -950,7 +956,7 @@ export default function RequestForm({
             First name <span aria-hidden="true">*</span>
             <span className="sr-only">(required)</span>
           </label>
-          <input {...fieldProps('contactFirstName')} autoComplete="given-name" required />
+          <input {...fieldProps('contactFirstName')} autoComplete="given-name" defaultValue={facility?.contact?.firstName ?? ''} required />
           <FieldError name="contactFirstName" />
         </div>
 
@@ -959,7 +965,7 @@ export default function RequestForm({
             Last name <span aria-hidden="true">*</span>
             <span className="sr-only">(required)</span>
           </label>
-          <input {...fieldProps('contactLastName')} autoComplete="family-name" required />
+          <input {...fieldProps('contactLastName')} autoComplete="family-name" defaultValue={facility?.contact?.lastName ?? ''} required />
           <FieldError name="contactLastName" />
         </div>
       </div>
@@ -970,7 +976,7 @@ export default function RequestForm({
             Phone <span aria-hidden="true">*</span>
             <span className="sr-only">(required)</span>
           </label>
-          <input {...fieldProps('contactPhone')} type="tel" autoComplete="tel" required />
+          <input {...fieldProps('contactPhone')} type="tel" autoComplete="tel" defaultValue={facility?.contact?.phone ?? ''} required />
           <FieldError name="contactPhone" />
         </div>
 
@@ -978,7 +984,7 @@ export default function RequestForm({
           <label className={labelCls} htmlFor="contactEmail">
             Email
           </label>
-          <input {...fieldProps('contactEmail')} type="email" autoComplete="email" />
+          <input {...fieldProps('contactEmail')} type="email" autoComplete="email" defaultValue={facility?.contact?.email ?? ''} />
           <FieldError name="contactEmail" />
         </div>
       </div>

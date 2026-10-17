@@ -49,7 +49,7 @@ const PLANS = [
   {
     name: 'Standing Ride Plan',
     save: '15% off',
-    body: 'Your standing appointment, the same driver at the same time every week. Minimum eight legs a month, billed monthly, priority over one-off bookings.',
+    body: 'Your standing appointment, the same driver at the same time every week. Minimum eight legs a month, each ride billed after the ride, priority over one-off bookings.',
   },
   {
     name: 'Care Pack 10',

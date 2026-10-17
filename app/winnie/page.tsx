@@ -52,7 +52,7 @@ export default function WinniePage() {
         },
         {
           title: 'Standing runs cost less',
-          body: 'Four trips a month is 10% off, eight trips is 15% off, billed monthly. Built for daycare runs and a groomer you see on the same day every month.',
+          body: 'Four trips a month is 10% off, eight trips is 15% off, each ride billed after the ride. Built for daycare runs and a groomer you see on the same day every month.',
         },
       ]}
       tiers={[

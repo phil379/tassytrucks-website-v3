@@ -254,7 +254,7 @@ export default function HomePage() {
               family before they made it.
             </p>
             <p className="text-lg leading-relaxed mb-8 opacity-75">
-              Book on account, one invoice a month instead of chasing receipts. Preferred
+              Book on account, one invoice a week instead of chasing receipts. Preferred
               rates from 10 trips a month, contract rates from 25.
             </p>
             <div className="flex flex-wrap gap-3">

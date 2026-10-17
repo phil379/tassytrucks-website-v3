@@ -79,7 +79,7 @@ export default function NemtPage() {
       ]}
       partnerCta={{
         title: 'Clinics, dialysis centers and case managers',
-        body: 'Book on account and get one invoice a month instead of chasing receipts. Preferred rates from 10 trips a month, contract rates from 25.',
+        body: 'Book on account and get one invoice a week instead of chasing receipts. Preferred rates from 10 trips a month, contract rates from 25.',
         href: 'mailto:phil@tassytrucks.com?subject=Facility%20account%20—%20Tassy%20Care',
         label: 'Ask for the facility packet',
       }}

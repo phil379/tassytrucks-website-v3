@@ -38,7 +38,7 @@ export default function RenewPage() {
         },
         {
           title: 'Going regularly?',
-          body: 'A standing course of treatment can go on the Standing Ride Plan — the same driver at the same time each week, 15% off, billed monthly, minimum eight legs.',
+          body: 'A standing course of treatment can go on the Standing Ride Plan — the same driver at the same time each week, 15% off, each ride billed after the ride, minimum eight legs.',
         },
       ]}
       tiers={[

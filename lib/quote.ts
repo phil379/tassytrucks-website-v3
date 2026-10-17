@@ -601,7 +601,8 @@ const DAY_ENDS_HOUR = 20;
  * Standing Ride Plan — the recurring product. Data only; not wired into the
  * estimator until the booking flow can take a recurring schedule.
  *
- * 15% off every leg, minimum 8 legs a month, billed monthly, same driver at the
+ * 15% off every leg, minimum 8 legs a month, each ride billed after the ride
+ * (no monthly billing run exists yet), same driver at the
  * same time. It sells the ROUTE, not a discount: it gives Tassy a predictable
  * midday slot and gives the customer the thing a national competitor charges
  * $10-20 a trip extra for — the same driver every time.

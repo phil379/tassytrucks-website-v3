@@ -5,6 +5,7 @@ import ConsoleShell from '@/components/facility/ConsoleShell';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { canBook } from '@/lib/facility';
 import { accountManagerDisplayName } from '@/lib/facility.server';
+import { invitedByFor } from '@/lib/facility-team.server';
 
 export const metadata: Metadata = {
   title: 'Finish setting up your account — Tassy Transportation',
@@ -38,6 +39,34 @@ export default async function FacilityWelcomePage({
    * /facility/link-expired. See FacilitySession.facility.
    */
   const facility = session.facility;
+
+  /**
+   * A teammate someone invited is not setting the account up -- the person who
+   * created it is. Once the account can take bookings they go straight to the
+   * dashboard; until then they read one sentence instead of being handed a
+   * blank wizard that would overwrite the real answers.
+   */
+  const invitedBy = await invitedByFor(session.facilityUserId);
+  if (invitedBy) {
+    if (canBook(facility) && facility.address) redirect('/facility');
+    return (
+      <ConsoleShell facilityName={facility.name} signedInAs={session.email} bare>
+        <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+          <h1 className="serif text-center text-3xl font-semibold sm:text-4xl">
+            {facility.name} is almost ready
+          </h1>
+          <p className="mt-4 text-center text-[color:var(--ink-soft)]">
+            {invitedBy} is finishing the account setup. Once it is done you can sign in again from the same
+            email and request rides.
+          </p>
+          <p className="mt-4 text-center text-[color:var(--ink-soft)]">
+            Need a ride before then? Call dispatch on{' '}
+            <a className="underline" href="tel:+17049418508">(704) 941-8508</a>.
+          </p>
+        </div>
+      </ConsoleShell>
+    );
+  }
 
   /**
    * A facility that finished the wizard on weekly invoice is waiting on US, not

@@ -1,5 +1,5 @@
 import { serviceLabel } from '@/lib/trip-request';
-import { tripCents, type FacilityTrip } from '@/lib/facility-dashboard.server';
+import { tripCents, tripEstimate, type FacilityTrip } from '@/lib/facility-dashboard.server';
 
 /** Charlotte, always. The server runs in UTC; a 6:45am pickup rendered in UTC
  *  reads as 10:45, which is the most alarming thing a coordinator could see. */
@@ -94,6 +94,7 @@ function AssignmentLine({ trip }: { trip: FacilityTrip }) {
 
 export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
   const cents = tripCents(trip);
+  const est = tripEstimate(trip);
   // A row stored as `assigned` with no driver (written before the ops console
   // refused that) must not read "Driver assigned". It is confirmed, no more.
   const shownStatus =
@@ -139,6 +140,10 @@ export function TripRow({ trip, noun }: { trip: FacilityTrip; noun: string }) {
           // facility never sees the passenger's card and the passenger never
           // sees the facility's rate.
           <span className="ink-mute">{noun} pays</span>
+        ) : cents === null && est ? (
+          <span className="ink-mute tabular-nums" title="Estimate from when you booked. We confirm the final price.">
+            est. {est[0] === est[1] ? money(est[0]) : `${money(est[0])}\u2013${money(est[1])}`}
+          </span>
         ) : cents === null ? (
           <span className="ink-mute">price to come</span>
         ) : (

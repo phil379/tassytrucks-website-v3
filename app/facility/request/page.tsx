@@ -15,6 +15,7 @@ import { coerceServiceLine, serviceWasHonoured } from '@/lib/trip-request';
 import { facilityUnreadCount } from '@/lib/facility-console.server';
 import ConsoleShell from '@/components/facility/ConsoleShell';
 import { patientForFacility } from './_patient';
+import { coordinatorContact } from '@/lib/facility-team.server';
 
 /**
  * Facility Phase 2 — the screen a coordinator books from.
@@ -109,9 +110,10 @@ export default async function FacilityRequestPage({
 
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
-  const [patient, unread] = await Promise.all([
+  const [patient, unread, contact] = await Promise.all([
     patientForFacility(facility.id, searchParams?.patient),
     facilityUnreadCount(facility.id),
+    coordinatorContact({ facilityUserId: session.facilityUserId, facilityId: facility.id, email: session.email }),
   ]);
 
   return (
@@ -142,6 +144,7 @@ export default async function FacilityRequestPage({
               patient,
               allowedLines,
               address: facility.address,
+              contact,
             }}
           />
         </Suspense>

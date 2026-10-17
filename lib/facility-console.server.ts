@@ -52,7 +52,7 @@ function ok<T>(res: { data: T | null; error: { message: string } | null }, what:
 
 const TRIP_COLS =
   'id, service_line, status, contact_name, pickup_address, dropoff_address, requested_at, ' +
-  'return_trip, payer, payment_status, agreed_cents, quoted_cents, facility_ref, facility_invoice_id, ' +
+  'return_trip, payer, payment_status, agreed_cents, quoted_cents, estimate_low_cents, estimate_high_cents, facility_ref, facility_invoice_id, ' +
   'facility_patient_id, driver_id, vehicle_id, vehicle_description';
 
 export type TripBucket = 'today' | 'upcoming' | 'recent';

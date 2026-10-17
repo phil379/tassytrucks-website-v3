@@ -9,7 +9,8 @@ import {
   facilityProfileSchema,
 } from '@/lib/facility';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { FACILITIES_TABLE, FACILITY_USERS_TABLE } from '@/lib/facility.server';
+import { FACILITIES_TABLE } from '@/lib/facility.server';
+import { inviteToFacility } from '@/lib/facility-team.server';
 
 /**
  * The wizard's writes.
@@ -96,34 +97,23 @@ export async function inviteTeammates(input: unknown): Promise<ActionResult> {
     return { ok: false, error: 'Please check the invites.', fieldErrors: fieldErrorsFrom(parsed.error) };
   }
 
-  const db = supabaseAdmin();
   const invites = parsed.data.invites.filter((i) => i.email !== session.email);
   if (invites.length === 0) {
     revalidatePath('/facility/welcome');
     return { ok: true };
   }
 
-  // facility_users has a unique index on lower(email), so an address already in
-  // use — here or at another facility — must not 500 the whole screen. Insert
-  // one at a time and skip the ones already known.
-  for (const invite of invites) {
-    const existing = await db
-      .from(FACILITY_USERS_TABLE)
-      .select('id')
-      .ilike('email', invite.email)
-      .maybeSingle();
-
-    if (existing.data) continue;
-
-    const { error } = await db.from(FACILITY_USERS_TABLE).insert({
-      facility_id: session.facilityId,
-      email: invite.email,
-      role: invite.role,
-      status: 'invited',
-      invited_by: session.email,
-    });
-    if (error) return { ok: false, error: error.message };
-  }
+  // Saves each invite AND emails the teammate a sign-in link. Before this the
+  // rows were stored and nobody was ever told, so an invited colleague could
+  // not get in. An address already used (here or at another facility) is
+  // skipped, and a failed email never fails the screen: the Team page has a
+  // "Send new link" button for exactly that case.
+  await inviteToFacility({
+    facilityId: session.facilityId,
+    facilityName: session.facility.name,
+    invitedBy: session.email,
+    invites,
+  });
 
   revalidatePath('/facility/welcome');
   return { ok: true };

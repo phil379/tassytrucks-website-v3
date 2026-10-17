@@ -104,13 +104,15 @@ function charlotteHour(at: Date): number {
  * submits at 2am and reads "by 9 AM" is exactly the person who might need to
  * reach a human now.
  */
-export function callbackPromise(at: Date = new Date()): string {
+export function callbackPromise(at: Date = new Date(), hasPrice = false): string {
   const hour = charlotteHour(at);
   const open = hour >= BUSINESS_OPEN_HOUR && hour < BUSINESS_CLOSE_HOUR;
+  // When the price is already in the email, the call is only to confirm the details.
+  const what = hasPrice ? 'to confirm the details' : 'to confirm the details and give you a price';
 
   return open
-    ? `Someone will call or text you within 2 hours to confirm the details and give you a price — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`
-    : `Someone will call or text you by 9 AM to confirm the details and give you a price — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`;
+    ? `Someone will call or text you within 2 hours ${what} — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`
+    : `Someone will call or text you by 9 AM ${what} — if you need us sooner, call dispatch on ${DISPATCH_PHONE}.`;
 }
 
 function formatWhen(iso: string): string {
@@ -356,7 +358,12 @@ function detailLines(serviceLine: string, stored: unknown): string[] {
  * the clock (see callbackPromise). It asserts nothing about tracking, and it
  * carries no marketing language.
  */
-async function notifyRequester(id: string, data: TripRequestInput, tripNumber?: string | null): Promise<void> {
+async function notifyRequester(
+  id: string,
+  data: TripRequestInput,
+  tripNumber?: string | null,
+  price?: QuotedPrice | null,
+): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
   // The form collects the given name directly now, so the greeting no longer
@@ -370,8 +377,17 @@ async function notifyRequester(id: string, data: TripRequestInput, tripNumber?: 
     `We have your ${serviceShortName(data.serviceLine)} request for ${formatWhen(data.requestedAt)}.`,
     'A dispatcher is reviewing it now.',
     '',
-    callbackPromise(),
-    'Nothing is booked and nothing is charged until you agree to that price.',
+    ...(price
+      ? [
+          `${price.exact ? 'Your price' : 'Estimated price'}: ${price.text}`,
+          price.exact
+            ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
+            : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
+          '',
+        ]
+      : []),
+    callbackPromise(new Date(), Boolean(price)),
+    'Nothing is booked and nothing is charged until you agree to the price.',
     '',
     '— Tassy Transportation',
     `Reference: ${tripNumber ?? shortRef(id)}`,
@@ -389,6 +405,9 @@ async function notifyRequester(id: string, data: TripRequestInput, tripNumber?: 
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type LegOutcome = 'sent' | 'failed' | 'skipped';
+
+/** The price the visitor was shown, recomputed on the server. `exact` is false for a ZIP-only estimate. */
+export type QuotedPrice = { text: string; exact: boolean };
 
 export type NotificationOutcome = {
   push: LegOutcome;
@@ -419,6 +438,7 @@ export async function fireNotifications(
   data: TripRequestInput,
   tripNumber?: string | null,
   facility?: FacilityAlertContext,
+  price?: QuotedPrice | null,
 ): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
@@ -432,7 +452,7 @@ export async function fireNotifications(
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
     runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility)),
     data.contactEmail
-      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber))
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price))
       : Promise.resolve<LegOutcome>('skipped'),
   ]);
 

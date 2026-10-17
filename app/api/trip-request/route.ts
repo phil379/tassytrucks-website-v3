@@ -5,7 +5,7 @@ import {
   tripRequestSchema,
   UNAVAILABLE_SERVICE_LINES,
 } from '@/lib/trip-request';
-import { estimateTrip } from '@/lib/quote';
+import { estimateTrip, formatRange } from '@/lib/quote';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
@@ -428,6 +428,9 @@ export async function POST(request: Request) {
   // or a trip past the last band) is NOT a price and must not be written into
   // the estimate columns, where /ops would read it as one.
   const estimate = quoted?.kind === 'estimate' ? quoted : null;
+  // What the confirmation screen and the auto-reply email tell the customer, so the price is
+  // never first heard on a later phone call.
+  const price = estimate ? { text: formatRange(estimate), exact: estimate.exact } : null;
 
   let id: string;
   // Assigned before the insert so the same reference can be echoed on the confirmation screen.
@@ -529,7 +532,7 @@ export async function POST(request: Request) {
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  }, tripNumber, facilityAlert);
+  }, tripNumber, facilityAlert, price);
 
-  return NextResponse.json({ ok: true, id, tripNumber, notifications }, { status: 200 });
+  return NextResponse.json({ ok: true, id, tripNumber, notifications, price }, { status: 200 });
 }

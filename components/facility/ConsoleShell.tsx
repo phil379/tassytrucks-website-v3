@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {
-  Home, Plus, Bus, Users, MessageSquare, BarChart3, type LucideIcon,
+  Home, Plus, Bus, Users, MessageSquare, BarChart3, Receipt, type LucideIcon,
 } from 'lucide-react';
 
 /**
@@ -17,7 +17,7 @@ import {
  */
 
 export type ConsoleTab =
-  | 'dashboard' | 'request' | 'trips' | 'patients' | 'messages' | 'reports';
+  | 'dashboard' | 'request' | 'trips' | 'patients' | 'messages' | 'reports' | 'billing';
 
 type Tab = { key: ConsoleTab; href: string; label: string; Icon: LucideIcon };
 
@@ -28,6 +28,7 @@ const TABS: Tab[] = [
   { key: 'patients',  href: '/facility/patients', label: 'Passengers',     Icon: Users },
   { key: 'messages',  href: '/facility/messages', label: 'Messages',       Icon: MessageSquare },
   { key: 'reports',   href: '/facility/reports',  label: 'Reports',        Icon: BarChart3 },
+  { key: 'billing',   href: '/facility/billing',  label: 'Billing',        Icon: Receipt },
 ];
 
 function Badge({ n }: { n: number }) {

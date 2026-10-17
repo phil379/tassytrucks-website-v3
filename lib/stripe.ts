@@ -48,7 +48,11 @@ function encode(fields: Record<string, FormValue>): string {
   return body.toString();
 }
 
-async function post<T>(path: string, fields: Record<string, FormValue>): Promise<T> {
+async function post<T>(
+  path: string,
+  fields: Record<string, FormValue>,
+  extraHeaders?: Record<string, string>,
+): Promise<T> {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error('STRIPE_SECRET_KEY is not set on this deployment');
 
@@ -61,6 +65,7 @@ async function post<T>(path: string, fields: Record<string, FormValue>): Promise
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/x-www-form-urlencoded',
+        ...extraHeaders,
       },
       body: encode(fields),
     });
@@ -269,6 +274,105 @@ export async function getPaymentMethodLabel(checkoutSessionId: string): Promise<
     return cardLabel(pm.card?.brand, pm.card?.last4);
   } catch (e) {
     console.error('[stripe] could not read the card for the receipt:', (e as Error).message);
+    return null;
+  }
+}
+
+/**
+ * The branded pay page: a fresh Stripe Checkout Session that carries the Tassy logo.
+ *
+ * A Payment Link takes its logo from the ACCOUNT's branding, and this one Stripe account also serves
+ * T-Gigs and Jackie Party, so putting a Tassy logo on the account would put it on their pages too. A
+ * Checkout Session can carry its own branding_settings, so only Tassy trip payments show the logo.
+ *
+ * Sessions expire (24 hours), so the address the customer is given is /pay/<token> on our own site:
+ * it makes a session at the moment of the click and sends the customer on. The link in the email
+ * therefore never goes stale. The Payment Link made at confirmation stays as the record the webhook's
+ * amount check reads (its id travels in the session metadata) and as the fallback if this fails.
+ *
+ * Tries three times, best first, because a payment must never be blocked by a logo:
+ *   1. a pinned recent API version, with branding
+ *   2. the account's default API version, with branding
+ *   3. the account's default API version, without branding
+ */
+export async function createBrandedCheckout(input: {
+  amountCents: number;
+  serviceName: string;
+  confirmationCode: string;
+  tripRequestId: string;
+  serviceLine?: string | null;
+  /** The Payment Link recorded for this trip; read back by the webhook's amount check. */
+  paymentLinkId?: string | null;
+  successUrl: string;
+  cancelUrl: string;
+  logoUrl: string;
+}): Promise<{ id: string; url: string; branded: boolean }> {
+  if (!Number.isInteger(input.amountCents) || input.amountCents < 50) {
+    throw new Error('A checkout needs a whole amount of at least $0.50');
+  }
+  const catalogKey = catalogKeyForLine(input.serviceLine);
+  const productId = catalogKey ? await seededProductId(catalogKey).catch(() => null) : null;
+  const label = `${input.serviceName} · ${input.confirmationCode}`;
+
+  const fields: Record<string, FormValue> = {
+    mode: 'payment',
+    'line_items[0][quantity]': 1,
+    'line_items[0][price_data][currency]': 'usd',
+    'line_items[0][price_data][unit_amount]': input.amountCents,
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    'metadata[business]': STRIPE_BUSINESS,
+    'metadata[trip_request_id]': input.tripRequestId,
+    'metadata[confirmation_code]': input.confirmationCode,
+    'metadata[payment_link_id]': input.paymentLinkId ?? undefined,
+    'payment_intent_data[description]': label,
+    'payment_intent_data[metadata][business]': STRIPE_BUSINESS,
+    'payment_intent_data[metadata][trip_request_id]': input.tripRequestId,
+    'payment_intent_data[metadata][confirmation_code]': input.confirmationCode,
+  };
+  if (productId) {
+    fields['line_items[0][price_data][product]'] = productId;
+  } else {
+    fields['line_items[0][price_data][product_data][name]'] = label;
+    fields['line_items[0][price_data][product_data][metadata][business]'] = STRIPE_BUSINESS;
+  }
+
+  const branding: Record<string, FormValue> = {
+    'branding_settings[display_name]': 'Tassy Transportation',
+    'branding_settings[logo][type]': 'url',
+    'branding_settings[logo][url]': input.logoUrl,
+    'branding_settings[icon][type]': 'url',
+    'branding_settings[icon][url]': input.logoUrl,
+  };
+
+  const attempts: Array<{ withBranding: boolean; headers?: Record<string, string> }> = [
+    { withBranding: true, headers: { 'Stripe-Version': '2025-09-30.clover' } },
+    { withBranding: true },
+    { withBranding: false },
+  ];
+  let lastError: unknown = null;
+  for (const a of attempts) {
+    try {
+      const session = await post<{ id: string; url?: string | null }>(
+        '/checkout/sessions',
+        a.withBranding ? { ...fields, ...branding } : fields,
+        a.headers,
+      );
+      if (!session.url) throw new Error('Stripe returned no checkout url');
+      return { id: session.id, url: session.url, branded: a.withBranding };
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('Stripe: could not create checkout');
+}
+
+/** The hosted URL of an existing Payment Link (the fallback when a branded checkout cannot be made). */
+export async function paymentLinkUrl(linkId: string): Promise<string | null> {
+  try {
+    const link = await get<{ url?: string; active?: boolean }>(`/payment_links/${encodeURIComponent(linkId)}`);
+    return link.active === false ? null : (link.url ?? null);
+  } catch {
     return null;
   }
 }

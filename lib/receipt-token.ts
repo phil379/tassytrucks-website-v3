@@ -28,6 +28,15 @@ export function receiptUrlFor(token: string): string {
   return `${siteBase()}/r/${token}`;
 }
 
+/** The address a customer is given to pay: /pay/<token>. Same private token as the receipt. */
+export function payPageUrlFor(token: string): string {
+  return `${siteBase()}/pay/${token}`;
+}
+
+export function brandLogoUrl(): string {
+  return `${siteBase()}/brand/logo-master.png`;
+}
+
 /**
  * Make sure a trip has a receipt token and return it. Safe to call twice at once: the update only
  * lands on a row that has no token yet, and the row is re-read afterwards so both callers agree.

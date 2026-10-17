@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { CARE, dollars } from '@/lib/quote';
+import { CARE } from '@/lib/quote';
 import { applyDiscount } from '@/lib/discounts';
 import { request } from '@/lib/request-links';
 
@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/** Exact cents, because the discount is not a whole number of dollars ($4.45, not $4). */
+const usd = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
 // A real fare from the published Care card, so the example can never drift from the price list.
 const EXAMPLE_LIST = CARE.bands[3].cents;
 const EXAMPLE = applyDiscount(EXAMPLE_LIST, COMMUNITY_RATE.pct);
@@ -44,7 +47,7 @@ export default function CommunityRatePage() {
         eyebrow="Community Rate"
         title="Veteran Rate and Senior Day."
         tagline={`${COMMUNITY_RATE.pct}% off the fare. Same flat price, same driver standard.`}
-        description={`Two ways to take ${COMMUNITY_RATE.pct}% off a Tassy ride. Veterans get it every day. Riders ${COMMUNITY_RATE.seniorAge} and over get it every ${COMMUNITY_RATE.seniorDay}. It is one discount at a time, so a veteran who is ${COMMUNITY_RATE.seniorAge}+ gets ${COMMUNITY_RATE.pct}% on a ${COMMUNITY_RATE.seniorDay}, not ${COMMUNITY_RATE.pct * 2}%. On a ${dollars(EXAMPLE_LIST)} Care ride that is ${dollars(EXAMPLE.discountCents)} off, ${(EXAMPLE.agreedCents / 100).toFixed(2).replace(/^/, '$')} to pay.`}
+        description={`Two ways to take ${COMMUNITY_RATE.pct}% off a Tassy ride. Veterans get it every day. Riders ${COMMUNITY_RATE.seniorAge} and over get it every ${COMMUNITY_RATE.seniorDay}. It is one discount at a time, so a veteran who is ${COMMUNITY_RATE.seniorAge}+ gets ${COMMUNITY_RATE.pct}% on a ${COMMUNITY_RATE.seniorDay}, not ${COMMUNITY_RATE.pct * 2}%. On a ${usd(EXAMPLE_LIST)} Care ride that is ${usd(EXAMPLE.discountCents)} off, ${usd(EXAMPLE.agreedCents)} to pay.`}
         bookHref={request.nemt}
         bookLabel="Book a ride"
         altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
@@ -64,7 +67,7 @@ export default function CommunityRatePage() {
           },
           {
             title: 'Not verified yet? You still ride.',
-            body: 'Book at the regular price any time. After you book we text you a link to verify, and your discount applies to your next ride once you have.',
+            body: 'Book at the regular price any time. After you book we text you a link to verify, so you can save 5% on rides after that.',
           },
           {
             title: 'What it does not cover',

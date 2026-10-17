@@ -225,7 +225,11 @@ export default function RequestForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
   // What the confirmation screen echoes back, so a visitor can see exactly what was captured.
-  const [receipt, setReceipt] = useState<{ tripNumber: string | null; when: string | null } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    tripNumber: string | null;
+    when: string | null;
+    price: { text: string; exact: boolean } | null;
+  } | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
 
@@ -558,7 +562,11 @@ export default function RequestForm({
             minute: '2-digit',
           })
         : null;
-      setReceipt({ tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null, when });
+      const price =
+        json.price && typeof json.price.text === 'string'
+          ? { text: String(json.price.text), exact: Boolean(json.price.exact) }
+          : null;
+      setReceipt({ tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null, when, price });
       setDone(json.id);
     } catch {
       announce({}, 'We could not reach the server. Please call (704) 941-8508.');
@@ -578,6 +586,17 @@ export default function RequestForm({
             {receipt.tripNumber && receipt.when ? ' · ' : null}
             {receipt.when ? <>Pickup requested for <strong>{receipt.when}</strong> (Charlotte time)</> : null}
           </p>
+        ) : null}
+        {receipt?.price ? (
+          <div className="mt-4" data-testid="confirmed-price">
+            <p className="ink-soft text-sm">{receipt.price.exact ? 'Your price' : 'Estimated price'}</p>
+            <p className="serif text-3xl font-semibold text-[color:var(--gold)]">{receipt.price.text}</p>
+            <p className="ink-soft mt-1 text-xs max-w-md mx-auto">
+              {receipt.price.exact
+                ? 'This is the price you saw when you booked.'
+                : 'Based on the ZIP codes you entered. We confirm the exact price before anything is booked.'}
+            </p>
+          </div>
         ) : null}
         <p className="ink-soft mt-3 max-w-md mx-auto">{COPY.confirmation}</p>
         <p className="ink-soft text-sm mt-4">
@@ -1046,7 +1065,7 @@ export default function RequestForm({
           {estimate ? (
             <>
               <p className="text-sm">
-                <span className="ink-soft">Estimated fare</span>{' '}
+                <span className="ink-soft">{estimate.exact ? 'Your price' : 'Estimated fare'}</span>{' '}
                 <span className="serif text-2xl font-semibold text-[color:var(--gold)]">
                   {formatRange(estimate)}
                 </span>
@@ -1078,9 +1097,9 @@ export default function RequestForm({
                 </p>
               )}
               <p className="ink-soft mt-2 text-xs">
-                An estimate, not a final price. Tolls, extra wait time and a route we
-                cannot see yet can move it. A dispatcher confirms the exact figure
-                before your trip is booked.
+                {estimate.exact
+                  ? 'This is your price for the trip as entered. If a toll, a longer wait or a change to the trip moves it, we tell you the new price before you agree to anything.'
+                  : 'An estimate, not a final price. A dispatcher confirms the exact figure before your trip is booked.'}
               </p>
             </>
           ) : quoted?.kind === 'quote-only' ? (

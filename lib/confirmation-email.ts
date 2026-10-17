@@ -122,7 +122,9 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
       ${
         t.driverName
           ? `A driver is assigned to your ${esc(serviceShortName(data.serviceLine))} trip.`
-          : `Your ${esc(serviceShortName(data.serviceLine))} trip is confirmed. We will text you your driver's name before pickup.`
+          : data.smsConsent
+            ? `Your ${esc(serviceShortName(data.serviceLine))} trip is confirmed. We will text you your driver's name before pickup.`
+            : `Your ${esc(serviceShortName(data.serviceLine))} trip is confirmed. Dispatch will share your driver's name before pickup.`
       } Keep this
       email — the confirmation number below is all we need to find you.
     </p>

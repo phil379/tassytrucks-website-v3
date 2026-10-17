@@ -20,7 +20,7 @@
  * because there is no word boundary between "t" and "0". The leading \b is what
  * keeps `phil+qatar@…` from matching "qa".
  */
-const TEST_TAGS = /\+[^@]*\b(test|tests|e2e|qa|demo|staging|selftest|smoke|fixture)\d*\b/i;
+const TEST_TAGS = /\+[^@]*(?:\b|claude)(test|tests|e2e|qa|demo|staging|selftest|smoke|fixture)\d*\b/i;
 
 const TEST_DOMAINS = new Set([
   'example.com', 'example.org', 'example.net',

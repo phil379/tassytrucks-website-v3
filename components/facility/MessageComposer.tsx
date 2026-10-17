@@ -36,12 +36,18 @@ export default function MessageComposer() {
         rows={3}
         maxLength={4000}
         required
-        placeholder="Change a pickup time, add a companion seat, ask where a driver is…"
+        placeholder="Change a pickup time, ask where a driver is, ask a question about a ride…"
       />
       {/* Said here because this box is next to passenger names and it is
           exactly where someone would otherwise type a reason for the visit. */}
       <p className="ink-mute mt-1.5 text-xs">
         Logistics only, please &mdash; no diagnoses, procedures or record numbers.
+      </p>
+      {/* A rider or companion added after booking changes the fare, and a booked
+          trip's price is fixed. Say so here so nobody assumes a message adds a seat. */}
+      <p className="ink-mute mt-1 text-xs">
+        Need to add a rider or companion? Submit a new request for that ride, or tell us here and
+        dispatch will confirm the new fare with you before anything changes.
       </p>
       {error && <p role="alert" className="mt-2 text-sm text-[#f87171]">{error}</p>}
       <button type="submit" disabled={busy} className="btn-gold mt-3 inline-flex min-h-[44px] items-center gap-2 text-sm">

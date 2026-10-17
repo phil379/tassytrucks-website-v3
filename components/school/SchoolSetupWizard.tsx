@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import AddressAutocomplete from '@/components/request/AddressAutocomplete';
 import SchoolPicker from '@/components/school/SchoolPicker';
 import { PolicyBody } from '@/components/school/PolicyBody';
+import { PARENT_SMS_CONSENT_DISCLOSURE, PARENT_SMS_CONSENT_LABEL } from '@/lib/sms-consent';
 import {
   AM_TIMES,
   PM_TIMES,
@@ -12,7 +13,6 @@ import {
   SCHOOL_POLICIES,
   STEP_TITLES,
   WEEKDAYS,
-  SIBLING_NOTE,
   SAFETY_NOTE_HINT,
   SAFETY_NOTE_LABEL,
   restoreStep,
@@ -74,9 +74,16 @@ type SchedForm = {
 export default function SchoolSetupWizard({
   plan,
   googleMapsApiKey,
+  standardHouseholdConfirmed,
 }: {
   plan: SchoolPlan;
   googleMapsApiKey: string | undefined;
+  /**
+   * True only when the parent has passed the household check in
+   * SchoolEligibilityGate (one child, one address, one school, standard
+   * schedule). Sent to the server, which refuses the booking without it.
+   */
+  standardHouseholdConfirmed: boolean;
 }) {
   const router = useRouter();
   // Restore a prior in-progress snapshot for THIS plan. Read once, on mount.
@@ -117,6 +124,12 @@ export default function SchoolSetupWizard({
     ...((restored?.policies as object) ?? {}),
   }));
   const [commit, setCommit] = useState<boolean>(() => Boolean(restored?.commit));
+  // Optional, unchecked unless the parent ticked it earlier in this tab.
+  const [smsConsent, setSmsConsent] = useState<boolean>(() => Boolean(restored?.smsConsent));
+  // True while the browser is being handed to Stripe's card page. Blocks a second submit.
+  const [redirecting, setRedirecting] = useState(false);
+  // Full Year only: the booking saved but the card page could not be opened.
+  const [cardNotOpened, setCardNotOpened] = useState(false);
 
   /**
    * Restore the step AFTER mount, never during render.
@@ -138,7 +151,7 @@ export default function SchoolSetupWizard({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const key = wizardStorageKey(plan.key);
-    if (step >= 6) {
+    if (step >= 6 || redirecting) {
       try {
         window.sessionStorage.removeItem(key);
       } catch {
@@ -149,12 +162,12 @@ export default function SchoolSetupWizard({
     try {
       window.sessionStorage.setItem(
         key,
-        JSON.stringify({ step, parent, child, sched, policies, commit }),
+        JSON.stringify({ step, parent, child, sched, policies, commit, smsConsent }),
       );
     } catch {
       /* private mode / quota — degrade to in-memory only */
     }
-  }, [plan.key, step, parent, child, sched, policies, commit]);
+  }, [plan.key, step, parent, child, sched, policies, commit, smsConsent, redirecting]);
 
   const canContinue = (() => {
     switch (step) {
@@ -198,7 +211,7 @@ export default function SchoolSetupWizard({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan: plan.slug,
-          parent,
+          parent: { ...parent, sms_consent: smsConsent },
           child: {
             ...child,
             grade: child.grade || null,
@@ -210,6 +223,7 @@ export default function SchoolSetupWizard({
             SCHOOL_POLICIES.map((p) => [p.key, { accepted: true as const, ts }]),
           ),
           starts_on: nextSchoolStart(),
+          standard_household_confirmed: standardHouseholdConfirmed,
           hp_token: '',
           elapsedMs: Date.now() - startedAt,
         }),
@@ -231,6 +245,16 @@ export default function SchoolSetupWizard({
       }
 
       setReference(json.reference ?? null);
+
+      // Full Year: the booking is stored; hand the parent to Stripe to SAVE a card (no charge).
+      // The wizard snapshot is cleared by the effect above once `redirecting` is set, so Back
+      // cannot resubmit a booking that already exists.
+      if (typeof json.cardSetupUrl === 'string' && json.cardSetupUrl.startsWith('https://')) {
+        setRedirecting(true);
+        window.location.assign(json.cardSetupUrl);
+        return;
+      }
+      setCardNotOpened(Boolean(json.cardRequired));
       setStep(6);
     } catch {
       setFormError(
@@ -265,12 +289,22 @@ export default function SchoolSetupWizard({
         </p>
       )}
 
-      {step === 1 && <ParentStep parent={parent} setParent={setParent} apiKey={googleMapsApiKey} />}
+      {step === 1 && (
+        <ParentStep
+          parent={parent}
+          setParent={setParent}
+          apiKey={googleMapsApiKey}
+          smsConsent={smsConsent}
+          setSmsConsent={setSmsConsent}
+        />
+      )}
       {step === 2 && <ChildStep child={child} setChild={setChild} apiKey={googleMapsApiKey} />}
       {step === 3 && <ScheduleStep plan={plan} sched={sched} setSched={setSched} />}
       {step === 4 && <PolicyStep policies={policies} setPolicies={setPolicies} />}
       {step === 5 && <CommitStep plan={plan} commit={commit} setCommit={setCommit} />}
-      {step === 6 && <DoneStep reference={reference} childName={child.first_name} plan={plan} />}
+      {step === 6 && (
+        <DoneStep reference={reference} childName={child.first_name} plan={plan} cardNotOpened={cardNotOpened} />
+      )}
 
       {step < 6 && (
         <div className="mt-8 flex items-center justify-between gap-3">
@@ -293,11 +327,18 @@ export default function SchoolSetupWizard({
           ) : (
             <button
               type="button"
-              disabled={!canContinue || busy}
+              disabled={!canContinue || busy || redirecting}
               onClick={onCommit}
+              data-testid="confirm-commitment"
               className="btn-primary min-h-[44px] disabled:opacity-40"
             >
-              {busy ? 'Confirming…' : 'Confirm commitment'}
+              {redirecting
+                ? 'Opening secure card page…'
+                : busy
+                  ? 'Confirming…'
+                  : plan.key === 'full_year'
+                    ? 'Confirm and add card'
+                    : 'Confirm commitment'}
             </button>
           )}
         </div>
@@ -348,10 +389,14 @@ function ParentStep({
   parent,
   setParent,
   apiKey,
+  smsConsent,
+  setSmsConsent,
 }: {
   parent: ParentForm;
   setParent: React.Dispatch<React.SetStateAction<ParentForm>>;
   apiKey: string | undefined;
+  smsConsent: boolean;
+  setSmsConsent: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const set = (k: keyof ParentForm, v: string) => setParent((prev) => ({ ...prev, [k]: v }));
   return (
@@ -386,6 +431,25 @@ function ParentStep({
         />
         <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">Used as the default pickup point.</p>
       </div>
+      {/* Text updates opt-in. Unchecked by default and never required. */}
+      <label className="flex min-h-[44px] cursor-pointer items-start gap-3">
+        <input
+          type="checkbox"
+          data-testid="parent-sms-consent"
+          className="mt-1 h-5 w-5 shrink-0"
+          checked={smsConsent}
+          onChange={(e) => setSmsConsent(e.target.checked)}
+        />
+        <span className="text-sm">
+          <span className="font-medium">{PARENT_SMS_CONSENT_LABEL}</span>
+          <span className="mt-1 block text-xs leading-relaxed text-[color:var(--ink-soft)]">
+            {PARENT_SMS_CONSENT_DISCLOSURE}{' '}
+            <a href="/privacy" target="_blank" rel="noreferrer" className="underline">Privacy</a>
+            {' · '}
+            <a href="/terms" target="_blank" rel="noreferrer" className="underline">Terms</a>
+          </span>
+        </span>
+      </label>
     </div>
   );
 }
@@ -671,11 +735,18 @@ function CommitStep({
           Set by school location before your first ride. {plan.billing}.
         </p>
       </div>
+      {plan.key === 'full_year' && (
+        <p className="rounded-lg border border-[color:var(--line)] px-4 py-3 text-sm text-[color:var(--ink-soft)]" data-testid="card-note">
+          Next, you&rsquo;ll add a card on Stripe&rsquo;s secure page. <strong>Your card is saved, not charged.</strong>{' '}
+          We confirm your price and your driver before your first ride, and billing starts only after that.
+        </p>
+      )}
       <label className="flex min-h-[44px] items-start gap-3 text-sm">
         <input type="checkbox" className="mt-1 h-5 w-5" checked={commit} onChange={(e) => setCommit(e.target.checked)} />
         <span>
           I authorize the {plan.planLabel} commitment and auto-renewal once pricing is confirmed for my
-          school.
+          school
+          {plan.key === 'full_year' ? ', and authorize Tassy to charge the card I add once that confirmation is made' : ''}.
         </span>
       </label>
       <p className="text-xs text-[color:var(--ink-mute)]">
@@ -692,10 +763,12 @@ function DoneStep({
   reference,
   childName,
   plan,
+  cardNotOpened,
 }: {
   reference: string | null;
   childName: string;
   plan: SchoolPlan;
+  cardNotOpened: boolean;
 }) {
   return (
     <div className="space-y-4 text-center" role="status" aria-live="polite">
@@ -704,6 +777,12 @@ function DoneStep({
         {childName ? `${childName} is booked on the ` : 'You are booked on the '}
         {plan.planLabel}. We&rsquo;ll confirm your pricing and your driver before the first ride.
       </p>
+      {cardNotOpened && (
+        <p className="text-sm text-[color:var(--ink-soft)]" data-testid="card-not-opened">
+          We could not open the card page just now. Your booking is saved and nothing has been charged.
+          We will contact you to add your card.
+        </p>
+      )}
       {reference ? (
         <p className="text-xs text-[color:var(--ink-mute)]">
           Reference: <span className="font-mono">{reference}</span>

@@ -47,3 +47,49 @@ export function buildSmsConsent(
     sms_consent_phone: phone,
   };
 }
+
+/* ───────────────────────────────────────────── Tassy Scholar: parent texts */
+
+/**
+ * The Scholar setup wizard's own opt-in, for texts ABOUT A CHILD'S RIDE (picked up,
+ * dropped off, cancelled). Separate wording and a separate version from the rider box
+ * above, because the messages are different and the recipient is a parent.
+ *
+ * Stored in students.parent_sms_consent / parent_sms_consent_at (columns from SMS_02,
+ * already applied) and, with the wording version and the number it was given for,
+ * flat in the first trip's trip_details. NOTHING IS SENT from this consent alone:
+ * TassyOps keeps Scholar parent texts off until a Twilio campaign that covers them is
+ * approved (SMS_SCHOLAR_PARENT_ENABLED).
+ */
+export const PARENT_SMS_CONSENT_VERSION = 'scholar-v1';
+
+export const PARENT_SMS_CONSENT_LABEL = "Text me updates about my child's rides";
+
+export const PARENT_SMS_CONSENT_DISCLOSURE =
+  "By checking this box you agree to receive text messages from Tassy Transportation about your child's Tassy Scholar rides: " +
+  'picked up, dropped off, and ride cancelled. ' +
+  'Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. ' +
+  'Consent is not a condition of booking.';
+
+export type ParentSmsConsentFields = {
+  parent_sms_consent: true;
+  parent_sms_consent_at: string;
+  parent_sms_consent_v: string;
+  parent_sms_consent_phone: string;
+};
+
+export function buildParentSmsConsent(
+  optedIn: unknown,
+  parentPhone: string,
+  now: Date = new Date(),
+): ParentSmsConsentFields | null {
+  if (optedIn !== true) return null;
+  const phone = parentPhone.trim();
+  if (phone.replace(/\D/g, '').length < 10) return null;
+  return {
+    parent_sms_consent: true,
+    parent_sms_consent_at: now.toISOString(),
+    parent_sms_consent_v: PARENT_SMS_CONSENT_VERSION,
+    parent_sms_consent_phone: phone,
+  };
+}

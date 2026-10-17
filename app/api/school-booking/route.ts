@@ -15,9 +15,15 @@ import { looksLikeTestIdentity } from '@/lib/test-data';
 import { parseLocalDateTime } from '@/lib/time';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { classifyHousehold, householdRequestHref } from '@/lib/school-household';
+import { buildParentSmsConsent } from '@/lib/sms-consent';
+import { planNeedsCard, startCardSetup } from '@/lib/school-billing';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Next caches identical GET fetches (Supabase reads, Stripe lookups) even here, so a repeat
+// request can see a stale card status. Billing state must always be read live.
+export const fetchCache = 'force-no-store';
 
 const SIGNUPS_PER_IP_PER_HOUR = Number(process.env.SCHOOL_BOOKING_RATE_LIMIT) || 5;
 /** Fastest a human plausibly completes six steps. Below it, treat as a script. */
@@ -85,6 +91,26 @@ export async function POST(request: Request) {
     );
   }
 
+  /**
+   * The standard booking is one child, one address, one school, a standard
+   * schedule. A request that names any reason it is not -- or that omits the
+   * household confirmation altogether (schema, below) -- is NOT stored here.
+   * 409 carries the custom-request URL so a client can send the family there.
+   * Nothing is written, charged or reserved on this path.
+   */
+  const household = classifyHousehold(raw.household_reasons);
+  if (household.path === 'custom') {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'This booking is for one child, one school and one pickup address. Please send a custom household request instead.',
+        redirect: householdRequestHref(household.reasons, typeof raw.plan === 'string' ? raw.plan : null),
+      },
+      { status: 409 },
+    );
+  }
+
   const parsed = schoolBookingSchema.safeParse(raw);
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
@@ -112,6 +138,8 @@ export async function POST(request: Request) {
   const db = supabaseAdmin();
   const parentName = `${data.parent.first_name} ${data.parent.last_name}`.trim();
   const childName = `${data.child.first_name} ${data.child.last_name}`.trim();
+  // Optional text opt-in. Stored when ticked; the booking never depends on it.
+  const parentSms = buildParentSmsConsent(data.parent.sms_consent, data.parent.phone);
 
   // ── 1. the student ────────────────────────────────────────────────────────
   const { data: student, error: studentErr } = await db
@@ -147,6 +175,11 @@ export async function POST(request: Request) {
       ],
       // The one non-medical safety field. See SAFETY_NOTE_* in lib/school-plans.
       notes: data.child.safety_note || null,
+      // Written ONLY when the parent ticked the box, so a booking that did not opt
+      // in never depends on these columns existing.
+      ...(parentSms
+        ? { parent_sms_consent: true, parent_sms_consent_at: parentSms.parent_sms_consent_at }
+        : {}),
     })
     .select('id')
     .single();
@@ -260,6 +293,7 @@ export async function POST(request: Request) {
         school_needs_review: !data.child.school_id,
         policy_version: POLICY_VERSION,
         policies: data.policies,
+        ...(parentSms ?? {}),
       },
     })
     .select('id')
@@ -304,8 +338,34 @@ export async function POST(request: Request) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
+  // Full Year: send the parent to Stripe to SAVE a card. Nothing is charged here or
+  // anywhere in this route; billing starts only when Phil approves in TassyOps.
+  const cardRequired = planNeedsCard(plan.key);
+  let cardSetupUrl: string | null = null;
+  if (cardRequired) {
+    const card = await startCardSetup(db, {
+      standingOrderId: order.id,
+      studentId: student.id,
+      plan: plan.key,
+      parentName,
+      parentEmail: data.parent.email,
+      parentPhone: data.parent.phone,
+      origin: new URL(request.url).origin,
+    });
+    cardSetupUrl = card?.url ?? null;
+  }
+
   return NextResponse.json(
-    { ok: true, id: trip.id, reference, studentId: student.id, standingOrderId: order.id, notifications },
+    {
+      ok: true,
+      id: trip.id,
+      reference,
+      studentId: student.id,
+      standingOrderId: order.id,
+      notifications,
+      cardRequired,
+      cardSetupUrl,
+    },
     { status: 200 },
   );
 }

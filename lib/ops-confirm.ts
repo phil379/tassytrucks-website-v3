@@ -11,7 +11,7 @@ import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { serviceShortName } from '@/lib/trip-request';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
 import { recordPaymentAttempt } from '@/lib/payment-attempts';
-import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
+import { ensureReceiptToken, receiptUrlFor, payPageUrlFor } from '@/lib/receipt-token';
 
 /**
  * The one place a trip becomes "confirmed": issue a code, take an agreed price, create the Stripe
@@ -92,7 +92,9 @@ export async function confirmTrip(args: {
       console.error('[ops] payment link failed (trip left unchanged):', e);
     }
     if (!link) return { ok: false, code: 'link_failed' };
-    payUrl = link.url;
+    // The customer gets our own /pay address (it opens a Tassy-branded Stripe checkout and never goes
+    // stale); without a token the plain Payment Link is used, exactly as before.
+    payUrl = receiptToken ? payPageUrlFor(receiptToken) : link.url;
     payLinkId = link.id;
     // Remember what this link asked for, so the Stripe webhook can check the amount collected.
     await recordPaymentAttempt(db, { tripId: id, linkId: link.id, amountCents: agreedCents });

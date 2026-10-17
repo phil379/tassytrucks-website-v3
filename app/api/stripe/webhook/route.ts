@@ -77,8 +77,10 @@ export async function POST(request: Request) {
   // replaced link, or a wrong amount, needs a person. Links minted before payment_attempts existed
   // have no row and behave exactly as before.
   let attempt: PaymentAttempt | null = null;
-  if (session.payment_link) {
-    attempt = await findPaymentAttempt(db, session.payment_link);
+  // A branded checkout (app/pay) is a plain session that names its Payment Link in metadata.
+  const paidLinkId = session.payment_link ?? session.metadata?.payment_link_id ?? null;
+  if (paidLinkId) {
+    attempt = await findPaymentAttempt(db, paidLinkId);
     if (attempt) {
       const verdict = checkPaidAmount({
         amountTotal: session.amount_total,
@@ -112,8 +114,8 @@ export async function POST(request: Request) {
   const tripId = session.metadata?.trip_request_id;
   const query = tripId
     ? base.eq('id', tripId)
-    : session.payment_link
-      ? base.eq('stripe_payment_link_id', session.payment_link)
+    : paidLinkId
+      ? base.eq('stripe_payment_link_id', paidLinkId)
       : null;
 
   if (!query) {
@@ -133,7 +135,7 @@ export async function POST(request: Request) {
     // a payment already recorded, or a payment for a request that isn't there.
     const locator = tripId
       ? db.from(TRIP_REQUESTS_TABLE).select('id').eq('id', tripId)
-      : db.from(TRIP_REQUESTS_TABLE).select('id').eq('stripe_payment_link_id', session.payment_link!);
+      : db.from(TRIP_REQUESTS_TABLE).select('id').eq('stripe_payment_link_id', paidLinkId!);
 
     const { data: existing } = await locator;
     if (existing && existing.length > 0) {

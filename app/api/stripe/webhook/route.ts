@@ -3,10 +3,20 @@ import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { getPaymentMethodLabel, verifyWebhookSignature } from '@/lib/stripe';
 import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
 import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
-import { notifyOperatorPaid, notifyOperatorPaymentMismatch, sendRichEmail } from '@/lib/notifications';
+import {
+  notifyOperatorPaid,
+  notifyOperatorPaymentMismatch,
+  notifyOperatorScholarBilling,
+  sendRichEmail,
+} from '@/lib/notifications';
 import { checkPaidAmount } from '@/lib/payment-check';
 import { closePaymentAttempt, findPaymentAttempt, type PaymentAttempt } from '@/lib/payment-attempts';
-import { CARD_SETUP_PURPOSE, recordCardFromSession } from '@/lib/school-billing';
+import {
+  CARD_SETUP_PURPOSE,
+  SCHOLAR_BILLING_EVENTS,
+  applySubscriptionEvent,
+  recordCardFromSession,
+} from '@/lib/school-billing';
 import { receiptSubject, receiptHtml, receiptText, type ReceiptData } from '@/lib/receipt-email';
 
 /**
@@ -63,6 +73,23 @@ export async function POST(request: Request) {
     event = JSON.parse(raw);
   } catch {
     return NextResponse.json({ ok: false, error: 'Bad JSON' }, { status: 400 });
+  }
+
+  // Scholar monthly billing: a failed payment, a recovery, or an ended subscription. Handled here
+  // because the plan lives on standing_orders, not on a trip.
+  if (event.type && SCHOLAR_BILLING_EVENTS.has(event.type)) {
+    const result = await applySubscriptionEvent(
+      supabaseAdmin(),
+      event.type,
+      event.data?.object as unknown as Parameters<typeof applySubscriptionEvent>[2],
+    );
+    if (result.retry) {
+      return NextResponse.json({ ok: false, error: 'Could not record billing event' }, { status: 500 });
+    }
+    if ((result.handled === 'past_due' || result.handled === 'canceled') && result.standingOrderId) {
+      await notifyOperatorScholarBilling(result.standingOrderId, result.handled);
+    }
+    return NextResponse.json({ ok: true, scholar: result.handled });
   }
 
   if (event.type !== 'checkout.session.completed') {

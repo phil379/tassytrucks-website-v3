@@ -47,6 +47,10 @@ export const BILLING_STATUS = {
   cardSaved: 'card_saved',
   /** Phil approved; the subscription exists. Set only by TassyOps. */
   active: 'active',
+  /** A monthly payment failed. Stripe keeps retrying; Phil is alerted; clears itself when a payment lands. */
+  pastDue: 'past_due',
+  /** The subscription ended (family cancelled at the end of the paid month, or Stripe gave up). */
+  canceled: 'canceled',
 } as const;
 
 export function planNeedsCard(plan: PlanKey): boolean {
@@ -212,4 +216,109 @@ export async function recordCardFromSession(
   // Zero rows is fine: either already active, or recorded by the other path first.
   void data;
   return { ok: true, standingOrderId, brand, last4 };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Monthly billing events (after Phil approves a family)
+//
+// RULES (Phil, 2026-10-17):
+//   * Failed payment: Stripe retries on its own schedule, the plan is marked past_due, Phil gets one
+//     alert. Rides pause after 7 days unpaid: TassyOps shows the day count and the "pause rides" flag;
+//     nothing is cancelled automatically. A later successful payment puts the plan back to active.
+//   * Cancel: stops at the end of the paid month (set in TassyOps; Stripe sends subscription.deleted
+//     when the month ends). No prorated refund.
+//   * Refunds: decided by Phil, one at a time, in Stripe. Nothing here refunds anything.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const SCHOLAR_BILLING_EVENTS = new Set([
+  'invoice.payment_failed',
+  'invoice.paid',
+  'customer.subscription.deleted',
+]);
+
+/** After this many days unpaid, rides are paused (shown in TassyOps; a person acts on it). */
+export const PAST_DUE_PAUSE_DAYS = 7;
+
+type BillingObject = {
+  id?: string;
+  subscription?: string | { id?: string } | null;
+  parent?: { subscription_details?: { subscription?: string | null } | null } | null;
+};
+
+/** The subscription an event is about. Newer API versions nest it under parent.subscription_details. */
+export function subscriptionIdOf(type: string, obj: BillingObject | undefined): string | null {
+  if (!obj) return null;
+  if (type === 'customer.subscription.deleted') return typeof obj.id === 'string' ? obj.id : null;
+  const direct = typeof obj.subscription === 'string' ? obj.subscription : obj.subscription?.id ?? null;
+  return direct ?? obj.parent?.subscription_details?.subscription ?? null;
+}
+
+export type SubscriptionEventResult = {
+  handled: 'past_due' | 'recovered' | 'canceled' | 'not_ours' | 'noop';
+  /** True when trying again later could succeed (the webhook should answer 500). */
+  retry: boolean;
+  standingOrderId?: string;
+};
+
+export async function applySubscriptionEvent(
+  db: SupabaseClient,
+  type: string,
+  obj: BillingObject | undefined,
+  now: Date = new Date(),
+): Promise<SubscriptionEventResult> {
+  const subId = subscriptionIdOf(type, obj);
+  if (!subId) return { handled: 'not_ours', retry: false };
+
+  const { data: row, error } = await db
+    .from(STANDING_ORDERS_TABLE)
+    .select('id, billing_status, billing_past_due_at')
+    .eq('stripe_subscription_id', subId)
+    .maybeSingle();
+  if (error) {
+    console.error('[school-billing] subscription lookup failed:', error.message);
+    return { handled: 'noop', retry: true };
+  }
+  // Facility invoices and anything else on the account are not ours.
+  if (!row) return { handled: 'not_ours', retry: false };
+
+  const id = row.id as string;
+  const status = row.billing_status as string;
+  const stamp = now.toISOString();
+
+  const write = async (patch: Record<string, unknown>) => {
+    const { error: writeError } = await db.from(STANDING_ORDERS_TABLE).update(patch).eq('id', id);
+    if (writeError) {
+      console.error('[school-billing] could not record billing event:', writeError.message);
+      return false;
+    }
+    return true;
+  };
+
+  if (type === 'customer.subscription.deleted') {
+    if (status === BILLING_STATUS.canceled) return { handled: 'noop', retry: false, standingOrderId: id };
+    if (!(await write({ billing_status: BILLING_STATUS.canceled, billing_canceled_at: stamp }))) {
+      return { handled: 'noop', retry: true };
+    }
+    return { handled: 'canceled', retry: false, standingOrderId: id };
+  }
+
+  if (type === 'invoice.payment_failed') {
+    if (status === BILLING_STATUS.canceled || status === BILLING_STATUS.pastDue) {
+      return { handled: 'noop', retry: false, standingOrderId: id };
+    }
+    if (!(await write({ billing_status: BILLING_STATUS.pastDue, billing_past_due_at: row.billing_past_due_at ?? stamp }))) {
+      return { handled: 'noop', retry: true };
+    }
+    return { handled: 'past_due', retry: false, standingOrderId: id };
+  }
+
+  if (type === 'invoice.paid') {
+    if (status !== BILLING_STATUS.pastDue) return { handled: 'noop', retry: false, standingOrderId: id };
+    if (!(await write({ billing_status: BILLING_STATUS.active, billing_past_due_at: null }))) {
+      return { handled: 'noop', retry: true };
+    }
+    return { handled: 'recovered', retry: false, standingOrderId: id };
+  }
+
+  return { handled: 'noop', retry: false };
 }

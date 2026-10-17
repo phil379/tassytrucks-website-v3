@@ -681,3 +681,32 @@ export async function notifyOperatorPaymentMismatch(row: { id: string }, kind: s
     if (r.status === 'rejected') console.error('[stripe] mismatch alert leg failed for', ref, r.reason);
   }
 }
+
+/**
+ * Scholar monthly billing needs a person: a family's payment failed, or a subscription ended.
+ * Push only (same legs as the payment-mismatch alert). PII RULE: ref only, no name, no amount.
+ */
+export async function notifyOperatorScholarBilling(
+  standingOrderId: string,
+  kind: 'past_due' | 'canceled',
+): Promise<void> {
+  const ref = shortRef(standingOrderId);
+  const message: PushMessage =
+    kind === 'past_due'
+      ? {
+          title: 'SCHOLAR PAYMENT FAILED',
+          body: `Plan ${ref} is past due. Stripe is retrying. Rides pause after 7 days unpaid - see TassyOps Scholar.`,
+          priority: 'urgent',
+          tags: ['warning'],
+        }
+      : {
+          title: 'Scholar plan ended',
+          body: `Plan ${ref} was cancelled and billing has stopped. See TassyOps Scholar.`,
+          priority: 'default',
+          tags: ['information_source'],
+        };
+  const results = await Promise.allSettled([pushToNtfy(message), pushToZapier(ref, message)]);
+  for (const r of results) {
+    if (r.status === 'rejected') console.error('[stripe] scholar billing alert leg failed for', ref, r.reason);
+  }
+}

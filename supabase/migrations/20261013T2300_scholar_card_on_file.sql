@@ -1,4 +1,5 @@
--- PROPOSED. NOT APPLIED. Applying it needs Phil's explicit approval.
+-- Applied to prod 2026-10-17 on Phil's go (Scholar billing switched on). Extended the same day with past_due
+-- and the cancel / past-due timestamps.
 --
 -- Tassy Scholar: card on file and billing state, kept on the recurring schedule.
 --
@@ -34,7 +35,15 @@ alter table public.standing_orders add column if not exists billing_started_at t
 
 alter table public.standing_orders add column if not exists billing_started_by uuid;
 
-alter table public.standing_orders add constraint standing_orders_billing_status_ck check (billing_status in ('not_required', 'card_pending', 'card_saved', 'active', 'canceled'));
+alter table public.standing_orders add constraint standing_orders_billing_status_ck check (billing_status in ('not_required', 'card_pending', 'card_saved', 'active', 'past_due', 'canceled'));
+
+-- When a monthly payment first failed (cleared when a payment lands). TassyOps counts days from here.
+alter table public.standing_orders add column if not exists billing_past_due_at timestamptz;
+
+-- Set by TassyOps when Phil cancels: the end of the paid month, when billing stops.
+alter table public.standing_orders add column if not exists billing_cancel_at timestamptz;
+
+alter table public.standing_orders add column if not exists billing_canceled_at timestamptz;
 
 -- Lets the admin list find bookings waiting on a card or on approval without a scan.
 create index if not exists standing_orders_billing_status_idx on public.standing_orders (billing_status) where service_line = 'scholar';

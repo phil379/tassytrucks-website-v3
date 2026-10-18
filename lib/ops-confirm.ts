@@ -9,8 +9,9 @@ import {
 import { sendRichEmail } from '@/lib/notifications';
 import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
 import { serviceShortName } from '@/lib/trip-request';
+import { planConfirm, CLOSED_STATUSES } from '@/lib/confirm-plan';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
-import { recordPaymentAttempt } from '@/lib/payment-attempts';
+import { findPaymentAttempt, recordPaymentAttempt } from '@/lib/payment-attempts';
 import { ensureReceiptToken, receiptUrlFor, payPageUrlFor } from '@/lib/receipt-token';
 
 /**
@@ -36,10 +37,8 @@ export type ConfirmFailure =
   | 'already_confirmed';
 
 export type ConfirmResult =
-  | { ok: true; confirmationCode: string; payUrl: string | null; textSent: boolean }
+  | { ok: true; confirmationCode: string; payUrl: string | null; textSent: boolean; amountCents: number }
   | { ok: false; code: ConfirmFailure };
-
-const CLOSED_STATUSES = ['cancelled', 'completed', 'no_show'];
 
 export async function confirmTrip(args: {
   id: string;
@@ -74,14 +73,30 @@ export async function confirmTrip(args: {
   let payUrl: string | null = row.payment_link_url ?? null;
   let payLinkId: string | null = row.stripe_payment_link_id ?? null;
 
-  if (!onAccount && !payUrl && stripeConfigured()) {
+  // What this confirm may change (lib/confirm-plan.ts): never re-price or re-status a paid or closed
+  // trip, never touch paid / refunded / on_account, and when a link is being resent use the amount
+  // that link will actually charge so the email, the receipt and /pay agree.
+  const existingAttempt = payUrl && payLinkId ? await findPaymentAttempt(db, payLinkId) : null;
+  const plan = planConfirm({
+    row,
+    requestedCents: agreedCents,
+    onAccount,
+    existingLink: Boolean(payUrl && payLinkId),
+    attemptCents: existingAttempt?.amount_cents ?? null,
+  });
+  const amountCents = plan.amountCents;
+  if (plan.amountOverridden) {
+    console.warn('[ops] confirm kept the existing amount', amountCents, 'instead of', agreedCents, 'for trip', id);
+  }
+
+  if (plan.payableNow && !payUrl && stripeConfigured()) {
     // The private receipt address is issued BEFORE the link, so Stripe can send the customer straight
     // to it after paying. Best effort: with no token the link falls back to Stripe's own thank-you.
     const receiptToken = await ensureReceiptToken(db, id, (row as { receipt_token?: string | null }).receipt_token);
     let link: Awaited<ReturnType<typeof createTripPaymentLink>> | null = null;
     try {
       link = await createTripPaymentLink({
-        amountCents: agreedCents,
+        amountCents,
         serviceName: serviceShortName(row.service_line),
         confirmationCode: code,
         tripRequestId: id,
@@ -97,18 +112,19 @@ export async function confirmTrip(args: {
     payUrl = receiptToken ? payPageUrlFor(receiptToken) : link.url;
     payLinkId = link.id;
     // Remember what this link asked for, so the Stripe webhook can check the amount collected.
-    await recordPaymentAttempt(db, { tripId: id, linkId: link.id, amountCents: agreedCents });
+    await recordPaymentAttempt(db, { tripId: id, linkId: link.id, amountCents });
   }
 
   const confirmed: ConfirmedTrip = {
     confirmationCode: code,
     tripNumber: (row as unknown as { trip_number?: string | null }).trip_number ?? null,
-    agreedCents,
+    agreedCents: amountCents,
     driverName: row.driver_name ?? null,
     vehicleDescription: row.vehicle_description ?? null,
     discountLabel: row.discount_label ?? null,
     discountCents: row.discount_cents ?? null,
-    payUrl,
+    // No pay link in the email for a trip that is paid, on account, refunded or cancelled.
+    payUrl: plan.payableNow ? payUrl : null,
   };
 
   // The shape the email templates read. Built from the stored row rather than a form, so what the
@@ -143,14 +159,16 @@ export async function confirmTrip(args: {
   const { error: writeError } = await db
     .from(TRIP_REQUESTS_TABLE)
     .update({
-      status: 'confirmed',
+      // A closed trip (cancelled / completed / no_show) is not reopened by a confirm.
+      status: plan.nextStatus,
       confirmation_code: code,
       confirmed_at: row.confirmed_at ?? new Date().toISOString(),
-      agreed_cents: agreedCents,
+      agreed_cents: plan.agreedCentsToWrite,
       payment_link_url: payUrl,
       stripe_payment_link_id: payLinkId,
-      // `unpaid` until Stripe says otherwise; `on_account` is a decision, not a guess. The webhook owns `paid`.
-      payment_status: onAccount ? 'on_account' : (row.payment_status ?? 'unpaid'),
+      // `unpaid` until Stripe says otherwise; `on_account` is a decision, not a guess. The webhook owns
+      // `paid`: only an `unpaid` trip can become `on_account`; paid / refunded / on_account stay as they are.
+      payment_status: plan.nextPaymentStatus,
     })
     .eq('id', id);
   if (writeError) throw new Error(writeError.message);
@@ -158,5 +176,5 @@ export async function confirmTrip(args: {
   // Rider text (booking confirmed + payment link). Best effort, after everything is saved and emailed.
   const textSent = await pingTassyOpsConfirmed(id);
 
-  return { ok: true, confirmationCode: code, payUrl, textSent };
+  return { ok: true, confirmationCode: code, payUrl, textSent, amountCents };
 }

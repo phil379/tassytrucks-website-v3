@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { OPS_COOKIE, isOpsAuthed, passwordMatches, sessionToken } from '@/lib/ops-auth';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE, TRIP_STATUSES } from '@/lib/supabase-admin';
 import { ADVANCE, assignmentBlocker } from '@/lib/ops-status';
@@ -11,6 +11,10 @@ import { sendRichEmail } from '@/lib/notifications';
 import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
 import { confirmTrip } from '@/lib/ops-confirm';
+import { FAILURE_DELAY_MS, beginOpsLogin } from '@/lib/ops-login-guard';
+import { clientIp } from '@/lib/rate-limit';
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
  * Every mutation re-checks the cookie. A server action is a public HTTP endpoint —
@@ -33,7 +37,21 @@ export async function login(formData: FormData) {
   const password = String(formData.get('password') ?? '');
 
   if (!process.env.OPS_PASSWORD) redirect('/ops?error=unconfigured');
-  if (!passwordMatches(password)) redirect('/ops?error=bad');
+
+  // Lockout (lib/ops-login-guard.ts): 5 wrong passwords per IP, 30 for the whole gate, per 15 minutes.
+  // The attempt is counted before the password is checked, and the password itself is never stored or logged.
+  const attempt = await beginOpsLogin(supabaseAdmin, clientIp(headers()));
+  if (!attempt.allowed) {
+    await attempt.finish('refused');
+    await sleep(FAILURE_DELAY_MS);
+    redirect('/ops?error=locked');
+  }
+  if (!passwordMatches(password)) {
+    await attempt.finish('failed');
+    await sleep(FAILURE_DELAY_MS);
+    redirect('/ops?error=bad');
+  }
+  await attempt.finish('ok');
 
   cookies().set(OPS_COOKIE, sessionToken(), {
     httpOnly: true,

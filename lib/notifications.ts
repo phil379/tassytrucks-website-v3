@@ -682,6 +682,70 @@ export async function notifyOperatorPaymentMismatch(row: { id: string }, kind: s
   }
 }
 
+function dollars(cents: number | null | undefined, currency?: string | null): string {
+  if (typeof cents !== 'number') return 'unknown';
+  return `$${(cents / 100).toFixed(2)}${currency && currency.toLowerCase() !== 'usd' ? ` ${currency.toUpperCase()}` : ''}`;
+}
+
+/**
+ * A second Stripe checkout completed for a trip that was already paid: the customer may have been
+ * charged twice. The trip stays paid and NOTHING is refunded automatically - a person checks Stripe.
+ * Push carries the reference only (PII RULE above); the full detail - trip number, amounts and both
+ * Stripe ids - goes to OPERATOR_EMAIL, a mailbox we control. NEVER throws (webhook caller).
+ */
+export async function notifyOperatorPossibleDoublePayment(info: {
+  tripId: string;
+  tripNumber: string | null;
+  tripAmountCents: number | null;
+  first: { sessionId: string | null; paymentIntentId: string | null; amountCents: number | null } | null;
+  second: { sessionId: string | null; paymentIntentId: string | null; amountCents: number | null; currency: string | null };
+  verified: boolean;
+}): Promise<void> {
+  const ref = shortRef(info.tripId);
+  const trip = info.tripNumber ?? ref;
+  const message: PushMessage = {
+    title: 'POSSIBLE DOUBLE PAYMENT - check Stripe',
+    body: `Ref ${ref} - a second payment arrived for a trip already paid. Details in your email.`,
+    priority: 'urgent',
+    tags: ['warning'],
+  };
+  const text = [
+    `POSSIBLE DOUBLE PAYMENT - trip ${trip}`,
+    '',
+    'A second Stripe checkout completed for a trip that was already marked paid.',
+    'The customer may have been charged twice. Nothing has been refunded automatically.',
+    info.verified
+      ? 'The two payments have different Stripe ids.'
+      : 'The first payment has no Stripe id on file (it was recorded before ids were kept), so this could also be a repeat delivery of the original payment. Check Stripe to be sure.',
+    '',
+    `Trip number:        ${trip}`,
+    `Request ID:         ${info.tripId}`,
+    `Trip price:         ${dollars(info.tripAmountCents)}`,
+    '',
+    `First payment:      ${dollars(info.first?.amountCents)}`,
+    `  checkout session: ${info.first?.sessionId ?? 'not recorded'}`,
+    `  payment intent:   ${info.first?.paymentIntentId ?? 'not recorded'}`,
+    '',
+    `Second payment:     ${dollars(info.second.amountCents, info.second.currency)}`,
+    `  checkout session: ${info.second.sessionId ?? 'not available'}`,
+    `  payment intent:   ${info.second.paymentIntentId ?? 'not available'}`,
+    '',
+    'Next step: open both payments in the Stripe dashboard. If the customer really paid twice, refund the second one there.',
+  ].join('\n');
+
+  const operator = process.env.OPERATOR_EMAIL;
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    operator
+      ? sendResendEmail({ to: operator, subject: `POSSIBLE DOUBLE PAYMENT - trip ${trip}`, text })
+      : Promise.reject(new Error('OPERATOR_EMAIL is not set')),
+  ]);
+  for (const r of results) {
+    if (r.status === 'rejected') console.error('[stripe] double-payment alert leg failed for', ref, r.reason);
+  }
+}
+
 /**
  * Scholar monthly billing needs a person: a family's payment failed, or a subscription ended.
  * Push only (same legs as the payment-mismatch alert). PII RULE: ref only, no name, no amount.

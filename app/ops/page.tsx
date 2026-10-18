@@ -52,6 +52,11 @@ function LoginGate({ error }: { error?: string }) {
                 Incorrect password.
               </p>
             )}
+            {error === 'locked' && (
+              <p role="alert" className="form-error">
+                Too many attempts. Please try again later.
+              </p>
+            )}
             {error === 'unconfigured' && (
               <p role="alert" className="form-error">
                 OPS_PASSWORD is not configured on the server.

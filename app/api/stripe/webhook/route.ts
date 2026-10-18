@@ -6,9 +6,11 @@ import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
 import {
   notifyOperatorPaid,
   notifyOperatorPaymentMismatch,
+  notifyOperatorPossibleDoublePayment,
   notifyOperatorScholarBilling,
   sendRichEmail,
 } from '@/lib/notifications';
+import { handleAlreadyPaid, paymentNote, recordFirstPayment } from '@/lib/double-payment';
 import { checkPaidAmount } from '@/lib/payment-check';
 import { closePaymentAttempt, findPaymentAttempt, type PaymentAttempt } from '@/lib/payment-attempts';
 import {
@@ -51,6 +53,7 @@ type CheckoutSession = {
   amount_total?: number;
   currency?: string;
   payment_link?: string;
+  payment_intent?: string | null;
   metadata?: Record<string, string> | null;
 };
 
@@ -181,20 +184,41 @@ export async function POST(request: Request) {
   if (!data || data.length === 0) {
     // Zero rows now means one of two very different things: a Stripe retry of
     // a payment already recorded, or a payment for a request that isn't there.
+    const cols = 'id, trip_number, agreed_cents, quoted_cents';
     const locator = tripId
-      ? db.from(TRIP_REQUESTS_TABLE).select('id').eq('id', tripId)
-      : db.from(TRIP_REQUESTS_TABLE).select('id').eq('stripe_payment_link_id', paidLinkId!);
+      ? db.from(TRIP_REQUESTS_TABLE).select(cols).eq('id', tripId)
+      : db.from(TRIP_REQUESTS_TABLE).select(cols).eq('stripe_payment_link_id', paidLinkId!);
 
     const { data: existing } = await locator;
     if (existing && existing.length > 0) {
-      return NextResponse.json({ ok: true, ignored: 'already paid' });
+      // Already paid. Either Stripe is repeating the event we recorded (silent no-op), or a SECOND
+      // checkout completed for this trip and the customer paid twice (alert the owner, never refund).
+      const outcome = await handleAlreadyPaid(
+        db,
+        {
+          trip: existing[0] as unknown as { id: string; trip_number: string | null; agreed_cents: number | null; quoted_cents: number | null },
+          current: { sessionId: session.id ?? null, paymentIntentId: session.payment_intent ?? null },
+          amountTotal: session.amount_total,
+          currency: session.currency,
+        },
+        notifyOperatorPossibleDoublePayment,
+      );
+      if (outcome === 'retry') {
+        return NextResponse.json({ ok: false, error: 'Could not check for a double payment' }, { status: 500 });
+      }
+      return NextResponse.json({ ok: true, ignored: outcome === 'alerted' ? 'possible double payment' : 'already paid' });
     }
 
     console.error('[stripe] paid session matched no request:', session.id);
     return NextResponse.json({ ok: true, ignored: 'no matching request' });
   }
 
-  if (attempt) await closePaymentAttempt(db, attempt.id, 'paid');
+  // Remember WHICH Stripe session paid, so a second payment for this trip can be told apart from a
+  // retry of this one (see lib/double-payment.ts). Best effort; written first, before anything else.
+  const paidIds = { sessionId: session.id ?? null, paymentIntentId: session.payment_intent ?? null };
+  await recordFirstPayment(db, data[0].id as string, paidIds, session.amount_total);
+
+  if (attempt) await closePaymentAttempt(db, attempt.id, 'paid', paymentNote(paidIds, session.amount_total));
 
   // The money is recorded. Only now does anyone get told — and a failed alert
   // must not undo a stored payment.

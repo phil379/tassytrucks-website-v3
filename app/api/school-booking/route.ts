@@ -16,6 +16,7 @@ import { parseLocalDateTime } from '@/lib/time';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { classifyHousehold, householdRequestHref } from '@/lib/school-household';
+import { checkScholarLeg, routeCapEnforced, ROUTE_TOO_LONG_MESSAGE, ROUTE_UNVERIFIED_MESSAGE } from '@/lib/school-route-cap';
 import { buildParentSmsConsent } from '@/lib/sms-consent';
 import { planNeedsCard, startCardSetup } from '@/lib/school-billing';
 
@@ -133,6 +134,28 @@ export async function POST(request: Request) {
       { ok: false, error: 'That schedule is incomplete. Please go back and pick your times.' },
       { status: 400 },
     );
+  }
+
+  /**
+   * The standard $850 booking covers a loaded drive of 20 minutes or less (decided
+   * 2026-10-18). Measured here, on the server, from the addresses actually being booked;
+   * the wizard's early check is a courtesy and is never trusted. Too long, or unmeasurable,
+   * both go to a person: we never sell a route we could not check. Nothing is written.
+   */
+  if (routeCapEnforced()) {
+    const leg = await checkScholarLeg(schedule.pickup_address, schedule.dropoff_address);
+    if (leg.verdict !== 'within') {
+      const reason = leg.verdict === 'too_long' ? 'route_too_long' : 'route_unverified';
+      console.warn(`[school-booking] route cap: ${leg.verdict} minutes=${leg.minutes ?? 'n/a'}`);
+      return NextResponse.json(
+        {
+          ok: false,
+          error: leg.verdict === 'too_long' ? ROUTE_TOO_LONG_MESSAGE : ROUTE_UNVERIFIED_MESSAGE,
+          redirect: householdRequestHref([reason], plan.slug),
+        },
+        { status: 409 },
+      );
+    }
   }
 
   const db = supabaseAdmin();

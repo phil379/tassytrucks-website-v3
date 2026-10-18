@@ -45,15 +45,41 @@ export const NONSTANDARD_REASONS = [
   { key: 'other_nonstandard', label: 'Something else that is not a standard school-day routine' },
 ] as const;
 
-export type NonstandardReason = (typeof NONSTANDARD_REASONS)[number]['key'];
+/**
+ * Reasons the SYSTEM sets, never the parent. They are not checkboxes: they are
+ * carried to the request form so a person sees why the family was sent there.
+ * DECIDED (Phil, 2026-10-18): the standard $850 route covers a loaded drive of
+ * 20 minutes or less. Longer routes, and routes we could not measure, go to a
+ * person for a custom quote. Nothing is charged or promised in the meantime.
+ */
+export const SYSTEM_REASONS = [
+  { key: 'route_too_long', label: 'The drive from home to school is longer than our standard 20-minute route' },
+  { key: 'route_unverified', label: 'We could not measure the drive from home to school' },
+] as const;
 
-const REASON_KEYS = NONSTANDARD_REASONS.map((r) => r.key) as readonly string[];
+export type SystemReason = (typeof SYSTEM_REASONS)[number]['key'];
+
+export type NonstandardReason = (typeof NONSTANDARD_REASONS)[number]['key'] | SystemReason;
+
+/** Every key we accept, in screen order (parent reasons first, then system reasons). */
+const ALL_REASONS: readonly { key: NonstandardReason }[] = [...NONSTANDARD_REASONS, ...SYSTEM_REASONS];
 
 /** Keep only reasons we know, once each, in screen order. Unknown values are dropped. */
 export function cleanReasons(input: unknown): NonstandardReason[] {
   if (!Array.isArray(input)) return [];
   const seen = new Set(input.filter((v): v is string => typeof v === 'string'));
-  return NONSTANDARD_REASONS.filter((r) => seen.has(r.key) && REASON_KEYS.includes(r.key)).map((r) => r.key);
+  return ALL_REASONS.filter((r) => seen.has(r.key)).map((r) => r.key);
+}
+
+/** Parent-facing wording for the route cap. Lives here so the browser can import it without server code. */
+export const ROUTE_TOO_LONG_MESSAGE =
+  "Your drive to school is longer than our standard Scholar route, so we price it individually. Send us a quick request and we'll reply with a quote.";
+export const ROUTE_UNVERIFIED_MESSAGE =
+  "We couldn't confirm the drive time automatically. Send us a quick request and a person will check your route and reply.";
+
+/** True when the reason list carries a route-length reason set by the system. */
+export function hasRouteReason(reasons: readonly string[]): boolean {
+  return reasons.includes('route_too_long') || reasons.includes('route_unverified');
 }
 
 export type HouseholdPath = 'standard' | 'custom';

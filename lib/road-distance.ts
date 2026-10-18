@@ -179,7 +179,84 @@ function siteReferer(): string {
   return `${base}/`;
 }
 
+/**
+ * Drive time between two ADDRESSES (not coordinates), used by the Scholar route-length
+ * cap. Kept separate from roadDistance() so the pricing path is untouched.
+ *
+ * Unlike roadDistance this IS traffic-aware: the cap protects the driver's hourly pay on a
+ * real school morning, and free-flow time at 7:30 AM understates it. Volume is one call per
+ * completed home + school pair, cached, so the extra per-call cost is negligible.
+ *
+ * NULL IS A NORMAL ANSWER (no key, Google slow, address not found). The caller must treat
+ * null as "could not verify" and send the family to a person, never as "fine".
+ */
+const addressCache = new Map<string, CacheEntry>();
+
+export async function roadTimeByAddress(
+  originAddress: string,
+  destinationAddress: string,
+  departAt?: Date,
+): Promise<RoadDistance | null> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const o = originAddress.trim();
+  const d = destinationAddress.trim();
+  if (!apiKey || !o || !d) return null;
+
+  const now = Date.now();
+  const key = `${o.toLowerCase()}|${d.toLowerCase()}|${departAt ? departAt.toISOString() : ''}`;
+  const hit = addressCache.get(key);
+  if (hit && hit.expiresAt > now) return hit.value;
+  if (addressCache.size >= CACHE_MAX) {
+    const oldest = addressCache.keys().next().value;
+    if (oldest !== undefined) addressCache.delete(oldest);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const response = await fetch(ENDPOINT, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration',
+        Referer: siteReferer(),
+      },
+      body: JSON.stringify({
+        origin: { address: o },
+        destination: { address: d },
+        travelMode: 'DRIVE',
+        routingPreference: 'TRAFFIC_AWARE',
+        ...(departAt ? { departureTime: departAt.toISOString() } : {}),
+        units: 'IMPERIAL',
+      }),
+    });
+    if (!response.ok) {
+      addressCache.set(key, { value: null, expiresAt: now + 60_000 });
+      return null;
+    }
+    const body = (await response.json()) as { routes?: { distanceMeters?: number; duration?: string }[] };
+    const route = body.routes?.[0];
+    const meters = route?.distanceMeters;
+    const seconds = parseDuration(route?.duration);
+    if (typeof meters !== 'number' || !Number.isFinite(meters) || meters <= 0 || seconds === null) {
+      addressCache.set(key, { value: null, expiresAt: now + 60_000 });
+      return null;
+    }
+    const value: RoadDistance = { miles: meters / METERS_PER_MILE, seconds };
+    addressCache.set(key, { value, expiresAt: now + CACHE_TTL_MS });
+    return value;
+  } catch {
+    addressCache.set(key, { value: null, expiresAt: now + 60_000 });
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** Test-only. */
 export function __resetRoadDistanceCache() {
   cache.clear();
+  addressCache.clear();
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import AddressAutocomplete from '@/components/request/AddressAutocomplete';
 import SchoolPicker from '@/components/school/SchoolPicker';
 import { PolicyBody } from '@/components/school/PolicyBody';
+import { ROUTE_TOO_LONG_MESSAGE } from '@/lib/school-household';
 import { PARENT_SMS_CONSENT_DISCLOSURE, PARENT_SMS_CONSENT_LABEL } from '@/lib/sms-consent';
 import {
   AM_TIMES,
@@ -169,6 +170,42 @@ export default function SchoolSetupWizard({
     }
   }, [plan.key, step, parent, child, sched, policies, commit, smsConsent, redirecting]);
 
+  /**
+   * Early route-length check (courtesy only; /api/school-booking measures again and decides).
+   * Runs once both addresses are set so a family with a long route learns it on step 2.
+   * Only a clear 'too_long' blocks Continue; an unmeasurable route is left to the server.
+   */
+  const [routeCheck, setRouteCheck] = useState<{
+    key: string;
+    verdict: 'within' | 'too_long' | 'unknown';
+    redirect: string | null;
+  } | null>(null);
+  const routeKey = `${parent.home_address}||${child.school_address}`;
+  useEffect(() => {
+    if (step !== 2 || !parent.home_address || !child.school_address) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/school-route-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ home_address: parent.home_address, school_address: child.school_address, plan: plan.slug }),
+        });
+        const json = await res.json().catch(() => null);
+        if (cancelled || !json) return;
+        const verdict = json.verdict === 'within' || json.verdict === 'too_long' ? json.verdict : 'unknown';
+        setRouteCheck({ key: routeKey, verdict, redirect: typeof json.redirect === 'string' ? json.redirect : null });
+      } catch {
+        /* the server check at booking time still decides */
+      }
+    }, 700);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [step, parent.home_address, child.school_address, plan.slug, routeKey]);
+  const routeTooLong = routeCheck?.key === routeKey && routeCheck.verdict === 'too_long';
+
   const canContinue = (() => {
     switch (step) {
       case 1:
@@ -181,7 +218,8 @@ export default function SchoolSetupWizard({
         );
       case 2:
         return Boolean(
-          child.first_name &&
+          !routeTooLong &&
+            child.first_name &&
             child.last_name &&
             child.school_name &&
             child.school_address &&
@@ -236,6 +274,13 @@ export default function SchoolSetupWizard({
        * what the bot filter returns, and an error payload has no id at all —
        * both are failures and neither may reach step 6.
        */
+      // 409 with a redirect: this family belongs with a person (route too long, or not
+      // measurable). Nothing was stored. Send them to the request form, never leave a dead end.
+      if (res.status === 409 && typeof json?.redirect === 'string' && json.redirect.startsWith('/school/')) {
+        setRedirecting(true);
+        window.location.assign(json.redirect);
+        return;
+      }
       if (!res.ok || !json?.ok || typeof json?.id !== 'string' || json.id.length === 0) {
         setFormError(
           json?.error ??
@@ -297,6 +342,14 @@ export default function SchoolSetupWizard({
           smsConsent={smsConsent}
           setSmsConsent={setSmsConsent}
         />
+      )}
+      {step === 2 && routeTooLong && (
+        <p role="alert" className="mb-5 rounded-lg border border-[color:var(--gold)] px-3 py-3 text-sm">
+          {ROUTE_TOO_LONG_MESSAGE}{' '}
+          <a href={routeCheck?.redirect ?? '/school/household-request'} className="font-semibold underline">
+            Send a request
+          </a>
+        </p>
       )}
       {step === 2 && <ChildStep child={child} setChild={setChild} apiKey={googleMapsApiKey} />}
       {step === 3 && <ScheduleStep plan={plan} sched={sched} setSched={setSched} />}

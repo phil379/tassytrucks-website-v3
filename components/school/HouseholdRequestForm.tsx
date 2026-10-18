@@ -8,6 +8,7 @@ import {
   HOUSEHOLD_DIRECTIONS,
   MAX_HOUSEHOLD_CHILDREN,
   NONSTANDARD_REASONS,
+  hasRouteReason,
   type NonstandardReason,
 } from '@/lib/school-household';
 
@@ -250,6 +251,15 @@ export default function HouseholdRequestForm({
           <textarea id="hh-extra" rows={3} className={field} value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} />
         </div>
       </fieldset>
+
+      {hasRouteReason(reasons) && (
+        <p role="note" className="rounded-xl border border-[color:var(--line)] p-3 text-sm text-[color:var(--ink-soft)]">
+          {reasons.includes('route_too_long')
+            ? 'The drive from your home to the school is longer than our standard route, so we will prepare a personalized quote instead of the standard plan.'
+            : 'We could not measure the drive from your home to the school, so a person will check the route and send you options.'}{' '}
+          Nothing is charged or reserved until we have reviewed it with you.
+        </p>
+      )}
 
       <fieldset className="space-y-2">
         <legend className="serif mb-1 text-lg font-semibold">What makes your family&rsquo;s plan different?</legend>

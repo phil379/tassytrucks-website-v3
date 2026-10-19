@@ -142,8 +142,10 @@ export async function POST(request: Request) {
    * the wizard's early check is a courtesy and is never trusted. Too long, or unmeasurable,
    * both go to a person: we never sell a route we could not check. Nothing is written.
    */
+  let legMinutes: number | null = null;
   if (routeCapEnforced()) {
     const leg = await checkScholarLeg(schedule.pickup_address, schedule.dropoff_address);
+    legMinutes = leg.verdict === 'within' ? leg.minutes : null;
     if (leg.verdict !== 'within') {
       const reason = leg.verdict === 'too_long' ? 'route_too_long' : 'route_unverified';
       console.warn(`[school-booking] route cap: ${leg.verdict} minutes=${leg.minutes ?? 'n/a'}`);
@@ -330,6 +332,22 @@ export async function POST(request: Request) {
       { ok: false, error: 'We could not save that, and nothing has been booked. Please call (704) 941-8508.' },
       { status: 500 },
     );
+  }
+
+  /**
+   * Freeze the measured drive minutes for Scholar's per-minute driver pay (TassyOps PR #54). Best-effort
+   * and AFTER everything above is saved: the columns arrive with the PAY_05 migration, and a booking
+   * must never fail because that migration is not applied yet. Until the minutes are stored, ops pays
+   * the old way.
+   */
+  if (legMinutes !== null) {
+    const [so, tr] = await Promise.all([
+      db.from(STANDING_ORDERS_TABLE).update({ leg_minutes: legMinutes }).eq('id', order.id),
+      db.from(TRIP_REQUESTS_TABLE).update({ trip_minutes: legMinutes }).eq('id', trip.id),
+    ]);
+    if (so.error || tr.error) {
+      console.warn('[school-booking] leg minutes not stored:', so.error?.message ?? tr.error?.message);
+    }
   }
 
   const reference = bookingReference(plan.key, Date.now());

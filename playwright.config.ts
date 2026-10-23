@@ -154,5 +154,38 @@ export default defineConfig({
         RESEND_API_KEY: '',
       },
     },
+    {
+      /**
+       * The address-picker rig. Two servers, both owned by this config:
+       *
+       *   3946  playwright/support/stub-supabase.mjs - an in-memory PostgREST, so the
+       *         trip-request route can INSERT and the spec can read the row back with
+       *         no production credentials (the CI job has none).
+       *   3947  the app, with a fake GOOGLE_MAPS_API_KEY so /request hands the form a
+       *         key and the form tries to load Places. The specs answer that script
+       *         request themselves (playwright/support/maps-stub.ts), so "the visitor
+       *         picked a suggestion" is something a test can actually do.
+       *
+       * Nothing here reaches Google, Supabase, Resend or Stripe.
+       */
+      command: 'node playwright/support/stub-supabase.mjs 3946',
+      port: 3946,
+      reuseExistingServer: true,
+      timeout: 30_000,
+    },
+    {
+      command: 'bunx next start -p 3947',
+      port: 3947,
+      reuseExistingServer: true,
+      timeout: 60_000,
+      env: {
+        GOOGLE_MAPS_API_KEY: 'pw-fake-maps-key',
+        SUPABASE_URL: 'http://127.0.0.1:3946',
+        SUPABASE_SERVICE_ROLE_KEY: 'stub',
+        RESEND_API_KEY: '',
+        STRIPE_SECRET_KEY: '',
+        TRIP_REQUEST_RATE_LIMIT: '1000',
+      },
+    },
   ],
 });

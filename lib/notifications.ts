@@ -7,6 +7,7 @@ import {
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
 import { SAAS_BASE } from './saas-links';
+import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE } from './price-fallback';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -278,7 +279,12 @@ export type FacilityAlertContext = {
   payer?: string | null;
 };
 
-async function notifyOperatorEmail(id: string, data: TripRequestInput, facility?: FacilityAlertContext): Promise<void> {
+async function notifyOperatorEmail(
+  id: string,
+  data: TripRequestInput,
+  facility?: FacilityAlertContext,
+  priceUnavailable = false,
+): Promise<void> {
   const to = process.env.OPERATOR_EMAIL;
   if (!to) throw new Error('OPERATOR_EMAIL is not set');
 
@@ -294,6 +300,10 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput, facility?
     `Reference:         ${shortRef(id)}`,
     `Request ID:        ${id}`,
     `Service:           ${serviceShortName(data.serviceLine)}`,
+    // Before anything else a dispatcher reads: this trip has no price on it.
+    ...(priceUnavailable
+      ? [`${NEEDS_PRICE_MARKER}      the system could not price this trip. Quote it before you confirm.`]
+      : []),
     '',
     ...(facility
       ? [
@@ -326,7 +336,7 @@ async function notifyOperatorEmail(id: string, data: TripRequestInput, facility?
 
   await sendResendEmail({
     to,
-    subject: `NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}${
+    subject: `${priceUnavailable ? `${NEEDS_PRICE_MARKER} ` : ''}NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}${
       facility ? ` (${facility.facilityName}${facility.payer === 'facility' ? ', on account' : ''})` : ''
     }`,
     text: lines.join('\n'),
@@ -350,6 +360,46 @@ function detailLines(serviceLine: string, stored: unknown): string[] {
 }
 
 /**
+ * The plain-text body of the auto-reply. Pure, so the wording can be tested without sending
+ * mail. When there is no price AND the server could not compute one, it says so and says what
+ * happens next, instead of staying silent about a price the form promised.
+ */
+export function buildRequesterText(args: {
+  firstName: string;
+  serviceLine: string;
+  requestedAt: string;
+  price?: QuotedPrice | null;
+  priceUnavailable?: boolean;
+  reference: string;
+  at?: Date;
+}): string {
+  const { firstName, price, priceUnavailable } = args;
+  return [
+    `Hi ${firstName},`,
+    '',
+    `We have your ${serviceShortName(args.serviceLine)} request for ${formatWhen(args.requestedAt)}.`,
+    'A dispatcher is reviewing it now.',
+    '',
+    ...(price
+      ? [
+          `${price.exact ? 'Your price' : 'Estimated price'}: ${price.text}`,
+          price.exact
+            ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
+            : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
+          '',
+        ]
+      : priceUnavailable
+        ? [PRICE_PENDING_MESSAGE, '']
+        : []),
+    callbackPromise(args.at ?? new Date(), Boolean(price)),
+    'Nothing is booked and nothing is charged until you agree to the price.',
+    '',
+    '— Tassy Transportation',
+    `Reference: ${args.reference}`,
+  ].join('\n');
+}
+
+/**
  * Auto-reply to the requester. ~70 words.
  *
  * It confirms what they asked for so they know a person read it, states the
@@ -363,6 +413,7 @@ async function notifyRequester(
   data: TripRequestInput,
   tripNumber?: string | null,
   price?: QuotedPrice | null,
+  priceUnavailable = false,
 ): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
@@ -371,27 +422,14 @@ async function notifyRequester(
   // "Van Nguyen" for anyone whose family name is written first.
   const firstName = data.contactFirstName.trim() || 'there';
 
-  const text = [
-    `Hi ${firstName},`,
-    '',
-    `We have your ${serviceShortName(data.serviceLine)} request for ${formatWhen(data.requestedAt)}.`,
-    'A dispatcher is reviewing it now.',
-    '',
-    ...(price
-      ? [
-          `${price.exact ? 'Your price' : 'Estimated price'}: ${price.text}`,
-          price.exact
-            ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
-            : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
-          '',
-        ]
-      : []),
-    callbackPromise(new Date(), Boolean(price)),
-    'Nothing is booked and nothing is charged until you agree to the price.',
-    '',
-    '— Tassy Transportation',
-    `Reference: ${tripNumber ?? shortRef(id)}`,
-  ].join('\n');
+  const text = buildRequesterText({
+    firstName,
+    serviceLine: data.serviceLine,
+    requestedAt: data.requestedAt,
+    price,
+    priceUnavailable,
+    reference: tripNumber ?? shortRef(id),
+  });
 
   await sendResendEmail({
     to: data.contactEmail,
@@ -439,20 +477,21 @@ export async function fireNotifications(
   tripNumber?: string | null,
   facility?: FacilityAlertContext,
   price?: QuotedPrice | null,
+  priceUnavailable = false,
 ): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
     title: `New ${serviceShortName(data.serviceLine)} request`,
-    body: `Ref ${ref} · pickup ${shortWhen(data.requestedAt)}`,
+    body: `Ref ${ref} · pickup ${shortWhen(data.requestedAt)}${priceUnavailable ? ' · NEEDS PRICE' : ''}`,
     tags: ['bell'],
   };
 
   const [push, pushFallback, operatorEmail, requesterEmail] = await Promise.all([
     runLeg(id, 'ntfy', () => pushToNtfy(message)),
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
-    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility)),
+    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility, priceUnavailable)),
     data.contactEmail
-      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price))
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price, priceUnavailable))
       : Promise.resolve<LegOutcome>('skipped'),
   ]);
 

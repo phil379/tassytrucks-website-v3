@@ -26,7 +26,14 @@ import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
 import { SHOW_ESTIMATES, estimateTrip, formatRange, isQuoteOnly } from '@/lib/quote';
-import { PICK_ADDRESS_MESSAGE, PRICE_PENDING_MESSAGE } from '@/lib/price-fallback';
+import {
+  PICK_ADDRESS_MESSAGE,
+  PICK_TO_SEE_PRICE,
+  PRICE_PENDING_MESSAGE,
+  PRICE_RANGE_NOTE,
+  priceKind,
+  priceLabel,
+} from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema } from '@/lib/care-intake';
 
@@ -260,7 +267,7 @@ export default function RequestForm({
   const [receipt, setReceipt] = useState<{
     tripNumber: string | null;
     when: string | null;
-    price: { text: string; exact: boolean } | null;
+    price: { text: string; exact: boolean; range: boolean } | null;
     /** The server could not price the trip: say a dispatcher will, rather than show nothing. */
     priceUnavailable: boolean;
   } | null>(null);
@@ -406,7 +413,22 @@ export default function RequestForm({
     mobility,
   ]);
 
-  const estimate = quoted?.kind === 'estimate' ? quoted : null;
+  /** Google's suggestions are loaded for both address fields, so an address CAN be picked. */
+  const suggestionsOn = pickupSuggest && dropoffSuggest;
+
+  // While suggestions work, a price built from ZIP codes is not shown on any line. The visitor
+  // is asked to pick the address instead, so the price they see is the one that gets booked, and
+  // the panel never offers a number the submit button then refuses. With suggestions off (no key,
+  // blocked script) there is nothing to pick, and the ZIP estimate stays as the fallback.
+  const estimate =
+    quoted?.kind === 'estimate' && !(suggestionsOn && !quoted.exact) ? quoted : null;
+  const estimateKind = estimate
+    ? priceKind({
+        exact: estimate.exact,
+        range: estimate.lowCents !== estimate.highCents,
+        text: formatRange(estimate),
+      })
+    : null;
 
   /**
    * On every PRICED line (not Scholar, not a wheelchair quote) the address must be picked
@@ -439,7 +461,59 @@ export default function RequestForm({
   }, [pickupPlace, dropoffPlace]);
 
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
-  const errorList = Object.entries(errors);
+  /**
+   * The error summary: each problem ONCE, led by the name of the field it belongs to. Without
+   * the name, two address errors read as the same sentence twice ("Pick your address from the
+   * list ..." and "Pick your address from the list ...") and nobody knows which address.
+   */
+  const FIELD_LABELS: Record<string, string> = {
+    serviceLine: 'Service',
+    pickupAddress: 'Pickup address',
+    dropoffAddress: 'Destination',
+    requestedAt: 'Date & time',
+    returnAt: 'Return time',
+    passengers: 'Passengers',
+    mobility: 'Mobility',
+    vehicleNotes: 'Notes',
+    contactFirstName: 'First name',
+    contactLastName: 'Last name',
+    contactPhone: 'Phone',
+    contactEmail: 'Email',
+    preferredContact: 'Preferred contact',
+    facilityRef: 'Your reference',
+    authorizedBy: 'Authorized by',
+    'careIntake.payer': 'How the ride is paid',
+    'careIntake.dob': 'Patient date of birth',
+    'careIntake.medicaidBroker': 'Medicaid plan or broker',
+    'careIntake.memberId': 'Member ID',
+    'careIntake.authorizationNumber': 'Authorization number',
+    'careIntake.hipaa': 'Privacy acknowledgement',
+    'careIntake.transportConsent': 'Transport consent',
+    'careIntake.signerName': 'Name to sign',
+  };
+  function summaryLabel(name: string): string {
+    if (name.startsWith('details.')) {
+      const key = name.slice('details.'.length);
+      return detailsFor(service)?.fields.find((f) => f.key === key)?.label ?? key.replace(/_/g, ' ');
+    }
+    if (FIELD_LABELS[name]) return FIELD_LABELS[name]!;
+    if (name === 'form') return '';
+    return name.replace(/^careIntake\./, '').replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').trim();
+  }
+  const errorList = (() => {
+    const seen = new Set<string>();
+    const out: { name: string; text: string }[] = [];
+    for (const [name, message] of Object.entries(errors)) {
+      const label = summaryLabel(name);
+      // "Species is required" already names its field; prefixing it would read "Species: Species is
+      // required". Only prefix a message that does not start with the field's name.
+      const text = !label || message.toLowerCase().startsWith(label.toLowerCase()) ? message : `${label}: ${message}`;
+      if (seen.has(text)) continue;
+      seen.add(text);
+      out.push({ name, text });
+    }
+    return out;
+  })();
 
   /** Wires a field to its label, its error, and its validity state. */
   function fieldProps(name: string) {
@@ -651,7 +725,7 @@ export default function RequestForm({
         : null;
       const price =
         json.price && typeof json.price.text === 'string'
-          ? { text: String(json.price.text), exact: Boolean(json.price.exact) }
+          ? { text: String(json.price.text), exact: Boolean(json.price.exact), range: Boolean(json.price.range) }
           : null;
       setReceipt({
         tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null,
@@ -681,12 +755,14 @@ export default function RequestForm({
         ) : null}
         {receipt?.price ? (
           <div className="mt-4" data-testid="confirmed-price">
-            <p className="ink-soft text-sm">{receipt.price.exact ? 'Your price' : 'Estimated price'}</p>
+            <p className="ink-soft text-sm">{priceLabel(priceKind(receipt.price))}</p>
             <p className="serif text-3xl font-semibold text-[color:var(--gold)]">{receipt.price.text}</p>
             <p className="ink-soft mt-1 text-xs max-w-md mx-auto">
-              {receipt.price.exact
+              {priceKind(receipt.price) === 'firm'
                 ? 'This is the price you saw when you booked.'
-                : 'Based on the ZIP codes you entered. We confirm the exact price before anything is booked.'}
+                : priceKind(receipt.price) === 'range'
+                  ? PRICE_RANGE_NOTE
+                  : 'Based on the ZIP codes you entered. We confirm the exact price before anything is booked.'}
             </p>
           </div>
         ) : receipt?.priceUnavailable ? (
@@ -751,14 +827,14 @@ export default function RequestForm({
                 : `There are ${errorList.length} problems with this form:`}
             </p>
             <ul className="list-disc pl-5 mt-1 space-y-0.5">
-              {errorList.map(([name, message]) => (
+              {errorList.map(({ name, text }) => (
                 <li key={name}>
                   {/* A detail error is keyed `details.pet_name` but the input it
                       belongs to is `#details-pet_name`. Without this the link in
                       the summary scrolls nowhere, which is worse than no link —
                       a screen reader user is told where to go and then dropped. */}
                   <a href={`#${name.replace('details.', 'details-')}`} className="underline">
-                    {message}
+                    {text}
                   </a>
                 </li>
               ))}
@@ -1149,8 +1225,14 @@ export default function RequestForm({
             <span className="text-sm">
               <span className="font-medium">{SMS_CONSENT_LABEL}</span>
               <span className="ink-soft block mt-1 text-xs leading-relaxed">
-                {SMS_CONSENT_DISCLOSURE}{' '}
-                <a href="/privacy" className="underline">Privacy</a> · <a href="/terms" className="underline">Terms</a>
+                {SMS_CONSENT_DISCLOSURE}
+              </span>
+              {/* Their own row, each at least 44px tall and wide: set inline at the end of the
+                  paragraph they were 15px tall, too small to tap, and padding them in place
+                  would have stolen taps from the text above. */}
+              <span className="-ml-2 mt-1 flex gap-2">
+                <a href="/privacy" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center px-2 text-xs underline">Privacy</a>
+                <a href="/terms" className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center px-2 text-xs underline">Terms</a>
               </span>
             </span>
           </label>
@@ -1166,7 +1248,7 @@ export default function RequestForm({
           {estimate ? (
             <>
               <p className="text-sm">
-                <span className="ink-soft">{estimate.exact ? 'Your price' : 'Estimated fare'}</span>{' '}
+                <span className="ink-soft">{priceLabel(estimateKind!)}</span>{' '}
                 <span className="serif text-2xl font-semibold text-[color:var(--gold)]">
                   {formatRange(estimate)}
                 </span>
@@ -1197,10 +1279,12 @@ export default function RequestForm({
                   street address for an exact figure.
                 </p>
               )}
-              <p className="ink-soft mt-2 text-xs">
-                {estimate.exact
+              <p className="ink-soft mt-2 text-xs" data-testid="price-note">
+                {estimateKind === 'firm'
                   ? 'This is your price for the trip as entered. If a toll, a longer wait or a change to the trip moves it, we tell you the new price before you agree to anything.'
-                  : 'An estimate, not a final price. A dispatcher confirms the exact figure before your trip is booked.'}
+                  : estimateKind === 'range'
+                    ? PRICE_RANGE_NOTE
+                    : 'An estimate, not a final price. A dispatcher confirms the exact figure before your trip is booked.'}
               </p>
             </>
           ) : quoted?.kind === 'quote-only' ? (
@@ -1213,8 +1297,8 @@ export default function RequestForm({
                   which reads as odd next to an address field that offers
                   suggestions, and left people typing a street with no ZIP and
                   no price. Name the faster route first. */}
-              {mustPick && pickupSuggest && dropoffSuggest
-                ? 'Pick each address from the list to see your price. Put the apartment or unit in its own box.'
+              {suggestionsOn
+                ? PICK_TO_SEE_PRICE
                 : 'Pick each address from the suggestions to see your price — or type the ZIP codes if the address is not listed.'}
             </p>
           )}

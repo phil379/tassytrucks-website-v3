@@ -238,7 +238,10 @@ const tripRequestObject = z
      * number the browser could edit is not a number you can defend in a billing
      * dispute.
      */
-    estimateShown: z.coerce.boolean().default(false),
+    // STRICT, not z.coerce.boolean(): coercion turns the string "false" (and "0", and any
+    // non-empty string) into true, so a client that sent "false" was recorded as having shown
+    // the customer a price. Only a real true, or the string "true", counts.
+    estimateShown: z.preprocess((v) => v === true || v === 'true', z.boolean()),
 
     contactFirstName: trimmed(100).min(1, 'Enter your first name'),
     contactLastName: trimmed(100).min(1, 'Enter your last name'),

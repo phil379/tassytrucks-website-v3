@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { PRICE_RANGE_NOTE, PICK_TO_SEE_PRICE, priceKind, priceLabel } from '../lib/price-fallback';
 import { buildRequesterText } from '../lib/notifications';
-import { formatRange } from '../lib/quote';
+import { estimateTrip, formatRange, roundTripForced } from '../lib/quote';
 
 let n = 0;
 function t(name: string, fn: () => void) {
@@ -75,6 +75,53 @@ t('email, one firm price and one ZIP estimate: wording unchanged', () => {
   const zip = mail({ text: '$59', exact: false, range: false });
   assert.ok(zip.includes('Estimated price: $59'));
   assert.ok(zip.includes('That is an estimate from the ZIP codes you entered.'));
+});
+
+// Wheelchair Recovery: the box says one way, the job is a round trip.
+const rec = (mobility: string | null, returnTrip: boolean) => {
+  const r = estimateTrip({
+    serviceLine: 'recovery',
+    requestedAt: '2026-10-26T10:00',
+    pickup: { lat: 35.2271, lng: -80.8431 },
+    dropoff: { lat: 35.2271, lng: -80.8131 },
+    roadMiles: 2,
+    mobility,
+    returnTrip,
+  });
+  assert.equal(r?.kind, 'estimate');
+  return r as Extract<typeof r, { kind: 'estimate' }>;
+};
+
+t('wheelchair Recovery is a round trip whether or not the box is ticked, and prices the same either way', () => {
+  const unticked = rec('wheelchair', false);
+  const ticked = rec('wheelchair', true);
+  assert.equal(unticked.roundTrip, true);
+  assert.equal(unticked.lowCents, ticked.lowCents);
+  assert.equal(unticked.highCents, ticked.highCents);
+  assert.equal(unticked.cardLabel, 'Tassy Care WAV');
+  // 1.8 x the $109 entry rung: the return leg is charged, not dropped.
+  assert.equal(unticked.lowCents, 19600);
+});
+
+t('nothing else moves: ambulatory Recovery stays $129, and Care + wheelchair stays one way unless ticked', () => {
+  assert.equal(rec(null, false).lowCents, 12900);
+  assert.equal(rec('ambulatory', true).lowCents, 12900);
+  assert.equal(roundTripForced('recovery', 'wheelchair'), true);
+  assert.equal(roundTripForced('recovery', 'ambulatory'), false);
+  assert.equal(roundTripForced('care', 'wheelchair'), false);
+  assert.equal(roundTripForced('concierge', 'wheelchair'), false);
+  const care = (returnTrip: boolean) =>
+    estimateTrip({
+      serviceLine: 'care',
+      requestedAt: '2026-10-26T10:00',
+      pickup: { lat: 35.2271, lng: -80.8431 },
+      dropoff: { lat: 35.2271, lng: -80.8131 },
+      roadMiles: 2,
+      mobility: 'wheelchair',
+      returnTrip,
+    }) as { lowCents: number };
+  assert.equal(care(false).lowCents, 10900);
+  assert.equal(care(true).lowCents, 19600);
 });
 
 console.log(`${n} passed`);

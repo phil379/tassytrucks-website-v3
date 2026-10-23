@@ -28,6 +28,8 @@ export const PRICE_PENDING_MESSAGE = 'A dispatcher will confirm your price befor
  */
 export const NEEDS_PRICE_MARKER = '[NEEDS PRICE]';
 
+import type { QuoteResult } from './quote';
+
 export type UnpricedEnds = { pickup: boolean; dropoff: boolean };
 
 export function needsPriceNote(ends: UnpricedEnds): string {
@@ -43,6 +45,33 @@ export function needsPriceNote(ends: UnpricedEnds): string {
     `${NEEDS_PRICE_MARKER} No price was computed: ${which}, and the typed text has no ZIP to ` +
     'measure from. Quote the trip and confirm the price with the customer before anything is charged.'
   );
+}
+
+/** Same marker, other cause: the trip is longer than the last price band, so a person quotes it. */
+export function beyondBandsNote(miles: number | null): string {
+  const about = miles != null ? ` (about ${miles} miles)` : '';
+  return (
+    `${NEEDS_PRICE_MARKER} No price was computed: the trip is longer than the published rates cover${about}. ` +
+    'Quote the trip and confirm the price with the customer before anything is charged.'
+  );
+}
+
+/**
+ * Does this estimate result leave the row with no price a dispatcher must supply, and if so what
+ * goes in internal_notes? Two cases, one marker:
+ *   null                      an end could not be placed (typed address, no ZIP)
+ *   quote-only, beyond-bands  past the last price band
+ * Scholar and other quoted lines are NOT here: they are priced by plan, not missing a price.
+ */
+export function unpricedFor(
+  quoted: QuoteResult | null,
+  ends: UnpricedEnds,
+): { priceUnavailable: boolean; note: string | null } {
+  if (quoted === null) return { priceUnavailable: true, note: needsPriceNote(ends) };
+  if (quoted.kind === 'quote-only' && quoted.reason === 'beyond-bands') {
+    return { priceUnavailable: true, note: beyondBandsNote(quoted.miles) };
+  }
+  return { priceUnavailable: false, note: null };
 }
 
 export function isNeedsPrice(note: string | null | undefined): boolean {

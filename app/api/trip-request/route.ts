@@ -8,7 +8,7 @@ import {
 import { estimateTrip, formatRange } from '@/lib/quote';
 import { resolvePoint } from '@/lib/zip-centroids';
 import { withUnit } from '@/lib/address-unit';
-import { needsPriceNote } from '@/lib/price-fallback';
+import { unpricedFor } from '@/lib/price-fallback';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
@@ -455,17 +455,16 @@ export async function POST(request: Request) {
     : null;
 
   // A PRICED line that still has no number: estimateTrip() could not place one end or both
-  // (an address typed instead of picked, with no ZIP in it). 'quote-only' is a different
-  // case - Scholar, or a trip past the last band - and already tells the customer why.
+  // (an address typed instead of picked, with no ZIP in it), or the trip is past the last band.
+  // Scholar is the other 'quote-only' case and is priced by plan, so it is NOT marked.
   // Here the customer would otherwise see nothing where a price was promised, and a
   // dispatcher would see a row that looks like any other. See lib/price-fallback.ts.
-  const priceUnavailable = quoted === null;
-  const unpricedNote = priceUnavailable
-    ? needsPriceNote({
-        pickup: !resolvePoint({ lat: data.pickupLat, lng: data.pickupLng }, data.pickupAddress),
-        dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
-      })
-    : null;
+  // A trip past the last price band ('quote-only', reason 'beyond-bands') is the same situation
+  // for the dispatcher - no number, someone must quote it - so it gets the same marker.
+  const { priceUnavailable, note: unpricedNote } = unpricedFor(quoted, {
+    pickup: !resolvePoint({ lat: data.pickupLat, lng: data.pickupLng }, data.pickupAddress),
+    dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
+  });
 
   // What dispatch reads: the picked address, then the door. The estimate above was
   // computed from the address alone, so a unit can never break the match.

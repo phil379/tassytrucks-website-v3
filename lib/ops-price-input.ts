@@ -16,3 +16,25 @@ export function priceInputToCents(raw: string, opts: { allowZero?: boolean } = {
   if (dollars > MAX_PRICE_DOLLARS) return null;
   return Math.round(dollars * 100);
 }
+
+/**
+ * What the "Agreed price" box on /ops starts with, as dollars text ("" = blank).
+ *
+ * An agreed or quoted price always wins. An ESTIMATE is only pre-filled when it is one number
+ * (low and high the same): a range such as $89-$99 is not a price anyone agreed to, and
+ * pre-filling its top end meant one tap on "Confirm & send" charged the high figure.
+ */
+export function agreedPriceDefault(row: {
+  agreed_cents: number | null;
+  quoted_cents: number | null;
+  estimate_low_cents: number | null;
+  estimate_high_cents: number | null;
+}): string {
+  const cents =
+    row.agreed_cents ??
+    row.quoted_cents ??
+    (row.estimate_low_cents != null && row.estimate_low_cents === row.estimate_high_cents
+      ? row.estimate_high_cents
+      : null);
+  return cents != null ? (cents / 100).toFixed(2) : '';
+}

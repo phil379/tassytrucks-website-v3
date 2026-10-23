@@ -984,9 +984,9 @@ export function formatUsd(cents: number): string {
   return `$${Math.round(cents / 100).toLocaleString('en-US')}`;
 }
 
-/** "$74 – $89", or "$74" when both road estimates landed in the same band. */
+/** "$74–$89", or "$74" when both road estimates landed in the same band. */
 export function formatRange(quote: Quote): string {
   return quote.lowCents === quote.highCents
     ? formatUsd(quote.lowCents)
-    : `${formatUsd(quote.lowCents)} – ${formatUsd(quote.highCents)}`;
+    : `${formatUsd(quote.lowCents)}–${formatUsd(quote.highCents)}`;
 }

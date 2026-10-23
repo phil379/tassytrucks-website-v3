@@ -479,9 +479,21 @@ export const CARE_WAV: Card = {
   // MTA's $100, and it buys a FIVE mile band against their three. We still do
   // not surcharge nights, weekends or holidays, so on the trips that actually
   // happen the gap is wider than the headline.
+  //
+  // REPRICED 2026-10-23 by Phil: the two shortest rungs, 95 -> 109 (0-5 mi) and
+  // 125 -> 129 (6-10 mi). The upper rungs (155 / 185 / 225) are unchanged. The
+  // 0-5 mile rung was the one sitting under the middle of the NC private-pay
+  // range ($65-110 base, $3.00-5.50/mi), and it is the rung most medical runs use.
+  // Against the Charlotte comparisons above it is still BELOW Capitol on both rungs
+  // ($109 vs $120 for 0-5 mi, $129 vs $140 for 5-10 mi) and a step over MTA's $100
+  // first-3-miles base, while giving five miles to their three.
+  //
+  // The 2026-10-02 note above argued for a deliberately low entry rung. This
+  // is a conscious reversal of that choice for the short rungs, made on the
+  // market-midpoint reasoning, not a correction of an error.
   bands: [
-    { upToMiles: 5, cents: 9500 },
-    { upToMiles: 10, cents: 12500 },
+    { upToMiles: 5, cents: 10900 },
+    { upToMiles: 10, cents: 12900 },
     { upToMiles: 15, cents: 15500 },
     { upToMiles: 20, cents: 18500 },
     { upToMiles: 30, cents: 22500 },
@@ -490,11 +502,13 @@ export const CARE_WAV: Card = {
   waitOverage: 3000,
   perExtra: 0,
   returnFactor: 1.8,
-  // $180 at the entry rung, matching MTA's published round trip, where 1.8 x $95
-  // alone would give $171. Every rung above clears the floor on the factor
-  // ($125 -> $225, $155 -> $279, $185 -> $333, $225 -> $405), so this sets the
-  // first row and nothing else. Moved WITH the card every time the entry band
-  // moves -- a floor left at 21400 would now exceed the 11-15 mile round trip.
+  // Was $180 at the entry rung, matching MTA's published round trip, where 1.8 x $95
+  // alone gave $171. SINCE 2026-10-23 THIS NO LONGER BINDS: 1.8 x $109 is $196, above
+  // $180, so every rung now clears the floor on the factor ($109 -> $196, $129 -> $232,
+  // $155 -> $279, $185 -> $333, $225 -> $405). It is kept as a guard rather than
+  // removed, so a later cut to the entry rung cannot undercut a $180 round trip.
+  // Moved WITH the card every time the entry band moves -- a floor left at 21400
+  // would exceed the 11-15 mile round trip.
   returnFloor: 18000,
 };
 

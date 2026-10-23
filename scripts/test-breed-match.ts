@@ -69,4 +69,9 @@ t('an empty species list (Other) offers nothing', () => {
   assert.deepEqual(matchBreeds('F', BREEDS_BY_SPECIES.nonexistent ?? []), []);
 });
 
+// Same rule, one level up: nothing in the app may bring the native datalist back. It lives in its
+// own file so it can be run alone, and is pulled in here so `bun run test:unit` runs it without
+// another edit to the one-line test:unit script.
+await import('./test-no-native-datalist');
+
 console.log(`${n} passed`);

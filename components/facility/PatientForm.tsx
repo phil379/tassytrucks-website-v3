@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Loader2, Plus, X } from 'lucide-react';
 import { savePatient } from '@/app/facility/patients/actions';
 import { facilityPatientSchema, passengerNoun, isPetFacility, defaultServiceLineForKind } from '@/lib/facility';
 import { mobilityOptionsFor, mobilityLabelFor } from '@/lib/trip-request';
 import { BREEDS_BY_SPECIES, OTHER_BREED_SENTINEL } from '@/lib/pet-breeds';
+import BreedCombobox from '@/components/request/BreedCombobox';
 
 const SPECIES = [
   { value: 'dog', label: 'Dog' },
@@ -40,6 +41,14 @@ export default function PatientForm({ kind }: { kind: string }) {
   const line = defaultServiceLineForKind(kind);
   const mobilityOptions = mobilityOptionsFor(line);
   const [species, setSpecies] = useState<string>('dog');
+  // Controlled, because the suggestions are drawn by BreedCombobox rather than the browser.
+  // Cleared whenever the form closes, so reopening starts empty as it always did.
+  const [breed, setBreed] = useState('');
+  // Same list the old datalist offered: the species' breeds, without the "Other / Not Listed" row.
+  const breedSuggestions = useMemo(
+    () => (BREEDS_BY_SPECIES[species] ?? []).filter((b) => b !== OTHER_BREED_SENTINEL),
+    [species],
+  );
   const err = 'mt-1.5 text-sm text-[#f87171]';
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -80,7 +89,7 @@ export default function PatientForm({ kind }: { kind: string }) {
     try {
       const res = await savePatient(payload);
       if (res.ok) {
-        setOpen(false);
+        closeForm();
         (e.target as HTMLFormElement).reset();
       } else {
         setErrors(res.fieldErrors ?? {});
@@ -89,6 +98,11 @@ export default function PatientForm({ kind }: { kind: string }) {
     } finally {
       setBusy(false);
     }
+  }
+
+  function closeForm() {
+    setOpen(false);
+    setBreed('');
   }
 
   if (!open) {
@@ -103,7 +117,7 @@ export default function PatientForm({ kind }: { kind: string }) {
     <form onSubmit={onSubmit} noValidate className="card-tile mt-2 p-6">
       <div className="flex items-start justify-between gap-4">
         <h3 className="serif text-xl font-semibold">Add a {noun}</h3>
-        <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="ink-mute p-1">
+        <button type="button" onClick={closeForm} aria-label="Close" className="ink-mute p-1">
           <X size={18} />
         </button>
       </div>
@@ -156,15 +170,19 @@ export default function PatientForm({ kind }: { kind: string }) {
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium" htmlFor="breed">Breed</label>
-            {/* A datalist, not a select: the lists are long and nobody's pet is
-                guaranteed to be on one. Type anything, pick from the list if it
-                helps. */}
-            <input id="breed" name="breed" className="form-field" list="breed-options" maxLength={80} />
-            <datalist id="breed-options">
-              {(BREEDS_BY_SPECIES[species] ?? [])
-                .filter((b) => b !== OTHER_BREED_SENTINEL)
-                .map((b) => <option key={b} value={b} />)}
-            </datalist>
+            {/* A text input with suggestions, not a select: the lists are long and nobody's
+                pet is guaranteed to be on one. Type anything, pick from the list if it
+                helps. Drawn by BreedCombobox, not a native <datalist>, which is unreliable
+                on phones (see components/request/BreedCombobox.tsx). */}
+            <BreedCombobox
+              id="breed"
+              name="breed"
+              value={breed}
+              onChange={setBreed}
+              suggestions={breedSuggestions}
+              maxLength={80}
+              invalid={Boolean(errors.breed)}
+            />
             <p className="ink-mute mt-1 text-xs">Helps us send a vehicle with room for the carrier.</p>
             {errors.breed && <p className={err}>{errors.breed}</p>}
           </div>

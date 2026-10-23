@@ -546,6 +546,16 @@ export function cardFor(serviceLine: ServiceLine, mobility?: string | null): Car
   return CARD_FOR_LINE[serviceLine] ?? null;
 }
 
+/**
+ * Recovery with a wheelchair passenger is ALWAYS a round trip. Recovery means the driver waits
+ * and brings the patient home, but the wheelchair switch moves the price onto the Care WAV card,
+ * whose bands are one way until "return trip" is ticked - so an unticked box priced the
+ * whole job at the one-way WAV rate ($109) and the return leg was never charged.
+ */
+export function roundTripForced(serviceLine: ServiceLine, mobility?: string | null): boolean {
+  return serviceLine === 'recovery' && mobility === 'wheelchair';
+}
+
 /** True when this request is quoted by a person rather than by the table. */
 export function isQuoteOnly(serviceLine: ServiceLine, mobility?: string | null): boolean {
   return cardFor(serviceLine, mobility) === null;
@@ -930,9 +940,12 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const escortCents =
     input.escort && escortAvailable(input.serviceLine) ? ESCORT_CENTS : 0;
 
-  // Recovery is already a round trip, so ticking the box must not double it.
-  const bothLegs = card.returnFactor === 1 || Boolean(input.returnTrip);
-  const factor = input.returnTrip ? card.returnFactor : 1;
+  // Recovery is already a round trip, so ticking the box must not double it. A wheelchair
+  // Recovery is forced to one (see roundTripForced), whatever the box says; the form and the
+  // server both come through here, so the price on screen is the price that is stored.
+  const returnTrip = Boolean(input.returnTrip) || roundTripForced(input.serviceLine, input.mobility);
+  const bothLegs = card.returnFactor === 1 || returnTrip;
+  const factor = returnTrip ? card.returnFactor : 1;
 
   const price = (band: Band) => {
     // Multiply the LEG, then add what is charged once. Surcharges and extra
@@ -940,7 +953,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     // once, at one hour of the day, carrying one extra passenger.
     const legs = Math.round(band.cents * factor);
     return (
-      roundTo(Math.max(legs, input.returnTrip ? card.returnFloor : 0), 100) +
+      roundTo(Math.max(legs, returnTrip ? card.returnFloor : 0), 100) +
       surchargeTotal +
       extras +
       escortCents
@@ -950,7 +963,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   // A round trip on Winnie carries a longer wait than a one-way: the driver
   // stays with the animal rather than leaving and coming back for it.
   const waitIncludedMin =
-    card === WINNIE && input.returnTrip ? 20 : card.waitIncludedMin;
+    card === WINNIE && returnTrip ? 20 : card.waitIncludedMin;
 
   const exact = from.exact && to.exact;
   const fromPlace = zipPlace(from.zip);

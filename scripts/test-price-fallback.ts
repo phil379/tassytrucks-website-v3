@@ -96,8 +96,9 @@ t('auto-reply with no price and an unpriceable trip tells the customer a dispatc
 });
 
 t('auto-reply with a price shows the price and does NOT carry the dispatcher-will-price line', () => {
-  const text = mail({ price: { text: '$59–$74', exact: false }, priceUnavailable: false });
-  assert.ok(text.includes('Estimated price: $59–$74'));
+  // A single ZIP estimate. (Ranges have their own wording, pinned in test-price-wording.ts.)
+  const text = mail({ price: { text: '$59', exact: false }, priceUnavailable: false });
+  assert.ok(text.includes('Estimated price: $59'));
   assert.ok(!text.includes(PRICE_PENDING_MESSAGE));
 });
 

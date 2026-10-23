@@ -7,7 +7,7 @@ import {
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
 import { SAAS_BASE } from './saas-links';
-import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE } from './price-fallback';
+import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -381,13 +381,16 @@ export function buildRequesterText(args: {
     'A dispatcher is reviewing it now.',
     '',
     ...(price
-      ? [
-          `${price.exact ? 'Your price' : 'Estimated price'}: ${price.text}`,
-          price.exact
-            ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
-            : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
-          '',
-        ]
+      ? priceKind(price) === 'range'
+        ? // A range is never "your price". One sentence, the same words as the confirmation screen.
+          [`Estimated price ${price.text}. ${PRICE_RANGE_NOTE}`, '']
+        : [
+            `${priceKind(price) === 'firm' ? 'Your price' : 'Estimated price'}: ${price.text}`,
+            priceKind(price) === 'firm'
+              ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
+              : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
+            '',
+          ]
       : priceUnavailable
         ? [PRICE_PENDING_MESSAGE, '']
         : []),
@@ -445,7 +448,7 @@ async function notifyRequester(
 export type LegOutcome = 'sent' | 'failed' | 'skipped';
 
 /** The price the visitor was shown, recomputed on the server. `exact` is false for a ZIP-only estimate. */
-export type QuotedPrice = { text: string; exact: boolean };
+export type QuotedPrice = { text: string; exact: boolean; range?: boolean };
 
 export type NotificationOutcome = {
   push: LegOutcome;

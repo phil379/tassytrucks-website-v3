@@ -433,7 +433,12 @@ export async function POST(request: Request) {
   const estimate = quoted?.kind === 'estimate' ? quoted : null;
   // What the confirmation screen and the auto-reply email tell the customer, so the price is
   // never first heard on a later phone call.
-  const price = estimate ? { text: formatRange(estimate), exact: estimate.exact } : null;
+  // A range (low and high differ) is an estimate however it was measured, so it is never
+  // `exact`: the screen and the email key their wording off these two flags.
+  const priceIsRange = Boolean(estimate && estimate.lowCents !== estimate.highCents);
+  const price = estimate
+    ? { text: formatRange(estimate), exact: estimate.exact && !priceIsRange, range: priceIsRange }
+    : null;
 
   // A PRICED line that still has no number: estimateTrip() could not place one end or both
   // (an address typed instead of picked, with no ZIP in it). 'quote-only' is a different

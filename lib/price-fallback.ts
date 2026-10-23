@@ -48,3 +48,37 @@ export function needsPriceNote(ends: UnpricedEnds): string {
 export function isNeedsPrice(note: string | null | undefined): boolean {
   return typeof note === 'string' && note.startsWith(NEEDS_PRICE_MARKER);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// How a quoted price is LABELLED, in one place, for the panel, the confirmation
+// screen and the auto-reply email.
+//
+//   firm   one number, both addresses picked   "Your price"
+//   range  low and high differ                 "Estimated price" - NEVER "Your price"
+//   zip    one number from ZIP centroids       "Estimated price"
+//
+// A range is not a price the customer was promised, so it must never be called "Your price"
+// or "the price you saw when you booked" (it used to be, whenever both addresses were picked
+// but the drive distance could not be measured).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Shown in the price panel, in place of a price, while address suggestions are working. */
+export const PICK_TO_SEE_PRICE = 'Pick your address to see your price';
+
+/** Follows any price range, on screen and in the email. */
+export const PRICE_RANGE_NOTE = 'A dispatcher will confirm the exact price before you’re charged.';
+
+export type PriceKind = 'firm' | 'range' | 'zip';
+
+/** "$89–$99" (or an old-style "$89 – $99"): two dollar amounts joined by a dash. */
+const RANGE_TEXT = /\$\d[\d,]*\s*[–-]\s*\$\d/;
+
+export function priceKind(p: { exact: boolean; range?: boolean; text?: string }): PriceKind {
+  // The flag is the contract; the text is a backstop, so a range can never be labelled "Your
+  // price" because some caller forgot to set the flag.
+  if (p.range || (p.text !== undefined && RANGE_TEXT.test(p.text))) return 'range';
+  return p.exact ? 'firm' : 'zip';
+}
+
+export const priceLabel = (kind: PriceKind): 'Your price' | 'Estimated price' =>
+  kind === 'firm' ? 'Your price' : 'Estimated price';

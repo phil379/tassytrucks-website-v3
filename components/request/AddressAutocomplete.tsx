@@ -63,6 +63,7 @@ export default function AddressAutocomplete({
   defaultValue = '',
   onResolve,
   onText,
+  onSuggestionsReady,
   debug = false,
 }: {
   name: string;
@@ -89,6 +90,15 @@ export default function AddressAutocomplete({
    * lib/zip-centroids.ts — and a blank panel loses the booking outright.
    */
   onText?: (value: string) => void;
+  /**
+   * Fires with true once Google's suggestions are loaded and working, false while they
+   * are not (no key, blocked script, still loading).
+   *
+   * The form only INSISTS that an address be picked when this is true. If suggestions
+   * cannot load there is nothing to pick from, and a form that refused to submit would
+   * stop taking bookings because a third party is down - rule 1 above.
+   */
+  onSuggestionsReady?: (ready: boolean) => void;
   /**
    * Operator-only. Shows why suggestions are off instead of failing silently.
    * Never on for a customer — see the note in lib/google-maps.ts.
@@ -118,6 +128,13 @@ export default function AddressAutocomplete({
   useEffect(() => {
     onTextRef.current?.(text);
   }, [text]);
+
+  const onReadyRef = useRef(onSuggestionsReady);
+  onReadyRef.current = onSuggestionsReady;
+  const suggestionsReady = Boolean(places);
+  useEffect(() => {
+    onReadyRef.current?.(suggestionsReady);
+  }, [suggestionsReady]);
 
   const listId = useId();
   const statusId = useId();

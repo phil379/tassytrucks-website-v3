@@ -6,6 +6,9 @@ import {
   UNAVAILABLE_SERVICE_LINES,
 } from '@/lib/trip-request';
 import { estimateTrip, formatRange } from '@/lib/quote';
+import { resolvePoint } from '@/lib/zip-centroids';
+import { withUnit } from '@/lib/address-unit';
+import { needsPriceNote } from '@/lib/price-fallback';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
@@ -432,6 +435,24 @@ export async function POST(request: Request) {
   // never first heard on a later phone call.
   const price = estimate ? { text: formatRange(estimate), exact: estimate.exact } : null;
 
+  // A PRICED line that still has no number: estimateTrip() could not place one end or both
+  // (an address typed instead of picked, with no ZIP in it). 'quote-only' is a different
+  // case - Scholar, or a trip past the last band - and already tells the customer why.
+  // Here the customer would otherwise see nothing where a price was promised, and a
+  // dispatcher would see a row that looks like any other. See lib/price-fallback.ts.
+  const priceUnavailable = quoted === null;
+  const unpricedNote = priceUnavailable
+    ? needsPriceNote({
+        pickup: !resolvePoint({ lat: data.pickupLat, lng: data.pickupLng }, data.pickupAddress),
+        dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
+      })
+    : null;
+
+  // What dispatch reads: the picked address, then the door. The estimate above was
+  // computed from the address alone, so a unit can never break the match.
+  const pickupStored = withUnit(data.pickupAddress, data.pickupUnit);
+  const dropoffStored = withUnit(data.dropoffAddress, data.dropoffUnit);
+
   let id: string;
   // Assigned before the insert so the same reference can be echoed on the confirmation screen.
   let tripNumber: string | null = null;
@@ -462,8 +483,8 @@ export async function POST(request: Request) {
         is_test_data:
           looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
         preferred_contact: data.preferredContact,
-        pickup_address: data.pickupAddress,
-        dropoff_address: data.dropoffAddress,
+        pickup_address: pickupStored,
+        dropoff_address: dropoffStored,
         // Charlotte wall-clock -> UTC instant. Never `new Date(naiveString)`
         // here: this function runs in UTC and would shift the trip 4 hours.
         requested_at: parseLocalDateTime(data.requestedAt)!.toISOString(),
@@ -487,6 +508,8 @@ export async function POST(request: Request) {
         // Only true when the range was on screen. An estimate computed for the
         // ops queue while the public display is off is not a promise.
         estimate_shown: Boolean(estimate && data.estimateShown),
+        // Marks a row that has no price so /ops shows it as one that needs a price.
+        ...(unpricedNote ? { internal_notes: unpricedNote } : {}),
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,
@@ -527,12 +550,17 @@ export async function POST(request: Request) {
   // instants, exactly as the stored row does, so every email agrees with /ops.
   const notifications = await fireNotifications(id, {
     ...data,
+    pickupAddress: pickupStored,
+    dropoffAddress: dropoffStored,
     requestedAt: parseLocalDateTime(data.requestedAt)?.toISOString() ?? data.requestedAt,
     returnAt: data.returnAt
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  }, tripNumber, facilityAlert, price);
+  }, tripNumber, facilityAlert, price, priceUnavailable);
 
-  return NextResponse.json({ ok: true, id, tripNumber, notifications, price }, { status: 200 });
+  return NextResponse.json(
+    { ok: true, id, tripNumber, notifications, price, priceUnavailable },
+    { status: 200 },
+  );
 }

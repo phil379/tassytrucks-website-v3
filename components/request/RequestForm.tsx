@@ -25,11 +25,40 @@ import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/Ad
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
-import { SHOW_ESTIMATES, estimateTrip, formatRange } from '@/lib/quote';
+import { SHOW_ESTIMATES, estimateTrip, formatRange, isQuoteOnly } from '@/lib/quote';
+import { PICK_ADDRESS_MESSAGE, PRICE_PENDING_MESSAGE } from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema } from '@/lib/care-intake';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
+
+/**
+ * Apartment, unit or suite, in its own box under an address.
+ *
+ * Typed into the address field it stops Google matching the building, so the visitor
+ * types the whole address by hand and ends up with no price. Here it is uncontrolled and
+ * read from the form on submit; the server joins it to the address for dispatch and
+ * leaves it out of the price. Defined at module level so typing here is never reset by
+ * the form re-rendering.
+ */
+function UnitField({ name }: { name: 'pickupUnit' | 'dropoffUnit' }) {
+  return (
+    <div className="mt-3">
+      <label className={labelCls} htmlFor={name}>
+        Apt, unit or suite <span className="ink-soft font-normal">(optional)</span>
+      </label>
+      <input
+        id={name}
+        name={name}
+        type="text"
+        className="form-field"
+        autoComplete="address-line2"
+        maxLength={40}
+        placeholder="Apt 1910"
+      />
+    </div>
+  );
+}
 
 /**
  * Accessibility notes for anyone editing this form.
@@ -215,6 +244,9 @@ export default function RequestForm({
   /** Raw field text. Feeds the ZIP fallback when no place could be picked. */
   const [pickupText, setPickupText] = useState(facility?.address ?? '');
   const [dropoffText, setDropoffText] = useState('');
+  /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
+  const [pickupSuggest, setPickupSuggest] = useState(false);
+  const [dropoffSuggest, setDropoffSuggest] = useState(false);
   const [whenValue, setWhenValue] = useState('');
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
@@ -229,6 +261,8 @@ export default function RequestForm({
     tripNumber: string | null;
     when: string | null;
     price: { text: string; exact: boolean } | null;
+    /** The server could not price the trip: say a dispatcher will, rather than show nothing. */
+    priceUnavailable: boolean;
   } | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
@@ -374,6 +408,36 @@ export default function RequestForm({
 
   const estimate = quoted?.kind === 'estimate' ? quoted : null;
 
+  /**
+   * On every PRICED line (not Scholar, not a wheelchair quote) the address must be picked
+   * from Google's list. A typed address has no coordinates, and often no ZIP, so the trip
+   * cannot be priced and the customer is shown nothing. Only enforced while suggestions
+   * are actually working: with no Maps key or a blocked script there is nothing to pick,
+   * and the form must keep taking bookings (the server then marks the row for a price).
+   */
+  const mustPick = estimatesEnabled && !isQuoteOnly(service, mobility);
+
+  /** An address is acceptable when it was picked, or is the facility's own, unchanged. */
+  const addressOk = (place: ResolvedPlace | null, text: string, facilityPrefill: boolean) =>
+    Boolean(place?.placeId) ||
+    (facilityPrefill && Boolean(facility?.address) && text.trim() === facility!.address!.trim() && /\b\d{5}\b/.test(text));
+
+  // The message goes away the moment the address is picked, not at the next submit.
+  useEffect(() => {
+    setErrors((current) => {
+      let next = current;
+      if (pickupPlace?.placeId && current.pickupAddress === PICK_ADDRESS_MESSAGE) {
+        next = { ...next };
+        delete next.pickupAddress;
+      }
+      if (dropoffPlace?.placeId && current.dropoffAddress === PICK_ADDRESS_MESSAGE) {
+        next = { ...next };
+        delete next.dropoffAddress;
+      }
+      return next;
+    });
+  }, [pickupPlace, dropoffPlace]);
+
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
   const errorList = Object.entries(errors);
 
@@ -414,6 +478,8 @@ export default function RequestForm({
       serviceLine: String(fd.get('serviceLine') ?? ''),
       pickupAddress: String(fd.get('pickupAddress') ?? ''),
       dropoffAddress: String(fd.get('dropoffAddress') ?? ''),
+      pickupUnit: String(fd.get('pickupUnit') ?? '') || null,
+      dropoffUnit: String(fd.get('dropoffUnit') ?? '') || null,
       requestedAt: String(fd.get('requestedAt') ?? ''),
       returnTrip: fd.get('returnTrip') === 'on',
       returnAt: String(fd.get('returnAt') ?? '') || null,
@@ -491,7 +557,25 @@ export default function RequestForm({
 
     const careCheck = payload.careIntake ? careIntakeSchema.safeParse(payload.careIntake) : null;
 
-    if (!check.success || !detailCheck.ok || (extrasCheck && !extrasCheck.success) || (careCheck && !careCheck.success)) {
+    // Typed, not picked, while suggestions are working: no price can be shown. Only for an
+    // address that has text; an empty one gets the schema's own "Enter a ..." message.
+    const pickErrors: Record<string, string> = {};
+    if (mustPick) {
+      if (pickupSuggest && payload.pickupAddress.trim() && !addressOk(pickupPlace, payload.pickupAddress, true)) {
+        pickErrors.pickupAddress = PICK_ADDRESS_MESSAGE;
+      }
+      if (dropoffSuggest && payload.dropoffAddress.trim() && !addressOk(dropoffPlace, payload.dropoffAddress, false)) {
+        pickErrors.dropoffAddress = PICK_ADDRESS_MESSAGE;
+      }
+    }
+
+    if (
+      !check.success ||
+      !detailCheck.ok ||
+      (extrasCheck && !extrasCheck.success) ||
+      (careCheck && !careCheck.success) ||
+      Object.keys(pickErrors).length > 0
+    ) {
       const next: Record<string, string> = {};
       if (careCheck && !careCheck.success) {
         for (const issue of careCheck.error.issues) {
@@ -515,6 +599,9 @@ export default function RequestForm({
           const key = issue.path.join('.') || 'form';
           if (!next[key]) next[key] = issue.message;
         }
+      }
+      for (const [key, message] of Object.entries(pickErrors)) {
+        if (!next[key]) next[key] = message;
       }
       announce(next);
       return;
@@ -566,7 +653,12 @@ export default function RequestForm({
         json.price && typeof json.price.text === 'string'
           ? { text: String(json.price.text), exact: Boolean(json.price.exact) }
           : null;
-      setReceipt({ tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null, when, price });
+      setReceipt({
+        tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null,
+        when,
+        price,
+        priceUnavailable: !price && json.priceUnavailable === true,
+      });
       setDone(json.id);
     } catch {
       announce({}, 'We could not reach the server. Please call (704) 941-8508.');
@@ -597,6 +689,11 @@ export default function RequestForm({
                 : 'Based on the ZIP codes you entered. We confirm the exact price before anything is booked.'}
             </p>
           </div>
+        ) : receipt?.priceUnavailable ? (
+          /* The form promised a price and there is none. Say so, and say what happens next. */
+          <p className="mt-4 text-sm max-w-md mx-auto" data-testid="price-pending">
+            {PRICE_PENDING_MESSAGE}
+          </p>
         ) : null}
         <p className="ink-soft mt-3 max-w-md mx-auto">{COPY.confirmation}</p>
         <p className="ink-soft text-sm mt-4">
@@ -722,9 +819,11 @@ export default function RequestForm({
           describedBy={errors.pickupAddress ? 'pickupAddress-error' : undefined}
           onResolve={setPickupPlace}
           onText={setPickupText}
+          onSuggestionsReady={setPickupSuggest}
           debug={debugMaps}
         />
         <FieldError name="pickupAddress" />
+        <UnitField name="pickupUnit" />
       </div>
 
       <div>
@@ -737,9 +836,11 @@ export default function RequestForm({
           describedBy={errors.dropoffAddress ? 'dropoffAddress-error' : undefined}
           onResolve={setDropoffPlace}
           onText={setDropoffText}
+          onSuggestionsReady={setDropoffSuggest}
           debug={debugMaps}
         />
         <FieldError name="dropoffAddress" />
+        <UnitField name="dropoffUnit" />
       </div>
 
       <div>
@@ -1112,8 +1213,9 @@ export default function RequestForm({
                   which reads as odd next to an address field that offers
                   suggestions, and left people typing a street with no ZIP and
                   no price. Name the faster route first. */}
-              Pick each address from the suggestions to see your price — or type the ZIP
-              codes if the address is not listed.
+              {mustPick && pickupSuggest && dropoffSuggest
+                ? 'Pick each address from the list to see your price. Put the apartment or unit in its own box.'
+                : 'Pick each address from the suggestions to see your price — or type the ZIP codes if the address is not listed.'}
             </p>
           )}
         </div>

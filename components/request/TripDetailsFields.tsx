@@ -1,6 +1,5 @@
 'use client';
 
-import { useId } from 'react';
 import {
   detailsFor,
   fieldVisible,
@@ -9,6 +8,7 @@ import {
 } from '@/lib/trip-details';
 import { BREEDS_BY_SPECIES } from '@/lib/pet-breeds';
 import SchoolPicker from '@/components/school/SchoolPicker';
+import BreedCombobox from '@/components/request/BreedCombobox';
 
 /**
  * The "who or what is travelling" block, rendered from lib/trip-details.ts.
@@ -22,8 +22,10 @@ import SchoolPicker from '@/components/school/SchoolPicker';
  *
  * 2. BREED IS A TEXT INPUT WITH SUGGESTIONS, NOT A DROPDOWN. The list is long
  *    and still incomplete; a closed <select> would turn "my dog is a breed you
- *    have not heard of" into a booking that cannot be submitted. The datalist
- *    helps the 95% and the other 5% just type.
+ *    have not heard of" into a booking that cannot be submitted. The suggestions
+ *    help the 95% and the other 5% just type. They are drawn by BreedCombobox, not
+ *    a native <datalist>: on phones the browser's own datalist UI is unreliable and
+ *    "F" never offered French Bulldog.
  */
 export default function TripDetailsFields({
   service,
@@ -38,8 +40,6 @@ export default function TripDetailsFields({
   onChange: (key: string, value: string) => void;
 }) {
   const section: DetailSection | null = detailsFor(service);
-  const listPrefix = useId().replace(/:/g, '');
-
   if (!section) return null;
 
   const visible = section.fields.filter((f) => fieldVisible(f, values));
@@ -56,7 +56,6 @@ export default function TripDetailsFields({
               field={field}
               value={values[field.key] ?? ''}
               error={errors[field.key]}
-              listId={field.suggestFrom ? `${listPrefix}-${field.key}` : undefined}
               suggestions={suggestionsFor(field, values)}
               onChange={(next) => onChange(field.key, next)}
               idValue={values[`${field.key}_id`] ?? ''}
@@ -79,7 +78,6 @@ function Row({
   field,
   value,
   error,
-  listId,
   suggestions,
   onChange,
   idValue,
@@ -88,7 +86,6 @@ function Row({
   field: DetailField;
   value: string;
   error?: string;
-  listId?: string;
   suggestions: string[];
   onChange: (value: string) => void;
   /** Only the `school` type uses these: the resolved id alongside the name. */
@@ -174,27 +171,33 @@ function Row({
           aria-describedby={describedBy || undefined}
           onChange={(event) => onChange(event.target.checked ? 'true' : '')}
         />
+      ) : field.suggestFrom ? (
+        /*
+          Suggestions follow another field (breed follows species). The value is
+          whatever is typed: picking a suggestion just fills in its text.
+        */
+        <BreedCombobox
+          id={id}
+          name={id}
+          value={value}
+          onChange={onChange}
+          suggestions={suggestions}
+          maxLength={field.max}
+          placeholder={field.placeholder}
+          invalid={Boolean(error)}
+          describedBy={describedBy}
+        />
       ) : (
-        <>
-          <input
-            {...shared}
-            type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
-            inputMode={field.type === 'number' ? 'numeric' : undefined}
-            min={field.type === 'number' ? field.min : undefined}
-            max={field.type === 'number' ? field.maxValue : undefined}
-            maxLength={field.type === 'text' ? field.max : undefined}
-            placeholder={field.placeholder}
-            list={listId && suggestions.length > 0 ? listId : undefined}
-            autoComplete="off"
-          />
-          {listId && suggestions.length > 0 && (
-            <datalist id={listId}>
-              {suggestions.map((option) => (
-                <option key={option} value={option} />
-              ))}
-            </datalist>
-          )}
-        </>
+        <input
+          {...shared}
+          type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+          inputMode={field.type === 'number' ? 'numeric' : undefined}
+          min={field.type === 'number' ? field.min : undefined}
+          max={field.type === 'number' ? field.maxValue : undefined}
+          maxLength={field.type === 'text' ? field.max : undefined}
+          placeholder={field.placeholder}
+          autoComplete="off"
+        />
       )}
 
       {field.help && (

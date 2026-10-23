@@ -8,6 +8,7 @@ import { login, logout, updateRow, advanceStatus, confirmAndSend } from './actio
 import { PendingButton } from '@/components/ops/PendingButton';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
+import { isNeedsPrice } from '@/lib/price-fallback';
 
 export const metadata: Metadata = {
   title: 'Ops queue',
@@ -201,6 +202,16 @@ export default async function OpsPage({
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   {row.status === 'new' && <ElapsedSince iso={row.created_at} />}
+                  {/* The booking page could not price this trip (an address typed, not picked).
+                      Clears itself once a price has been agreed or quoted. */}
+                  {isNeedsPrice(row.internal_notes) && row.agreed_cents == null && row.quoted_cents == null && (
+                    <span
+                      data-testid="needs-price-badge"
+                      className="rounded-full border border-[color:var(--gold)] px-3 py-1 text-xs font-semibold text-[color:var(--gold)]"
+                    >
+                      Needs price
+                    </span>
+                  )}
                   <span className="rounded-full border border-line px-3 py-1 text-xs capitalize">{row.status}</span>
                 </div>
               </header>

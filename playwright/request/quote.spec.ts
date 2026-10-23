@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   CARE,
+  CARE_WAV,
   TREATMENT_DAY,
   treatmentDayAvailable,
   RECOVERY,
@@ -254,6 +255,35 @@ test.describe('Care WAV is priced on its own card', () => {
       }),
     );
     expect(q.cardLabel).toBe('Tassy Care');
+  });
+  // Repriced 2026-10-23 by Phil: the two shortest rungs went from $95 / $125 to $109 / $129.
+  // Pinned so a later change to this card is a decision someone made, not a drift.
+  test('the WAV card is $109 / $129 / $155 / $185 / $225 on 5 / 10 / 15 / 20 / 30 miles', () => {
+    expect(CARE_WAV.bands.map((b) => [b.upToMiles, b.cents])).toEqual([
+      [5, 10900],
+      [10, 12900],
+      [15, 15500],
+      [20, 18500],
+      [30, 22500],
+    ]);
+  });
+  test('a wheelchair trip prices one way and round trip off the repriced rungs', () => {
+    const price = (miles: number, returnTrip: boolean) =>
+      asEstimate(
+        estimateTrip({
+          serviceLine: 'care',
+          pickup: UPTOWN,
+          dropoff: CMC,
+          requestedAt: WEEKDAY_MIDDAY,
+          mobility: 'wheelchair',
+          roadMiles: miles,
+          returnTrip,
+        }),
+      ).lowCents;
+    // One way: the rung itself.
+    expect([price(4, false), price(8, false), price(12, false)]).toEqual([10900, 12900, 15500]);
+    // Round trip is 1.8 x the rung. The $180 floor no longer binds on the entry rung ($196).
+    expect([price(4, true), price(8, true), price(12, true)]).toEqual([19600, 23200, 27900]);
   });
   test('wheelchair does NOT turn a pet trip into a WAV quote', () => {
     // A dog does not need a lift. The form blocks this pairing, but a stale row

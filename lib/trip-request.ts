@@ -201,6 +201,10 @@ const tripRequestObject = z
 
     pickupAddress: trimmed(500).min(5, 'Enter a pickup address'),
     dropoffAddress: trimmed(500).min(5, 'Enter a destination'),
+    // Apartment / unit / suite, in its own field so it cannot break address matching.
+    // See lib/address-unit.ts. Optional; the server stores it joined to the address.
+    pickupUnit: trimmed(40).optional().nullable(),
+    dropoffUnit: trimmed(40).optional().nullable(),
 
     requestedAt: z
       .string()

@@ -11,6 +11,7 @@ import { sendRichEmail } from '@/lib/notifications';
 import { ratingSubject, ratingHtml, ratingText, type RatingEmailData } from '@/lib/rating-email';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
 import { confirmTrip } from '@/lib/ops-confirm';
+import { priceInputToCents } from '@/lib/ops-price-input';
 import { FAILURE_DELAY_MS, beginOpsLogin } from '@/lib/ops-login-guard';
 import { clientIp } from '@/lib/rate-limit';
 
@@ -141,9 +142,9 @@ export async function updateRow(formData: FormData) {
   if (rawQuote === '') {
     patch.quoted_cents = null;
   } else {
-    const dollars = Number(rawQuote);
-    if (!Number.isFinite(dollars) || dollars < 0) throw new Error('Invalid quote');
-    patch.quoted_cents = Math.round(dollars * 100);
+    const cents = priceInputToCents(rawQuote, { allowZero: true });
+    if (cents === null) throw new Error('Invalid quote');
+    patch.quoted_cents = cents;
   }
 
   // The select form can set any status, so it needs the same refusal as the
@@ -272,9 +273,8 @@ export async function confirmAndSend(formData: FormData) {
   const id = String(formData.get('id') ?? '');
   if (!id) throw new Error('Missing id');
 
-  const rawAgreed = String(formData.get('agreedDollars') ?? '').trim();
-  const dollars = Number(rawAgreed);
-  if (rawAgreed === '' || !Number.isFinite(dollars) || dollars <= 0) {
+  const agreedCents = priceInputToCents(String(formData.get('agreedDollars') ?? ''));
+  if (agreedCents === null) {
     backWithNotice('no_price');
   }
 
@@ -282,7 +282,7 @@ export async function confirmAndSend(formData: FormData) {
   const onAccount = formData.get('onAccount') === 'on';
 
   // The work itself lives in lib/ops-confirm.ts, shared with the TassyOps one-tap confirm.
-  const result = await confirmTrip({ id, agreedCents: Math.round(dollars * 100), onAccount });
+  const result = await confirmTrip({ id, agreedCents, onAccount });
   if (!result.ok) {
     if (result.code === 'not_found') throw new Error('Request not found');
     if (result.code === 'no_price' || result.code === 'no_email' || result.code === 'link_failed' || result.code === 'email_failed') {

@@ -14,6 +14,7 @@ import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications, type FacilityAlertContext } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { containsNul, MAX_REQUEST_BODY_CHARS } from '@/lib/request-guards';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { createHash } from 'node:crypto';
@@ -79,9 +80,22 @@ const MIN_FILL_MS = 3_000;
 export async function POST(request: Request) {
   let body: unknown;
   try {
-    body = await request.json();
+    const text = await request.text();
+    // Refused before it is parsed: nothing a visitor can type comes near this size.
+    if (text.length > MAX_REQUEST_BODY_CHARS) {
+      return NextResponse.json({ ok: false, error: 'That request is too large.' }, { status: 413 });
+    }
+    body = JSON.parse(text);
   } catch {
     return NextResponse.json({ ok: false, error: 'Expected a JSON body.' }, { status: 400 });
+  }
+
+  // A NUL character cannot be stored, and used to surface as "we could not save your request" (500).
+  if (containsNul(body)) {
+    return NextResponse.json(
+      { ok: false, error: 'Please check the form.', fieldErrors: { form: 'Remove any unusual characters and try again.' } },
+      { status: 400 },
+    );
   }
 
   const raw = (body ?? {}) as Record<string, unknown>;

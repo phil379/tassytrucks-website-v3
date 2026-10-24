@@ -247,6 +247,7 @@ export default function HouseholdRequestForm({
           <label className={label} htmlFor="hh-extra">
             Activities, dismissal, destinations or anything else we should know
           </label>
+          <p className="mb-1 text-xs text-[color:var(--ink-mute)]">Please do not include medical details, diagnoses or school records.</p>
           <textarea id="hh-extra" rows={3} className={field} value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} />
         </div>
       </fieldset>
@@ -271,8 +272,17 @@ export default function HouseholdRequestForm({
       <div>
         <label className="flex min-h-[44px] cursor-pointer items-start gap-3 text-sm" htmlFor="hh-consent">
           <input id="hh-consent" type="checkbox" className="mt-1 h-4 w-4 shrink-0" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-          <span>I agree that Tassy Transportation may contact me about this transportation request.</span>
+          <span>
+            I am the parent or legal guardian of the child or children above, and I agree that Tassy Transportation may contact
+            me about this transportation request. This is not a sign-up for text messages.
+          </span>
         </label>
+        <p className="ml-7 text-xs text-[color:var(--ink-mute)]">
+          We use what you enter only to prepare a plan and reply to you. See our{' '}
+          <a href="/privacy" className="inline-flex min-h-[44px] items-center underline">Privacy Policy</a>{' '}
+          and{' '}
+          <a href="/terms" className="inline-flex min-h-[44px] items-center underline">Terms</a>.
+        </p>
         {fe('consent_contact')}
       </div>
 

@@ -80,6 +80,12 @@ export type DetailField = {
   showWhen?: { key: string; equals: readonly string[] };
   /** Renders half width on a wide screen. */
   half?: boolean;
+  /**
+   * select: an option that is a valid answer to the question but cannot be submitted online, mapped to
+   * the message the visitor sees. Used where the honest answer ("No, I am not the guardian") means the
+   * booking has to be arranged by phone.
+   */
+  blockValues?: Readonly<Record<string, string>>;
 };
 
 export type DetailSection = {
@@ -421,6 +427,23 @@ const SCHOLAR: DetailSection = {
   intro: 'Routes are quoted by the run, so the schedule matters as much as the address.',
   fields: [
     {
+      key: 'guardian_confirmed',
+      label: "Are you this student's parent or legal guardian?",
+      type: 'select',
+      required: true,
+      options: [
+        {
+          value: 'yes',
+          label: "Yes, and I agree to Tassy using this information to arrange this student's rides",
+        },
+        { value: 'no', label: 'No, I am someone else' },
+      ],
+      blockValues: {
+        no: "Please call (704) 941-8508 so we can arrange this with the student's parent or legal guardian.",
+      },
+      help: 'We ask for the student\'s name, school and schedule only to arrange rides. A parent or guardian fills this in; we never ask a student to.',
+    },
+    {
       key: 'student_first_name',
       label: "Student's first name",
       type: 'text',
@@ -589,6 +612,10 @@ export function validateDetails(service: string, raw: unknown): DetailValidation
         const allowed = (field.options ?? []).some((o) => o.value === text);
         if (!allowed) {
           errors[field.key] = `Choose an option for ${field.label.toLowerCase()}`;
+          break;
+        }
+        if (field.blockValues && field.blockValues[text]) {
+          errors[field.key] = field.blockValues[text]!;
           break;
         }
         values[field.key] = text;

@@ -32,6 +32,12 @@ jobs:
       - name: Typecheck
         run: bunx tsc --noEmit
 
+      # package.json has had a `test:unit` script (pricing, payments, the ops confirm signature,
+      # receipts, discounts...) that nothing ever ran: this job only typechecked, built and ran
+      # Playwright. Those tests need no network, database or secrets.
+      - name: Unit tests
+        run: bun run test:unit
+
       - name: Build
         run: bun run build
 

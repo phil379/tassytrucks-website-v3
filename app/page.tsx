@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { contact } from '@/lib/saas-links';
+import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { partnerSignup } from '@/lib/partner-links';
 import { request } from '@/lib/request-links';
 // Entry fares read from the rate cards, never typed. Three places said
@@ -138,7 +139,7 @@ export default function HomePage() {
             </div>
 
             <p className="mt-4 text-xs ink-mute flex items-center gap-2">
-              <span className="dot" /> Request any time · a dispatcher usually confirms your driver and your price within 2 hours
+              <span className="dot" /> Request any time · {CONFIRMATION_PROMISE}
             </p>
 
             {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
@@ -146,9 +147,9 @@ export default function HomePage() {
                 verification, task #222); credentials shown here are all documentable. */}
             <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
               {[
-                ['SDVOSB',  'VA-verified'],
+                ['SDVOSB',  'SBA-certified'],
                 ['MBE · DBE', 'SBE certified'],
-                ['USDOT',   '#3104152'],
+                ['Charlotte', 'NC based'],
                 ['Veteran', 'Owned & operated'],
               ].map(([num, label]) => (
                 <div key={label}>
@@ -274,7 +275,7 @@ export default function HomePage() {
             </div>
             <div className="bg-surface rounded-2xl p-6 text-cream-text">
               <div className="serif text-3xl font-semibold">2 hrs</div>
-              <div className="text-xs ink-mute uppercase tracking-wider mt-1">To confirm any booking</div>
+              <div className="text-xs ink-mute uppercase tracking-wider mt-1">Usual confirmation, in business hours</div>
             </div>
             <div className="bg-surface rounded-2xl p-6 col-span-2 text-cream-text">
               <div className="text-xs ink-mute uppercase tracking-wider mb-3">Certified for institutional procurement</div>
@@ -283,7 +284,6 @@ export default function HomePage() {
                 <span className="pill">MBE</span>
                 <span className="pill">DBE</span>
                 <span className="pill">SBE</span>
-                <span className="pill">USDOT #3104152</span>
               </div>
             </div>
           </div>
@@ -321,8 +321,8 @@ export default function HomePage() {
               },
               {
                 n: '02',
-                h: 'We usually confirm within 2 hours',
-                b: 'A dispatcher calls or texts with your exact price and your driver. Nothing is charged, and nothing is booked, until you say yes.',
+                h: 'We confirm your price and driver',
+                b: `${CONFIRMATION_PROMISE} Nothing is charged, and nothing is booked, until you say yes.`,
               },
               {
                 n: '03',

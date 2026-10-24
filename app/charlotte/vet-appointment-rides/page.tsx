@@ -58,8 +58,7 @@ export default function VetAppointmentRidesPage() {
                 <Link href="/charlotte/pet-transport" className={linkCls}>
                   professional pet transport
                 </Link>{' '}
-                from Tassy Transportation, a veteran-owned, Charlotte-based company
-                operating under USDOT #3104152 — not a stranger from an app with a
+                from Tassy Transportation, a veteran-owned, Charlotte-based company — not a stranger from an app with a
                 towel on the back seat.
               </p>
             </>

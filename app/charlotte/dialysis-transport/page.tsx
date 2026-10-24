@@ -52,8 +52,7 @@ export default function DialysisTransportPage() {
               </p>
               <p>
                 Tassy Transportation is a Charlotte-based, Service-Disabled
-                Veteran-Owned Small Business (SDVOSB) operating under USDOT
-                #3104152 and MC #79222. Recurring medical rides are the core of
+                Veteran-Owned Small Business (SDVOSB). Recurring medical rides are the core of
                 what we do, not an add-on.
               </p>
             </>

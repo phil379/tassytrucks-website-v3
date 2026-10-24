@@ -52,7 +52,7 @@ Cincinnati OH (/school).
 1. A visitor submits the request form at https://www.tassytrucks.com/request
    (or calls dispatch).
 2. A dispatcher reviews every request personally.
-3. The dispatcher confirms by phone or text within 2 hours during business hours.
+3. A dispatcher usually confirms your driver and your price within 2 hours during business hours.
 4. Pricing is quoted before the trip is confirmed.
 
 Requests need at least 4 hours' lead time. There is no instant-booking or

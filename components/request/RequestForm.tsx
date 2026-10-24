@@ -36,6 +36,7 @@ import {
 } from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema } from '@/lib/care-intake';
+import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -1324,6 +1325,10 @@ export default function RequestForm({
       </button>
 
       <p className="ink-soft text-sm">{COPY.confirmation}</p>
+      <p className="ink-soft text-sm" data-testid="refund-note">
+        {freeCancellationSentence()} Late cancellations and no-shows can carry a fee.{' '}
+        <a href={REFUNDS_PATH} className="inline-flex min-h-[44px] items-center underline">Cancellations &amp; refunds</a>
+      </p>
     </form>
   );
 }

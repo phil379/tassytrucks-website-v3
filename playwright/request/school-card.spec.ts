@@ -96,6 +96,7 @@ function payload(over: Record<string, unknown> = {}, parentOver: Record<string, 
     },
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
+    guardian: { accepted: true, ts },
     starts_on: '2026-08-24',
     standard_household_confirmed: true,
     hp_token: '',
@@ -345,6 +346,7 @@ async function walkToConfirm(page: Page, tickSms: boolean) {
   if (tickSms) await sms.check();
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  await page.locator('#guardianConfirm').check();
   await page.locator('#childFirst').fill('Sam');
   await page.locator('#childLast').fill('Reed');
   await page.getByRole('combobox', { name: /^School \(required\)$/ }).fill('Elizabeth Traditional');

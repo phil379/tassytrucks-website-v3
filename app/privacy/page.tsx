@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { businessContactLine } from '@/lib/business';
 
 // MEGA_TASSY_PUBLISH_READY (2026-07-02) — footer linked /privacy but no route existed (404).
 // Baseline policy; TODO(phil): have counsel review before any paid-acquisition push.
@@ -49,7 +50,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Contact',
     body: [
-      'Tassy Trucks LLC (d/b/a Tassy Transportation) · Charlotte, North Carolina · book@tassytrucks.com · (704) 941-8508.',
+      `${businessContactLine()}.`,
     ],
   },
 ];

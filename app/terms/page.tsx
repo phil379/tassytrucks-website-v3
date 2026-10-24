@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BUSINESS_LOCATION, businessContactLine } from '@/lib/business';
 
 // MEGA_TASSY_PUBLISH_READY (2026-07-02) — footer linked /terms but no route existed (404).
 // Baseline terms; TODO(phil): have counsel review before any paid-acquisition push.
@@ -14,7 +15,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Who we are',
     body: [
-      'Transportation services are provided by Tassy Trucks LLC, d/b/a Tassy Transportation — a Charlotte, North Carolina transportation company, and a Service-Disabled Veteran-Owned Small Business (SDVOSB). Non-emergency transportation only: if you are experiencing a medical emergency, call 911.',
+      'Transportation services are provided by Tassy Trucks LLC, d/b/a Tassy Transportation — a transportation company based in ' + BUSINESS_LOCATION + ', and a Service-Disabled Veteran-Owned Small Business (SDVOSB). Non-emergency transportation only: if you are experiencing a medical emergency, call 911.',
     ],
   },
   {
@@ -51,7 +52,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Contact',
     body: [
-      'Questions about these terms: book@tassytrucks.com · (704) 941-8508 · Tassy Trucks LLC, Charlotte, NC.',
+      `Questions about these terms: ${businessContactLine()}.`,
     ],
   },
 ];

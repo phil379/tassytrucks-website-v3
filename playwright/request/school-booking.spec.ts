@@ -47,6 +47,7 @@ function payload(over: Record<string, unknown> = {}) {
     },
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
+    guardian: { accepted: true, ts },
     starts_on: '2026-08-24',
     standard_household_confirmed: true,
     hp_token: '',
@@ -125,6 +126,7 @@ async function fillStep1(page: Page, addr = '1200 Elizabeth Ave, Charlotte NC') 
 }
 
 async function fillStep2(page: Page) {
+  await page.locator('#guardianConfirm').check();
   await page.locator('#childFirst').fill('Sam');
   await page.locator('#childLast').fill('Reed');
   // The school is a picker now, not a text box. Typed free-hand here on

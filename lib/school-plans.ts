@@ -293,6 +293,22 @@ const policyAck = z.object({ accepted: z.literal(true), ts: z.string() });
  * copy on screen says so.
  */
 export const SAFETY_NOTE_LABEL = 'Anything your driver should know to keep your child safe?';
+/**
+ * The statement a parent or legal guardian ticks before giving us a child's details.
+ * Stored with a timestamp and GUARDIAN_TEXT_VERSION on the first trip, so "the parent
+ * agreed to this wording" can be shown later. Change the wording => bump the version.
+ */
+export const GUARDIAN_CONFIRMATION_TEXT =
+  "I am the parent or legal guardian and I agree to Tassy using this information to arrange this child's rides.";
+export const GUARDIAN_TEXT_VERSION = 'guardian-v1';
+
+/** Plain-language note shown where the child's details are collected. */
+export const CHILD_DATA_EXPLAINER: string[] = [
+  "We ask for your child's name, school, grade (optional), your home address, the pickup schedule and an emergency contact.",
+  "We use it only to arrange and carry out your child's rides and to reach you. We do not ask for medical or school-record information, so please do not type it into the notes.",
+  'A parent or guardian fills this in. We never ask a child to enter anything.',
+];
+
 export const SAFETY_NOTE_HINT =
   "Please don't include medical details — for anything medical, call us and we'll arrange a CNA-escorted ride.";
 
@@ -350,6 +366,8 @@ export const schoolBookingSchema = z.object({
     safety_practices: policyAck,
     known_driver: policyAck,
   }),
+  /** The parent / legal guardian statement (GUARDIAN_CONFIRMATION_TEXT), required. */
+  guardian: policyAck,
   starts_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Please pick a start date'),
   /**
    * The parent's own answer to the household check that precedes this wizard:

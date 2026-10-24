@@ -1,6 +1,8 @@
 import { serviceShortName, fullName, mobilityLabel, type TripRequestInput } from '@/lib/trip-request';
 import { formatUsd } from '@/lib/quote';
 import { OPERATING_TIME_ZONE } from '@/lib/time';
+import { freeCancellationSentence, REFUNDS_URL } from '@/lib/refund-policy';
+import { emailFooterHtml, emailFooterText } from '@/lib/business';
 
 /**
  * The booking confirmation.
@@ -185,12 +187,12 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
            style="border:1px solid ${LINE};border-radius:12px;">
       <tr><td style="padding:14px 18px;color:${INK};font-size:14px;line-height:1.65;">
-        Your driver texts you when they are on the way, and again when they arrive.<br>
+        If you asked for text updates, your driver texts you when they are on the way, and again when they arrive.<br>
         They come to the door — you are never left to find the car.<br>
         ${t.driverName ? `Your driver is <strong>${esc(t.driverName)}</strong>.<br>` : ''}
         ${t.vehicleDescription ? `Vehicle: ${esc(t.vehicleDescription)}.<br>` : ''}
-        Need to change or cancel? Call us. No fee if you let us know at least
-        4 hours ahead.
+        Need to change or cancel? Call us. ${freeCancellationSentence()}
+        <a href="${REFUNDS_URL}" style="color:${MUTE};">Cancellation and refund policy</a>.
       </td></tr>
     </table>
   </td></tr>
@@ -228,6 +230,7 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
       Tassy Transportation · Charlotte, NC<br>
       Veteran-owned. SDVOSB, MBE, DBE and SBE certified.<br>
       Serving Charlotte and Mecklenburg County.
+      ${emailFooterHtml(MUTE)}
     </div>
   </td></tr>
 
@@ -272,13 +275,14 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
     `  We will call   ${data.contactPhone}`,
     '',
     'ON THE DAY',
-    '  Your driver texts you when they are on the way, and again when they arrive.',
+    '  If you asked for text updates, your driver texts you when they are on the way, and again when they arrive.',
     '  They come to the door. You are never left to find the car.',
   );
   if (t.driverName) lines.push(`  Your driver is ${t.driverName}.`);
   if (t.vehicleDescription) lines.push(`  Vehicle: ${t.vehicleDescription}.`);
   lines.push(
-    '  Need to change or cancel? Call us. No fee if you tell us at least 4 hours ahead.',
+    `  Need to change or cancel? Call us. ${freeCancellationSentence()}`,
+    `  Cancellation and refund policy: ${REFUNDS_URL}`,
     '',
   );
   if (t.payUrl) {
@@ -295,6 +299,8 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
     '',
     '— Tassy Transportation, Charlotte NC',
     '  Veteran-owned. SDVOSB, MBE, DBE and SBE certified.',
+    '',
+    ...emailFooterText(),
   );
   return lines.join('\n');
 }

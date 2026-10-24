@@ -361,7 +361,7 @@ export default function AddressAutocomplete({
             role="option"
             aria-selected={index === activeIndex}
             className={`flex min-h-[48px] cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${
-              index === activeIndex ? 'bg-[color:var(--gold)]/20' : ''
+              index === activeIndex ? 'bg-[color:var(--gold)]/20 border-l-4 border-[color:var(--gold-warm)]' : 'border-l-4 border-transparent'
             }`}
             onMouseEnter={() => setActiveIndex(index)}
             // onMouseDown, not onClick: mousedown fires before the input's blur,

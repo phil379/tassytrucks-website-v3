@@ -270,7 +270,7 @@ export default function CharlotteDayMap() {
              paint-order:stroke;stroke:#13161B;stroke-width:2.6px;stroke-linejoin:round}
         .cdm-node[data-big="1"]{font-size:10.2px;fill:#A3A9B3;letter-spacing:.09em}
         .cdm-road{fill:none;stroke:#20262E;stroke-linecap:round}
-        .cdm-rl{font-size:8px;fill:#39424D;letter-spacing:.04em}
+        .cdm-rl{font-size:8px;fill:#748598;letter-spacing:.04em}
         .cdm-leg{fill:none;stroke-linecap:round;opacity:.1;transition:opacity .6s ease}
         .cdm-leg[data-on="1"]{opacity:.3}
         .cdm-glow{opacity:.16;transition:opacity .9s ease}
@@ -280,10 +280,10 @@ export default function CharlotteDayMap() {
         .cdm-strip-head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;
              text-transform:uppercase;color:#878D97;margin-bottom:8px}
         .cdm-track{position:relative;height:6px;background:#1B2027;border-radius:99px}
-        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.55}
+        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.8}
         .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
-        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
-             color:#4B535E;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;
+             color:#7C8491;letter-spacing:.04em;font-variant-numeric:tabular-nums}
         .cdm-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
              gap:1px;background:var(--line);border-top:1px solid var(--line)}
         .cdm-leg-item{background:#13161B;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
@@ -294,9 +294,9 @@ export default function CharlotteDayMap() {
         .cdm-text{display:flex;flex-direction:column;gap:2px;min-width:0}
         .cdm-name{font-size:12.5px;color:#878D97;transition:color .4s ease;white-space:nowrap}
         .cdm-leg-item[data-on="1"] .cdm-name{color:#F2EEE4}
-        .cdm-where{font-size:10.5px;color:#5A626D;line-height:1.3}
-        .cdm-when{font-size:10px;color:#6B7380;font-variant-numeric:tabular-nums;white-space:nowrap}
-        .cdm-cap{padding:11px 18px 14px;font-size:11px;color:#5F6773;line-height:1.5;border-top:1px solid var(--line)}
+        .cdm-where{font-size:12px;color:#7C8491;line-height:1.3}
+        .cdm-when{font-size:12px;color:#7C8491;font-variant-numeric:tabular-nums;white-space:nowrap}
+        .cdm-cap{padding:11px 18px 14px;font-size:12px;color:#7C8491;line-height:1.5;border-top:1px solid var(--line)}
         @media (prefers-reduced-motion:reduce){.cdm-leg,.cdm-glow,.cdm-leg-item,.cdm-swatch,.cdm-dot{transition:none}}
       `}</style>
 

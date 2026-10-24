@@ -208,6 +208,10 @@ export default function FacilitySignupForm({
       <p className="mt-3 text-center text-xs text-[color:var(--muted)]">
         We&rsquo;ll email a secure link to finish setup. No password to remember.
       </p>
+      <p className="text-center text-xs text-[color:var(--muted)]">
+        We use your email only to set up your account and contact you about it.{' '}
+        <a href="/privacy" className="inline-flex min-h-[44px] items-center underline">Privacy Policy</a>
+      </p>
     </form>
   );
 }
@@ -235,7 +239,7 @@ function Field({
         type={type}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="mt-2 w-full rounded-lg border border-[color:var(--line)] bg-transparent px-4 py-3 text-base outline-none focus:border-[color:var(--gold)]"
+        className="form-field mt-2 w-full"
         {...rest}
       />
       {error ? (

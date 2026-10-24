@@ -148,7 +148,7 @@ export default function HomePage() {
               {[
                 ['SDVOSB',  'VA-verified'],
                 ['MBE · DBE', 'SBE certified'],
-                ['USDOT',   '#3104152'],
+                ['Charlotte', 'NC based'],
                 ['Veteran', 'Owned & operated'],
               ].map(([num, label]) => (
                 <div key={label}>
@@ -283,7 +283,6 @@ export default function HomePage() {
                 <span className="pill">MBE</span>
                 <span className="pill">DBE</span>
                 <span className="pill">SBE</span>
-                <span className="pill">USDOT #3104152</span>
               </div>
             </div>
           </div>

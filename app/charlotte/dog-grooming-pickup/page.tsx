@@ -90,8 +90,7 @@ export default function DogGroomingPickupPage() {
             <>
               <p>
                 This is not a rideshare with a towel on the seat. Winnie Ride is a
-                direct relationship with a veteran-owned Charlotte carrier
-                operating under USDOT #3104152, and every grooming ride follows the
+                direct relationship with a veteran-owned Charlotte carrier, and every grooming ride follows the
                 same protocol as our medical and{' '}
                 <Link href="/charlotte/pet-boarding-transport" className={linkCls}>
                   boarding transport

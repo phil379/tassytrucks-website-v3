@@ -29,7 +29,7 @@ export default function Footer() {
             people who matter to you with discretion, dignity, and Army-grade reliability.
           </p>
           <div className="mt-6 text-xs opacity-60 space-y-1">
-            <div>USDOT #3104152 · MC #79222</div>
+            {/* TODO(FMCSA): Phil's USDOT 3808299 / MC-1373369 are Inactive at FMCSA, so no USDOT/MC number is published on any public page. Add them back (footer, JSON-LD, trust chips) only once FMCSA shows Active. The USDOT/MC numbers that used to be here belonged to another company (Tassy Logistics LLC) and must never return; scripts/test-banned-claims.ts enforces that. */}
             <div>SDVOSB Certified · Charlotte, North Carolina</div>
           </div>
 

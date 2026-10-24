@@ -47,7 +47,7 @@ export default function PostSurgeryPetTransportPage() {
               <p>
                 Winnie Ride is the pet-transport division of Tassy Transportation, a
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
-                (SDVOSB) operating under USDOT #3104152 and MC #79222. We handle
+                (SDVOSB). We handle
                 the drive so your only job is meeting your pet at the door. We
                 cover all of Charlotte and Mecklenburg County, plus Matthews,
                 Pineville, and Huntersville. For everyday trips that aren&rsquo;t

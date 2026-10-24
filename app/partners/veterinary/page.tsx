@@ -43,7 +43,7 @@ export default function VeterinaryPartnersPage() {
               <p>
                 Winnie Ride is the pet-transport vertical of Tassy Transportation, a
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
-                (SDVOSB) operating under USDOT #3104152 and MC #79222. We work
+                (SDVOSB). We work
                 with the full range of veterinary practices in the Charlotte
                 area: general practices managing wellness visits and dental
                 schedules, specialty hospitals in oncology, cardiology, and

@@ -20,7 +20,7 @@ app/
 
 components/
   Header.tsx         Sticky top nav (Pinned · 5 verticals · Pricing · Book)
-  Footer.tsx         Charcoal footer w/ SDVOSB credentials + USDOT
+  Footer.tsx         Charcoal footer w/ SDVOSB credentials
   VerticalTile.tsx   Reusable service card on Home
   ServicePage.tsx    Reusable layout for every vertical page
 

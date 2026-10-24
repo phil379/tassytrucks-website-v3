@@ -67,12 +67,9 @@ const localBusinessLd = {
   url: 'https://www.tassytrucks.com',
   telephone: '+1-704-941-8508',
   email: 'book@tassytrucks.com',
-  // MEGA_TASSY_PUBLISH_READY — operating authority + certification + motto
+  // MEGA_TASSY_PUBLISH_READY — certification + motto
+  // TODO(FMCSA): Phil's USDOT 3808299 / MC-1373369 are Inactive at FMCSA, so no USDOT/MC number is published on any public page. Add them back (footer, JSON-LD, trust chips) only once FMCSA shows Active. The USDOT/MC numbers that used to be here belonged to another company (Tassy Logistics LLC) and must never return; scripts/test-banned-claims.ts enforces that.
   slogan: 'We Transport With Care',
-  identifier: [
-    { '@type': 'PropertyValue', propertyID: 'USDOT', value: '3104152' },
-    { '@type': 'PropertyValue', propertyID: 'MC', value: '79222' },
-  ],
   hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
   priceRange: '$$',
   image: 'https://www.tassytrucks.com/brand/og-image.png',

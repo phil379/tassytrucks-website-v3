@@ -14,7 +14,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Who we are',
     body: [
-      'Transportation services are provided by Tassy Trucks LLC, d/b/a Tassy Transportation — a Charlotte, North Carolina motor carrier operating under USDOT #3104152 and MC #79222, and a Service-Disabled Veteran-Owned Small Business (SDVOSB). Non-emergency transportation only: if you are experiencing a medical emergency, call 911.',
+      'Transportation services are provided by Tassy Trucks LLC, d/b/a Tassy Transportation — a Charlotte, North Carolina transportation company, and a Service-Disabled Veteran-Owned Small Business (SDVOSB). Non-emergency transportation only: if you are experiencing a medical emergency, call 911.',
     ],
   },
   {
@@ -45,7 +45,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'Liability',
     body: [
-      'We carry commercial auto and general liability insurance as required for our operating authority. To the extent permitted by law, our liability for any claim arising from a trip is limited to the amount paid for that trip, except where the law provides otherwise.',
+      'We carry commercial auto and general liability insurance as required for our operations. To the extent permitted by law, our liability for any claim arising from a trip is limited to the amount paid for that trip, except where the law provides otherwise.',
     ],
   },
   {

@@ -25,7 +25,7 @@ import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/Ad
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
-import { SHOW_ESTIMATES, estimateTrip, formatRange, isQuoteOnly } from '@/lib/quote';
+import { SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
 import {
   PICK_ADDRESS_MESSAGE,
   PICK_TO_SEE_PRICE,
@@ -36,6 +36,7 @@ import {
 } from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema } from '@/lib/care-intake';
+import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -1268,7 +1269,7 @@ export default function RequestForm({
                   : ''}
                 {estimate.escortCents > 0 ? ' · Tassy Escort included' : ''}
                 {estimate.surcharges.length > 0
-                  ? ` · ${estimate.surcharges.map((x) => x.label.toLowerCase()).join(' and ')}`
+                  ? ` · includes ${estimate.surcharges.map((x) => `${x.label.toLowerCase()} +${formatUsd(x.cents)}`).join(' and ')}`
                   : ''}
               </p>
               {/* A ZIP-derived price is a good estimate and a bad promise. Say which. */}
@@ -1324,6 +1325,10 @@ export default function RequestForm({
       </button>
 
       <p className="ink-soft text-sm">{COPY.confirmation}</p>
+      <p className="ink-soft text-sm" data-testid="refund-note">
+        {freeCancellationSentence()} Late cancellations and no-shows can carry a fee.{' '}
+        <a href={REFUNDS_PATH} className="inline-flex min-h-[44px] items-center underline">Cancellations &amp; refunds</a>
+      </p>
     </form>
   );
 }

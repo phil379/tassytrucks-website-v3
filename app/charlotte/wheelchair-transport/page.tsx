@@ -66,8 +66,7 @@ export default function WheelchairTransportPage() {
                   non-emergency medical transportation
                 </Link>{' '}
                 service. We are a Charlotte-based, Service-Disabled
-                Veteran-Owned Small Business (SDVOSB) operating under USDOT
-                #3104152 and MC #79222, with dispatch answering around the
+                Veteran-Owned Small Business (SDVOSB), with dispatch answering around the
                 clock at (704) 941-8508.
               </p>
             </>

@@ -55,9 +55,8 @@ export default function PetTransportPage() {
               </p>
               <p>
                 Winnie Ride is operated by Tassy Transportation, a Charlotte-based,
-                Service-Disabled Veteran-Owned Small Business (SDVOSB) running
-                under USDOT #3104152 and MC #79222. We are a real transportation
-                company with real authority — the same standards we hold for
+                Service-Disabled Veteran-Owned Small Business (SDVOSB). We are a real transportation
+                company — the same standards we hold for
                 medical transport apply to the seat your pet rides in.
               </p>
               <p>
@@ -240,7 +239,7 @@ export default function PetTransportPage() {
         },
         {
           q: 'Is Winnie Ride an app or a marketplace?',
-          a: 'Neither. Winnie Ride is operated directly by Tassy Transportation, a veteran-owned Charlotte transportation company (USDOT #3104152). The company you book with is the company that drives your pet — no third-party matching.',
+          a: 'Neither. Winnie Ride is operated directly by Tassy Transportation, a veteran-owned Charlotte transportation company. The company you book with is the company that drives your pet — no third-party matching.',
         },
         {
           q: 'What areas around Charlotte do you cover?',

@@ -74,9 +74,8 @@ export default function FamilyMedicalRidesPage() {
                 stubborn and use the walker — you call us, not the driver, and
                 dispatch sorts it out. One number, answered around the clock:
                 (704) 941-8508. Tassy Transportation is a Charlotte-based,
-                Service-Disabled Veteran-Owned Small Business operating under
-                USDOT #3104152 and MC #79222, so the company you are trusting
-                with a parent is licensed, insured, and checkable.
+                Service-Disabled Veteran-Owned Small Business, so the company you are trusting
+                with a parent is licensed and insured.
               </p>
             </>
           ),

@@ -126,7 +126,11 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
     h: 'Your choices',
     body: [
       'You can ask us to correct or delete the personal information we hold about you, or to stop non-essential communications, by emailing book@tassytrucks.com or calling (704) 941-8508. Trip records required for regulatory, insurance, or billing purposes are retained for the period the law requires.',
-      `You can also ask to see what we hold about you. Whichever you ask for, contact ${BUSINESS.bookingEmail} or ${BUSINESS.phoneDisplay}. We will check that you are the person the information is about before we act, which may mean asking you a question only you could answer. We aim to reply within ${PRIVACY_RESPONSE_DAYS} days. We do not delete anything we are required to keep, and we will tell you if that applies.`,
+      <>
+        You can also use our{' '}
+        <Link href="/privacy/request" className={LINK}>data request form</Link>. Or contact {BUSINESS.bookingEmail} or {BUSINESS.phoneDisplay}.
+      </>,
+      `Whichever way you ask, we will check that you are the person the information is about before we act, which may mean asking you a question only you could answer. We aim to reply within ${PRIVACY_RESPONSE_DAYS} days. We do not delete anything we are required to keep, and we will tell you if that applies.`,
       'To stop non-essential messages: reply STOP to any text from us, and for email tell us at the address above. Messages we must send to run a trip you booked (for example, a confirmation or a receipt) are not optional marketing and will still be sent for that trip.',
     ],
   },

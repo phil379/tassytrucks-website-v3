@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { BUSINESS_LOCATION, businessContactLine } from '@/lib/business';
 
 // MEGA_TASSY_PUBLISH_READY (2026-07-02) — footer linked /terms but no route existed (404).
@@ -11,7 +13,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const SECTIONS: Array<{ h: string; body: string[] }> = [
+const LINK = 'underline underline-offset-2';
+
+const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
   {
     h: 'Who we are',
     body: [
@@ -25,15 +29,47 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     ],
   },
   {
+    h: 'Payments and payment links',
+    body: [
+      'Asking for a ride does not charge you. After a dispatcher confirms the price and your driver, we send one payment link for the confirmed amount. Payment is by card on a page run by our payment provider, Stripe; we do not see or keep your full card number. The link is meant for the person paying and may be forwarded to them, but please do not post it publicly.',
+      'If anything about the trip changes after you are quoted, we tell you the new price before you pay. Waiting time beyond what is included, and tolls, are quoted to you before they are charged.',
+    ],
+  },
+  {
     h: 'Cancellations & no-shows',
     body: [
-      'You may cancel or reschedule a trip by phone or through your booking link. Trips cancelled with reasonable notice are not charged; late cancellations or no-shows may incur a fee, which is disclosed at booking. On school routes, drivers follow the posted no-show protocol: wait, call the parent, and never leave a child unattended at a curb.',
+      'You may cancel or reschedule a trip by phone or email. Trips cancelled with reasonable notice are not charged; late cancellations or no-shows may incur a fee, which is disclosed at booking. On school routes, drivers follow the posted no-show protocol: wait, call the parent, and never leave a child unattended at a curb.',
+      <>
+        The notice we ask for, what a late cancellation or no-show costs, and how refunds work are on our{' '}
+        <Link href="/refunds" className={LINK}>Cancellations &amp; Refunds</Link> page, which forms part of these terms.
+      </>,
     ],
   },
   {
     h: 'Rider responsibilities',
     body: [
       'Riders (or their booking party) are responsible for accurate pickup information, securing personal belongings, using provided restraints and securement equipment, and treating drivers with respect. Pets ride in provided carriers or harnesses. We may decline or end a trip that presents a safety risk.',
+    ],
+  },
+  {
+    h: 'Driver and vehicle assignments',
+    body: [
+      'When we confirm your trip we tell you your driver and vehicle once we have assigned them. Sometimes we have to change them, for example if a driver is sick or a vehicle needs repair. When we do, we will use a driver and vehicle that suit the trip you booked, and we will tell you if the change affects the time, the price, or what the trip needs (for example a ramp for a wheelchair). For Tassy Scholar we aim to keep the same driver whenever we can, but we cannot promise it.',
+    ],
+  },
+  {
+    h: 'Accessibility and wheelchair trips',
+    body: [
+      <>
+        Tell us what you need when you book: a wheelchair or other mobility equipment, a service animal, extra time, or a caregiver riding with you. Wheelchair trips are run in ramp-equipped vehicles with an operator trained in securement. If your equipment cannot be carried safely in the vehicle we would send, we will tell you before the day of the trip. More about our service and this website is on our{' '}
+        <Link href="/accessibility" className={LINK}>Accessibility</Link> page.
+      </>,
+    ],
+  },
+  {
+    h: 'Riders under 18 and Tassy Scholar',
+    body: [
+      'A rider under 18 must be booked by a parent or legal guardian, who agrees to these terms for the child. Tassy Scholar is set up by a parent or guardian, who confirms the schedule and the policies for the child (including who may collect them). We release a child only to an authorized adult on the pickup list. What we collect about children, and why, is in our Privacy Policy.',
     ],
   },
   {
@@ -50,6 +86,28 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
     ],
   },
   {
+    h: 'Governing law',
+    body: [
+      'These terms are governed by the laws of the State of North Carolina, without regard to its conflict-of-laws rules. Any dispute that we cannot resolve by talking first will be brought in the state or federal courts located in Mecklenburg County, North Carolina.',
+    ],
+  },
+  {
+    h: 'Changes to these terms',
+    body: [
+      'We may update these terms. The date at the top shows when they last changed. A change does not affect a trip you have already booked.',
+    ],
+  },
+  {
+    h: 'Related policies',
+    body: [
+      <>
+        <Link href="/privacy" className={LINK}>Privacy Policy</Link> ·{' '}
+        <Link href="/refunds" className={LINK}>Cancellations &amp; Refunds</Link> ·{' '}
+        <Link href="/accessibility" className={LINK}>Accessibility</Link>
+      </>,
+    ],
+  },
+  {
     h: 'Contact',
     body: [
       `Questions about these terms: ${businessContactLine()}.`,
@@ -63,13 +121,13 @@ export default function TermsPage() {
       <div className="container-x py-16 lg:py-24 max-w-3xl">
         <div className="eyebrow">Legal</div>
         <h1 className="h-section mt-3">Terms of Service</h1>
-        <p className="mt-3 text-sm ink-mute">Last updated: October 8, 2026</p>
+        <p className="mt-3 text-sm ink-mute">Last updated: October 24, 2026</p>
         <div className="mt-8 space-y-10">
           {SECTIONS.map((s) => (
             <div key={s.h}>
               <h2 className="serif text-2xl font-semibold">{s.h}</h2>
-              {s.body.map((p) => (
-                <p key={p.slice(0, 32)} className="mt-3 ink-soft leading-relaxed">{p}</p>
+              {s.body.map((p, i) => (
+                <p key={`${s.h}-${i}`} className="mt-3 ink-soft leading-relaxed">{p}</p>
               ))}
             </div>
           ))}

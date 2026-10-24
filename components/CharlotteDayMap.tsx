@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { DAY_MAP_BG, DAY_MAP_LABEL } from '@/lib/day-map-colors';
 
 /**
  * The hero panel: a Tassy day in Charlotte, 4 AM to 8 PM, in thirty seconds.
@@ -257,7 +258,7 @@ export default function CharlotteDayMap() {
   return (
     <div className="cdm">
       <style>{`
-        .cdm{background:linear-gradient(180deg,#181C22,#13161B);border:1px solid var(--line);
+        .cdm{background:linear-gradient(180deg,${DAY_MAP_BG.cardTop},${DAY_MAP_BG.cardBottom});border:1px solid var(--line);
              border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -28px rgba(0,0,0,.9)}
         .cdm-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
              padding:16px 18px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -282,21 +283,21 @@ export default function CharlotteDayMap() {
         .cdm-track{position:relative;height:6px;background:#1B2027;border-radius:99px}
         .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.8}
         .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
-        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;
-             color:#7C8491;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
+             color:${DAY_MAP_LABEL.ticks};letter-spacing:.04em;font-variant-numeric:tabular-nums}
         .cdm-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
              gap:1px;background:var(--line);border-top:1px solid var(--line)}
-        .cdm-leg-item{background:#13161B;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
+        .cdm-leg-item{background:${DAY_MAP_BG.legendCell};padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
              transition:background .4s ease}
-        .cdm-leg-item[data-on="1"]{background:#181C22}
+        .cdm-leg-item[data-on="1"]{background:${DAY_MAP_BG.legendCellOn}}
         .cdm-swatch{width:8px;height:8px;border-radius:99px;flex:none;margin-top:5px;opacity:.3;transition:opacity .4s ease}
         .cdm-leg-item[data-on="1"] .cdm-swatch{opacity:1}
         .cdm-text{display:flex;flex-direction:column;gap:2px;min-width:0}
         .cdm-name{font-size:12.5px;color:#878D97;transition:color .4s ease;white-space:nowrap}
         .cdm-leg-item[data-on="1"] .cdm-name{color:#F2EEE4}
-        .cdm-where{font-size:12px;color:#7C8491;line-height:1.3}
-        .cdm-when{font-size:12px;color:#7C8491;font-variant-numeric:tabular-nums;white-space:nowrap}
-        .cdm-cap{padding:11px 18px 14px;font-size:12px;color:#7C8491;line-height:1.5;border-top:1px solid var(--line)}
+        .cdm-where{font-size:10.5px;color:${DAY_MAP_LABEL.where};line-height:1.3}
+        .cdm-when{font-size:10px;color:${DAY_MAP_LABEL.when};font-variant-numeric:tabular-nums;white-space:nowrap}
+        .cdm-cap{padding:11px 18px 14px;font-size:11px;color:#5F6773;line-height:1.5;border-top:1px solid var(--line)}
         @media (prefers-reduced-motion:reduce){.cdm-leg,.cdm-glow,.cdm-leg-item,.cdm-swatch,.cdm-dot{transition:none}}
       `}</style>
 

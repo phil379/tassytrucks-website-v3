@@ -356,3 +356,47 @@ body {
   .animate-float-slow { animation: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ── Site header: full size at the top, compact when it would eat a phone screen ───────────
+   Full size is unchanged (logo 88 / 112 / 128px, 16px above and below). It shrinks to a 48px
+   logo when (a) a phone-width page has been scrolled (<html data-hdr-scrolled>, set by
+   components/HeaderScrollState.tsx) and (b) in short landscape viewports, always.
+   NO LAYOUT SHIFT: while scrolled the header gives back exactly the height it lost as
+   margin-bottom, so everything below it stays where it was. Logo, padding and margin are all
+   real properties on one 200ms ease, so the three always sum to the same height. */
+.site-header {
+  --hdr-logo-full: 88px;
+  --hdr-pad-full: 16px;
+  --hdr-logo: var(--hdr-logo-full);
+  --hdr-pad: var(--hdr-pad-full);
+  margin-bottom: 0;
+  transition: margin-bottom .2s ease;
+}
+@media (min-width: 768px)  { .site-header { --hdr-logo-full: 112px; } }
+@media (min-width: 1024px) { .site-header { --hdr-logo-full: 128px; } }
+/* An explicit row height (logo + the padding above and below it), not padding around the content,
+   so the bar is exactly the height the margin below is calculated against: the 50px Request-a-Ride
+   button is taller than the compact logo and would otherwise decide the height instead. */
+.site-header-row { height: calc(var(--hdr-logo) + 2 * var(--hdr-pad)); padding-top: 0; padding-bottom: 0; transition: height .2s ease; }
+.site-header-logo {
+  width: var(--hdr-logo);
+  height: var(--hdr-logo);
+  transition: width .2s ease, height .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+@media (max-width: 767px) {
+  html[data-hdr-scrolled] .site-header {
+    --hdr-logo: 48px;
+    --hdr-pad: 8px;
+    margin-bottom: calc((var(--hdr-logo-full) - 48px) + 2 * (var(--hdr-pad-full) - 8px));
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .site-header, html[data-hdr-scrolled] .site-header {
+    --hdr-logo: 48px;
+    --hdr-pad: 8px;
+    margin-bottom: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header, .site-header-row, .site-header-logo { transition: none; }
+}

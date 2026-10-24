@@ -111,3 +111,17 @@ assert.equal(notGuardian.ok, false);
 if (!notGuardian.ok) assert.ok(/call/i.test(notGuardian.errors.guardian_confirmed ?? ''));
 assert.equal(validateDetails('scholar', { ...base, guardian_confirmed: 'yes' }).ok, true);
 ok('/request Scholar needs a "yes" to the guardian question; "no" asks them to call');
+
+// Data requests: the page, the route, the staged migration, and the footer link must all exist.
+{
+  const { existsSync } = await import('node:fs');
+  assert.ok(existsSync(join(ROOT, 'app/privacy/request/page.tsx')));
+  assert.ok(existsSync(join(ROOT, 'app/api/privacy-request/route.ts')));
+  const sql = read('docs/migrations_pending/20261024T0100_privacy_requests.sql');
+  assert.ok(/CREATE TABLE IF NOT EXISTS public\.privacy_requests/.test(sql));
+  assert.ok(/ENABLE ROW LEVEL SECURITY/.test(sql) && /REVOKE ALL ON public\.privacy_requests FROM anon, authenticated/.test(sql));
+  assert.ok(!/CREATE POLICY/.test(sql), 'the table must have no policies (closed to the public)');
+  assert.ok(/NOTIFY pgrst, 'reload schema'/.test(sql));
+  assert.ok(read('components/Footer.tsx').includes('href="/privacy/request"'));
+  ok('data request page, route, staged migration and footer link exist');
+}

@@ -150,6 +150,7 @@ export default function Footer() {
             <Link href="/cookies" className="hover:opacity-100">Cookies</Link>
             <Link href="/accessibility" className="hover:opacity-100">Accessibility</Link>
             <CookieSettingsButton className="hover:opacity-100" />
+            <Link href="/privacy/request" className="hover:opacity-100">Do not sell or share my info &amp; data requests</Link>
           </div>
         </div>
       </div>

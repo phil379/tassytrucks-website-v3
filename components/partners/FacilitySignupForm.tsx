@@ -208,6 +208,10 @@ export default function FacilitySignupForm({
       <p className="mt-3 text-center text-xs text-[color:var(--muted)]">
         We&rsquo;ll email a secure link to finish setup. No password to remember.
       </p>
+      <p className="text-center text-xs text-[color:var(--muted)]">
+        We use your email only to set up your account and contact you about it.{' '}
+        <a href="/privacy" className="inline-flex min-h-[44px] items-center underline">Privacy Policy</a>
+      </p>
     </form>
   );
 }

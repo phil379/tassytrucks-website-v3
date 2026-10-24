@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
 import { partnerSignup } from '@/lib/partner-links';
 import { BUSINESS, BUSINESS_LOCATION } from '@/lib/business';
+import CookieSettingsButton from '@/components/CookieSettingsButton';
 
 // FIX_PROD_131 — footer de-cluttered: 7 columns (~33 SEO-stuffed links) + a
 // redundant facility banner → brand + 4 focused columns. The facility banner was
@@ -142,11 +143,13 @@ export default function Footer() {
       <div className="border-t border-white/10 py-6">
         <div className="container-x flex flex-col sm:flex-row justify-between items-center gap-2 text-xs opacity-60">
           <div>© {new Date().getFullYear()} {BUSINESS.legalName} · DBA {BUSINESS.tradeName} · SDVOSB Certified</div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link href="/privacy" className="hover:opacity-100">Privacy</Link>
             <Link href="/terms" className="hover:opacity-100">Terms</Link>
             <Link href="/refunds" className="hover:opacity-100">Refunds</Link>
+            <Link href="/cookies" className="hover:opacity-100">Cookies</Link>
             <Link href="/accessibility" className="hover:opacity-100">Accessibility</Link>
+            <CookieSettingsButton className="hover:opacity-100" />
           </div>
         </div>
       </div>

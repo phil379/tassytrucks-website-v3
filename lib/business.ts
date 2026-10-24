@@ -52,3 +52,26 @@ export function businessContactLine(): string {
 export function hasMailingAddress(): boolean {
   return BUSINESS_MAILING_ADDRESS.trim().length > 0;
 }
+
+// ── Email footers ───────────────────────────────────────────────────────────────
+
+/** Who is writing, for the foot of every email. City and state only (see BUSINESS_LOCATION). */
+export function emailIdentityText(): string {
+  return `${BUSINESS.tradeName} (${BUSINESS.legalName}) · ${BUSINESS.location}`;
+}
+
+/** Said at the foot of customer emails about a ride. */
+export const EMAIL_MANAGE_TEXT =
+  'You are getting this email because of a ride you asked for. To stop non-essential messages, reply to this email or write to book@tassytrucks.com. Messages about a ride you booked, such as a confirmation or a receipt, are still sent for that ride.';
+
+export const EMAIL_PRIVACY_URL = 'https://www.tassytrucks.com/privacy';
+
+/** Plain-text footer lines (no leading blank line). */
+export function emailFooterText(): string[] {
+  return [emailIdentityText(), EMAIL_MANAGE_TEXT, `Privacy: ${EMAIL_PRIVACY_URL}`];
+}
+
+/** HTML footer block in the given muted colour. Safe to drop inside a table cell. */
+export function emailFooterHtml(mutedColor: string): string {
+  return `<div style="margin-top:14px;color:${mutedColor};font-size:11.5px;line-height:1.6;">${emailIdentityText()}<br>${EMAIL_MANAGE_TEXT}<br><a href="${EMAIL_PRIVACY_URL}" style="color:${mutedColor};">Privacy Policy</a></div>`;
+}

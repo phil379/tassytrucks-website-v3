@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { facilitySignupSchema, coerceFacilityKind, facilityKind } from '@/lib/facility';
 import { createOrFindFacility, generateFacilityMagicLink, linkProspectToFacility } from '@/lib/facility.server';
 import { sendRichEmail, notifyOperatorFacilitySignup } from '@/lib/notifications';
+import { emailIdentityText } from '@/lib/business';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
@@ -162,6 +163,7 @@ function welcomeHtml(facilityName: string, link: string): string {
   <p style="line-height:1.6;color:#5F6773;font-size:13px;margin:0">
     Prefer to talk it through? Call dispatch on (704) 941-8508.
   </p>
+  <p style="line-height:1.6;color:#878D97;font-size:12px;margin:16px 0 0">${emailIdentityText()}</p>
 </div>`.trim();
 }
 
@@ -176,6 +178,8 @@ function welcomeText(facilityName: string, link: string): string {
     '',
     'This link works once and expires. If it has, reply and we will send another.',
     'Prefer to talk it through? Call dispatch on (704) 941-8508.',
+    '',
+    emailIdentityText(),
   ].join('\n');
 }
 

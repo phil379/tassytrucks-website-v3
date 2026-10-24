@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { FACILITY_USERS_TABLE, generateFacilityMagicLink } from '@/lib/facility.server';
 import { sendRichEmail } from '@/lib/notifications';
+import { emailIdentityText } from '@/lib/business';
 import type { InviteOutcome, TeamMember, TeamRole } from '@/lib/facility-team';
 
 /**
@@ -84,6 +85,7 @@ export async function sendTeamInvite(opts: { to: string; facilityName: string; i
   </p>
   <p style="line-height:1.6;color:#5F6773;font-size:13px;margin:0 0 8px">This link works once and expires. If it has, ask ${by} to send another from the Team page, or call dispatch.</p>
   <p style="line-height:1.6;color:#5F6773;font-size:13px;margin:0">Dispatch: (704) 941-8508</p>
+  <p style="line-height:1.6;color:#878D97;font-size:12px;margin:16px 0 0">${emailIdentityText()}</p>
 </div>`.trim(),
     text: [
       `You have been added to ${opts.facilityName}`,
@@ -94,6 +96,8 @@ export async function sendTeamInvite(opts: { to: string; facilityName: string; i
       link,
       '',
       `This link works once and expires. If it has, ask ${opts.invitedBy} to send another from the Team page, or call dispatch on (704) 941-8508.`,
+      '',
+      emailIdentityText(),
     ].join('\n'),
   });
 }

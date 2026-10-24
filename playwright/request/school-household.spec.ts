@@ -374,6 +374,7 @@ function bookingPayload(over: Record<string, unknown> = {}) {
     },
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
+    guardian: { accepted: true, ts },
     starts_on: '2026-08-24',
     standard_household_confirmed: true,
     hp_token: '',

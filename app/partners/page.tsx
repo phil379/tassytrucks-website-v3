@@ -56,8 +56,7 @@ export default function PartnersPage() {
                 service was built specifically around that reality.
               </p>
               <p>
-                We also work with VA Community Care providers coordinating rides
-                for veterans. As a Service-Disabled Veteran-Owned Small Business,
+                As a Service-Disabled Veteran-Owned Small Business,
                 veteran transport is personal for us — you can read how we handle
                 it on our{' '}
                 <Link href="/charlotte/veteran-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
@@ -127,11 +126,9 @@ export default function PartnersPage() {
               <p>
                 Beyond routine NEMT, we contract for post-procedure transport —
                 patients recovering from anesthesia who need a trained driver and
-                a documented handoff, not a stranger with an app. We provide
-                veteran transport under VA Community Care Network (CCN)
-                arrangements, the VA program that lets veterans receive care from
-                community providers close to home. And for senior-living
-                communities, there is one more service residents genuinely love:
+                a documented handoff, not a stranger with an app. And for
+                senior-living communities, there is one more service residents
+                genuinely love:
                 Winnie Ride, our pet transport vertical, which gets a
                 resident&rsquo;s dog or cat to the vet and back when family
                 can&rsquo;t. Details on facility pet programs are on our{' '}

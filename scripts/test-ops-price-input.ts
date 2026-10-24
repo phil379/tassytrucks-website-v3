@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { MAX_PRICE_DOLLARS, priceInputToCents } from '../lib/ops-price-input';
+import { MAX_PRICE_DOLLARS, agreedPriceDefault, priceInputToCents } from '../lib/ops-price-input';
 
 let n = 0;
 function t(name: string, fn: () => void) {
@@ -41,6 +41,35 @@ t('both /ops price fields go through the helper (no unbounded Number() parse lef
   const src = readFileSync(new URL('../app/ops/actions.ts', import.meta.url), 'utf8');
   assert.equal((src.match(/priceInputToCents\(/g) ?? []).length, 2);
   assert.ok(!src.includes('Math.round(dollars * 100)'));
+});
+
+const none = { agreed_cents: null, quoted_cents: null, estimate_low_cents: null, estimate_high_cents: null };
+
+t('an estimate that is a single price pre-fills the agreed-price box', () => {
+  assert.equal(agreedPriceDefault({ ...none, estimate_low_cents: 8900, estimate_high_cents: 8900 }), '89.00');
+});
+
+t('an estimate that is a range ($89-$99) leaves the box blank', () => {
+  assert.equal(agreedPriceDefault({ ...none, estimate_low_cents: 8900, estimate_high_cents: 9900 }), '');
+});
+
+t('no estimate, or a half-empty one, leaves the box blank', () => {
+  assert.equal(agreedPriceDefault(none), '');
+  assert.equal(agreedPriceDefault({ ...none, estimate_high_cents: 9900 }), '');
+  assert.equal(agreedPriceDefault({ ...none, estimate_low_cents: 9900 }), '');
+});
+
+t('an agreed or quoted price still wins over any estimate', () => {
+  const range = { estimate_low_cents: 8900, estimate_high_cents: 9900 };
+  assert.equal(agreedPriceDefault({ ...none, ...range, agreed_cents: 9500 }), '95.00');
+  assert.equal(agreedPriceDefault({ ...none, ...range, quoted_cents: 9100 }), '91.00');
+  assert.equal(agreedPriceDefault({ ...none, ...range, agreed_cents: 9500, quoted_cents: 9100 }), '95.00');
+});
+
+t('the /ops page uses the helper, not estimate_high_cents directly', () => {
+  const src = readFileSync(new URL('../app/ops/page.tsx', import.meta.url), 'utf8');
+  assert.ok(src.includes('agreedPriceDefault(row)'));
+  assert.ok(!src.includes('(row.estimate_high_cents / 100)'));
 });
 
 console.log(`${n} passed`);

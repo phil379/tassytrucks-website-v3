@@ -92,3 +92,22 @@ const tripRoute = read('app/api/trip-request/route.ts');
 assert.ok(!/user_agent:\s*userAgent/.test(tripRoute), 'the ride row must not store the visitor browser string');
 assert.ok(read('components/partners/FacilitySignupForm.tsx').includes('href="/privacy"'), 'partner sign-up must link the Privacy Policy');
 ok('ride rows do not store the browser string; partner sign-up links Privacy');
+
+// Children (Tassy Scholar): the server must require the guardian statement, and it is stored with its wording version.
+import { GUARDIAN_CONFIRMATION_TEXT, GUARDIAN_TEXT_VERSION } from '../lib/school-plans';
+assert.ok(GUARDIAN_CONFIRMATION_TEXT.includes('parent or legal guardian'));
+assert.ok(GUARDIAN_TEXT_VERSION.length > 0);
+assert.ok(/guardian:\s*policyAck/.test(read('lib/school-plans.ts')), 'schoolBookingSchema must require the guardian statement');
+assert.ok(read('app/api/school-booking/route.ts').includes('guardian_confirmation'), 'the route must store the guardian confirmation');
+assert.ok(/guardian_confirmed[\s\S]{0,200}required: true/.test(read('lib/trip-details.ts')), '/request Scholar must require the guardian question');
+assert.ok(read('components/school/HouseholdRequestForm.tsx').includes('parent or legal guardian'));
+ok('Scholar flows require and store a parent or legal guardian confirmation');
+
+import { validateDetails } from '../lib/trip-details';
+const base = { student_first_name: 'Sam', student_last_name: 'Reed', school_name: 'Elizabeth Traditional', schedule: 'both' };
+assert.equal(validateDetails('scholar', base).ok, false, 'missing guardian answer must be rejected');
+const notGuardian = validateDetails('scholar', { ...base, guardian_confirmed: 'no' });
+assert.equal(notGuardian.ok, false);
+if (!notGuardian.ok) assert.ok(/call/i.test(notGuardian.errors.guardian_confirmed ?? ''));
+assert.equal(validateDetails('scholar', { ...base, guardian_confirmed: 'yes' }).ok, true);
+ok('/request Scholar needs a "yes" to the guardian question; "no" asks them to call');

@@ -105,9 +105,10 @@ t('Care WAV edges: 5 mi is $109, 5.01 is $129, 10 is $129, 10.01 is $155', () =>
   assert.deepEqual([4.99, 5, 5.01, 9.99, 10, 10.01, 15, 15.01, 20, 20.01, 30].map((m) => cents('care', m, { mobility: 'wheelchair' })), [10900, 10900, 12900, 12900, 12900, 15500, 15500, 18500, 18500, 22500, 22500]);
 });
 
-t('wheelchair on Recovery and Concierge prices on the WAV card (not the ambulatory card)', () => {
-  assert.equal(cents('recovery', 4, { mobility: 'wheelchair' }), 10900);
+t('wheelchair on Concierge prices on the WAV card one way; wheelchair on Recovery is a forced round trip on the WAV card (1.8x)', () => {
   assert.equal(cents('concierge', 4, { mobility: 'wheelchair' }), 10900);
+  // Recovery with a wheelchair is always a round trip (PR 49): 1.8 x the $109 rung = $196.
+  assert.equal(cents('recovery', 4, { mobility: 'wheelchair' }), 19600);
 });
 
 // ── Unusable distances fall back to the straight line between the two points; they never throw

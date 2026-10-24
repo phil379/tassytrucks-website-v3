@@ -50,7 +50,7 @@ export default function NemtPage() {
         },
         {
           title: 'Veteran-owned, and certified',
-          body: 'SDVOSB, MBE, DBE and SBE certified. USDOT #3104152. Licensed and insured for exactly this work.',
+          body: 'SDVOSB, MBE, DBE and SBE certified. Licensed and insured for exactly this work.',
         },
       ]}
       tiers={[

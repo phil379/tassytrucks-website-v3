@@ -33,8 +33,7 @@ export default function VeteranTransportPage() {
             <>
               <p>
                 Tassy Transportation is a certified <strong>Service-Disabled
-                Veteran-Owned Small Business</strong> operating under USDOT
-                #3104152 and MC #79222, based right here in Charlotte. That is
+                Veteran-Owned Small Business</strong>, based right here in Charlotte. That is
                 not a logo we added for marketing — it is who founded the
                 company and how it runs. When a veteran books a ride with us,
                 they are riding with a company built by someone who has worn the
@@ -185,7 +184,7 @@ export default function VeteranTransportPage() {
         },
         {
           q: 'Is Tassy Transportation actually veteran-owned?',
-          a: 'Yes. Tassy Transportation is a certified Service-Disabled Veteran-Owned Small Business (SDVOSB) operating under USDOT #3104152 and MC #79222. The company is veteran-founded and Charlotte-based, and medical transport is our core business.',
+          a: 'Yes. Tassy Transportation is a certified Service-Disabled Veteran-Owned Small Business (SDVOSB). The company is veteran-founded and Charlotte-based, and medical transport is our core business.',
         },
         {
           q: 'Can you handle recurring rides to ongoing treatment?',

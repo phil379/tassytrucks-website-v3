@@ -21,7 +21,7 @@ const SECTIONS: Array<{ h: string; body: string[] }> = [
   {
     h: 'How we use it',
     body: [
-      'We use your information to dispatch and complete trips, send confirmations and driver ETAs by text or email, invoice facilities and payers, and meet our regulatory obligations as a licensed motor carrier (USDOT #3104152 · MC #79222).',
+      'We use your information to dispatch and complete trips, send confirmations and driver ETAs by text or email, invoice facilities and payers, and meet our regulatory obligations as a transportation provider.',
       'We do not sell your personal information. We share it only with the people needed to complete your trip (your driver and dispatcher), with a facility or broker that arranged your ride, or when the law requires it.',
     ],
   },

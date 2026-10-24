@@ -147,7 +147,7 @@ export default function ComparePage() {
                 Charlotte. We own our vehicles, train our drivers on patient
                 handling, and take bookings directly from patients and families as
                 well as from facilities. We are a Service-Disabled Veteran-Owned
-                Small Business operating under USDOT #3104152 and MC #79222, serving
+                Small Business, serving
                 Mecklenburg County plus Matthews, Concord, and Gastonia. See our{' '}
                 <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page

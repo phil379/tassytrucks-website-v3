@@ -37,7 +37,7 @@ export default function PartnerPacketPage() {
         eyebrow="Partner packet"
         title="One number to call. One page to book. One statement."
         tagline="Reliable rides for your patients and residents, priced flat before they go."
-        description={`Tassy Transportation is a Charlotte, NC service-disabled veteran-owned company (USDOT #3104152, MC #79222). Tassy Care rides are flat by distance, from ${usd(careFrom)} to ${usd(careTo)}. Tassy Recovery, the ride home after a procedure, is flat from ${usd(recFrom)} to ${usd(recTo)} and already includes the return. You see the price before the ride is booked.`}
+        description={`Tassy Transportation is a Charlotte, NC service-disabled veteran-owned company. Tassy Care rides are flat by distance, from ${usd(careFrom)} to ${usd(careTo)}. Tassy Recovery, the ride home after a procedure, is flat from ${usd(recFrom)} to ${usd(recTo)} and already includes the return. You see the price before the ride is booked.`}
         bookHref={partnerSignup({ source: 'partner-packet' })}
         bookLabel="Set up your facility account"
         altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}

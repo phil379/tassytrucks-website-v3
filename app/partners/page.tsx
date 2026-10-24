@@ -20,7 +20,7 @@ export default function PartnersPage() {
       eyebrow="For Facilities · B2B Partnerships"
       h1="Partner with Tassy Transportation — Charlotte's SDVOSB Medical Transport"
       heroSubtitle="A contracted transport partner for discharge planners and facility coordinators who are tired of chasing no-show rides — with one dispatch line, one portal, and one invoice."
-      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified, operate under USDOT #3104152 / MC #79222, and dispatch 24/7."
+      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified and dispatch 24/7."
       ctaText="Schedule a 15-min intro call"
       ctaHref={CTA_HREF}
       secondaryCta={{
@@ -228,7 +228,7 @@ export default function PartnersPage() {
       faqs={[
         {
           q: 'What documentation can you provide for our compliance team?',
-          a: 'Our SDVOSB certification, federal operating authority (USDOT #3104152, MC #79222), certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all retrievable on demand through the facility portal once you are onboarded.',
+          a: 'Our SDVOSB certification, certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all retrievable on demand through the facility portal once you are onboarded.',
         },
         {
           q: 'How fast can you onboard a new facility?',
@@ -274,8 +274,7 @@ export default function PartnersPage() {
               <p className="mt-2 ink-soft leading-relaxed max-w-2xl">
                 Awarded by the U.S. Department of Labor to employers who recruit, hire
                 and retain veterans. Alongside it we hold SDVOSB certification,
-                MBE, DBE and SBE certification, and federal operating authority under
-                USDOT #3104152 and MC #79222. Certificates of insurance, driver
+                MBE, DBE and SBE certification. Certificates of insurance, driver
                 credentials and vehicle credentials are available to your compliance
                 team on request.
               </p>

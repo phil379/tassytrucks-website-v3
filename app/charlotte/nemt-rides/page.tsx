@@ -46,8 +46,7 @@ export default function NemtRidesPage() {
               </p>
               <p>
                 Tassy Transportation is a Charlotte-based, Service-Disabled Veteran-Owned
-                Small Business (SDVOSB) operating under USDOT #3104152 and MC
-                #79222. Medical transport is not a side business for us — it is the
+                Small Business (SDVOSB). Medical transport is not a side business for us — it is the
                 core of what we do.
               </p>
             </>

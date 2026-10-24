@@ -5,6 +5,7 @@ import {
   schoolBookingSchema,
   to24h,
   POLICY_VERSION,
+  GUARDIAN_TEXT_VERSION,
   bookingReference,
   type SchoolBookingInput,
   type SchoolPlan,
@@ -293,6 +294,7 @@ export async function POST(request: Request) {
         school_needs_review: !data.child.school_id,
         policy_version: POLICY_VERSION,
         policies: data.policies,
+        guardian_confirmation: { ...data.guardian, text_version: GUARDIAN_TEXT_VERSION },
         ...(parentSms ?? {}),
       },
     })

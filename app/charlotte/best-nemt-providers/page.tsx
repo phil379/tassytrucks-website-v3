@@ -21,7 +21,7 @@ export default function BestNemtProvidersPage() {
       eyebrow="NEMT Buyer&rsquo;s Guide · Charlotte, North Carolina"
       h1="Best NEMT Providers in Charlotte: How to Actually Choose One"
       heroSubtitle="A plain-English checklist for vetting any medical transport company in Mecklenburg County — then judge us by the same standard."
-      quickAnswer="The best NEMT providers in Charlotte share traits you can verify before booking: active USDOT and MC operating authority, current insurance certificates, trained drivers, a dependable on-time record, 24/7 reachability, and wheelchair-accessible vehicles. This page walks through that checklist so you can evaluate any provider. Tassy Transportation is a Charlotte-based, veteran-owned NEMT provider — USDOT #3104152, MC #79222."
+      quickAnswer="The best NEMT providers in Charlotte share traits you can verify before booking: active USDOT and MC operating authority, current insurance certificates, trained drivers, a dependable on-time record, 24/7 reachability, and wheelchair-accessible vehicles. This page walks through that checklist so you can evaluate any provider. Tassy Transportation is a Charlotte-based, veteran-owned NEMT provider."
       ctaText="Try Tassy for your next ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -146,8 +146,7 @@ export default function BestNemtProvidersPage() {
                 We will not tell you we are the best NEMT provider in Charlotte
                 — that is yours to decide, and any company that crowns itself
                 has already failed the honesty test. Here is where we stand on
-                each item above. Licensing: USDOT #3104152 and MC #79222, both
-                public, both checkable tonight. Certification: Service-Disabled
+                each item above. Certification: Service-Disabled
                 Veteran-Owned Small Business (SDVOSB). Insurance: certificates
                 available on request, same as we provide to facility partners.
               </p>
@@ -168,7 +167,7 @@ export default function BestNemtProvidersPage() {
       faqs={[
         {
           q: 'How do I verify a NEMT provider’s USDOT number?',
-          a: 'Use the FMCSA SAFER company snapshot tool — it is free and public. Enter the USDOT number and confirm the operating status is active and the legal name matches the company you are talking to. Tassy Transportation operates under USDOT #3104152 and MC #79222.',
+          a: 'Use the FMCSA SAFER company snapshot tool — it is free and public. Enter the USDOT number and confirm the operating status is active and the legal name matches the company you are talking to.',
         },
         {
           q: 'What is the difference between a NEMT provider and a NEMT broker?',

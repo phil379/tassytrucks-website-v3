@@ -7,6 +7,7 @@ import {
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
 import { SAAS_BASE } from './saas-links';
+import { assertEmailAllowed, type EmailKind } from './marketing-guard';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
 
 /**
@@ -214,7 +215,9 @@ async function pushToZapier(ref: string, message: PushMessage): Promise<'sent' |
 // Email
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function sendResendEmail(payload: { to: string; subject: string; text: string }): Promise<void> {
+async function sendResendEmail(payload: { to: string; subject: string; text: string; kind?: EmailKind }): Promise<void> {
+  // Marketing / outreach is blocked until a mailing address is set (lib/marketing-guard.ts).
+  assertEmailAllowed(payload.kind ?? 'transactional');
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
@@ -246,7 +249,9 @@ export async function sendRichEmail(payload: {
   subject: string;
   html: string;
   text: string;
+  kind?: EmailKind;
 }): Promise<void> {
+  assertEmailAllowed(payload.kind ?? 'transactional');
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
@@ -814,5 +819,71 @@ export async function notifyOperatorScholarBilling(
   const results = await Promise.allSettled([pushToNtfy(message), pushToZapier(ref, message)]);
   for (const r of results) {
     if (r.status === 'rejected') console.error('[stripe] scholar billing alert leg failed for', ref, r.reason);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Privacy requests (access / correct / delete / stop messages)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Tell the operator about a privacy request, and give the requester a receipt.
+ *
+ * The OPERATOR leg THROWS on failure: until the privacy_requests table exists this email is the
+ * only record, so the route must not tell a visitor "received" when it was not. The requester
+ * leg is best effort (they may have given only a phone number). Nothing here changes any data.
+ */
+export async function sendPrivacyRequestEmails(input: {
+  reference: string;
+  name: string;
+  email: string;
+  phone: string;
+  typeLabel: string;
+  details: string;
+  responseDays: number;
+  identityLine: string;
+}): Promise<void> {
+  const operator = process.env.OPERATOR_EMAIL;
+  if (!operator) throw new Error('OPERATOR_EMAIL is not set');
+
+  await sendResendEmail({
+    to: operator,
+    subject: `PRIVACY REQUEST ${input.reference} — ${input.typeLabel}`,
+    text: [
+      `A privacy request came in on the website. Reference ${input.reference}.`,
+      '',
+      `Asking to:  ${input.typeLabel}`,
+      `Name:       ${input.name}`,
+      `Email:      ${input.email || '(none given)'}`,
+      `Phone:      ${input.phone || '(none given)'}`,
+      `Details:    ${input.details || '(none)'}`,
+      '',
+      `We told them we would reply within ${input.responseDays} days.`,
+      'BEFORE ACTING: check the person really is the data subject (ask something only they would know).',
+      'Nothing has been deleted or changed. Do not delete anything automatically.',
+    ].join('\n'),
+  });
+
+  if (!input.email) return;
+  try {
+    await sendResendEmail({
+      to: input.email,
+      subject: `We received your privacy request — reference ${input.reference}`,
+      text: [
+        `Hello ${input.name},`,
+        '',
+        `We received your request: ${input.typeLabel}.`,
+        `Your reference number is ${input.reference}. Please keep it.`,
+        '',
+        `We aim to reply within ${input.responseDays} days. Before we change or share anything, we will check that you are the person the information is about, which may mean asking you a question only you could answer.`,
+        'Nothing has been changed or deleted yet.',
+        '',
+        'If you did not make this request, you can ignore this email.',
+        '',
+        input.identityLine,
+      ].join('\n'),
+    });
+  } catch (err) {
+    console.error('[privacy-request] receipt email failed for', input.reference, err instanceof Error ? err.message : err);
   }
 }

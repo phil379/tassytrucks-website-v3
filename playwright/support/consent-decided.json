@@ -1,0 +1,41 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3941",
+      "localStorage": [
+        {
+          "name": "tassy-consent",
+          "value": "{\"v\": 1, \"analytics\": false, \"at\": \"2026-10-24T00:00:00.000Z\"}"
+        }
+      ]
+    },
+    {
+      "origin": "http://localhost:3943",
+      "localStorage": [
+        {
+          "name": "tassy-consent",
+          "value": "{\"v\": 1, \"analytics\": false, \"at\": \"2026-10-24T00:00:00.000Z\"}"
+        }
+      ]
+    },
+    {
+      "origin": "http://localhost:3945",
+      "localStorage": [
+        {
+          "name": "tassy-consent",
+          "value": "{\"v\": 1, \"analytics\": false, \"at\": \"2026-10-24T00:00:00.000Z\"}"
+        }
+      ]
+    },
+    {
+      "origin": "http://localhost:3947",
+      "localStorage": [
+        {
+          "name": "tassy-consent",
+          "value": "{\"v\": 1, \"analytics\": false, \"at\": \"2026-10-24T00:00:00.000Z\"}"
+        }
+      ]
+    }
+  ]
+}

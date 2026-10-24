@@ -404,7 +404,8 @@ export async function POST(request: Request) {
   }
 
   const source = typeof raw.source === 'string' ? raw.source.slice(0, 500) : null;
-  const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? null;
+  // The visitor's browser string is deliberately NOT stored on the ride row: nothing needs it to
+  // deliver a ride (privacy audit 2026-10-24). A signed care consent still records it above, as evidence.
 
   // The SAME measured distance the visitor was shown, fetched again here rather
   // than trusted from the body - a price the browser can edit is not a price.
@@ -536,7 +537,6 @@ export async function POST(request: Request) {
         // Null unless a payer-billed Tassy Care ride. See the block above.
         care_intake: careIntake,
         source,
-        user_agent: userAgent,
         // Empty for every retail booking, so this spread changes nothing there.
         // See the facility-context block above for where these come from and
         // why facility_id is not among the fields a form may set.

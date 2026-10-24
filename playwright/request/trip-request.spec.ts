@@ -13,7 +13,7 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 const SERVICES = ['care', 'recovery', 'concierge', 'winnie', 'scholar'] as const;
 
 const MEDICAL_WARNING = 'Please do not include medical details, diagnoses, or procedure names.';
-const CONFIRMATION = 'We confirm every request by phone or text within 2 hours during business hours.';
+const CONFIRMATION = 'A dispatcher usually confirms your driver and your price within 2 hours during business hours.';
 const WAIT_COPY = '20 minutes of on-site wait included';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;

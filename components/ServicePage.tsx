@@ -34,7 +34,8 @@ type Props = {
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent A) — objection-preemption row on
 // every service hero. Credentials only — all documentable/true (no invented
 // prices; the price objection is handled by the "See pricing" CTA).
-const TRUST_CHIPS = ['SDVOSB certified', 'USDOT #3104152', 'Licensed & insured', 'Trained drivers'];
+// TODO(FMCSA): Phil's USDOT 3808299 / MC-1373369 are Inactive at FMCSA, so no USDOT/MC number is published on any public page. Add them back (footer, JSON-LD, trust chips) only once FMCSA shows Active. The USDOT/MC numbers that used to be here belonged to another company (Tassy Logistics LLC) and must never return; scripts/test-banned-claims.ts enforces that.
+const TRUST_CHIPS = ['SDVOSB certified', 'Licensed & insured', 'Trained drivers'];
 
 export default function ServicePage({
   eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now', altCta,

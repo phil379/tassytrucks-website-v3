@@ -1,0 +1,6 @@
+{
+  "name": "VA-verified",
+  "pattern": "va[\\s\\-\\u2010-\\u2015\\u00ad]*verified",
+  "flags": "i",
+  "reason": "Tassy's SDVOSB status is certified by the SBA, not verified by the VA. Say \"SBA-certified SDVOSB\"."
+}

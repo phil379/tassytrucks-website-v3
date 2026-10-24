@@ -47,8 +47,7 @@ export default function PetBoardingTransportPage() {
               <p>
                 Winnie Ride closes that gap. We&rsquo;re the pet-transport
                 division of Tassy Transportation — a Charlotte-based, Service-Disabled
-                Veteran-Owned Small Business (SDVOSB) operating under USDOT
-                #3104152 and MC #79222 — and boarding runs are one of the most
+                Veteran-Owned Small Business (SDVOSB) — and boarding runs are one of the most
                 common trips we drive. Your dog gets to the facility on time, you
                 make your flight, and nobody owes anybody a favor. For the full
                 picture of what we drive, start with our{' '}

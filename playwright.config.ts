@@ -20,6 +20,13 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3941',
     /**
+     * The cookie banner is a fixed bar at the bottom of every page for a first-time visitor and
+     * would sit over the buttons these specs click. Every spec starts as a visitor who has
+     * already answered it (Reject), which is also the state that keeps analytics off.
+     * playwright/legal/consent.spec.ts overrides this to test the first-visit banner itself.
+     */
+    storageState: './playwright/support/consent-decided.json',
+    /**
      * Keep a trace for anything that fails or flakes. A wizard spec that lands
      * on the wrong page fails as a locator timeout with no page snapshot, which
      * is a dead end at 3am — the trace has the URL, the DOM and the network.

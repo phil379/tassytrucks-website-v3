@@ -7,7 +7,10 @@ import {
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
 import { SAAS_BASE } from './saas-links';
-import { assertEmailAllowed, type EmailKind } from './marketing-guard';
+import { assertEmailAllowed, EmailBlockedError, type EmailKind } from './marketing-guard';
+import { BUSINESS_MAILING_ADDRESS, emailFooterText, emailIdentityText } from './business';
+import { isSuppressed } from './email-suppression';
+import { unsubscribeUrl } from './unsubscribe-token';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
 
 /**
@@ -404,6 +407,8 @@ export function buildRequesterText(args: {
     '',
     '— Tassy Transportation',
     `Reference: ${args.reference}`,
+    '',
+    ...emailFooterText(),
   ].join('\n');
 }
 
@@ -886,4 +891,74 @@ export async function sendPrivacyRequestEmails(input: {
   } catch (err) {
     console.error('[privacy-request] receipt email failed for', input.reference, err instanceof Error ? err.message : err);
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Marketing / outreach email (none is sent from this repo today)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The ONLY way marketing, prospecting or outreach email may be sent. It refuses unless ALL of these hold:
+ *   1. a business mailing address is set (lib/business.ts: BUSINESS_MAILING_ADDRESS, empty by default),
+ *   2. a signed one-click unsubscribe link can be made (UNSUBSCRIBE_SECRET is set),
+ *   3. the do-not-email list is available and the address is NOT on it.
+ * Every message carries the postal address and the unsubscribe link in its body, List-Unsubscribe
+ * headers for one-click, and an honest sender (FROM_ADDRESS) and subject. Throws EmailBlockedError
+ * (or SuppressionUnavailableError) when a rule fails; nothing is sent.
+ *
+ * `deps` exists so tests can run the checks without a database or a network.
+ */
+export async function sendMarketingEmail(
+  payload: { to: string; subject: string; text: string },
+  deps: {
+    mailingAddress?: string;
+    isSuppressed?: (email: string) => Promise<boolean>;
+    unsubscribeUrl?: (email: string) => string;
+  } = {},
+): Promise<void> {
+  const makeUrl = deps.unsubscribeUrl ?? ((e: string) => unsubscribeUrl(e));
+  let url: string | null = null;
+  try {
+    url = makeUrl(payload.to);
+  } catch {
+    url = null; // no UNSUBSCRIBE_SECRET: assertEmailAllowed below refuses
+  }
+  assertEmailAllowed('marketing', { mailingAddress: deps.mailingAddress, unsubscribeUrl: url });
+
+  const suppressed = await (deps.isSuppressed ?? isSuppressed)(payload.to);
+  if (suppressed) throw new EmailBlockedError('this address has unsubscribed');
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) throw new Error('RESEND_API_KEY is not set');
+  const address = (deps.mailingAddress ?? BUSINESS_MAILING_ADDRESS).trim();
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [payload.to],
+      subject: payload.subject,
+      text: [
+        payload.text,
+        '',
+        '—',
+        `${emailIdentityText()} · ${address}`,
+        `Unsubscribe: ${url}`,
+      ].join('\n'),
+      headers: { 'List-Unsubscribe': `<${url}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+    }),
+  });
+  if (!res.ok) throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+}
+
+/** Until the do-not-email table exists, an unsubscribe is handled by hand: tell the operator. Throws on failure. */
+export async function notifyOperatorUnsubscribe(email: string): Promise<void> {
+  const operator = process.env.OPERATOR_EMAIL;
+  if (!operator) throw new Error('OPERATOR_EMAIL is not set');
+  await sendResendEmail({
+    to: operator,
+    subject: 'UNSUBSCRIBE — add to the do-not-email list',
+    text: `${email} used the unsubscribe link. Add this address to the do-not-email list now (the table is not set up yet, so this email is the record). Never send marketing or outreach email to it again.`,
+  });
 }

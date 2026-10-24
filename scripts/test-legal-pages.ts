@@ -125,3 +125,11 @@ ok('/request Scholar needs a "yes" to the guardian question; "no" asks them to c
   assert.ok(read('components/Footer.tsx').includes('href="/privacy/request"'));
   ok('data request page, route, staged migration and footer link exist');
 }
+
+{
+  const { existsSync } = await import('node:fs');
+  assert.ok(existsSync(join(ROOT, 'docs/migrations_pending/20261024T0200_email_suppressions.sql')));
+  const sql = read('docs/migrations_pending/20261024T0200_email_suppressions.sql');
+  assert.ok(/ENABLE ROW LEVEL SECURITY/.test(sql) && !/CREATE POLICY/.test(sql) && /NOTIFY pgrst/.test(sql));
+  ok('do-not-email table is staged with RLS on and no policies');
+}

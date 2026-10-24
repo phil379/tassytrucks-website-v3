@@ -1,4 +1,5 @@
 import { serviceShortName } from '@/lib/trip-request';
+import { emailFooterHtml, emailFooterText } from '@/lib/business';
 
 /**
  * The post-ride RATING request — a one-tap smiley.
@@ -104,6 +105,7 @@ export function ratingHtml(d: RatingEmailData): string {
       Charlotte, NC &middot; <a href="tel:+17049418508" style="color:${GOLD};text-decoration:none;">(704) 941-8508</a> &middot;
       <a href="mailto:book@tassytrucks.com" style="color:${GOLD};text-decoration:none;">book@tassytrucks.com</a>
     </div>
+    ${emailFooterHtml(MUTE)}
   </td></tr>
 
 </table>
@@ -122,5 +124,7 @@ export function ratingText(d: RatingEmailData): string {
     `  Not great: ${rateUrl(d.tripId, 'bad')}`,
     ``,
     `Tassy Transportation · (704) 941-8508`,
+    ``,
+    ...emailFooterText(),
   ].join('\n');
 }

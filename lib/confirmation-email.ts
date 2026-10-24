@@ -2,6 +2,7 @@ import { serviceShortName, fullName, mobilityLabel, type TripRequestInput } from
 import { formatUsd } from '@/lib/quote';
 import { OPERATING_TIME_ZONE } from '@/lib/time';
 import { freeCancellationSentence, REFUNDS_URL } from '@/lib/refund-policy';
+import { emailFooterHtml, emailFooterText } from '@/lib/business';
 
 /**
  * The booking confirmation.
@@ -229,6 +230,7 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
       Tassy Transportation · Charlotte, NC<br>
       Veteran-owned. SDVOSB, MBE, DBE and SBE certified.<br>
       Serving Charlotte and Mecklenburg County.
+      ${emailFooterHtml(MUTE)}
     </div>
   </td></tr>
 
@@ -297,6 +299,8 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
     '',
     '— Tassy Transportation, Charlotte NC',
     '  Veteran-owned. SDVOSB, MBE, DBE and SBE certified.',
+    '',
+    ...emailFooterText(),
   );
   return lines.join('\n');
 }

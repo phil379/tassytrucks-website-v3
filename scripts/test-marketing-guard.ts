@@ -27,8 +27,8 @@ for (const blank of ['', '   ', '\n']) {
 ok('blank and whitespace addresses are blocked');
 
 // 3. An address alone is not enough: a one-click unsubscribe is required too.
-assert.ok(emailBlockReason('marketing', { mailingAddress: 'PO Box 1, Example, NC 28000' }));
-assert.equal(emailBlockReason('marketing', { mailingAddress: 'PO Box 1, Example, NC 28000', unsubscribeUrl: 'https://example.test/u/abc' }), null);
+assert.ok(emailBlockReason('marketing', { mailingAddress: '1 Example Street, Exampleville, XX 00000' }));
+assert.equal(emailBlockReason('marketing', { mailingAddress: '1 Example Street, Exampleville, XX 00000', unsubscribeUrl: 'https://example.test/u/abc' }), null);
 ok('marketing needs both a mailing address and an unsubscribe link');
 
 // 4. Transactional email (request received, booked, receipt, pay link) is never blocked.

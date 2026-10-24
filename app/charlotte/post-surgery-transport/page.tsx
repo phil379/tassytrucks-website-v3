@@ -79,8 +79,7 @@ export default function PostSurgeryTransportPage() {
               <p>
                 A scheduled medical transport service is a different
                 arrangement. When you book post-surgery transport with Tassy
-                Trucks, the facility gets a named company with USDOT and MC
-                authority on file, a confirmed pickup, and a driver whose entire
+                Trucks, the facility gets a named company, a confirmed pickup, and a driver whose entire
                 job is you. Before you book, it is worth a quick call to your
                 surgery center to confirm their discharge policy — then call us
                 at (704) 941-8508 and we will set the ride up around it. You can

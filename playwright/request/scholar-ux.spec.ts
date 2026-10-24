@@ -277,6 +277,7 @@ test('the booking stores the school\'s own address, not a blank', async ({ page,
   await page.locator('input[name="home_address"]').fill('1200 Elizabeth Ave, Charlotte NC');
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  await page.locator('#guardianConfirm').check();
   await page.locator('#childFirst').fill('Sam');
   await page.locator('#childLast').fill('Reed');
   await pickFirst(page, 'Ardrey Kell High');

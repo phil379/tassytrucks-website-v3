@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, ChevronDown, Phone, Menu, X } from 'lucide-react';
 import { contact } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
+import HeaderScrollState from './HeaderScrollState';
 
 // FIX_PROD_131 — nav trimmed 8→6 visible items: "How it works" moved into the
 // Services dropdown (below) so the top bar stays calm.
@@ -45,13 +46,15 @@ const servicesMenu: Array<{ heading: string; links: Array<{ href: string; label:
 
 export default function Header() {
   return (
-    <header data-site-chrome className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
-      <div className="container-x py-4 flex items-center justify-between">
+    <header data-site-chrome className="site-header border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
+      {/* Compact header on phones once scrolled, and in short landscape: see .site-header in globals.css */}
+      <HeaderScrollState />
+      <div className="site-header-row container-x flex items-center justify-between">
         <Link href="/" aria-label="Tassy Transportation home" className="flex items-center gap-3">
           {/* FIX_PROD_137b — doubled again per Phil (was 44/56/64 → now 88/112/128px);
               framed to rhyme with the founder photo tile (rounded-tile · border-line ·
               overflow-hidden · object-cover). */}
-          <span className="block shrink-0 h-[88px] w-[88px] md:h-28 md:w-28 lg:h-32 lg:w-32 rounded-tile border border-line overflow-hidden transition-all duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
+          <span className="site-header-logo block shrink-0 rounded-tile border border-line overflow-hidden hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
             <img
               src="/brand/logo-cream.svg"
               alt="Tassy Transportation — veteran-owned premium transport in Charlotte NC"

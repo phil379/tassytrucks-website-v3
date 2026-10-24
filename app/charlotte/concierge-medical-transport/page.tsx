@@ -53,8 +53,7 @@ export default function ConciergeMedicalTransportPage() {
                   VIP concierge service
                 </Link>
                 . Tassy Transportation is a Charlotte-based, Service-Disabled
-                Veteran-Owned Small Business operating under USDOT #3104152 and
-                MC #79222 — discretion backed by real operating authority, not
+                Veteran-Owned Small Business — discretion backed by a real company, not
                 just a nice website.
               </p>
             </>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
+import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 // Derived, never typed — see the note in app/page.tsx.
 import { CARE_WAV, dollars } from '@/lib/quote';
 
@@ -38,7 +39,7 @@ export default function NemtPage() {
         },
         {
           title: 'Booked ahead, for a time you chose',
-          body: 'Send the request whenever suits you. A dispatcher confirms your driver and your exact price within two hours, and the same company answers when you call back.',
+          body: `Send the request whenever suits you. ${CONFIRMATION_PROMISE} The same company answers when you call back.`,
         },
         {
           title: 'Riding every week? Stop booking every week.',
@@ -50,7 +51,7 @@ export default function NemtPage() {
         },
         {
           title: 'Veteran-owned, and certified',
-          body: 'SDVOSB, MBE, DBE and SBE certified. USDOT #3104152. Licensed and insured for exactly this work.',
+          body: 'SDVOSB, MBE, DBE and SBE certified. Licensed and insured for exactly this work.',
         },
       ]}
       tiers={[

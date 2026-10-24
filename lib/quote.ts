@@ -1,3 +1,4 @@
+import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { isPetLine, type ServiceLine } from '@/lib/trip-request';
 import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
 import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
@@ -923,7 +924,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
       kind: 'quote-only',
       reason: 'beyond-bands',
       miles: Math.round(milesMid * 10) / 10,
-      message: `That is a longer trip than our published ${card.label} rates cover. Send the request and a dispatcher will quote it — usually within 2 hours.`,
+      message: `That is a longer trip than our published ${card.label} rates cover. Send the request and a dispatcher will quote it. ${CONFIRMATION_PROMISE}`,
     };
   }
 

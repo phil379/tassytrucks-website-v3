@@ -1,0 +1,6 @@
+{
+  "name": "foreign USDOT/MC numbers",
+  "pattern": "3104152|\\b79222\\b",
+  "flags": "i",
+  "reason": "USDOT 3104152 / MC 79222 belong to Tassy Logistics LLC, a different company. Phil's own numbers are Inactive at FMCSA, so no USDOT/MC number may be published until FMCSA shows Active."
+}

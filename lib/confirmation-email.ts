@@ -1,6 +1,7 @@
 import { serviceShortName, fullName, mobilityLabel, type TripRequestInput } from '@/lib/trip-request';
 import { formatUsd } from '@/lib/quote';
 import { OPERATING_TIME_ZONE } from '@/lib/time';
+import { freeCancellationSentence, REFUNDS_URL } from '@/lib/refund-policy';
 
 /**
  * The booking confirmation.
@@ -189,8 +190,8 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
         They come to the door — you are never left to find the car.<br>
         ${t.driverName ? `Your driver is <strong>${esc(t.driverName)}</strong>.<br>` : ''}
         ${t.vehicleDescription ? `Vehicle: ${esc(t.vehicleDescription)}.<br>` : ''}
-        Need to change or cancel? Call us. No fee if you let us know at least
-        4 hours ahead.
+        Need to change or cancel? Call us. ${freeCancellationSentence()}
+        <a href="${REFUNDS_URL}" style="color:${MUTE};">Cancellation and refund policy</a>.
       </td></tr>
     </table>
   </td></tr>
@@ -278,7 +279,8 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
   if (t.driverName) lines.push(`  Your driver is ${t.driverName}.`);
   if (t.vehicleDescription) lines.push(`  Vehicle: ${t.vehicleDescription}.`);
   lines.push(
-    '  Need to change or cancel? Call us. No fee if you tell us at least 4 hours ahead.',
+    `  Need to change or cancel? Call us. ${freeCancellationSentence()}`,
+    `  Cancellation and refund policy: ${REFUNDS_URL}`,
     '',
   );
   if (t.payUrl) {

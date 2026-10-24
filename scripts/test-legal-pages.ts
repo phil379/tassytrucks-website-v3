@@ -86,3 +86,9 @@ for (const [host, provider] of Object.entries(KNOWN_HOSTS)) {
   if (found.has(host)) assert.ok(names.includes(provider), `${host} is called by the code but ${provider} is not in the Privacy table`);
 }
 ok('every known outside host in the code is disclosed in the provider table');
+
+// Forms: a ride row must not store the visitor's browser string, and the partner sign-up must link Privacy.
+const tripRoute = read('app/api/trip-request/route.ts');
+assert.ok(!/user_agent:\s*userAgent/.test(tripRoute), 'the ride row must not store the visitor browser string');
+assert.ok(read('components/partners/FacilitySignupForm.tsx').includes('href="/privacy"'), 'partner sign-up must link the Privacy Policy');
+ok('ride rows do not store the browser string; partner sign-up links Privacy');

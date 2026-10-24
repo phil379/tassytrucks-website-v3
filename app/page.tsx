@@ -146,7 +146,7 @@ export default function HomePage() {
                 verification, task #222); credentials shown here are all documentable. */}
             <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
               {[
-                ['SDVOSB',  'VA-verified'],
+                ['SDVOSB',  'SBA-certified'],
                 ['MBE · DBE', 'SBE certified'],
                 ['USDOT',   '#3104152'],
                 ['Veteran', 'Owned & operated'],

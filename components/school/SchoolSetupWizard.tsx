@@ -125,7 +125,8 @@ export default function SchoolSetupWizard({
     ...(Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, false])) as Policies),
     ...((restored?.policies as object) ?? {}),
   }));
-  const [commit, setCommit] = useState<boolean>(() => Boolean(restored?.commit));
+  // Never restored from a saved draft: authorizing a charge is given fresh, on the last step.
+  const [commit, setCommit] = useState<boolean>(false);
   // Required before any child detail is entered; unticked unless ticked earlier in this tab.
   const [guardian, setGuardian] = useState<boolean>(() => Boolean(restored?.guardian));
   // Optional, unchecked unless the parent ticked it earlier in this tab.

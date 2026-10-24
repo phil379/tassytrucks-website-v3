@@ -25,7 +25,7 @@ import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/Ad
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
-import { SHOW_ESTIMATES, estimateTrip, formatRange, isQuoteOnly } from '@/lib/quote';
+import { SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
 import {
   PICK_ADDRESS_MESSAGE,
   PICK_TO_SEE_PRICE,
@@ -1269,7 +1269,7 @@ export default function RequestForm({
                   : ''}
                 {estimate.escortCents > 0 ? ' · Tassy Escort included' : ''}
                 {estimate.surcharges.length > 0
-                  ? ` · ${estimate.surcharges.map((x) => x.label.toLowerCase()).join(' and ')}`
+                  ? ` · includes ${estimate.surcharges.map((x) => `${x.label.toLowerCase()} +${formatUsd(x.cents)}`).join(' and ')}`
                   : ''}
               </p>
               {/* A ZIP-derived price is a good estimate and a bad promise. Say which. */}

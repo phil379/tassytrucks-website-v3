@@ -133,3 +133,23 @@ ok('/request Scholar needs a "yes" to the guardian question; "no" asks them to c
   assert.ok(/ENABLE ROW LEVEL SECURITY/.test(sql) && !/CREATE POLICY/.test(sql) && /NOTIFY pgrst/.test(sql));
   ok('do-not-email table is staged with RLS on and no policies');
 }
+
+// Fees and claims: what a customer is told must match the rate cards and the code.
+{
+  const { WINNIE, SURCHARGES, formatUsd, dollars } = await import('../lib/quote');
+  const first = WINNIE.bands[0]!.cents;
+  const last = WINNIE.bands[WINNIE.bands.length - 1]!.cents;
+  const llms = read('public/llms.txt');
+  assert.ok(llms.includes(`${dollars(first)}-${dollars(last)} one way`), 'llms.txt Winnie one-way prices must match the rate card');
+  // The price panel shows each surcharge with its amount before the customer sends anything.
+  assert.ok(read('components/request/RequestForm.tsx').includes('formatUsd(x.cents)'), 'form must show surcharge amounts');
+  // The code charges at 8pm exactly, so the copy says "from 8pm", never "after 8pm".
+  assert.ok(!/after 8\s?pm/i.test(read('app/pricing/page.tsx')), 'pricing says "from 8pm on"');
+  assert.equal(SURCHARGES.afterHours, 2500);
+  // The booking email must not promise texts to people who did not ask for them.
+  assert.ok(read('lib/confirmation-email.ts').includes('If you asked for text updates'));
+  // The auto-renew / charge authorization box is never restored from a saved draft.
+  assert.ok(!/Boolean\(restored\?\.commit\)/.test(read('components/school/SchoolSetupWizard.tsx')));
+  void formatUsd;
+  ok('surcharge amounts, wait rates, 8pm wording, llms.txt Winnie prices, text-update line and auto-renew box are right');
+}

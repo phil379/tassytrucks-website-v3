@@ -49,10 +49,10 @@ function toReceipt(r: Row): ReceiptData {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main style={{ minHeight: '100vh', background: '#FFFFFF', fontFamily: FONT, color: INK }}>
+    <div style={{ minHeight: '100vh', background: '#FFFFFF', fontFamily: FONT, color: INK }}>
       <style>{`@media print{.no-print{display:none!important}main{padding:0!important}}`}</style>
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 12px 48px' }}>{children}</div>
-    </main>
+    </div>
   );
 }
 

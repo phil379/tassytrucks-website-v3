@@ -160,7 +160,7 @@ export default function BreedCombobox({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => pick(breed)}
               className={`flex min-h-11 cursor-pointer items-center px-3 py-2.5 text-left text-sm hover:bg-white/5 ${
-                i === active ? 'bg-white/10' : ''
+                i === active ? 'bg-white/10 border-l-4 border-[color:var(--gold-warm)]' : 'border-l-4 border-transparent'
               }`}
             >
               {breed}

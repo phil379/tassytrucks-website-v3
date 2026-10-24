@@ -3,6 +3,7 @@ import { Newsreader, Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ConsentManager from '@/components/ConsentManager';
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent C) — was a render-blocking
 // <link> to fonts.googleapis.com. next/font self-hosts (zero CLS, no
@@ -118,14 +119,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <Header />
-        <main id="main">{children}</main>
+        <main id="main" tabIndex={-1} className="outline-none">{children}</main>
         <Footer />
-        {/* Vercel Web Analytics — the tag the @vercel/analytics package renders.
-            Added as a tag, not a dependency: this repo locks with bun.lock and
-            the shell that edits it has no bun, so a package added here could not
-            be locked and would fail the build. Cookieless, no consent banner.
-            Enable Web Analytics on the Vercel project to start collecting. */}
-        <script defer src="/_vercel/insights/script.js" />
+        {/* Vercel Web Analytics is NOT a tag here any more: components/ConsentManager.tsx injects
+            /_vercel/insights/script.js only after the visitor presses Accept. Do not add it back
+            as a static <script> (scripts/test-consent.ts fails if it returns). */}
+        <ConsentManager />
       </body>
     </html>
   );

@@ -194,7 +194,7 @@ export default function HomePage() {
                   <div className="svc-slot">
                     <Image
                       src={v.image.src}
-                      alt={v.image.alt}
+                      alt=""
                       width={v.image.width}
                       height={v.image.height}
                       sizes="(min-width: 1024px) 280px, 240px"

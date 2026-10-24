@@ -14,6 +14,8 @@ import {
   STEP_TITLES,
   WEEKDAYS,
   SAFETY_NOTE_HINT,
+  GUARDIAN_CONFIRMATION_TEXT,
+  CHILD_DATA_EXPLAINER,
   SAFETY_NOTE_LABEL,
   restoreStep,
   wizardStorageKey,
@@ -22,7 +24,7 @@ import {
 } from '@/lib/school-plans';
 
 const field =
-  'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
+  'w-full rounded-lg border border-[rgba(244,239,224,0.40)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
 const label = 'block text-sm font-medium mb-1.5';
 const err = 'mt-1.5 text-sm text-[#f87171]';
 
@@ -123,7 +125,10 @@ export default function SchoolSetupWizard({
     ...(Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, false])) as Policies),
     ...((restored?.policies as object) ?? {}),
   }));
-  const [commit, setCommit] = useState<boolean>(() => Boolean(restored?.commit));
+  // Never restored from a saved draft: authorizing a charge is given fresh, on the last step.
+  const [commit, setCommit] = useState<boolean>(false);
+  // Required before any child detail is entered; unticked unless ticked earlier in this tab.
+  const [guardian, setGuardian] = useState<boolean>(() => Boolean(restored?.guardian));
   // Optional, unchecked unless the parent ticked it earlier in this tab.
   const [smsConsent, setSmsConsent] = useState<boolean>(() => Boolean(restored?.smsConsent));
   // True while the browser is being handed to Stripe's card page. Blocks a second submit.
@@ -162,12 +167,12 @@ export default function SchoolSetupWizard({
     try {
       window.sessionStorage.setItem(
         key,
-        JSON.stringify({ step, parent, child, sched, policies, commit, smsConsent }),
+        JSON.stringify({ step, parent, child, sched, policies, commit, smsConsent, guardian }),
       );
     } catch {
       /* private mode / quota — degrade to in-memory only */
     }
-  }, [plan.key, step, parent, child, sched, policies, commit, smsConsent, redirecting]);
+  }, [plan.key, step, parent, child, sched, policies, commit, smsConsent, guardian, redirecting]);
 
   const canContinue = (() => {
     switch (step) {
@@ -181,7 +186,8 @@ export default function SchoolSetupWizard({
         );
       case 2:
         return Boolean(
-          child.first_name &&
+          guardian &&
+            child.first_name &&
             child.last_name &&
             child.school_name &&
             child.school_address &&
@@ -222,6 +228,7 @@ export default function SchoolSetupWizard({
           policies: Object.fromEntries(
             SCHOOL_POLICIES.map((p) => [p.key, { accepted: true as const, ts }]),
           ),
+          guardian: { accepted: true as const, ts },
           starts_on: nextSchoolStart(),
           standard_household_confirmed: standardHouseholdConfirmed,
           hp_token: '',
@@ -298,7 +305,9 @@ export default function SchoolSetupWizard({
           setSmsConsent={setSmsConsent}
         />
       )}
-      {step === 2 && <ChildStep child={child} setChild={setChild} apiKey={googleMapsApiKey} />}
+      {step === 2 && (
+        <ChildStep child={child} setChild={setChild} apiKey={googleMapsApiKey} guardian={guardian} setGuardian={setGuardian} />
+      )}
       {step === 3 && <ScheduleStep plan={plan} sched={sched} setSched={setSched} />}
       {step === 4 && <PolicyStep policies={policies} setPolicies={setPolicies} />}
       {step === 5 && <CommitStep plan={plan} commit={commit} setCommit={setCommit} />}
@@ -458,15 +467,38 @@ function ChildStep({
   child,
   setChild,
   apiKey,
+  guardian,
+  setGuardian,
 }: {
   child: ChildForm;
   setChild: React.Dispatch<React.SetStateAction<ChildForm>>;
   apiKey: string | undefined;
+  guardian: boolean;
+  setGuardian: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const set = (k: keyof ChildForm, v: string) => setChild((prev) => ({ ...prev, [k]: v }));
   return (
     <div className="space-y-5">
       <h2 className="serif text-2xl font-semibold">Your child</h2>
+      <div className="rounded-lg border border-[color:var(--line)] p-4" data-testid="child-data-notice">
+        <p className="text-sm font-medium">What we ask for, and why</p>
+        <ul className="mt-2 space-y-1 text-sm text-[color:var(--ink-soft)]">
+          {CHILD_DATA_EXPLAINER.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <label className="mt-3 flex min-h-[44px] cursor-pointer items-start gap-3 text-sm" htmlFor="guardianConfirm">
+          <input
+            id="guardianConfirm"
+            data-testid="guardian-confirm"
+            type="checkbox"
+            className="mt-1 h-5 w-5 shrink-0"
+            checked={guardian}
+            onChange={(e) => setGuardian(e.target.checked)}
+          />
+          <span>{GUARDIAN_CONFIRMATION_TEXT}</span>
+        </label>
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field htmlFor="childFirst" labelText="Child&rsquo;s first name">
           <input id="childFirst" className={field} value={child.first_name} onChange={(e) => set('first_name', e.target.value)} />

@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 
 const CTA_HREF = seoRequest('winnie', { source: 'seo-compare-pet' });
 
-const yes = <Check size={18} className="inline" style={{ color: '#7C9A5C' }} aria-label="Yes" />;
-const no = <Minus size={18} className="inline opacity-40" aria-label="No" />;
+const yes = <Check size={18} className="inline" style={{ color: '#7C9A5C' }} role="img" aria-label="Yes" />;
+const no = <Minus size={18} className="inline opacity-40" role="img" aria-label="No" />;
 
 type Row = { label: string; winnie: React.ReactNode; uber: React.ReactNode; lyft: React.ReactNode };
 

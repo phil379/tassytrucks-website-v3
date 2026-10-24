@@ -10,6 +10,16 @@ import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/
 import { SCHOOL_PLANS } from '@/lib/school-plans';
 import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
 
+/** Wait rates, read from the rate cards (not typed), for the lines that include some on-site wait. */
+const WAIT_LINES = [
+  { label: 'Tassy Care', card: CARE },
+  { label: 'Tassy Recovery', card: RECOVERY },
+  { label: 'Winnie Ride', card: WINNIE_CARD },
+  { label: 'Tassy Care WAV', card: CARE_WAV },
+]
+  .filter((w) => w.card.waitIncludedMin > 0)
+  .map((w) => ({ label: w.label, cents: w.card.waitOverage }));
+
 export const metadata: Metadata = {
   title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
   description:
@@ -233,7 +243,7 @@ export default function PricingPage() {
               <h2 className="serif text-2xl font-semibold">What can change the price</h2>
               <ul className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
                 <li>
-                  Before 6am or after 8pm: <strong className="text-cream-text">+$25</strong>
+                  Before 6am or from 8pm on: <strong className="text-cream-text">+$25</strong>
                   {' '}(not on Tassy Concierge)
                 </li>
                 <li>Weekends: <strong className="text-cream-text">+$20</strong></li>
@@ -251,8 +261,14 @@ export default function PricingPage() {
                   driver comes in 15 minutes early and walks them out to the car
                 </li>
                 <li>
-                  Wait beyond what is included: quoted to you{' '}
-                  <strong className="text-cream-text">before</strong> it is charged, never after
+                  Wait beyond what is included, per 30 minutes:{' '}
+                  {WAIT_LINES.map((w, i) => (
+                    <span key={w.label}>
+                      {i > 0 ? ', ' : ''}
+                      {w.label} <strong className="text-cream-text">{dollars(w.cents)}</strong>
+                    </span>
+                  ))}
+                  . It is quoted to you <strong className="text-cream-text">before</strong> it is charged, never after
                 </li>
               </ul>
               <p className="ink-soft mt-4 text-sm leading-relaxed">

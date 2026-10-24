@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-compare' });
 
-const yes = <Check size={18} className="inline text-[color:var(--gold)]" aria-label="Yes" />;
-const no = <Minus size={18} className="inline opacity-40" aria-label="No" />;
+const yes = <Check size={18} className="inline text-[color:var(--gold)]" role="img" aria-label="Yes" />;
+const no = <Minus size={18} className="inline opacity-40" role="img" aria-label="No" />;
 
 type Row = { label: string; tassy: React.ReactNode; uber: React.ReactNode; lyft: React.ReactNode };
 

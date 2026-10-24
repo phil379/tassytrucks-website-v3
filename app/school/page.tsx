@@ -117,13 +117,13 @@ export default function SchoolPage() {
             {PLANS.map((p) => (
               <div key={p.name} className={`tier-card ${p.highlight ? 'is-popular' : ''}`}>
                 <div className="flex items-center justify-between">
-                  <div className="eyebrow" style={p.highlight ? { color: 'rgba(27,26,23,0.7)' } : undefined}>School plan</div>
+                  <div className="eyebrow" style={p.highlight ? { color: 'rgba(27,26,23,0.85)' } : undefined}>School plan</div>
                   {p.badge && (
                     <span className="status-badge" style={{ background: 'rgba(27,26,23,0.12)', color: '#1B1A17' }}>{p.badge}</span>
                   )}
                 </div>
                 <h3 className="serif text-2xl font-semibold mt-3">{p.name}</h3>
-                <p className={`mt-1 text-sm ${p.highlight ? '' : 'ink-mute'}`} style={p.highlight ? { color: 'rgba(27,26,23,0.7)' } : undefined}>{p.cadence}</p>
+                <p className={`mt-1 text-sm ${p.highlight ? '' : 'ink-mute'}`} style={p.highlight ? { color: 'rgba(27,26,23,0.85)' } : undefined}>{p.cadence}</p>
                 <ul className="mt-5 space-y-2 text-sm flex-1">
                   {p.features.map((f) => (
                     <li key={f} className="flex gap-2">
@@ -133,7 +133,7 @@ export default function SchoolPage() {
                   ))}
                 </ul>
                 <div className={`mt-5 pt-4 ${p.highlight ? '' : 'border-t border-line'}`} style={p.highlight ? { borderTop: '1px solid rgba(27,26,23,0.15)' } : undefined}>
-                  <div className="text-xs uppercase tracking-eyebrow" style={p.highlight ? { color: 'rgba(27,26,23,0.6)' } : { color: 'var(--ink-mute)' }}>Pricing</div>
+                  <div className="text-xs uppercase tracking-eyebrow" style={p.highlight ? { color: 'rgba(27,26,23,0.85)' } : { color: 'var(--ink-mute)' }}>Pricing</div>
                   <div className="text-sm mt-0.5" style={p.highlight ? { color: '#1B1A17' } : undefined}>Varies by school</div>
                 </div>
                 <a

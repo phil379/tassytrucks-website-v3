@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, ChevronDown, Phone, Menu, X } from 'lucide-react';
+import { ArrowRight, Phone, Menu, X } from 'lucide-react';
+import ServicesMenu from '@/components/ServicesMenu';
 import { contact } from '@/lib/saas-links';
 import { request } from '@/lib/request-links';
 
@@ -47,14 +48,16 @@ export default function Header() {
   return (
     <header data-site-chrome className="border-b border-line bg-bg/95 sticky top-0 z-30 backdrop-blur">
       <div className="container-x py-4 flex items-center justify-between">
-        <Link href="/" aria-label="Tassy Transportation home" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
+          {/* The link is named by its visible wordmark from 640px up; below that the wordmark is hidden, so this carries the name. */}
+          <span className="sr-only sm:hidden">Tassy Transportation home</span>
           {/* FIX_PROD_137b — doubled again per Phil (was 44/56/64 → now 88/112/128px);
               framed to rhyme with the founder photo tile (rounded-tile · border-line ·
               overflow-hidden · object-cover). */}
           <span className="block shrink-0 h-[88px] w-[88px] md:h-28 md:w-28 lg:h-32 lg:w-32 rounded-tile border border-line overflow-hidden transition-all duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
             <img
               src="/brand/logo-cream.svg"
-              alt="Tassy Transportation — veteran-owned premium transport in Charlotte NC"
+              alt=""
               width={128}
               height={128}
               className="w-full h-full object-cover"
@@ -77,39 +80,7 @@ export default function Header() {
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8">
-          {/* CSS-only hover dropdown — no client JS */}
-          <div className="relative group">
-            <Link href="/#services" className="nav-link inline-flex items-center gap-1">
-              Services <ChevronDown size={13} className="mt-0.5" />
-            </Link>
-            <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 hidden group-hover:block group-focus-within:block z-40">
-              <div className="bg-surface border border-line rounded-card shadow-[0_16px_40px_-16px_rgba(27,26,23,0.25)] p-6 w-[34rem]">
-                <div className="grid grid-cols-2 gap-8">
-                  {servicesMenu.map((col) => (
-                    <div key={col.heading}>
-                      <div className="eyebrow !text-[10px]">{col.heading}</div>
-                      <ul className="mt-3 space-y-2">
-                        {col.links.map((l) => (
-                          <li key={l.href}>
-                            <Link href={l.href} className="nav-link text-sm block">
-                              {l.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-                {/* FIX_PROD_131 — "How it works" relocated here from the top nav */}
-                <Link
-                  href="/#how"
-                  className="nav-link text-sm inline-flex items-center gap-1 mt-6 pt-4 border-t border-line w-full"
-                >
-                  How it works <ChevronDown size={13} className="-rotate-90 mt-0.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
+          <ServicesMenu columns={servicesMenu} />
           {nav.map((n) => (
             <Link key={n.href} href={n.href} className="nav-link">
               {n.label}
@@ -122,14 +93,14 @@ export default function Header() {
             href={contact.phone}
             className="nav-link hidden md:inline-flex items-center gap-1.5 text-sm"
           >
-            <Phone size={14} /> {contact.phoneDisplay}
+            <Phone size={14} aria-hidden="true" /> {contact.phoneDisplay}
           </a>
           {/* FIX_PROD_142 (SECURITY) — removed the "Sign in" link. It pointed at the SaaS
               login (portal.login → /login), a public discoverable link into an internal
               admin surface. Existing users have the app URL; the marketing site funnels
               to booking, not the backend login. */}
           <a href={request.ride} className="btn-gold text-sm">
-            Request a Ride <ArrowRight size={16} />
+            Request a Ride <ArrowRight size={16} aria-hidden="true" />
           </a>
 
           {/* MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agents B + E) — before this, the
@@ -172,7 +143,7 @@ export default function Header() {
                   link to the SaaS login; only the public dispatch phone remains. */}
               <div className="border-t border-line pt-4 mt-4 flex flex-col gap-3">
                 <a href={contact.phone} className="nav-link inline-flex items-center gap-2 text-sm">
-                  <Phone size={15} /> {contact.phoneDisplay}
+                  <Phone size={15} aria-hidden="true" /> {contact.phoneDisplay}
                 </a>
               </div>
             </div>

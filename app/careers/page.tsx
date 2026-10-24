@@ -98,7 +98,7 @@ export default function CareersPage() {
             <div key={title} className="card-tile flex flex-col p-6">
               <Icon size={22} aria-hidden="true" style={{ color: 'var(--gold)' }} />
               <h2 className="serif mt-4 text-2xl font-semibold">{title}</h2>
-              <div className="eyebrow mt-1 opacity-70">{line}</div>
+              <div className="eyebrow mt-1">{line}</div>
 
               <p className="ink-soft mt-4 flex-1 text-sm leading-relaxed">{body}</p>
 

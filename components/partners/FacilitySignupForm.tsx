@@ -239,7 +239,7 @@ function Field({
         type={type}
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="mt-2 w-full rounded-lg border border-[color:var(--line)] bg-transparent px-4 py-3 text-base outline-none focus:border-[color:var(--gold)]"
+        className="form-field mt-2 w-full"
         {...rest}
       />
       {error ? (

@@ -24,7 +24,7 @@ import {
 } from '@/lib/school-plans';
 
 const field =
-  'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
+  'w-full rounded-lg border border-[rgba(244,239,224,0.40)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
 const label = 'block text-sm font-medium mb-1.5';
 const err = 'mt-1.5 text-sm text-[#f87171]';
 

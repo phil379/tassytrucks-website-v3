@@ -834,7 +834,7 @@ export default function RequestForm({
                       belongs to is `#details-pet_name`. Without this the link in
                       the summary scrolls nowhere, which is worse than no link —
                       a screen reader user is told where to go and then dropped. */}
-                  <a href={`#${name.replace('details.', 'details-')}`} className="underline">
+                  <a href={`#${name.replace('details.', 'details-')}`} className="inline-flex min-h-[44px] items-center underline">
                     {text}
                   </a>
                 </li>
@@ -1104,10 +1104,10 @@ export default function RequestForm({
               ).map(([value, label]) => (
                 <label
                   key={value}
-                  className={`cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm transition ${
+                  className={`cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm transition has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--gold-warm)] ${
                     payer === value
                       ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/15 font-medium'
-                      : 'border-line'
+                      : 'border-[rgba(244,239,224,0.40)]'
                   }`}
                 >
                   <input
@@ -1192,10 +1192,10 @@ export default function RequestForm({
           {(['phone', 'text', 'email'] as const).map((opt) => (
             <label
               key={opt}
-              className={`cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm capitalize transition ${
+              className={`cursor-pointer rounded-lg border px-5 min-h-[44px] inline-flex items-center text-sm capitalize transition has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--gold-warm)] ${
                 preferred === opt
                   ? 'border-[color:var(--gold)] bg-[color:var(--gold)]/15 font-medium'
-                  : 'border-line'
+                  : 'border-[rgba(244,239,224,0.40)]'
               }`}
             >
               <input

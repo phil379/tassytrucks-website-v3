@@ -12,7 +12,7 @@ import {
 } from '@/lib/school-household';
 
 const field =
-  'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
+  'w-full rounded-lg border border-[rgba(244,239,224,0.40)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
 const label = 'block text-sm font-medium mb-1.5';
 const err = 'mt-1.5 text-sm text-[#f87171]';
 
@@ -140,7 +140,18 @@ export default function HouseholdRequestForm({
     );
   }
 
-  const fe = (k: string) => (fieldErrors[k] ? <p className={err}>{fieldErrors[k]}</p> : null);
+  const errId = (k: string) => `hh-err-${k.replace(/\./g, '-')}`;
+  const fe = (k: string) =>
+    fieldErrors[k] ? (
+      <p className={err} id={errId(k)}>
+        {fieldErrors[k]}
+      </p>
+    ) : null;
+  /** Ties an input to its error message, so a screen reader announces both together. */
+  const ad = (k: string) => ({
+    'aria-invalid': fieldErrors[k] ? (true as const) : undefined,
+    'aria-describedby': fieldErrors[k] ? errId(k) : undefined,
+  });
 
   return (
     <form onSubmit={onSubmit} className="card-tile space-y-8 p-6 sm:p-8" noValidate data-testid="household-form">
@@ -154,24 +165,24 @@ export default function HouseholdRequestForm({
         <legend className="serif mb-1 text-lg font-semibold">About you</legend>
         <div>
           <label className={label} htmlFor="hh-name">Parent or guardian name</label>
-          <input id="hh-name" className={field} autoComplete="name" value={guardian} onChange={(e) => setGuardian(e.target.value)} />
+          <input id="hh-name" {...ad('guardian_name')} className={field} autoComplete="name" value={guardian} onChange={(e) => setGuardian(e.target.value)} />
           {fe('guardian_name')}
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className={label} htmlFor="hh-email">Email</label>
-            <input id="hh-email" type="email" className={field} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input id="hh-email" {...ad('email')} type="email" className={field} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             {fe('email')}
           </div>
           <div>
             <label className={label} htmlFor="hh-phone">Mobile number</label>
-            <input id="hh-phone" type="tel" className={field} autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input id="hh-phone" {...ad('phone')} type="tel" className={field} autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
             {fe('phone')}
           </div>
         </div>
         <div>
           <label className={label} htmlFor="hh-home">Home pickup address</label>
-          <input id="hh-home" className={field} autoComplete="street-address" value={home} onChange={(e) => setHome(e.target.value)} />
+          <input id="hh-home" {...ad('home_address')} className={field} autoComplete="street-address" value={home} onChange={(e) => setHome(e.target.value)} />
           {fe('home_address')}
         </div>
       </fieldset>
@@ -180,7 +191,7 @@ export default function HouseholdRequestForm({
         <legend className="serif mb-1 text-lg font-semibold">Your children</legend>
         <div>
           <label className={label} htmlFor="hh-count">How many children need transportation?</label>
-          <select id="hh-count" className={field} value={childCount} onChange={(e) => setCount(Number(e.target.value))}>
+          <select id="hh-count" {...ad('child_count')} className={field} value={childCount} onChange={(e) => setCount(Number(e.target.value))}>
             {Array.from({ length: MAX_HOUSEHOLD_CHILDREN }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>{n}</option>
             ))}
@@ -193,14 +204,14 @@ export default function HouseholdRequestForm({
               <label className={label} htmlFor={`hh-school-${i}`}>
                 {childCount > 1 ? `Child ${i + 1}: school` : 'School'}
               </label>
-              <input id={`hh-school-${i}`} className={field} value={c.school_name} onChange={(e) => setChild(i, { school_name: e.target.value })} />
+              <input id={`hh-school-${i}`} {...ad(`children.${i}.school_name`)} className={field} value={c.school_name} onChange={(e) => setChild(i, { school_name: e.target.value })} />
               {fe(`children.${i}.school_name`)}
             </div>
             <div>
               <label className={label} htmlFor={`hh-grade-${i}`}>
                 {childCount > 1 ? `Child ${i + 1}: grade or age range` : 'Grade or age range'}
               </label>
-              <input id={`hh-grade-${i}`} className={field} value={c.grade_or_age} onChange={(e) => setChild(i, { grade_or_age: e.target.value })} />
+              <input id={`hh-grade-${i}`} {...ad(`children.${i}.grade_or_age`)} className={field} value={c.grade_or_age} onChange={(e) => setChild(i, { grade_or_age: e.target.value })} />
               {fe(`children.${i}.grade_or_age`)}
             </div>
           </div>
@@ -221,12 +232,12 @@ export default function HouseholdRequestForm({
         </div>
         <div>
           <label className={label} htmlFor="hh-start">Date you would like to start</label>
-          <input id="hh-start" type="date" className={field} value={start} onChange={(e) => setStart(e.target.value)} />
+          <input id="hh-start" {...ad('desired_start')} type="date" className={field} value={start} onChange={(e) => setStart(e.target.value)} />
           {fe('desired_start')}
         </div>
         <div>
           <label className={label} htmlFor="hh-sched">Your usual school-day schedule</label>
-          <textarea id="hh-sched" rows={3} className={field} value={scheduleNotes} onChange={(e) => setScheduleNotes(e.target.value)} />
+          <textarea id="hh-sched" {...ad('schedule_notes')} rows={3} className={field} value={scheduleNotes} onChange={(e) => setScheduleNotes(e.target.value)} />
           <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">
             For example: start and dismissal times for each school, and which days.
           </p>
@@ -239,7 +250,7 @@ export default function HouseholdRequestForm({
         {fridayDiffers && (
           <div>
             <label className={label} htmlFor="hh-friday-sched">What is different?</label>
-            <textarea id="hh-friday-sched" rows={2} className={field} value={fridaySchedule} onChange={(e) => setFridaySchedule(e.target.value)} />
+            <textarea id="hh-friday-sched" {...ad('friday_schedule')} rows={2} className={field} value={fridaySchedule} onChange={(e) => setFridaySchedule(e.target.value)} />
             {fe('friday_schedule')}
           </div>
         )}
@@ -271,7 +282,7 @@ export default function HouseholdRequestForm({
 
       <div>
         <label className="flex min-h-[44px] cursor-pointer items-start gap-3 text-sm" htmlFor="hh-consent">
-          <input id="hh-consent" type="checkbox" className="mt-1 h-4 w-4 shrink-0" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+          <input id="hh-consent" {...ad('consent_contact')} type="checkbox" className="mt-1 h-4 w-4 shrink-0" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
           <span>
             I am the parent or legal guardian of the child or children above, and I agree that Tassy Transportation may contact
             me about this transportation request. This is not a sign-up for text messages.

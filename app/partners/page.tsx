@@ -20,7 +20,7 @@ export default function PartnersPage() {
       eyebrow="For Facilities · B2B Partnerships"
       h1="Partner with Tassy Transportation — Charlotte's SDVOSB Medical Transport"
       heroSubtitle="A contracted transport partner for discharge planners and facility coordinators who are tired of chasing no-show rides — with one dispatch line, one portal, and one invoice."
-      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified, operate under USDOT #3104152 / MC #79222, and dispatch 24/7."
+      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified and dispatch 24/7."
       ctaText="Schedule a 15-min intro call"
       ctaHref={CTA_HREF}
       secondaryCta={{
@@ -56,8 +56,7 @@ export default function PartnersPage() {
                 service was built specifically around that reality.
               </p>
               <p>
-                We also work with VA Community Care providers coordinating rides
-                for veterans. As a Service-Disabled Veteran-Owned Small Business,
+                As a Service-Disabled Veteran-Owned Small Business,
                 veteran transport is personal for us — you can read how we handle
                 it on our{' '}
                 <Link href="/charlotte/veteran-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
@@ -127,11 +126,9 @@ export default function PartnersPage() {
               <p>
                 Beyond routine NEMT, we contract for post-procedure transport —
                 patients recovering from anesthesia who need a trained driver and
-                a documented handoff, not a stranger with an app. We provide
-                veteran transport under VA Community Care Network (CCN)
-                arrangements, the VA program that lets veterans receive care from
-                community providers close to home. And for senior-living
-                communities, there is one more service residents genuinely love:
+                a documented handoff, not a stranger with an app. And for
+                senior-living communities, there is one more service residents
+                genuinely love:
                 Winnie Ride, our pet transport vertical, which gets a
                 resident&rsquo;s dog or cat to the vet and back when family
                 can&rsquo;t. Details on facility pet programs are on our{' '}
@@ -228,7 +225,7 @@ export default function PartnersPage() {
       faqs={[
         {
           q: 'What documentation can you provide for our compliance team?',
-          a: 'Our SDVOSB certification, federal operating authority (USDOT #3104152, MC #79222), certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all retrievable on demand through the facility portal once you are onboarded.',
+          a: 'Our SDVOSB certification, certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all retrievable on demand through the facility portal once you are onboarded.',
         },
         {
           q: 'How fast can you onboard a new facility?',
@@ -274,8 +271,7 @@ export default function PartnersPage() {
               <p className="mt-2 ink-soft leading-relaxed max-w-2xl">
                 Awarded by the U.S. Department of Labor to employers who recruit, hire
                 and retain veterans. Alongside it we hold SDVOSB certification,
-                MBE, DBE and SBE certification, and federal operating authority under
-                USDOT #3104152 and MC #79222. Certificates of insurance, driver
+                MBE, DBE and SBE certification. Certificates of insurance, driver
                 credentials and vehicle credentials are available to your compliance
                 team on request.
               </p>

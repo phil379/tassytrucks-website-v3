@@ -1,4 +1,5 @@
 import { serviceShortName } from '@/lib/trip-request';
+import { emailFooterHtml, emailFooterText } from '@/lib/business';
 
 /**
  * The paid-trip RECEIPT.
@@ -161,6 +162,7 @@ ${rule(12)}
  Tassy Transportation &middot; Charlotte, NC &middot; Operated by Tassy Trucks LLC<br>
  Disabled Veteran-Owned &middot; SBE / DBE / MBE Certified<br>
  Keep this receipt for your records.
+ ${emailFooterHtml('#5F6773')}
 </td></tr>
 </table>`;
 }
@@ -215,5 +217,7 @@ export function receiptText(r: ReceiptData): string {
     ``,
     `Tassy Transportation · Charlotte, NC · Operated by Tassy Trucks LLC`,
     `Disabled Veteran-Owned · SBE / DBE / MBE Certified`,
+    ``,
+    ...emailFooterText(),
   ].filter((l, i, a) => l !== `` || a[i - 1] !== ``).join('\n');
 }

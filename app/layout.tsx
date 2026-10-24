@@ -3,6 +3,7 @@ import { Newsreader, Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ConsentManager from '@/components/ConsentManager';
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent C) — was a render-blocking
 // <link> to fonts.googleapis.com. next/font self-hosts (zero CLS, no
@@ -67,12 +68,9 @@ const localBusinessLd = {
   url: 'https://www.tassytrucks.com',
   telephone: '+1-704-941-8508',
   email: 'book@tassytrucks.com',
-  // MEGA_TASSY_PUBLISH_READY — operating authority + certification + motto
+  // MEGA_TASSY_PUBLISH_READY — certification + motto
+  // TODO(FMCSA): Phil's USDOT 3808299 / MC-1373369 are Inactive at FMCSA, so no USDOT/MC number is published on any public page. Add them back (footer, JSON-LD, trust chips) only once FMCSA shows Active. The USDOT/MC numbers that used to be here belonged to another company (Tassy Logistics LLC) and must never return; scripts/test-banned-claims.ts enforces that.
   slogan: 'We Transport With Care',
-  identifier: [
-    { '@type': 'PropertyValue', propertyID: 'USDOT', value: '3104152' },
-    { '@type': 'PropertyValue', propertyID: 'MC', value: '79222' },
-  ],
   hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
   priceRange: '$$',
   image: 'https://www.tassytrucks.com/brand/og-image.png',
@@ -123,12 +121,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main id="main">{children}</main>
         <Footer />
-        {/* Vercel Web Analytics — the tag the @vercel/analytics package renders.
-            Added as a tag, not a dependency: this repo locks with bun.lock and
-            the shell that edits it has no bun, so a package added here could not
-            be locked and would fail the build. Cookieless, no consent banner.
-            Enable Web Analytics on the Vercel project to start collecting. */}
-        <script defer src="/_vercel/insights/script.js" />
+        {/* Vercel Web Analytics is NOT a tag here any more: components/ConsentManager.tsx injects
+            /_vercel/insights/script.js only after the visitor presses Accept. Do not add it back
+            as a static <script> (scripts/test-consent.ts fails if it returns). */}
+        <ConsentManager />
       </body>
     </html>
   );

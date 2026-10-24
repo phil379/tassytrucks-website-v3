@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { normalizeUnit, withUnit } from '../lib/address-unit';
 import {
   NEEDS_PRICE_MARKER,
@@ -6,6 +7,7 @@ import {
   PRICE_PENDING_MESSAGE,
   isNeedsPrice,
   needsPriceNote,
+  unpricedFor,
 } from '../lib/price-fallback';
 import { buildRequesterText } from '../lib/notifications';
 import { estimateTrip } from '../lib/quote';
@@ -104,6 +106,43 @@ t('auto-reply with a price shows the price and does NOT carry the dispatcher-wil
 
 t('auto-reply for a quote-only line (no price, not "unavailable") is unchanged: no pending line', () => {
   assert.ok(!mail({ price: null, priceUnavailable: false }).includes(PRICE_PENDING_MESSAGE));
+});
+
+const LONG = {
+  serviceLine: 'care' as const,
+  requestedAt: '2026-10-26T10:00',
+  pickup: { lat: 35.2271, lng: -80.8431 },
+  dropoff: { lat: 35.9, lng: -80.2 },
+  roadMiles: 55,
+};
+const placed = { pickup: false, dropoff: false };
+
+t('a trip past the last price band is marked [NEEDS PRICE], like a typed-address trip', () => {
+  const quoted = estimateTrip(LONG);
+  assert.equal(quoted?.kind, 'quote-only');
+  assert.equal(quoted?.kind === 'quote-only' && quoted.reason, 'beyond-bands');
+  const r = unpricedFor(quoted, placed);
+  assert.equal(r.priceUnavailable, true);
+  assert.ok(isNeedsPrice(r.note));
+  assert.ok(r.note!.startsWith(NEEDS_PRICE_MARKER));
+});
+
+t('the typed-address case still gets its own note, and a normal estimate gets none', () => {
+  assert.equal(unpricedFor(null, { pickup: true, dropoff: false }).note, needsPriceNote({ pickup: true, dropoff: false }));
+  const ok = unpricedFor(estimateTrip({ ...LONG, roadMiles: 8 }), placed);
+  assert.deepEqual(ok, { priceUnavailable: false, note: null });
+});
+
+t('Scholar (quote-only by plan, not a missing price) is NOT marked', () => {
+  const q = estimateTrip({ ...LONG, serviceLine: 'scholar' as never });
+  assert.equal(q?.kind, 'quote-only');
+  assert.deepEqual(unpricedFor(q, placed), { priceUnavailable: false, note: null });
+});
+
+t('the booking route uses unpricedFor, so the row note and the alert flag cannot disagree', () => {
+  const src = readFileSync(new URL('../app/api/trip-request/route.ts', import.meta.url), 'utf8');
+  assert.ok(src.includes('unpricedFor('));
+  assert.ok(!src.includes('const priceUnavailable = quoted === null'));
 });
 
 console.log(`${n} passed`);

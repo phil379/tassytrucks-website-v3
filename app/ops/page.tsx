@@ -9,6 +9,7 @@ import { PendingButton } from '@/components/ops/PendingButton';
 import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
 import { isNeedsPrice } from '@/lib/price-fallback';
+import { agreedPriceDefault } from '@/lib/ops-price-input';
 
 export const metadata: Metadata = {
   title: 'Ops queue',
@@ -324,15 +325,7 @@ export default async function OpsPage({
                         min="0"
                         inputMode="decimal"
                         className={input}
-                        defaultValue={
-                          row.agreed_cents != null
-                            ? (row.agreed_cents / 100).toFixed(2)
-                            : row.quoted_cents != null
-                              ? (row.quoted_cents / 100).toFixed(2)
-                              : row.estimate_high_cents != null
-                                ? (row.estimate_high_cents / 100).toFixed(2)
-                                : ''
-                        }
+                        defaultValue={agreedPriceDefault(row)}
                       />
                     </div>
                   </div>

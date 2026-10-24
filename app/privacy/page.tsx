@@ -37,7 +37,7 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
     h: 'Who else handles your information',
     body: [
       'We use these outside services to run the website and your trips. Each only receives what it needs for the job described. We do not sell your personal information and we do not share it for advertising.',
-      <div key="providers" className="overflow-x-auto">
+      <div key="providers" className="overflow-x-auto" tabIndex={0} role="region" aria-label="Services that handle your information">
         <table className="w-full border-collapse">
           <thead>
             <tr>
@@ -102,7 +102,7 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
     h: 'How long we keep it',
     body: [
       'We keep records only as long as we need them for the reasons above and to meet tax, insurance and legal duties. After that we aim to delete them or remove what identifies you.',
-      <div key="retention" className="overflow-x-auto">
+      <div key="retention" className="overflow-x-auto" tabIndex={0} role="region" aria-label="How long we keep records">
         <table className="w-full border-collapse">
           <thead>
             <tr>

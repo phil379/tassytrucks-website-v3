@@ -145,7 +145,7 @@ export default function ServicePage({
                   }`}
                 >
                   {t.highlight && (
-                    <div className="eyebrow text-charcoal/70">Most popular</div>
+                    <div className="eyebrow text-charcoal/85">Most popular</div>
                   )}
                   <h3 className={`font-serif text-2xl ${t.highlight ? '' : 'text-cream-text'}`}>
                     {t.name}
@@ -153,7 +153,7 @@ export default function ServicePage({
                   <div className="mt-3">
                     <span className="font-serif text-4xl">{t.price}</span>
                     {t.cadence && (
-                      <span className={`ml-1 text-sm ${t.highlight ? 'text-charcoal/70' : 'text-cream-text/60'}`}>
+                      <span className={`ml-1 text-sm ${t.highlight ? 'text-charcoal/85' : 'text-cream-text/60'}`}>
                         /{t.cadence}
                       </span>
                     )}

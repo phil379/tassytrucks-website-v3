@@ -52,6 +52,8 @@ export default function SchoolPicker({
   const [picked, setPicked] = useState<SchoolHit | null>(null);
   const [hits, setHits] = useState<SchoolHit[]>([]);
   const [open, setOpen] = useState(false);
+  // The option the arrow keys are on (-1 = none). DOM focus stays in the input.
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [unlisted, setUnlisted] = useState(false);
   const [searching, setSearching] = useState(false);
   // Separate from "no hits". A parent who cannot tell a broken search from a
@@ -80,6 +82,7 @@ export default function SchoolPicker({
           const down = !res.ok || json.ok === false;
           setLookupDown(down);
           setHits(down ? [] : (json.schools ?? []));
+          setActiveIndex(-1);
           setOpen(!down);
         }
       } catch {
@@ -142,7 +145,7 @@ export default function SchoolPicker({
   const state = schoolFieldState(schoolId, picked?.address ?? null);
 
   const field =
-    'w-full rounded-lg border border-[color:var(--line)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
+    'w-full rounded-lg border border-[rgba(244,239,224,0.40)] bg-[#0f141a] px-3 py-3 text-base text-[color:var(--ink)] outline-none focus-visible:outline-3 focus-visible:outline-[color:var(--gold-warm)]';
 
   return (
     <div ref={boxRef}>
@@ -160,9 +163,36 @@ export default function SchoolPicker({
         aria-expanded={open && hits.length > 0}
         aria-controls={`${listId}-list`}
         aria-autocomplete="list"
+        aria-activedescendant={open && activeIndex >= 0 && hits[activeIndex] ? `${listId}-option-${activeIndex}` : undefined}
         placeholder={unlisted ? "Your child's school" : 'Start typing…'}
         onChange={(e) => retype(e.target.value)}
         onFocus={() => hits.length > 0 && setOpen(true)}
+        onKeyDown={(e) => {
+          const listOpen = open && hits.length > 0 && !unlisted;
+          if (e.key === 'ArrowDown') {
+            if (hits.length === 0) return;
+            e.preventDefault();
+            setOpen(true);
+            setActiveIndex((i) => (i + 1) % hits.length);
+          } else if (e.key === 'ArrowUp') {
+            if (!listOpen) return;
+            e.preventDefault();
+            setActiveIndex((i) => (i <= 0 ? hits.length - 1 : i - 1));
+          } else if (e.key === 'Enter') {
+            // Only swallow Enter when it is choosing an option; otherwise the form behaves as before.
+            if (listOpen && activeIndex >= 0 && hits[activeIndex]) {
+              e.preventDefault();
+              pick(hits[activeIndex]!);
+            }
+          } else if (e.key === 'Escape') {
+            if (listOpen) {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen(false);
+              setActiveIndex(-1);
+            }
+          }
+        }}
       />
 
       {/* What the form actually submits. */}
@@ -183,14 +213,24 @@ export default function SchoolPicker({
         <ul
           id={`${listId}-list`}
           role="listbox"
-          className="mt-1 max-h-64 overflow-auto rounded-lg border border-[color:var(--line)] bg-[#0f141a]"
+          className="mt-1 max-h-64 overflow-auto rounded-lg border border-[rgba(244,239,224,0.40)] bg-[#0f141a]"
         >
-          {hits.map((hit) => (
-            <li key={hit.id} role="option" aria-selected={hit.id === schoolId}>
+          {hits.map((hit, index) => (
+            <li
+              key={hit.id}
+              id={`${listId}-option-${index}`}
+              role="option"
+              aria-selected={index === activeIndex}
+              onMouseEnter={() => setActiveIndex(index)}
+            >
+              {/* Pointer users click this button; keyboard users use the arrow keys in the input, so it is not a Tab stop. */}
               <button
                 type="button"
+                tabIndex={-1}
                 onClick={() => pick(hit)}
-                className="block w-full px-3 py-2.5 text-left text-sm hover:bg-white/5"
+                className={`block w-full px-3 py-2.5 text-left text-sm hover:bg-white/5 border-l-4 ${
+                  index === activeIndex ? 'bg-white/10 border-[color:var(--gold-warm)]' : 'border-transparent'
+                }`}
               >
                 <span className="block">{hit.name}</span>
                 {hit.address ? (

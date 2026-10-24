@@ -29,6 +29,7 @@
 }
 
 html, body { background: var(--bg); color: var(--ink); }
+:root { color-scheme: dark; }  /* native date/time pickers and select menus match the dark page */
 html { scroll-behavior: smooth; }
 body {
   /* next/font/google self-hosts these (see app/layout.tsx) — the CSS var falls

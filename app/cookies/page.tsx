@@ -51,7 +51,7 @@ export default function CookiesPage() {
           id: 'necessary',
           heading: 'What the site stores because it has to',
           children: (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="What the site stores in your browser">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>

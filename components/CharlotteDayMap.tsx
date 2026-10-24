@@ -271,7 +271,7 @@ export default function CharlotteDayMap() {
              paint-order:stroke;stroke:#13161B;stroke-width:2.6px;stroke-linejoin:round}
         .cdm-node[data-big="1"]{font-size:10.2px;fill:#A3A9B3;letter-spacing:.09em}
         .cdm-road{fill:none;stroke:#20262E;stroke-linecap:round}
-        .cdm-rl{font-size:8px;fill:#39424D;letter-spacing:.04em}
+        .cdm-rl{font-size:8px;fill:#748598;letter-spacing:.04em}
         .cdm-leg{fill:none;stroke-linecap:round;opacity:.1;transition:opacity .6s ease}
         .cdm-leg[data-on="1"]{opacity:.3}
         .cdm-glow{opacity:.16;transition:opacity .9s ease}
@@ -281,7 +281,7 @@ export default function CharlotteDayMap() {
         .cdm-strip-head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;
              text-transform:uppercase;color:#878D97;margin-bottom:8px}
         .cdm-track{position:relative;height:6px;background:#1B2027;border-radius:99px}
-        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.55}
+        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.8}
         .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
         .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
              color:${DAY_MAP_LABEL.ticks};letter-spacing:.04em;font-variant-numeric:tabular-nums}

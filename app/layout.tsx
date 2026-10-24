@@ -119,7 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <Header />
-        <main id="main">{children}</main>
+        <main id="main" tabIndex={-1} className="outline-none">{children}</main>
         <Footer />
         {/* Vercel Web Analytics is NOT a tag here any more: components/ConsentManager.tsx injects
             /_vercel/insights/script.js only after the visitor presses Accept. Do not add it back

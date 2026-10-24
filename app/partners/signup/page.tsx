@@ -27,7 +27,7 @@ export default function FacilitySignupPage({
   const kind = searchParams?.type ? coerceFacilityKind(searchParams.type) : null;
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
+    <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
       <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--muted)]">
         Tassy Transportation
       </p>
@@ -53,6 +53,6 @@ export default function FacilitySignupPage({
         We Transport With Care ·{' '}
         <a className="underline" href="tel:+17049418508">(704) 941-8508</a>
       </p>
-    </main>
+    </div>
   );
 }

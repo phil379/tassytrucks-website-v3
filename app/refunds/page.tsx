@@ -55,7 +55,7 @@ export default function RefundsPage() {
                 Call us on {BUSINESS.phoneDisplay} or email {BUSINESS.bookingEmail}. Say your name and
                 the pickup time, and we will take it from there.
               </p>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Cancellation and refund rules by service">
                 <table className="w-full border-collapse">
                   <thead>
                     <tr>

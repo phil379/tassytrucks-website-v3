@@ -69,7 +69,7 @@ export default async function RatePage({
   const chosen = FACES.find((f) => f.key === scoreKey);
 
   return (
-    <main
+    <div
       style={{
         minHeight: '100vh',
         background: BRAND.paper,
@@ -161,6 +161,6 @@ export default async function RatePage({
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

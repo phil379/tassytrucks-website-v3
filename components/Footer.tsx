@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
 import { partnerSignup } from '@/lib/partner-links';
+import { BUSINESS, BUSINESS_LOCATION } from '@/lib/business';
 
 // FIX_PROD_131 — footer de-cluttered: 7 columns (~33 SEO-stuffed links) + a
 // redundant facility banner → brand + 4 focused columns. The facility banner was
@@ -30,7 +31,7 @@ export default function Footer() {
           </p>
           <div className="mt-6 text-xs opacity-60 space-y-1">
             {/* TODO(FMCSA): Phil's USDOT 3808299 / MC-1373369 are Inactive at FMCSA, so no USDOT/MC number is published on any public page. Add them back (footer, JSON-LD, trust chips) only once FMCSA shows Active. The USDOT/MC numbers that used to be here belonged to another company (Tassy Logistics LLC) and must never return; scripts/test-banned-claims.ts enforces that. */}
-            <div>SDVOSB Certified · Charlotte, North Carolina</div>
+            <div>SDVOSB Certified · {BUSINESS_LOCATION}</div>
           </div>
 
           {/* HIRE Vets medallion. White chip because the footer is dark and the
@@ -133,17 +134,18 @@ export default function Footer() {
             <li><a href={contact.phone} className="hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a></li>
             <li><a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a></li>
             <li><a href={contact.salesEmail} className="hover:text-[color:var(--gold-warm)]">partners@tassytrucks.com</a></li>
-            <li className="opacity-60 pt-2">Charlotte, NC</li>
+            <li className="opacity-60 pt-2">{BUSINESS_LOCATION}</li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-white/10 py-6">
         <div className="container-x flex flex-col sm:flex-row justify-between items-center gap-2 text-xs opacity-60">
-          <div>© {new Date().getFullYear()} Tassy Trucks LLC · DBA Tassy Transportation · SDVOSB Certified</div>
+          <div>© {new Date().getFullYear()} {BUSINESS.legalName} · DBA {BUSINESS.tradeName} · SDVOSB Certified</div>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:opacity-100">Privacy</Link>
             <Link href="/terms" className="hover:opacity-100">Terms</Link>
+            <Link href="/refunds" className="hover:opacity-100">Refunds</Link>
             <Link href="/accessibility" className="hover:opacity-100">Accessibility</Link>
           </div>
         </div>

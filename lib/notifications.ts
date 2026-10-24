@@ -7,6 +7,7 @@ import {
 } from './trip-request';
 import { describeDetails, detailsFor } from './trip-details';
 import { SAAS_BASE } from './saas-links';
+import { assertEmailAllowed, type EmailKind } from './marketing-guard';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
 
 /**
@@ -214,7 +215,9 @@ async function pushToZapier(ref: string, message: PushMessage): Promise<'sent' |
 // Email
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function sendResendEmail(payload: { to: string; subject: string; text: string }): Promise<void> {
+async function sendResendEmail(payload: { to: string; subject: string; text: string; kind?: EmailKind }): Promise<void> {
+  // Marketing / outreach is blocked until a mailing address is set (lib/marketing-guard.ts).
+  assertEmailAllowed(payload.kind ?? 'transactional');
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
@@ -246,7 +249,9 @@ export async function sendRichEmail(payload: {
   subject: string;
   html: string;
   text: string;
+  kind?: EmailKind;
 }): Promise<void> {
+  assertEmailAllowed(payload.kind ?? 'transactional');
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 

@@ -156,7 +156,7 @@ export default function PostSurgeryPetTransportPage() {
       faqs={[
         {
           q: 'Can you pick up my dog from the vet after surgery if I am at work?',
-          a: 'Yes. With your authorization, our driver coordinates directly with the clinic, secures your dog in a carrier, and brings them straight to your door. You arrange the handoff at home or authorize a trusted adult to receive them.',
+          a: 'Yes. With your authorization, our driver secures your dog in a carrier and brings them straight to your door. You arrange the pickup with the clinic and the handoff at home or authorize a trusted adult to receive them.',
         },
         {
           q: 'Does my pet have to be in a carrier after sedation?',

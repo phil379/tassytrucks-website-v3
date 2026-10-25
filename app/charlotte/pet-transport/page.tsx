@@ -124,7 +124,7 @@ export default function PetTransportPage() {
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   rides to the vet
                 </Link>{' '}
-                handle pickup, drop-off, clinic coordination, and the trip home —
+                handle pickup, drop-off, and the trip home —
                 without you burning PTO.
               </p>
               <p>

@@ -24,10 +24,10 @@ export default function DogGroomingPickupPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Dog Grooming Pickup Service in Charlotte — Your Dog Makes the Appointment, Even When You Can’t"
       heroSubtitle="Round-trip or one-way rides between your door and your groomer’s — same-day when vehicles are available, or on a recurring schedule that matches your standing appointment."
-      quickAnswer="Winnie Ride is a dog grooming pickup service covering Charlotte and Mecklenburg County. We drive your dog to the groomer and back — round-trip or one-way, same-day when a vehicle is available, or on a recurring weekly or biweekly schedule. Every trip includes vaccine verification, a signed liability waiver, and a photo at pickup."
+      quickAnswer="Winnie Ride is a dog grooming pickup service covering Charlotte and Mecklenburg County. We drive your dog to the groomer and back — round-trip or one-way, same-day when a vehicle is available, or on a recurring weekly or biweekly schedule. Current rabies vaccination required (plus DAPP for dogs). The pet's owner confirms rabies status when booking."
       ctaText="Schedule a grooming ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -62,7 +62,7 @@ export default function DogGroomingPickupPage() {
           body: (
             <>
               <p>
-                When your groomer has a last-minute opening, call our 24/7 dispatch
+                When your groomer has a last-minute opening, call our dispatch
                 line at (704) 941-8508. If a vehicle is available, we can run a
                 same-day trip — we ask for a 2-hour minimum lead time on routine
                 rides, which is usually shorter than the window the groomer gives
@@ -95,15 +95,12 @@ export default function DogGroomingPickupPage() {
                 <Link href="/charlotte/pet-boarding-transport" className={linkCls}>
                   boarding transport
                 </Link>{' '}
-                trips. We verify core vaccines before every ride — rabies plus
-                DAPP, consistent with AVMA core vaccine guidance, which is also
-                what most Charlotte groomers require at check-in. You sign an owner
-                liability waiver for every trip, and you get a photo at pickup so
-                you can see your dog loaded and comfortable before the wheels turn.
+                trips. Current rabies vaccination is required, plus DAPP for dogs
+                — also what most Charlotte groomers require at check-in — and the
+                pet&rsquo;s owner confirms rabies status when booking.
               </p>
               <p>
-                Drivers are trained on carrier handling, and vehicles are
-                climate-controlled — which matters twice on a grooming run, because
+                Vehicles are climate-controlled — which matters twice on a grooming run, because
                 your dog rides home freshly bathed and clipped. A hot car undoes a
                 blowout fast; ours won&rsquo;t.
               </p>
@@ -157,7 +154,7 @@ export default function DogGroomingPickupPage() {
       faqs={[
         {
           q: 'Can you pick up my dog for a grooming appointment today?',
-          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 2-hour minimum lead time on routine trips. Call 24/7 dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
+          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 2-hour minimum lead time on routine trips. Call dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
         },
         {
           q: 'Do you offer recurring rides for standing grooming appointments?',
@@ -169,11 +166,11 @@ export default function DogGroomingPickupPage() {
         },
         {
           q: 'What do you require before a grooming ride?',
-          a: 'Vaccine verification before every ride — rabies plus DAPP for dogs, per AVMA core vaccine guidance — and a signed owner liability waiver. Most groomers require the same vaccines, so your records do double duty. You get a photo at pickup on every trip.',
+          a: 'Current rabies vaccination required (plus DAPP for dogs). The pet\'s owner confirms rabies status when booking. Most groomers require the same vaccines, so your records do double duty.',
         },
         {
           q: 'How do I know my dog is okay during the ride?',
-          a: 'Every trip starts with a photo at pickup, your dog rides in a climate-controlled vehicle with a driver trained on carrier handling, and this is a direct relationship with one Charlotte company — not a marketplace handing your dog to whoever accepts the job.',
+          a: 'Your dog rides in a climate-controlled vehicle, and this is a direct relationship with one Charlotte company — not a marketplace handing your dog to whoever accepts the job.',
         },
       ]}
       relatedLinks={[

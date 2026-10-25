@@ -8,7 +8,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Pet Transport in Charlotte NC — Winnie Ride',
   description:
-    'Professional pet transport in Charlotte NC. Vaccine-verified rides to the vet, groomer, and boarding. Veteran-owned. Book online or call (704) 941-8508.',
+    'Pet transport in Charlotte NC to the vet, groomer, and boarding. Current rabies vaccination required. Veteran-owned. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/pet-transport' },
   openGraph: { url: '/charlotte/pet-transport', images: ['/og-image/pet-transport'] },
 };
@@ -25,7 +25,7 @@ export default function PetTransportPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       afterHero={
         <PagePhoto
           stem="pet-transport-french-bulldog"
@@ -38,7 +38,7 @@ export default function PetTransportPage() {
       }
       h1="Pet Transport in Charlotte, NC — Rides Your Dog or Cat Actually Deserves"
       heroSubtitle="Winnie Ride is door-to-door pet transport for Charlotte families — to the vet, the groomer, or boarding — run by a local company you can call, not an app you hope shows up."
-      quickAnswer="Winnie Ride is the pet transport service of Tassy Transportation, a veteran-owned Charlotte company. We move your dog or cat door-to-door in climate-controlled vehicles, with vaccine verification before every ride, a signed liability waiver, and a photo sent at pickup. Book online or call (704) 941-8508 — dispatch answers 24/7."
+      quickAnswer="Winnie Ride is the pet transport service of Tassy Transportation, a veteran-owned Charlotte company. We move your dog or cat door-to-door in climate-controlled vehicles. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Book online or call (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a pet ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -49,7 +49,7 @@ export default function PetTransportPage() {
             <>
               <p>
                 Professional pet transport is a scheduled, door-to-door ride for
-                your pet — with a trained driver, a climate-controlled vehicle, and
+                your pet — with a driver, a climate-controlled vehicle, and
                 a process built around animals instead of bolted onto a people
                 service. It is not a rideshare driver who happens to tolerate dogs,
                 and it is not asking a neighbor for one more favor. Your dog or cat
@@ -89,34 +89,22 @@ export default function PetTransportPage() {
                 non-negotiables:
               </p>
               <p>
-                <strong>Vaccine verification before every ride.</strong> We confirm
-                rabies vaccination for all pets, plus DAPP for dogs and FVRCP for
-                cats — the core vaccines recommended by the{' '}
+                <strong>Current rabies vaccination required.</strong> Plus DAPP for
+                dogs and FVRCP for cats — the core vaccines recommended by the{' '}
                 <a
                   href="https://www.avma.org/resources-tools/pet-owners/petcare/vaccinations"
                   className={linkCls}
                 >
                   American Veterinary Medical Association
                 </a>
-                . It protects your pet, every other pet in our vehicles, and our
+                . The pet&rsquo;s owner confirms rabies status when booking. It
+                protects your pet, every other pet in our vehicles, and our
                 drivers.
               </p>
               <p>
-                <strong>A signed liability waiver on every trip.</strong> You know
-                exactly where responsibility sits before a wheel turns. No fine
-                print buried in an app you agreed to two years ago.
-              </p>
-              <p>
-                <strong>A photo at pickup, every time.</strong> The moment your dog
-                or cat is in our care, you see it. You are never left wondering
-                whether the ride actually happened.
-              </p>
-              <p>
-                <strong>Drivers trained for animals.</strong> Our team is trained
-                on carrier handling and sedation-aware protocols, so a post-surgery
-                cat or an anxious dog gets handled correctly, not just hauled.
-                Every vehicle is climate-controlled — Charlotte summers are not a
-                place for guesswork.
+                <strong>Climate-controlled vehicles.</strong> Every vehicle is
+                climate-controlled — Charlotte summers are not a place for
+                guesswork.
               </p>
             </>
           ),
@@ -141,7 +129,7 @@ export default function PetTransportPage() {
               </p>
               <p>
                 <strong>After surgery.</strong> A pet coming out of anesthesia
-                needs a quiet, careful, sedation-aware ride home. That is exactly
+                needs a quiet, careful ride home. That is exactly
                 what our{' '}
                 <Link href="/charlotte/post-surgery-pet-transport" className={linkCls}>
                   post-surgery pet transport
@@ -182,10 +170,8 @@ export default function PetTransportPage() {
               <p>
                 If you run a veterinary practice, you already know the no-show
                 math: the client who could not leave work is the appointment that
-                did not happen. We work directly with clinics across Charlotte and
-                Mecklenburg County as their transport answer — when a client says
-                &ldquo;I can&rsquo;t get there,&rdquo; your front desk has a name
-                and a number instead of a shrug.
+                did not happen. Run a veterinary clinic, groomer or boarding
+                facility in Charlotte? Talk to us about a partner program.
               </p>
               <p>
                 Our{' '}
@@ -210,8 +196,9 @@ export default function PetTransportPage() {
                 and your home is in another, that is a normal Tuesday for us.
               </p>
               <p>
-                Requesting a ride takes about two minutes online, or call (704) 941-8508 —
-                dispatch answers 24/7. For routine rides we ask for a minimum of
+                Requesting a ride takes about two minutes online, or call (704) 941-8508.
+                A dispatcher usually confirms your driver and your price within 2
+                hours during business hours. For routine rides we ask for a minimum of
                 two hours&rsquo; lead time, though more notice always helps us hold
                 your preferred window. Have your pet&rsquo;s vaccine records handy
                 the first time; after that, we have them on file.
@@ -227,9 +214,9 @@ export default function PetTransportPage() {
               </p>
               <p>
                 One more thing worth saying plainly: you will never be guessing
-                who has your pet. From the photo at pickup to a driver who answers
-                to our dispatch — not an algorithm — every Winnie Ride trip has a
-                person accountable for it, and a Charlotte phone number behind it.
+                who has your pet. Every Winnie Ride trip has a driver who answers
+                to our dispatch — not an algorithm — a person accountable for it,
+                and a Charlotte phone number behind it.
               </p>
             </>
           ),
@@ -242,11 +229,11 @@ export default function PetTransportPage() {
         },
         {
           q: 'What vaccines does my pet need to ride?',
-          a: 'We verify rabies vaccination for all pets before every ride, plus DAPP for dogs and FVRCP for cats — the core vaccines per AVMA guidance. Send records when you book the first trip; we keep them on file after that.',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking.',
         },
         {
           q: 'How do I know my pet is safe during the ride?',
-          a: 'You get a photo at pickup the moment your pet is in our care, a signed liability waiver sets expectations before every trip, and our drivers are trained on carrier handling and sedation-aware protocols. Every vehicle is climate-controlled.',
+          a: 'Every vehicle is climate-controlled, and the company you book with is the company that drives your pet.',
         },
         {
           q: 'Is Winnie Ride an app or a marketplace?',

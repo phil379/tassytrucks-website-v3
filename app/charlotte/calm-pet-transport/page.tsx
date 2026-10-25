@@ -24,10 +24,10 @@ export default function CalmPetTransportPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Calm Pet Transport in Charlotte for Anxious, Fearful, and Senior Pets"
       heroSubtitle="A quiet, climate-controlled ride with a driver matched to your pet’s temperament — because a stressed pet shouldn’t have to ride in a stranger’s car."
-      quickAnswer="Calm pet transport means a quiet, climate-controlled vehicle, a driver trained on carrier handling, and a pace set by your pet rather than the clock. Winnie Ride by Tassy Transportation matches drivers to your pet's temperament across Charlotte and Mecklenburg County. You tell us your pet's triggers at booking, and the right driver shows up prepared."
+      quickAnswer="Calm pet transport means a quiet, climate-controlled vehicle and a pace set by your pet rather than the clock. Winnie Ride by Tassy Transportation matches drivers to your pet's temperament across Charlotte and Mecklenburg County. You tell us your pet's triggers at booking, and the right driver shows up prepared."
       ctaText="Request a calm ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -50,8 +50,8 @@ export default function CalmPetTransportPage() {
                 temperature. There is no blasting music and no hurried handling at
                 either end of the trip. The driver moves at your pet&rsquo;s pace,
                 not the schedule&rsquo;s. These are common-sense practices, but they
-                only happen when the person behind the wheel is trained to do them
-                every single time.
+                only happen when the person behind the wheel does them every single
+                time.
               </p>
               <p>
                 That is the core difference between Winnie Ride and the
@@ -62,9 +62,8 @@ export default function CalmPetTransportPage() {
                 <Link href="/charlotte/pet-transport" className={linkCls}>
                   pet transport service
                 </Link>{' '}
-                runs on drivers trained in carrier handling and sedation-aware
-                protocols, with a signed owner liability waiver and vaccine
-                verification before every ride.
+                requires current rabies vaccination (plus DAPP for dogs, FVRCP for
+                cats). The pet&rsquo;s owner confirms rabies status when booking.
               </p>
             </>
           ),
@@ -138,9 +137,9 @@ export default function CalmPetTransportPage() {
                 If your cat hides at the sight of the carrier, tell us at booking.
                 We schedule pickup windows with enough margin that you are not
                 wrestling your cat into a carrier with a driver idling outside. As
-                with every Winnie Ride trip, we verify core vaccines first — rabies
-                plus FVRCP for cats, per AVMA core vaccine guidance — and you get a
-                photo at pickup so you know your cat is settled and on the way.
+                with every Winnie Ride trip, current rabies vaccination is required
+                (plus FVRCP for cats), and the pet&rsquo;s owner confirms rabies
+                status when booking.
               </p>
             </>
           ),
@@ -159,8 +158,10 @@ export default function CalmPetTransportPage() {
                 unhurried treatment from the first knock.
               </p>
               <p>
-                Requesting a ride takes about two minutes online, or you can call our 24/7
+                Requesting a ride takes about two minutes online, or you can call our
                 dispatch line at (704) 941-8508 and talk it through with a person.
+                A dispatcher usually confirms your driver and your price within 2
+                hours during business hours.
                 We ask for a 2-hour minimum lead time on routine rides, and we
                 serve all of Charlotte and Mecklenburg County plus Matthews,
                 Pineville, and Huntersville. If you ride with us regularly,{' '}
@@ -181,7 +182,7 @@ export default function CalmPetTransportPage() {
       faqs={[
         {
           q: 'What makes a pet transport ride "calm"?',
-          a: 'A secured carrier, a stable cabin temperature, no loud music, and unhurried handling at pickup and drop-off — delivered by a driver trained on carrier handling who knows your pet’s temperament before arriving. We capture triggers and handling notes at booking so the right driver shows up prepared.',
+          a: 'A secured carrier, a stable cabin temperature, no loud music, and unhurried handling at pickup and drop-off — delivered by a driver who knows your pet’s temperament before arriving. We capture triggers and handling notes at booking so the right driver shows up prepared.',
         },
         {
           q: 'Can you transport a reactive or fearful dog in Charlotte?',
@@ -189,15 +190,15 @@ export default function CalmPetTransportPage() {
         },
         {
           q: 'Do you sedate pets for transport?',
-          a: 'No. Sedation decisions belong to you and your veterinarian. If your vet has prescribed a pre-ride medication, let us know at booking — our drivers are trained on sedation-aware protocols and will handle and monitor your pet accordingly.',
+          a: 'No. Sedation decisions belong to you and your veterinarian. If your vet has prescribed a pre-ride medication, let us know at booking.',
         },
         {
           q: 'What do you require before a calm pet transport ride?',
-          a: 'Vaccine verification before every ride — rabies for all pets, plus DAPP for dogs or FVRCP for cats, consistent with AVMA core vaccine guidance — and a signed owner liability waiver. You also get a photo at pickup on every trip.',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking.',
         },
         {
           q: 'What areas around Charlotte do you cover for anxious-pet transport?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. Routine rides need a 2-hour minimum lead time; call 24/7 dispatch at (704) 941-8508 for anything time-sensitive.',
+          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. Routine rides need a 2-hour minimum lead time; call dispatch at (704) 941-8508 for anything time-sensitive.',
         },
       ]}
       relatedLinks={[

@@ -6,7 +6,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Concierge Medical Transport in Charlotte NC',
   description:
-    'Discreet, white-glove concierge medical transport in Charlotte NC for plastic surgery and aesthetic patients. Private rides, 24/7 — (704) 941-8508.',
+    'Discreet, white-glove concierge medical transport in Charlotte NC for plastic surgery and aesthetic patients. Private rides — (704) 941-8508.',
   alternates: { canonical: '/charlotte/concierge-medical-transport' },
   openGraph: { url: '/charlotte/concierge-medical-transport', images: ['/og-image/concierge-medical-transport'] },
 };
@@ -21,7 +21,7 @@ export default function ConciergeMedicalTransportPage() {
       eyebrow="Tassy Recovery · Charlotte, North Carolina"
       h1="Concierge Medical Transport in Charlotte — Private, Discreet, Door to Door"
       heroSubtitle="White-glove transportation for plastic surgery, aesthetic, and med-spa patients — and anyone in Charlotte who wants their medical ride handled quietly and well."
-      quickAnswer="Concierge medical transport is private, white-glove transportation to and from medical appointments and procedures — one rider, one dedicated driver, no shared vehicles, no strangers. Tassy Transportation runs a dedicated VIP concierge service for plastic surgery, aesthetic, and med-spa patients across Charlotte and Mecklenburg County. Book online or call 24/7 dispatch at (704) 941-8508."
+      quickAnswer="Concierge medical transport is private, white-glove transportation to and from medical appointments and procedures — one rider, one dedicated driver, no shared vehicles, no strangers. Tassy Transportation runs a dedicated VIP concierge service for plastic surgery, aesthetic, and med-spa patients across Charlotte and Mecklenburg County. Book online or call (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request recovery transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Concierge Medical Transportation"
@@ -181,7 +181,7 @@ export default function ConciergeMedicalTransportPage() {
         },
         {
           q: 'How far in advance should I book concierge medical transport in Charlotte?',
-          a: 'As soon as your procedure date is set is ideal, since dedicated vehicles are reserved per client. That said, dispatch answers 24/7 at (704) 941-8508, and we accommodate short-notice requests whenever a vehicle is available.',
+          a: 'As soon as your procedure date is set is ideal, since dedicated vehicles are reserved per client. That said, call dispatch at (704) 941-8508 — we accommodate short-notice requests whenever a vehicle is available. A dispatcher usually confirms your driver and your price within 2 hours during business hours.',
         },
       ]}
       relatedLinks={[

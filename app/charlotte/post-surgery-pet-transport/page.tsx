@@ -7,7 +7,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Post-Surgery Pet Transport Charlotte — Dog Pickup',
   description:
-    'Sedation-aware pet transport in Charlotte NC. Safe rides home after your dog or cat’s spay, neuter, or dental. Book online or call (704) 941-8508.',
+    'Post-surgery pet transport in Charlotte NC. Safe rides home after your dog or cat’s spay, neuter, or dental. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-pet-transport' },
   openGraph: { url: '/charlotte/post-surgery-pet-transport', images: ['/og-image/post-surgery-pet-transport'] },
 };
@@ -24,10 +24,10 @@ export default function PostSurgeryPetTransportPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Post-Surgery Pet Transport in Charlotte — Safe Rides Home After Your Dog or Cat's Procedure"
-      heroSubtitle="A sedation-aware driver picks your pet up from the vet, follows the discharge instructions, and brings them straight to your door — so nobody has to drive with one eye on the back seat."
-      quickAnswer="Winnie Ride by Tassy Transportation provides post-surgery pet pickup across Charlotte and Mecklenburg County. Our drivers are trained in sedation-aware handling, every pet rides secured in a carrier in a climate-controlled vehicle, and you get a photo at pickup. Call (704) 941-8508 or book online — dispatch answers 24/7."
+      heroSubtitle="A driver picks your pet up from the vet, follows the discharge instructions, and brings them straight to your door — so nobody has to drive with one eye on the back seat."
+      quickAnswer="Winnie Ride by Tassy Transportation provides post-surgery pet pickup across Charlotte and Mecklenburg County. Every pet rides secured in a carrier in a climate-controlled vehicle. Call (704) 941-8508 or book online. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a post-op pickup"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -67,50 +67,22 @@ export default function PostSurgeryPetTransportPage() {
               <p>
                 Post-procedure rides follow a stricter protocol than a routine
                 trip. A secured carrier is required — a sedated dog or cat should
-                never ride loose, and our drivers are trained on carrier handling
-                so loading and unloading stays calm and gentle. Before the wheels
+                never ride loose. Before the wheels
                 move, the driver reviews your vet&rsquo;s discharge instructions
                 and follows them exactly: how your pet should be positioned, what
                 to avoid, and anything the clinic flagged for the trip home.
               </p>
               <p>
-                Drivers are also trained on sedation-aware protocols — slower,
-                smoother driving, no unnecessary stops, and attention to how your
-                pet is doing throughout the ride. The vehicle is climate-controlled
-                the entire trip, which matters for a pet whose body is still
-                working off anesthesia. And as with every Winnie Ride trip, we
-                verify vaccine records before the ride — rabies for all pets, plus
-                the core DAPP series for dogs and FVRCP for cats, consistent with
-                AVMA core-vaccine guidance. If your pet is healthy but simply
+                The vehicle is climate-controlled the entire trip, which matters
+                for a pet whose body is still working off anesthesia. And as with
+                every Winnie Ride trip, current rabies vaccination is required
+                (plus DAPP for dogs, FVRCP for cats), and the pet&rsquo;s owner
+                confirms rabies status when booking. If your pet is healthy but simply
                 anxious in cars, our{' '}
                 <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                   calm pet transport page
                 </Link>{' '}
                 covers how we handle nervous riders.
-              </p>
-            </>
-          ),
-        },
-        {
-          h2: 'Why a signed liability waiver matters after surgery',
-          body: (
-            <>
-              <p>
-                Every Winnie Ride trip — post-op or routine — includes a signed
-                owner liability waiver before we drive. For post-surgery pickups,
-                that paperwork is not a formality. It documents your pet&rsquo;s
-                condition, confirms you&rsquo;ve authorized transport while your
-                pet is recovering from sedation, and sets out exactly what the
-                driver will and won&rsquo;t do en route.
-              </p>
-              <p>
-                That protects both sides. It protects you, because the
-                responsibilities are in writing instead of assumed. And it
-                protects the driver, because handling a sedated pet carries real
-                liability and a professional service should never wave that away
-                with a handshake. A company willing to put a post-op trip in
-                writing is a company that has actually thought about what can go
-                wrong — and built a process so it doesn&rsquo;t.
               </p>
             </>
           ),
@@ -153,9 +125,7 @@ export default function PostSurgeryPetTransportPage() {
           body: (
             <>
               <p>
-                When the driver arrives at the clinic, you get a photo at pickup —
-                every trip, no exceptions — so you see your pet safely in the
-                carrier before the ride starts. The route runs direct to your
+                The route runs direct to your
                 door: no pooled stops, no other pets, no detours. Winnie Ride is a
                 direct relationship with one Charlotte company, not a marketplace
                 handing your sedated pet to whoever accepts the job.
@@ -164,7 +134,8 @@ export default function PostSurgeryPetTransportPage() {
                 Discharge times move — clinics run long, and a vet may want one
                 more hour of observation. That&rsquo;s fine. Request the pickup
                 window once you have a rough discharge estimate, and call dispatch
-                at (704) 941-8508 if the clinic shifts it; a person answers 24/7.
+                at (704) 941-8508 if the clinic shifts it. A dispatcher usually confirms your
+                driver and your price within 2 hours during business hours.
                 Routine rides need a 2-hour minimum lead time, so the moment the
                 clinic gives you a window is the moment to request the ride. If your pet has
                 regular checkups ahead, our{' '}
@@ -185,7 +156,7 @@ export default function PostSurgeryPetTransportPage() {
       faqs={[
         {
           q: 'Can you pick up my dog from the vet after surgery if I am at work?',
-          a: 'Yes. With your authorization and a signed liability waiver, our driver coordinates directly with the clinic, secures your dog in a carrier, sends you a photo at pickup, and brings them straight to your door. You arrange the handoff at home or authorize a trusted adult to receive them.',
+          a: 'Yes. With your authorization, our driver coordinates directly with the clinic, secures your dog in a carrier, and brings them straight to your door. You arrange the handoff at home or authorize a trusted adult to receive them.',
         },
         {
           q: 'Does my pet have to be in a carrier after sedation?',
@@ -193,11 +164,11 @@ export default function PostSurgeryPetTransportPage() {
         },
         {
           q: 'What vaccine records do you need before a post-surgery ride?',
-          a: 'We verify vaccine records before every ride: rabies for all pets, plus core DAPP for dogs or FVRCP for cats, per AVMA core-vaccine guidance. Your vet clinic usually has these on file and can share them at discharge, which makes post-op pickups simple.',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking. Your vet clinic usually has these on file and can share them at discharge, which makes post-op pickups simple.',
         },
         {
           q: 'How soon can you get to the clinic once my pet is discharged?',
-          a: 'Routine rides need a 2-hour minimum lead time, so book as soon as the clinic gives you a discharge estimate. If the time shifts, call (704) 941-8508 and dispatch will adjust the pickup window — a person answers 24/7.',
+          a: 'Routine rides need a 2-hour minimum lead time, so book as soon as the clinic gives you a discharge estimate. If the time shifts, call (704) 941-8508 and dispatch will adjust the pickup window.',
         },
         {
           q: 'What areas around Charlotte do you cover for post-op pet pickup?',

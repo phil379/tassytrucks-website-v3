@@ -58,7 +58,7 @@ const rows: Row[] = [
     lyft: <>{yes} Via brokers and health plans</>,
   },
   {
-    label: '24/7 phone support (a person answers)',
+    label: 'Phone support (confirmed within 2 hours in business hours)',
     tassy: <>{yes} (704) 941-8508</>,
     uber: 'Dashboard support for organizations',
     lyft: 'Dashboard support for organizations',

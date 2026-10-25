@@ -6,7 +6,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Post-Surgery Transport in Charlotte NC',
   description:
-    'Post-surgery transport in Charlotte NC. A driver who walks you in, waits through your procedure, and escorts you home. 24/7 dispatch (704) 941-8508.',
+    'Post-surgery transport in Charlotte NC. A driver who walks you in, waits through your procedure, and escorts you home. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-transport' },
   openGraph: { url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
 };
@@ -21,7 +21,7 @@ export default function PostSurgeryTransportPage() {
       eyebrow="Recovery Transport · Charlotte, North Carolina"
       h1="Post-Surgery Transport in Charlotte — A Real Person to Get You Home"
       heroSubtitle="Door-through-door rides for outpatient procedures, with a driver who walks you in, stays reachable during your procedure, and sees you safely back inside your own front door."
-      quickAnswer="Surgery centers generally will not discharge a patient who received anesthesia or sedation without a responsible adult to take them home — and a rideshare driver waiting at the curb usually does not count. Tassy Transportation provides scheduled post-surgery transport across Charlotte and Mecklenburg County: we walk you in, wait through variable discharge times, and escort you to your door. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Surgery centers generally will not discharge a patient who received anesthesia or sedation without a responsible adult to take them home — and a rideshare driver waiting at the curb usually does not count. Tassy Transportation provides scheduled post-surgery transport across Charlotte and Mecklenburg County: we walk you in, wait through variable discharge times, and escort you to your door. Call (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request recovery transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Post-Surgery Patient Transportation"
@@ -147,9 +147,9 @@ export default function PostSurgeryTransportPage() {
           body: (
             <>
               <p>
-                Request a ride in about two minutes or call (704) 941-8508 — a
-                person answers 24/7, which matters when your facility calls the
-                day before with a changed arrival time. Tell us the procedure
+                Request a ride in about two minutes or call (704) 941-8508. A
+                dispatcher usually confirms your driver and your price within 2
+                hours during business hours. Tell us the procedure
                 location, your check-in time, and your best guess at discharge.
                 We plan the morning pickup so you arrive early and unrushed, and
                 we keep the afternoon flexible because discharge will move.

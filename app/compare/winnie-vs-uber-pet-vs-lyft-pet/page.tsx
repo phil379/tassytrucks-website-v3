@@ -8,7 +8,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'Winnie Ride vs Uber Pet vs Lyft Pet — Compared',
   description:
-    'Honest Charlotte pet transport comparison: vaccine checks, liability waivers, sedated pets, unaccompanied rides. Where rideshare works and where it does not.',
+    'Honest Charlotte pet transport comparison: rabies vaccination, sedated pets, unaccompanied rides. Where rideshare works and where it does not.',
   alternates: { canonical: '/compare/winnie-vs-uber-pet-vs-lyft-pet' },
   openGraph: { url: '/compare/winnie-vs-uber-pet-vs-lyft-pet', images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
 };
@@ -21,15 +21,7 @@ const no = <Minus size={18} className="inline opacity-40" aria-label="No" />;
 type Row = { label: string; winnie: React.ReactNode; uber: React.ReactNode; lyft: React.ReactNode };
 
 const rows: Row[] = [
-  { label: 'Vaccine verification before the ride', winnie: <>{yes} Rabies + core vaccines</>, uber: no, lyft: no },
-  { label: 'Signed liability waiver', winnie: <>{yes} Every trip</>, uber: no, lyft: no },
-  { label: 'Photo at pickup', winnie: <>{yes} Every trip</>, uber: no, lyft: no },
-  {
-    label: 'Driver pet-handling training',
-    winnie: <>{yes} Carrier handling + sedation-aware</>,
-    uber: 'Standard rideshare drivers',
-    lyft: 'Standard rideshare drivers',
-  },
+  { label: 'Current rabies vaccination required', winnie: <>{yes} Owner confirms at booking</>, uber: no, lyft: no },
   {
     label: 'Sedated / post-op pets accepted',
     winnie: <>{yes} With carrier + vet instructions</>,
@@ -111,10 +103,10 @@ export default function WinnieComparePage() {
       eyebrow="Comparison · Charlotte Pet Transport"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Winnie Ride vs Uber Pet vs Lyft Pet — Charlotte Pet Transport Compared"
       heroSubtitle="The honest version: when a rideshare pet option is fine, and when your pet needs a service built for pets."
-      quickAnswer="Uber Pet and Lyft Pets let you bring your pet along on your own ride for an added fee — good for quick trips with a calm, well-socialized dog when you're in the car too. Winnie Ride is a dedicated Charlotte pet transport service that moves your pet when you can't be there, with vaccine verification, a signed liability waiver, a photo at pickup, and drivers trained on carrier handling."
+      quickAnswer="Uber Pet and Lyft Pets let you bring your pet along on your own ride for an added fee — good for quick trips with a calm, well-socialized dog when you're in the car too. Winnie Ride is a dedicated Charlotte pet transport service that moves your pet when you can't be there, with current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking."
       ctaText="Request a pet ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -135,8 +127,7 @@ export default function WinnieComparePage() {
               <p>
                 Winnie Ride, the pet transport vertical of Charlotte-based Tassy
                 Trucks, is built for exactly that gap: we pick your pet up, drive
-                them where they need to go, and send you a photo at pickup so you
-                know they&rsquo;re safe. See{' '}
+                them where they need to go. See{' '}
                 <Link href="/charlotte/pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   how our pet transport works
                 </Link>
@@ -171,11 +162,10 @@ export default function WinnieComparePage() {
             <>
               <p>
                 Everything that makes pet transport genuinely safe is on our side
-                of the table. We verify rabies and core vaccines before every ride —
-                rideshare drivers don&rsquo;t check anything. Every owner signs a
-                liability waiver that protects both sides — the platforms have no
-                pet-specific equivalent. Our drivers are trained on carrier handling
-                and sedation-aware protocols, which matters enormously for{' '}
+                of the table. Current rabies vaccination is required before every
+                ride, and the pet&rsquo;s owner confirms rabies status when
+                booking — rideshare drivers don&rsquo;t check anything. Our service
+                is built for pets who travel without you, which matters enormously for{' '}
                 <Link href="/charlotte/post-surgery-pet-transport" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   post-surgery pickups
                 </Link>{' '}
@@ -223,15 +213,15 @@ export default function WinnieComparePage() {
         },
         {
           q: 'Is Winnie Ride more expensive than Uber Pet?',
-          a: 'For a short ride where you are in the car anyway, yes — rideshare is cheaper. You are paying for a different service: vaccine verification, a trained driver, a signed waiver, a pickup photo, and a pet that travels safely without you. Subscriptions from $39/mo bring per-ride costs down for regulars.',
+          a: 'For a short ride where you are in the car anyway, yes — rideshare is cheaper. You are paying for a different service: a current rabies vaccination requirement and a pet that travels safely without you. Subscriptions from $39/mo bring per-ride costs down for regulars.',
         },
         {
-          q: 'Why does vaccine verification matter for a car ride?',
-          a: 'It protects your pet and every pet that rides after them, and it is why veterinary clinics and boarding facilities are comfortable referring us. We verify rabies for all pets and core vaccines (DAPP for dogs, FVRCP for cats) before every trip.',
+          q: 'Why do vaccines matter for a car ride?',
+          a: 'It protects your pet and every pet that rides after them. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking.',
         },
         {
           q: 'Can Winnie Ride take a sedated pet home after surgery?',
-          a: 'Yes — with a carrier and your vet’s discharge instructions. Drivers follow sedation-aware protocols. This is one of the clearest gaps between a dedicated pet service and a rideshare option.',
+          a: 'Yes — with a carrier and your vet’s discharge instructions. This is one of the clearest gaps between a dedicated pet service and a rideshare option.',
         },
         {
           q: 'Is this comparison up to date?',

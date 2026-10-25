@@ -7,13 +7,13 @@ import PawIcon from '@/components/seo/PawIcon';
 import { request } from '@/lib/request-links';
 
 const charlotteServices = [
-  { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — vaccine checks, waivers, photos, trained drivers.' },
+  { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — how it works, what it costs, and what your pet needs to ride.' },
   { href: '/charlotte/vet-appointment-rides', label: 'Vet appointment rides', blurb: 'Your pet makes the appointment even when you can’t leave work.' },
-  { href: '/charlotte/post-surgery-pet-transport', label: 'Post-surgery pet pickup', blurb: 'Sedation-aware rides home after spay, neuter, or dental procedures.' },
+  { href: '/charlotte/post-surgery-pet-transport', label: 'Post-surgery pet pickup', blurb: 'Rides home after spay, neuter, or dental procedures.' },
   { href: '/charlotte/calm-pet-transport', label: 'Calm pet transport', blurb: 'Built for anxious, reactive, and senior pets.' },
   { href: '/charlotte/dog-grooming-pickup', label: 'Dog grooming pickup', blurb: 'Same-day and standing weekly grooming runs.' },
   { href: '/charlotte/pet-boarding-transport', label: 'Pet boarding transport', blurb: 'Home to kennel and back, scheduled around your travel.' },
-  { href: '/partners/veterinary', label: 'For veterinary clinics', blurb: 'Referral partnerships, vaccine-verified trips, net-30 billing.' },
+  { href: '/partners/veterinary', label: 'For veterinary clinics', blurb: 'Referral partnerships and net-30 billing.' },
 ];
 
 export const metadata: Metadata = {
@@ -35,6 +35,7 @@ export default function WinniePage() {
       bookHref={request.winnie}
       bookLabel="Request a pet ride"
       serviceName="Winnie Ride — Pet Transportation"
+      trustChips={['SDVOSB certified', 'Licensed & insured']}
       path="/winnie"
       highlightsHeading="Charlotte pet transport, built around your pet"
       highlights={[

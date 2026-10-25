@@ -46,9 +46,9 @@ export default function AccessibilityPage() {
               If any part of this site or our booking process is difficult to use with assistive
               technology — or you simply prefer to book by phone — call{' '}
               <a href="tel:+17049418508" className="underline underline-offset-2">(704) 941-8508</a>{' '}
-              (24/7 dispatch) or email{' '}
+              or email{' '}
               <a href="mailto:book@tassytrucks.com" className="underline underline-offset-2">book@tassytrucks.com</a>.
-              A person answers, and we will complete your booking for you.
+              We will complete your booking for you. A dispatcher usually confirms your driver and your price within 2 hours during business hours.
             </p>
           </div>
         </div>

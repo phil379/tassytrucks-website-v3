@@ -21,7 +21,7 @@ export default function FamilyMedicalRidesPage() {
       eyebrow="Family Requests · Charlotte, North Carolina"
       h1="Request a Medical Ride for Someone Else in Charlotte"
       heroSubtitle="For the daughter in Denver and the son in D.C. coordinating Mom’s appointments in Charlotte — book the ride, get every update, and know she made it to the door."
-      quickAnswer="Yes — you can book and pay for a medical ride for someone else, even from out of town. With Tassy Transportation, you schedule the ride online or by phone, the confirmations and driver updates come to you, and a trained driver meets your loved one at their door anywhere in Charlotte or Mecklenburg County. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Yes — you can book and pay for a medical ride for someone else, even from out of town. With Tassy Transportation, you schedule the ride online or by phone, the confirmations and driver updates come to you, and a trained driver meets your loved one at their door anywhere in Charlotte or Mecklenburg County. Call (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request for a loved one"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -72,8 +72,7 @@ export default function FamilyMedicalRidesPage() {
                 If anything needs to change — the clinic runs long, the
                 appointment moves, your dad decides he wants to stop being
                 stubborn and use the walker — you call us, not the driver, and
-                dispatch sorts it out. One number, answered around the clock:
-                (704) 941-8508. Tassy Transportation is a Charlotte-based,
+                dispatch sorts it out. One number: (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours. Tassy Transportation is a Charlotte-based,
                 Service-Disabled Veteran-Owned Small Business, so the company you are trusting
                 with a parent is licensed and insured.
               </p>
@@ -170,7 +169,7 @@ export default function FamilyMedicalRidesPage() {
         },
         {
           q: 'How will I know my mom actually got picked up and made it home?',
-          a: 'As the booker, you are our contact: you get the confirmation when the ride is scheduled and driver updates as the trip progresses. If you ever want a live status check, call dispatch at (704) 941-8508 — a person answers 24/7.',
+          a: 'As the booker, you are our contact: you get the confirmation when the ride is scheduled and driver updates as the trip progresses. If you ever want a live status check, call dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours.',
         },
         {
           q: 'What if the appointment runs long and the return pickup needs to move?',

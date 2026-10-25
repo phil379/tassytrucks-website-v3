@@ -21,7 +21,7 @@ export default function DialysisTransportPage() {
       eyebrow="Dialysis Transport · Charlotte, North Carolina"
       h1="Dialysis Transport in Charlotte — Rides That Match Your Treatment Schedule"
       heroSubtitle="Recurring, door-to-door rides for Charlotte dialysis patients — booked once as a series, with the same pickup window and a driver who knows your routine."
-      quickAnswer="Dialysis transport is scheduled, recurring transportation to and from dialysis treatment — typically three days a week, every week. Tassy Transportation books the entire Monday-Wednesday-Friday or Tuesday-Thursday-Saturday series in one call, with door-to-door service across Charlotte and Mecklenburg County and 24/7 dispatch at (704) 941-8508."
+      quickAnswer="Dialysis transport is scheduled, recurring transportation to and from dialysis treatment — typically three days a week, every week. Tassy Transportation books the entire Monday-Wednesday-Friday or Tuesday-Thursday-Saturday series in one call, with door-to-door service across Charlotte and Mecklenburg County and phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Set up recurring rides"
       ctaHref={CTA_HREF}
       schemaServiceType="Dialysis Patient Transportation"
@@ -74,9 +74,8 @@ export default function DialysisTransportPage() {
                 If your treatment time changes, one call updates the whole
                 series. If you have a one-off conflict — a holiday shift at the
                 center, a doctor visit on an off day — dispatch adjusts that
-                single trip without touching the rest of your schedule. And
-                because dispatch answers 24/7 at (704) 941-8508, a 5:30 a.m.
-                first-shift chair time is not a problem.
+                single trip without touching the rest of your schedule. You can
+                reach dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours.
               </p>
               <p>
                 Recurring riders also get pricing that reflects the commitment.

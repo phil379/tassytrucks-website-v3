@@ -6,7 +6,7 @@ import { seoRequest } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'NEMT in Charlotte NC — Request Medical Transport',
   description:
-    'Non-emergency medical transportation in Charlotte NC. Veteran-owned, 24/7 dispatch, ambulatory and wheelchair rides. Request online or call (704) 941-8508.',
+    'Non-emergency medical transportation in Charlotte NC. Veteran-owned, ambulatory and wheelchair rides. Request online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/nemt-rides' },
   openGraph: { url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
 };
@@ -21,7 +21,7 @@ export default function NemtRidesPage() {
       eyebrow="NEMT · Charlotte, North Carolina"
       h1="NEMT in Charlotte, NC — Medical Rides You Can Set Your Watch By"
       heroSubtitle="Non-emergency medical transportation for Charlotte patients and the families who coordinate their care — bookable tonight, on the road tomorrow."
-      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with 24/7 phone dispatch at (704) 941-8508."
+      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a medical ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -107,8 +107,8 @@ export default function NemtRidesPage() {
           body: (
             <>
               <p>
-                Request a ride through our two-minute form, or call (704) 941-8508 —
-                a person answers around the clock, not a phone tree. Tell us the
+                Request a ride through our two-minute form, or call (704) 941-8508.
+                A dispatcher usually confirms your driver and your price within 2 hours during business hours. Tell us the
                 pickup address, the appointment time, and any mobility needs. We
                 schedule the pickup so you arrive early, not breathless. For
                 recurring trips like dialysis, we set the whole series at once so

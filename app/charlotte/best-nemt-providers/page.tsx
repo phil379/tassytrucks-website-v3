@@ -21,7 +21,7 @@ export default function BestNemtProvidersPage() {
       eyebrow="NEMT Buyer&rsquo;s Guide · Charlotte, North Carolina"
       h1="Best NEMT Providers in Charlotte: How to Actually Choose One"
       heroSubtitle="A plain-English checklist for vetting any medical transport company in Mecklenburg County — then judge us by the same standard."
-      quickAnswer="The best NEMT providers in Charlotte share traits you can verify before booking: active USDOT and MC operating authority, current insurance certificates, trained drivers, a dependable on-time record, 24/7 reachability, and wheelchair-accessible vehicles. This page walks through that checklist so you can evaluate any provider. Tassy Transportation is a Charlotte-based, veteran-owned NEMT provider."
+      quickAnswer="The best NEMT providers in Charlotte share traits you can verify before booking: active USDOT and MC operating authority, current insurance certificates, trained drivers, a dependable on-time record, a clear confirmation time, and wheelchair-accessible vehicles. This page walks through that checklist so you can evaluate any provider. Tassy Transportation is a Charlotte-based, veteran-owned NEMT provider."
       ctaText="Try Tassy for your next ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -153,8 +153,8 @@ export default function BestNemtProvidersPage() {
               <p>
                 Operations: door-to-door is our standard, not an add-on. We run
                 wheelchair-accessible vehicles, book recurring series in a
-                single call, and staff our dispatch line 24/7 at (704)
-                941-8508 — call it at an odd hour and see who picks up. We are
+                single call, and run a dispatch line at (704) 941-8508.
+                A dispatcher usually confirms your driver and your price within 2 hours during business hours. We are
                 a direct provider based in Charlotte, serving all of
                 Mecklenburg County plus Matthews, Huntersville, Concord, and
                 Gastonia. Put us through the same checklist you would apply to

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { contact } from '@/lib/saas-links';
+import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 
 type SubSection = { h3: string; body: React.ReactNode };
 type Section = { h2: string; body: React.ReactNode; subSections?: SubSection[] };
@@ -51,7 +52,7 @@ export default function LandingPageShell({
   const sage = accent === 'sage';
   const trustItems = [
     ...TRUST_BASE,
-    ...(trustExtras ?? ['Charlotte-based', '24/7 dispatch']),
+    ...(trustExtras ?? ['Charlotte-based', 'Usual confirmation, in business hours']),
   ];
 
   const serviceLd = {
@@ -259,8 +260,8 @@ export default function LandingPageShell({
             Ready when you are.
           </h2>
           <p className="mt-3 ink-mute max-w-xl mx-auto">
-            Request a ride in about two minutes, or call our Charlotte dispatch line —
-            a person answers, 24/7.
+            Request a ride in about two minutes, or call our Charlotte dispatch line.{' '}
+            {CONFIRMATION_PROMISE}
           </p>
           <div className="mt-8 flex gap-3 flex-wrap justify-center">
             <a

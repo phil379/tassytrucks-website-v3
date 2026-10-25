@@ -29,6 +29,8 @@ type Props = {
   /** Agent D — when both are set, emit Service JSON-LD (schema.org/Service). */
   serviceName?: string;
   path?: string;
+  /** Overrides the default credential chips under the hero (see TRUST_CHIPS). */
+  trustChips?: string[];
 };
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent A) — objection-preemption row on
@@ -41,7 +43,7 @@ export default function ServicePage({
   eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now', altCta,
   highlights, tiers, partnerCta,
   highlightsHeading = 'Why Charlotte families choose Tassy',
-  serviceName, path,
+  serviceName, path, trustChips = TRUST_CHIPS,
 }: Props) {
   const serviceLd =
     serviceName && path
@@ -95,7 +97,7 @@ export default function ServicePage({
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
           <ul className="mt-8 flex flex-wrap gap-2" aria-label="Credentials">
-            {TRUST_CHIPS.map((c) => (
+            {trustChips.map((c) => (
               <li
                 key={c}
                 className="inline-flex items-center gap-1.5 text-xs font-medium rounded-full border border-line bg-surface px-3 py-1.5 text-cream-text/85"

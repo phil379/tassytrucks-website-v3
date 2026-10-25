@@ -7,7 +7,7 @@ import { partnerSignup } from '@/lib/partner-links';
 export const metadata: Metadata = {
   title: 'Veterinary Partnerships — Pet Transport | Winnie Ride',
   description:
-    'Partner with Winnie Ride for vaccine-verified, liability-covered pet transport to and from your Charlotte veterinary practice. Book a 15-min intro call.',
+    'Partner with Winnie Ride for pet transport to and from your Charlotte veterinary practice. Current rabies vaccination required. Book a 15-min intro call.',
   alternates: { canonical: '/partners/veterinary' },
   openGraph: { url: '/partners/veterinary', images: ['/og-image/veterinary'] },
 };
@@ -24,10 +24,10 @@ export default function VeterinaryPartnersPage() {
       accent="sage"
       heroIcon={<PawIcon />}
       eyebrow="Winnie Ride · Veterinary Partnerships"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Partner with Winnie Ride — Trusted Pet Transport for Charlotte Veterinary Clinics"
       heroSubtitle="A dependable transport answer for the clients who ask your front desk, “How am I supposed to get him here?”"
-      quickAnswer="Winnie Ride partners with Charlotte-area veterinary practices to transport patients to and from appointments. We verify rabies and core vaccines before every ride, carry pet-specific liability coverage backed by a signed owner waiver, and photograph every pet at pickup for client peace of mind."
+      quickAnswer="Winnie Ride partners with Charlotte-area veterinary practices to transport patients to and from appointments. Current rabies vaccination is required (plus DAPP for dogs, FVRCP for cats), and the pet's owner confirms rabies status when booking."
       ctaText="Schedule a 15-min intro call"
       ctaHref={CTA_HREF}
       secondaryCta={{
@@ -48,7 +48,7 @@ export default function VeterinaryPartnersPage() {
                 area: general practices managing wellness visits and dental
                 schedules, specialty hospitals in oncology, cardiology, and
                 ophthalmology whose patients come back week after week, and
-                emergency and 24/7 animal hospitals that discharge patients at
+                emergency and overnight animal hospitals that discharge patients at
                 hours when no family member can get there.
               </p>
               <p>
@@ -82,10 +82,10 @@ export default function VeterinaryPartnersPage() {
             <>
               <p>
                 The first reason is the one your practice manager will care
-                about most: <strong>vaccine verification protects your waiting
-                room</strong>. Before every ride, we confirm rabies vaccination
-                for every patient, plus DAPP for dogs and FVRCP for cats — the
-                core vaccines as recognized by the{' '}
+                about most: <strong>a vaccination requirement protects your
+                waiting room</strong>. Current rabies vaccination is required for
+                every patient, plus DAPP for dogs and FVRCP for cats — the core
+                vaccines as recognized by the{' '}
                 <a
                   href="https://www.avma.org/resources-tools/pet-owners/petcare/vaccinations"
                   className={inlineLink}
@@ -94,24 +94,11 @@ export default function VeterinaryPartnersPage() {
                 >
                   AVMA
                 </a>
-                . A pet that arrives by
-                Winnie Ride has already been screened, which is more than you
-                can say for most pets walking through your front door.
+                . The pet&rsquo;s owner
+                confirms rabies status when booking.
               </p>
               <p>
-                The second reason is liability. Every owner signs our liability
-                waiver before their pet rides with us, and we carry pet-specific
-                liability coverage on every trip. Your clinic is never the party
-                holding the risk for how a patient traveled. We also photograph
-                every pet at pickup and log it in our system, so the owner — and
-                your team, if a question ever comes up — has a timestamped
-                record of exactly how the patient looked when the trip began.
-              </p>
-              <p>
-                Finally, our drivers are trained on carrier handling, not just
-                driving. They know how to load a carrier securely, how to keep a
-                nervous patient calm, and how to follow handling instructions
-                from an owner or a vet team. For routine rides we ask for a
+                The second reason is reliability. For routine rides we ask for a
                 2-hour minimum lead time, which keeps our scheduling honest and
                 your clients&rsquo; arrival times reliable. All of it happens in
                 climate-controlled vehicles, every season.
@@ -125,7 +112,7 @@ export default function VeterinaryPartnersPage() {
             <>
               <p>
                 Your clients can book same-day through our online wizard or by
-                calling dispatch at (704) 941-8508 — a person answers, 24/7. For
+                calling dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours. For
                 chronic patients on recurring schedules — the oncology patient
                 with weekly rechecks, the cardiology patient with monthly
                 monitoring — we set up recurring transport once so the owner
@@ -135,10 +122,8 @@ export default function VeterinaryPartnersPage() {
               <p>
                 Post-procedure pickup is where we earn the most trust. When a
                 patient goes home after a dental, a mass removal, or a
-                spay/neuter, our drivers follow sedation-aware handling
-                protocols: carrier required, owner and vet instructions
-                followed, no improvising. If your discharge notes say keep the
-                patient flat and quiet, that is exactly what happens. You can
+                spay/neuter, a carrier is required and we follow the handling
+                instructions from the owner and your vet team. You can
                 read more about how we handle these trips on our{' '}
                 <Link
                   href="/charlotte/post-surgery-pet-transport"
@@ -202,16 +187,14 @@ export default function VeterinaryPartnersPage() {
               <p>
                 Rideshare pet options solved one problem: letting a pet into the
                 back seat. They did not solve yours. Uber Pet and Lyft Pet do
-                not check vaccination status — Winnie Ride verifies rabies and
-                core vaccines before every single ride. They have no signed
-                liability waiver covering the pet in transit — every Winnie Ride
-                trip is backed by one, plus pet-specific liability coverage.
+                not check vaccination status — Winnie Ride requires current
+                rabies vaccination before every ride, and the pet&rsquo;s owner
+                confirms rabies status when booking.
               </p>
               <p>
-                Their drivers are generalists who happen to allow pets. Ours are
-                trained on carrier handling and sedation-aware protocols,
-                because a groggy patient coming home from anesthesia is not the
-                same cargo as a commuter&rsquo;s backpack. And because we are a
+                Their drivers are generalists who happen to allow pets, and a
+                groggy patient coming home from anesthesia is not the same cargo
+                as a commuter&rsquo;s backpack. And because we are a
                 direct transportation company, not a marketplace, there is no
                 marketplace markup between your client and the ride — and no
                 roulette over which driver shows up.
@@ -233,12 +216,12 @@ export default function VeterinaryPartnersPage() {
       ]}
       faqs={[
         {
-          q: 'What vaccines do you verify before a ride?',
-          a: 'Rabies for every patient, plus DAPP for dogs and FVRCP for cats — the core vaccines as recognized by the AVMA. Owners provide proof of vaccination before the first ride, and we keep it on file for recurring patients so repeat bookings stay fast.',
+          q: 'What vaccines do you require before a ride?',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats) — the core vaccines as recognized by the AVMA. The pet\'s owner confirms rabies status when booking.',
         },
         {
           q: 'Do you handle sedated pets?',
-          a: 'Yes. Post-procedure and sedated patients ride under our sedation-aware protocols: a carrier is required, and our drivers follow the handling instructions provided by the owner or your veterinary team — positioning, temperature, and quiet handling included.',
+          a: 'Yes. For post-procedure and sedated patients a carrier is required, and we follow the handling instructions provided by the owner or your veterinary team.',
         },
         {
           q: 'What is your service area?',

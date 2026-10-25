@@ -24,10 +24,10 @@ export default function VetAppointmentRidesPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Rides to the Vet in Charlotte — Pet Transport for Appointments You Can't Make"
       heroSubtitle="Your clinic closes at 5 and your job doesn't — Winnie Ride picks up your pet, handles the appointment trip, and brings them home while you stay at work."
-      quickAnswer="Winnie Ride provides scheduled rides to the vet across Charlotte and Mecklenburg County when you can't leave work — we pick up your dog or cat, deliver them to the clinic, and bring them home. Every trip includes vaccine verification, a signed liability waiver, and a photo at pickup. Book with at least two hours' notice or call (704) 941-8508."
+      quickAnswer="Winnie Ride provides scheduled rides to the vet across Charlotte and Mecklenburg County when you can't leave work — we pick up your dog or cat, deliver them to the clinic, and bring them home. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Book with at least two hours' notice or call (704) 941-8508."
       ctaText="Schedule a vet ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -70,23 +70,22 @@ export default function VetAppointmentRidesPage() {
             <>
               <p>
                 <strong>You request.</strong> Online in about two minutes, or call
-                (704) 941-8508 — dispatch answers 24/7. Tell us the pickup address,
+                (704) 941-8508. A dispatcher usually confirms your driver and your
+                price within 2 hours during business hours. Tell us the pickup address,
                 the clinic, and the appointment time. Routine rides need a minimum
                 of two hours&rsquo; lead time; more notice makes your preferred
                 window easier to hold.
               </p>
               <p>
-                <strong>We verify and confirm.</strong> Before the first ride, we
-                check vaccine records and you sign our liability waiver, so
-                everything is settled before a wheel turns. We coordinate with your
+                <strong>We confirm.</strong> The pet&rsquo;s owner confirms rabies
+                status when booking, so everything is settled before a wheel
+                turns. We coordinate with your
                 clinic on drop-off and pickup timing so your pet is not sitting in
                 a lobby longer than necessary.
               </p>
               <p>
-                <strong>Pickup, with proof.</strong> Your driver — trained on
-                carrier handling and sedation-aware protocols — secures your dog or
-                cat in a climate-controlled vehicle, and you get a photo at pickup
-                the moment they are in our care.
+                <strong>Pickup.</strong> Your driver secures your dog or cat in a
+                climate-controlled vehicle.
               </p>
               <p>
                 <strong>Appointment and the ride home.</strong> We deliver your pet
@@ -98,12 +97,12 @@ export default function VetAppointmentRidesPage() {
           ),
         },
         {
-          h2: 'Vaccine verification before every ride',
+          h2: 'Current rabies vaccination required',
           body: (
             <>
               <p>
-                Every pet that rides with us is vaccine-verified first — rabies for
-                all pets, plus DAPP for dogs and FVRCP for cats. These are the core
+                Current rabies vaccination is required for every pet that rides
+                with us, plus DAPP for dogs and FVRCP for cats. These are the core
                 vaccines recommended by the{' '}
                 <a
                   href="https://www.avma.org/resources-tools/pet-owners/petcare/vaccinations"
@@ -111,12 +110,12 @@ export default function VetAppointmentRidesPage() {
                 >
                   American Veterinary Medical Association
                 </a>
-                , and verifying them protects your pet and every other pet who
-                shares our vehicles.
+                , and they protect your pet and every other pet who shares our
+                vehicles. The pet&rsquo;s owner confirms rabies status when
+                booking.
               </p>
               <p>
-                Send records when you book your first trip; we keep them on file
-                after that, so repeat rides take seconds to schedule. If your pet
+                Keep your pet&rsquo;s records handy when you book. If your pet
                 is overdue, that is worth knowing anyway — and conveniently, you
                 already have a ride to the vet.
               </p>
@@ -134,7 +133,7 @@ export default function VetAppointmentRidesPage() {
                 <Link href="/charlotte/post-surgery-pet-transport" className={linkCls}>
                   post-surgery pet transport
                 </Link>{' '}
-                handles the careful, sedation-aware ride home. If your pet panics
+                handles the careful ride home. If your pet panics
                 at the sight of a carrier, our{' '}
                 <Link href="/charlotte/calm-pet-transport" className={linkCls}>
                   calm pet transport
@@ -174,9 +173,9 @@ export default function VetAppointmentRidesPage() {
               </p>
               <p>
                 Requesting a ride is the same two-minute process every time: pickup address,
-                clinic, appointment time. Dispatch answers (704) 941-8508 around
-                the clock — a person, not a phone tree — and your pet&rsquo;s
-                vaccine records stay on file after the first trip.
+                clinic, appointment time. Call (704) 941-8508 — a dispatcher
+                usually confirms your driver and your price within 2 hours during
+                business hours.
               </p>
             </>
           ),
@@ -185,7 +184,7 @@ export default function VetAppointmentRidesPage() {
       faqs={[
         {
           q: 'Can you take my pet to the vet while I am at work?',
-          a: 'Yes — that is the core of the service. We pick up your dog or cat from home, deliver them to the clinic, coordinate timing with the front desk, and bring them home after the appointment. You get a photo at pickup so you know the trip is underway.',
+          a: 'Yes — that is the core of the service. We pick up your dog or cat from home, deliver them to the clinic, coordinate timing with the front desk, and bring them home after the appointment.',
         },
         {
           q: 'How much notice do you need for a vet ride?',
@@ -193,11 +192,11 @@ export default function VetAppointmentRidesPage() {
         },
         {
           q: 'Does my pet need vaccines to ride?',
-          a: 'Yes. We verify rabies for all pets, plus DAPP for dogs and FVRCP for cats — core vaccines per AVMA guidance — before every ride. Send records with your first booking and we keep them on file for future trips.',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking.',
         },
         {
           q: 'Who is actually driving my pet?',
-          a: 'A Tassy Transportation driver trained on carrier handling and sedation-aware protocols, in a climate-controlled company vehicle. We are not a marketplace — the company you book with is the company that drives, and a signed liability waiver covers every trip.',
+          a: 'A Tassy Transportation driver, in a climate-controlled company vehicle. We are not a marketplace — the company you book with is the company that drives.',
         },
         {
           q: 'What if the vet keeps my pet longer than expected?',

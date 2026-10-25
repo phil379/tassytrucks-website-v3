@@ -21,11 +21,11 @@ export default function VeteranTransportPage() {
       eyebrow="Veteran Transport · Charlotte, North Carolina"
       h1="Veteran Medical Transport in Charlotte — Driven by a Veteran-Owned Company"
       heroSubtitle="Scheduled rides to VA and community care appointments across the Charlotte area, from a Service-Disabled Veteran-Owned Small Business that treats every rider like one of our own."
-      quickAnswer="Tassy Transportation provides veteran medical transport across Charlotte and Mecklenburg County — scheduled, door-to-door rides to VA appointments and VA-authorized community care visits. We are a Service-Disabled Veteran-Owned Small Business (SDVOSB), so the company driving you is veteran-owned itself. Dispatch answers 24/7 at (704) 941-8508."
+      quickAnswer="Tassy Transportation provides veteran medical transport across Charlotte and Mecklenburg County — scheduled, door-to-door rides to VA appointments and VA-authorized community care visits. We are a Service-Disabled Veteran-Owned Small Business (SDVOSB), so the company driving you is veteran-owned itself. Call (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request veteran transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Veteran Medical Transportation"
-      trustExtras={['Veteran-owned', 'Charlotte-based', '24/7 dispatch']}
+      trustExtras={['Veteran-owned', 'Charlotte-based', 'Usual confirmation, in business hours']}
       sections={[
         {
           h2: 'A veteran-owned company driving veterans',
@@ -136,9 +136,8 @@ export default function VeteranTransportPage() {
                 missed because the ride fell through. We work with facility and
                 program coordinators who need a transport partner that confirms
                 trips in advance, communicates by phone and email, and reports
-                honestly when something changes. Our 24/7 dispatch line, (704)
-                941-8508, is answered by a person — which matters when a pickup
-                needs to move at 6 a.m.
+                honestly when something changes. Our dispatch line is (704)
+                941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours.
               </p>
               <p>
                 We support standing schedules, multi-stop days, and

@@ -65,7 +65,7 @@ function shortWhen(iso: string): string {
 /**
  * When a dispatcher can realistically answer.
  *
- * The form now takes requests around the clock, so "within 2 hours" stopped
+ * The form now takes requests at any hour, so "within 2 hours" stopped
  * being true at 2am. The old copy papered over that with "during business
  * hours", which leaves the customer to work out what those are and when theirs
  * starts. Now the email knows what time it is and says the actual thing.

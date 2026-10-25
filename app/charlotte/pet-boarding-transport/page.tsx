@@ -24,10 +24,10 @@ export default function PetBoardingTransportPage() {
       eyebrow="Winnie Ride · Charlotte, North Carolina"
       heroIcon={<PawIcon />}
       accent="sage"
-      trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Pet Boarding Pickup & Drop-Off in Charlotte — Kennel Runs Scheduled Around Your Flights"
       heroSubtitle="We take your dog or cat to the boarding facility before you fly and bring them home when you land — no favors to ask, no second car to coordinate."
-      quickAnswer="Winnie Ride by Tassy Transportation is a pet boarding pickup service covering Charlotte and Mecklenburg County. We handle home-to-kennel drop-offs, boarding-to-home returns, and daily daycare runs, scheduled around your travel. Every trip is vaccine-verified with a photo at pickup — call (704) 941-8508, where dispatch answers 24/7."
+      quickAnswer="Winnie Ride by Tassy Transportation is a pet boarding pickup service covering Charlotte and Mecklenburg County. We handle home-to-kennel drop-offs, boarding-to-home returns, and daily daycare runs, scheduled around your travel. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Call (704) 941-8508 — a dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Schedule boarding transport"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
@@ -67,8 +67,7 @@ export default function PetBoardingTransportPage() {
                 Both directions work the same way. For drop-offs, we pick your pet
                 up at home, secure them in a carrier in a climate-controlled
                 vehicle, and deliver them to the boarding facility during its
-                check-in window — with a photo at pickup so you board your flight
-                knowing they&rsquo;re on their way. For returns, we collect your
+                check-in window. For returns, we collect your
                 pet when the facility releases them and have them home waiting for
                 you, or arriving right after you do.
               </p>
@@ -93,20 +92,15 @@ export default function PetBoardingTransportPage() {
             <>
               <p>
                 Boarding facilities require current vaccine records at check-in —
-                and so do we. Before every ride we verify vaccines: rabies for all
-                pets, plus core DAPP for dogs or FVRCP for cats, consistent with
-                AVMA core-vaccine guidance. That means your pet never arrives at
-                the kennel door only to be turned away over paperwork.
+                and so do we. Current rabies vaccination is required (plus DAPP
+                for dogs, FVRCP for cats), and the pet&rsquo;s owner confirms
+                rabies status when booking.
               </p>
               <p>
-                Every trip also includes a signed owner liability waiver, so
-                responsibilities are documented in writing before we drive —
-                protection for you and for the driver. Pets ride secured in
-                carriers handled by drivers trained on carrier handling, in
-                climate-controlled vehicles, direct to the facility with no pooled
-                stops. Winnie Ride is a direct relationship with one Charlotte
-                company, not a marketplace listing — the same trained team every
-                time, and rides for nervous travelers are covered on our{' '}
+                Pets ride secured in carriers, in climate-controlled vehicles,
+                direct to the facility with no pooled stops. Winnie Ride is a
+                direct relationship with one Charlotte company, not a marketplace
+                listing — and rides for nervous travelers are covered on our{' '}
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides page
                 </Link>{' '}
@@ -148,8 +142,9 @@ export default function PetBoardingTransportPage() {
           h2: 'Requests and service area',
           body: (
             <p>
-              Request a ride in about two minutes or call (704) 941-8508 — dispatch
-              answers 24/7, which matters when your flight lands late. Routine
+              Request a ride in about two minutes or call (704) 941-8508. A
+              dispatcher usually confirms your driver and your price within 2
+              hours during business hours. Routine
               rides need a 2-hour minimum lead time, but boarding runs are best
               booked as soon as your travel is confirmed so your preferred
               windows are locked in. We cover all of Charlotte and Mecklenburg
@@ -167,15 +162,15 @@ export default function PetBoardingTransportPage() {
       faqs={[
         {
           q: 'Can you pick up my dog from boarding while I am still traveling?',
-          a: 'Yes. With your authorization and a signed liability waiver on file, we coordinate the release with the facility, send you a photo at pickup, and bring your dog home — to you, or to a trusted adult you authorize to receive them.',
+          a: 'Yes. With your authorization, we coordinate the release with the facility and bring your dog home — to you, or to a trusted adult you authorize to receive them.',
         },
         {
           q: 'What if my flight is delayed and the pickup time changes?',
-          a: 'Call (704) 941-8508 and dispatch will move the window — a person answers 24/7. Boarding runs are scheduled around flights all the time, so a shifted arrival is a normal adjustment, not a problem.',
+          a: 'Call (704) 941-8508 and dispatch will move the window. Boarding runs are scheduled around flights all the time, so a shifted arrival is a normal adjustment, not a problem.',
         },
         {
-          q: 'Do you handle the vaccine paperwork the boarding facility requires?',
-          a: 'We verify vaccine records before every ride — rabies plus core DAPP for dogs or FVRCP for cats, per AVMA guidance — and boarding facilities require the same records at check-in. Send them when you book and your pet will not be turned away at the door.',
+          q: 'What vaccines does my pet need for boarding transport?',
+          a: 'Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet\'s owner confirms rabies status when booking. Boarding facilities require the same records at check-in, so have them ready.',
         },
         {
           q: 'Can you do recurring daycare drop-offs and pickups?',

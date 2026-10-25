@@ -31,9 +31,11 @@ export const BUSINESS = {
   location: BUSINESS_LOCATION,
   mailingAddress: BUSINESS_MAILING_ADDRESS,
   /**
-   * Dispatch hours are not stated here on purpose: some pages say 24/7 and the
-   * confirmation promise says "business hours", and nobody has told us the real
-   * hours. Left null until Phil confirms them.
+   * Dispatch hours are not stated here on purpose: the public pages use the
+   * confirmation promise ("within 2 hours during business hours", see
+   * lib/confirmation-promise.ts) and nobody has told us the real hours. No page may
+   * claim round-the-clock dispatch (scripts/unbuilt-claims.json lists what is not allowed).
+   * Left null until Phil confirms them.
    */
   dispatchHours: null as string | null,
 } as const;

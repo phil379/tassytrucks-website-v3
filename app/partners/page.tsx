@@ -6,7 +6,7 @@ import { partnerSignup } from '@/lib/partner-links';
 export const metadata: Metadata = {
   title: 'Facility Transport Partnerships in Charlotte NC',
   description:
-    'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, 24/7 dispatch, dedicated facility portal with net-30 invoicing. (704) 941-8508.',
+    'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, dedicated facility portal with net-30 invoicing. (704) 941-8508.',
   alternates: { canonical: '/partners' },
   openGraph: { url: '/partners', images: ['/og-image/partners'] },
 };
@@ -20,7 +20,7 @@ export default function PartnersPage() {
       eyebrow="For Facilities · B2B Partnerships"
       h1="Partner with Tassy Transportation — Charlotte's SDVOSB Medical Transport"
       heroSubtitle="A contracted transport partner for discharge planners and facility coordinators who are tired of chasing no-show rides — with one dispatch line, one portal, and one invoice."
-      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified and dispatch 24/7."
+      quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Schedule a 15-min intro call"
       ctaHref={CTA_HREF}
       secondaryCta={{
@@ -84,9 +84,9 @@ export default function PartnersPage() {
               <p>
                 Then there is the operational side, which is where transport
                 vendors usually fall down. Our dispatch line, (704) 941-8508, is
-                answered by a person 24 hours a day — when a discharge moves up or
-                a treatment runs long, your coordinator talks to someone who can
-                actually change the schedule. Our drivers are trained on patient
+                where your coordinator talks to someone who can actually change
+                the schedule when a discharge moves up or a treatment runs long.
+                A dispatcher usually confirms your driver and your price within 2 hours during business hours. Our drivers are trained on patient
                 handling: door-to-door assistance is the standard, not curb
                 drop-offs, and wheelchair-accessible vehicles are part of the
                 fleet, not a special request.

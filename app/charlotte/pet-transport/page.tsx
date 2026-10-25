@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
+import PagePhoto from '@/components/seo/PagePhoto';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -25,6 +26,16 @@ export default function PetTransportPage() {
       heroIcon={<PawIcon />}
       accent="sage"
       trustExtras={['Vaccine-verified trips', 'Liability-covered', 'Charlotte-based']}
+      afterHero={
+        <PagePhoto
+          stem="pet-transport-french-bulldog"
+          widths={[480, 800, 1125]}
+          width={1125}
+          height={1406}
+          alt="French bulldog resting on a cream pet bed"
+          sizes="min(28rem, calc(100vw - 3rem))"
+        />
+      }
       h1="Pet Transport in Charlotte, NC — Rides Your Dog or Cat Actually Deserves"
       heroSubtitle="Winnie Ride is door-to-door pet transport for Charlotte families — to the vet, the groomer, or boarding — run by a local company you can call, not an app you hope shows up."
       quickAnswer="Winnie Ride is the pet transport service of Tassy Transportation, a veteran-owned Charlotte company. We move your dog or cat door-to-door in climate-controlled vehicles, with vaccine verification before every ride, a signed liability waiver, and a photo sent at pickup. Book online or call (704) 941-8508 — dispatch answers 24/7."

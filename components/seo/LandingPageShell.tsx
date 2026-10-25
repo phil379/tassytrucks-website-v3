@@ -28,6 +28,8 @@ export type LandingPageShellProps = {
   trustExtras?: string[];
   /** Rendered between the last section and the FAQ (e.g. comparison table). */
   beforeFaq?: React.ReactNode;
+  /** Rendered directly under the opening (hero) section, before the content sections. */
+  afterHero?: React.ReactNode;
   /** Visible published date for pages that must age honestly (compare pages). */
   publishedDate?: string;
   secondaryCta?: { label: string; href: string };
@@ -44,7 +46,7 @@ const TRUST_BASE = ['SDVOSB Certified'];
 export default function LandingPageShell({
   h1, quickAnswer, sections, faqs, ctaText, ctaHref, relatedLinks,
   schemaServiceType, heroSubtitle, eyebrow, heroIcon, accent = 'gold',
-  trustExtras, beforeFaq, publishedDate, secondaryCta, canonicalPath,
+  trustExtras, beforeFaq, afterHero, publishedDate, secondaryCta, canonicalPath,
 }: LandingPageShellProps) {
   const sage = accent === 'sage';
   const trustItems = [
@@ -162,6 +164,8 @@ export default function LandingPageShell({
           )}
         </div>
       </section>
+
+      {afterHero}
 
       {/* CONTENT SECTIONS */}
       <article>

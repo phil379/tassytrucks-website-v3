@@ -4,6 +4,7 @@ import { request } from '@/lib/request-links';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 // Derived, never typed — see the note in app/page.tsx.
 import { CARE_WAV, dollars } from '@/lib/quote';
+import { WAV_PARTNER_LINE } from '@/lib/wav';
 
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 
@@ -47,7 +48,7 @@ export default function NemtPage() {
         },
         {
           title: 'Travelling in a wheelchair',
-          body: `Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`,
+          body: `${WAV_PARTNER_LINE} Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`,
         },
         {
           title: 'Veteran-owned, and certified',

@@ -88,8 +88,8 @@ export default function PartnersPage() {
                 the schedule when a discharge moves up or a treatment runs long.
                 A dispatcher usually confirms your driver and your price within 2 hours during business hours. Our drivers are trained on patient
                 handling: door-to-door assistance is the standard, not curb
-                drop-offs, and wheelchair-accessible vehicles are part of the
-                fleet, not a special request.
+                drop-offs, and wheelchair rides in partner-network vehicles are
+                a standard booking, not a special request.
               </p>
               <p>
                 Finally, the paperwork. Your team gets real-time ETA visibility on

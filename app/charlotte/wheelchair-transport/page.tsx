@@ -3,12 +3,13 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import RateTable, { returnRows } from '@/components/pricing/RateTable';
 import { CARE_WAV } from '@/lib/quote';
+import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Wheelchair Transport in Charlotte NC',
   description:
-    'Wheelchair accessible transport in Charlotte NC. Securement-equipped vans, door-through-door help, companions welcome. Call (704) 941-8508.',
+    'Wheelchair rides in Charlotte NC, run in ramp-equipped vehicles from our partner network. Door-through-door help, companions welcome. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/wheelchair-transport' },
   openGraph: { url: '/charlotte/wheelchair-transport', images: ['/og-image/wheelchair-transport'] },
 };
@@ -16,20 +17,8 @@ export const metadata: Metadata = {
 const CTA_HREF = seoRequest('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
 
 /**
- * The price, on the page the rider actually lands on.
- *
- * Added 2026-10-02. This page ranks for "wheelchair transport charlotte" and
- * sits in the Services menu, and until today it carried no number at all —
- * neither did any of the other fifteen landing pages. Somebody searching for a
- * wheelchair ride read about securement and then had to find /pricing, scroll
- * past a six-row table, and recognise a card headed "Travelling in a
- * wheelchair" as the thing they were looking for. Most people call instead, and
- * the card's own note in app/pricing/page.tsx already says why that is the
- * wrong outcome on this line: quoting on the phone "made the one passenger
- * least able to chase a phone call the only one who had to".
- *
- * Derived from CARE_WAV, never typed. Reprice in lib/quote.ts and this page
- * follows with /pricing on the next build.
+ * The price, on the page the rider actually lands on. Derived from CARE_WAV, never typed: reprice
+ * in lib/quote.ts and this page follows with /pricing on the next build.
  */
 const WAV_ROWS = returnRows(CARE_WAV);
 
@@ -40,8 +29,8 @@ export default function WheelchairTransportPage() {
       primaryKeyword="wheelchair transport charlotte nc"
       eyebrow="Wheelchair Transport · Charlotte, North Carolina"
       h1="Wheelchair Transport in Charlotte, NC — Accessible Rides, Door Through Door"
-      heroSubtitle="Wheelchair-accessible vehicles with proper securement, drivers trained to assist, and dispatch that asks the right questions before the van ever rolls."
-      quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Transportation provides wheelchair-accessible transport across Charlotte and Mecklenburg County with door-through-door assistance and phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
+      heroSubtitle="Ramp-equipped vehicles from our partner network, with four-point securement and dispatch that asks the right questions before the van ever rolls."
+      quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Transportation books wheelchair-accessible transport across Charlotte and Mecklenburg County, run in ramp-equipped vehicles from our partner network, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a wheelchair ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Wheelchair Accessible Transportation"
@@ -60,7 +49,7 @@ export default function WheelchairTransportPage() {
                 unless you choose to.
               </p>
               <p>
-                Tassy Transportation runs wheelchair-accessible vehicles as a core part
+                {WAV_PARTNER_LINE} Tassy Transportation books them as a core part
                 of our{' '}
                 <Link href="/nemt" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   non-emergency medical transportation
@@ -114,12 +103,12 @@ export default function WheelchairTransportPage() {
                 — it is the right call when a clinician says it is, and it is
                 priced accordingly. A rideshare is fine for an ambulatory rider
                 in a hurry, but standard rideshare vehicles cannot secure a
-                wheelchair, and the driver is not trained or expected to assist.
+                wheelchair, and the driver is not expected to assist.
               </p>
               <p>
                 Wheelchair transport sits in the practical middle: a scheduled,
-                properly insured, securement-equipped vehicle with a trained
-                driver, at a fraction of ambulance cost. For medical
+                securement-equipped vehicle with a driver who helps at the door,
+                at a fraction of ambulance cost. For medical
                 appointments, dialysis, therapy, and family events alike, it is
                 usually the right tool. If your trips repeat on a schedule —
                 dialysis is the classic case — our{' '}
@@ -188,9 +177,9 @@ export default function WheelchairTransportPage() {
               <RateTable
                 id="wheelchair-pricing"
                 heading="Tassy Care WAV"
-                note="A ramp-equipped vehicle and an operator trained in securement — you stay in your chair for the whole trip. 20 minutes of on-site wait included."
+                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. 20 minutes of on-site wait included.${wavLive() ? ` ${WAV_BOOK_AND_PAY_NOTE}` : ''}`}
                 colA="One way"
-                colASub="ramp-equipped, securement trained"
+                colASub="ramp-equipped vehicle"
                 colB="There and back"
                 colBSub="20 min wait included"
                 rows={WAV_ROWS}
@@ -216,7 +205,7 @@ export default function WheelchairTransportPage() {
         },
         {
           q: 'Can you transport power wheelchairs in Charlotte?',
-          a: 'Yes. When you book, dispatch asks whether your chair is power or manual, plus approximate dimensions and weight, so we send a vehicle with the right ramp or lift capacity and securement setup the first time.',
+          a: 'Yes. When you book, dispatch asks whether your chair is power or manual, plus approximate dimensions and weight, so we can match the ride to a partner vehicle with the right ramp or lift capacity and securement setup.',
         },
         {
           q: 'Can a family member or aide ride along?',
@@ -224,11 +213,11 @@ export default function WheelchairTransportPage() {
         },
         {
           q: 'Is wheelchair transport the same as an ambulance?',
-          a: 'No. An ambulance is for emergencies and stretcher-bound patients needing medical monitoring. Wheelchair transport is a scheduled ride in a securement-equipped vehicle with a trained driver who provides courtesy assistance, not medical care — and it costs far less.',
+          a: 'No. An ambulance is for emergencies and stretcher-bound patients needing medical monitoring. Wheelchair transport is a scheduled ride in a securement-equipped vehicle with a driver who provides courtesy assistance, not medical care — and it costs far less.',
         },
         {
           q: 'How far in advance should I book a wheelchair ride in Charlotte?',
-          a: 'Requesting the day before is ideal so we can guarantee the right vehicle. Same-day requests are accepted whenever an accessible vehicle is available — call (704) 941-8508 and dispatch will tell you honestly whether we can make your window.',
+          a: 'Requesting the day before is ideal so we can line up the right vehicle. Same-day requests are accepted whenever a partner vehicle is available — call (704) 941-8508 and dispatch will tell you honestly whether we can make your window.',
         },
       ]}
       relatedLinks={[

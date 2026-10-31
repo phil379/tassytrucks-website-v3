@@ -21,7 +21,7 @@ export default function NemtRidesPage() {
       eyebrow="NEMT · Charlotte, North Carolina"
       h1="NEMT in Charlotte, NC — Medical Rides You Can Set Your Watch By"
       heroSubtitle="Non-emergency medical transportation for Charlotte patients and the families who coordinate their care — bookable tonight, on the road tomorrow."
-      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory and wheelchair-accessible NEMT across Charlotte and Mecklenburg County, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
+      quickAnswer="NEMT (non-emergency medical transportation) gets you to medical appointments when you can't drive yourself — dialysis, follow-ups, infusions, therapy. Tassy Transportation provides ambulatory NEMT, and books wheelchair-accessible NEMT in partner-network vehicles, across Charlotte and Mecklenburg County, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a medical ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"
@@ -89,10 +89,11 @@ export default function NemtRidesPage() {
                 you are checked in before leaving.
               </p>
               <p>
-                Wheelchair-accessible NEMT uses vehicles equipped for riders who use
-                a wheelchair full-time or can&rsquo;t safely transfer to a standard
-                seat. If you are not sure which you need, call us — dispatch will
-                ask a few questions and put you in the right vehicle the first time.
+                Wheelchair-accessible NEMT is for riders who use a wheelchair
+                full-time or can&rsquo;t safely transfer to a standard seat, and
+                it is run in ramp-equipped vehicles from our partner network. If
+                you are not sure which you need, call us — dispatch will ask a
+                few questions and plan the right vehicle.
                 You can read more on our{' '}
                 <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page

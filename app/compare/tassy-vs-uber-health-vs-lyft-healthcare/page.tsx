@@ -28,7 +28,7 @@ const rows: Row[] = [
   },
   {
     label: 'Wheelchair-accessible vehicles',
-    tassy: <>{yes} Wheelchair vans with securement</>,
+    tassy: <>{yes} Wheelchair rides in ramp-equipped partner vehicles</>,
     uber: 'Select markets; availability varies',
     lyft: 'Select markets; availability varies',
   },
@@ -238,7 +238,7 @@ export default function ComparePage() {
         },
         {
           q: 'Can Uber or Lyft transport a wheelchair user in Charlotte?',
-          a: 'Both platforms offer wheelchair-accessible options only in select markets and availability varies. Tassy operates wheelchair-accessible vehicles with securement as a core service across Charlotte and Mecklenburg County.',
+          a: 'Both platforms offer wheelchair-accessible options only in select markets and availability varies. Tassy books wheelchair rides, run in ramp-equipped vehicles from our partner network, across Charlotte and Mecklenburg County.',
         },
         {
           q: 'Will a rideshare driver sign me out after surgery?',

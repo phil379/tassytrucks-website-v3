@@ -20,9 +20,9 @@
 - **Tassy Care** (/nemt) — one-way medical transport for ambulatory passengers:
   dialysis, infusion, physical therapy, specialist appointments. Flat distance
   bands from $49 (0-3 mi) to $129 (23-30 mi). Over 30 miles is quoted.
-- **Tassy Care WAV** — wheelchair-accessible transport in a ramp-equipped vehicle
-  from a partner network. **Quoted on the call, not published**, because the rate
-  depends on the subcontractor.
+- **Tassy Care WAV** — wheelchair rides, run in ramp-equipped vehicles from our
+  partner network (Tassy owns no wheelchair vehicle). See /pricing for how
+  wheelchair rides are priced today.
 - **Tassy Recovery** (/recover) — the ride home after outpatient surgery, sedation,
   dental work or a hospital discharge, for the trips where a facility will not
   release a patient without a responsible adult. Round trip with 20 minutes of

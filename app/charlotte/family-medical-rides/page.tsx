@@ -94,9 +94,9 @@ export default function FamilyMedicalRidesPage() {
               </p>
               <p>
                 If your parent uses a wheelchair full-time or can&rsquo;t
-                safely transfer to a standard seat, we run
-                wheelchair-accessible vehicles with proper securement; the
-                details are on our{' '}
+                safely transfer to a standard seat, wheelchair
+                rides are run in ramp-equipped vehicles from our partner
+                network; the details are on our{' '}
                 <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
                 </Link>

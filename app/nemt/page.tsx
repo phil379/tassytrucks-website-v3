@@ -4,7 +4,7 @@ import { request } from '@/lib/request-links';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 // Derived, never typed — see the note in app/page.tsx.
 import { CARE_WAV, dollars } from '@/lib/quote';
-import { WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import { WAV_PARTNER_LINE } from '@/lib/wav';
 
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 
@@ -48,9 +48,7 @@ export default function NemtPage() {
         },
         {
           title: 'Travelling in a wheelchair',
-          body: wavLive()
-            ? `${WAV_PARTNER_LINE} Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`
-            : `${WAV_PARTNER_LINE} A dispatcher quotes your route: send the request and you will have a price before anything is booked.`,
+          body: `${WAV_PARTNER_LINE} Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`,
         },
         {
           title: 'Veteran-owned, and certified',
@@ -77,7 +75,7 @@ export default function NemtPage() {
           name: '18 to 30 miles',
           price: '$109–129',
           cadence: 'one way',
-          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', wavLive() ? `Wheelchair from ${WAV_FROM}, priced by distance` : 'Wheelchair rides quoted by a dispatcher'],
+          features: ['Everything above', 'Longer runs and out-of-county clinics', 'Over 30 miles, call us', `Wheelchair from ${WAV_FROM}, priced by distance`],
           cta: { label: 'Request this', href: request.nemt },
         },
       ]}

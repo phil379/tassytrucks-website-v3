@@ -1,7 +1,7 @@
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { isPetLine, type ServiceLine } from '@/lib/trip-request';
 import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
-import { WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import { WAV_PARTNER_LINE } from '@/lib/wav';
 import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
 
 /**
@@ -24,7 +24,7 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
  * THE SIX LINES
  * ─────────────────────────────────────────────────────────────────────────────
  *   Tassy Care        one way, ambulatory medical              from $49
- *   Tassy Care WAV    wheelchair, partner vehicles              $109 (switch: lib/wav.ts)
+ *   Tassy Care WAV    wheelchair, partner-run vehicles          from $109
  *   Tassy Recovery    round trip + wait, after a procedure     from $129
  *   Tassy Concierge   one way, premium, nothing medical        from $69
  *   Winnie Ride       pet transport, owner not travelling      from $49
@@ -43,11 +43,11 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
  *     elastic, sold to the rider. Putting a trained medical operator in a golf
  *     trip is pure cost against a customer who will not pay for it.
  *
- *  2. CARE WAV IS PRICED HERE ONLY WHILE THE SWITCH IS ON. Tassy owns no
- *     wheelchair-accessible vehicle; the rides are run by partner-owned vehicles
- *     at 60% of the card price. Until the partner paperwork is in, wavLive()
- *     (lib/wav.ts) is false and this engine returns "quoted on the call" for
- *     every wheelchair request, exactly as it does for a person-quoted line.
+ *  2. CARE WAV IS PRICED HERE (CARE_WAV, published 2026-09-30). Tassy owns no
+ *     wheelchair-accessible vehicle; the rides are run in partner-owned vehicles,
+ *     so the card is a number the business holds by subcontract. The partner
+ *     paperwork and insurance are still open: see lib/wav.ts, which gates only the
+ *     new "book and pay at the card price" wording, never the price itself.
  *
  *  3. THE ENTRY BAND IS 3 MILES, NOT 5. Widening it was tested so the headline
  *     could read "under five miles, $49". It costs 7 points of margin and $10
@@ -423,28 +423,23 @@ const QUOTE_ONLY_MESSAGE: Partial<Record<ServiceLine, string>> = {
     'Tassy Guardian is quoted individually. Send the request and a dispatcher will call you back with a price.',
 };
 
-/**
- * Shown for a wheelchair passenger while the card is not published (the switch in lib/wav.ts is
- * off) and for the same passenger past the last band. Says who runs the ride, never what it costs.
- */
-export const WAV_MESSAGE = `${WAV_PARTNER_LINE} A dispatcher quotes your route: send the request and you will have a price before anything is booked. ${CONFIRMATION_PROMISE}`;
+/** Shown when a wheelchair request still falls through to a person (no card for the line). */
+const WAV_MESSAGE = `${WAV_PARTNER_LINE} A dispatcher quotes your route: send the request and you will have a price before anything is booked. ${CONFIRMATION_PROMISE}`;
 
 /**
  * TASSY CARE WAV — wheelchair rides in ramp-equipped partner vehicles.
  *
- * Tassy owns no WAV: the rides are run in vehicles owned by partners in our partner network,
- * who are paid 60% of the card price (the `care_wav` pay rate; the 55% driver rule does not cover
- * WAV). The card is PUBLISHED ONLY WHILE wavLive() (lib/wav.ts) IS TRUE; Phil turns that on once
- * the partner's certificate of insurance and written agreement are in. Pages read this card and
- * must never carry a copy of its dollars.
+ * Tassy owns no WAV: the rides are run in vehicles owned by partners in our partner network
+ * (first partner agreed 60 / 35 / 5). The card is published. What a WAV policy costs is still
+ * unknown and has to come out of Tassy's 40%.
  *
  * Anchored to the North Carolina private-pay market: $65-110 base, $3.00-5.50
  * per mile, against a $88 national average base. The card below tracks the
  * middle of that range and mirrors Care's band structure so the two read as one
  * price list rather than two products.
  *
- * pay_rates carries the `care_wav` row (partner 60%). What a WAV policy costs is still unknown and
- * has to come out of Tassy's 40%; that figure, not this card, is the open question.
+ * The `care_wav` pay_rates row is the partner's share. Its live value needs a read-back: see
+ * docs/proposed-migrations/WAV_01_care_wav_partner_60.sql.
  *
  * The prize this unlocks is not private pay. VA non-emergent WHEELCHAIR
  * transport is a 100% SDVOSB set-aside under 38 U.S.C. 8127(d) -- competitors
@@ -532,9 +527,7 @@ export const CARE_WAV: Card = {
  * comment above warns about, on the line where the passenger is least able to
  * absorb it.
  *
- * Tassy's model is partner-supplied wheelchair vehicles. While the switch is off, a wheelchair
- * passenger has no card (null), so every caller treats the request as one a person quotes. See
- * CARE_WAV for the market anchoring.
+ * Tassy's model is partner-supplied wheelchair vehicles. See CARE_WAV for the market anchoring.
  */
 export function cardFor(serviceLine: ServiceLine, mobility?: string | null): Card | null {
   // EVERY passenger line, not just Care. mobilityOptionsFor() offers Wheelchair
@@ -544,7 +537,7 @@ export function cardFor(serviceLine: ServiceLine, mobility?: string | null): Car
   // option set, and a `mobility=wheelchair` pet request is already rejected
   // upstream rather than dispatched as a wheelchair job for a dog.
   if (mobility === 'wheelchair' && !isPetLine(serviceLine)) {
-    return wavLive() ? CARE_WAV : null;
+    return CARE_WAV;
   }
   return CARD_FOR_LINE[serviceLine] ?? null;
 }
@@ -565,8 +558,8 @@ export function isQuoteOnly(serviceLine: ServiceLine, mobility?: string | null):
 }
 
 function quoteOnlyMessage(serviceLine: ServiceLine, mobility?: string | null): string {
-  // Any wheelchair request that falls through to a person: the switch is off. (Past the last
-  // rung the engine uses its own 'beyond-bands' message, which names the WAV card.)
+  // Retained for any wheelchair request that still falls through to a person --
+  // a line without a WAV card, or a distance past the last rung.
   if (mobility === 'wheelchair') return WAV_MESSAGE;
   return (
     QUOTE_ONLY_MESSAGE[serviceLine] ??
@@ -879,7 +872,7 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   if (isQuoteOnly(input.serviceLine, input.mobility)) {
     return {
       kind: 'quote-only',
-      reason: input.mobility === 'wheelchair' && !isPetLine(input.serviceLine) ? 'wheelchair' : 'quoted-line',
+      reason: input.serviceLine === 'care' ? 'wheelchair' : 'quoted-line',
       miles: null,
       message: quoteOnlyMessage(input.serviceLine, input.mobility),
     };

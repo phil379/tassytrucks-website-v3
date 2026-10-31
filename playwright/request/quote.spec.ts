@@ -23,10 +23,6 @@ import type { Quote, QuoteOnly } from '../../lib/quote';
 import { extractZip, zipCentroid, resolvePoint } from '../../lib/zip-centroids';
 import { SERVICE_VALUES } from '../../lib/trip-request';
 
-// The Care WAV tests below price on the published card, so the switch (lib/wav.ts) is on here.
-// It is read when estimateTrip runs, so setting it after the imports is enough.
-process.env.NEXT_PUBLIC_WAV_LIVE = 'true';
-
 /** Uptown Charlotte → Atrium Health Carolinas Medical Center. ~1.6 straight miles. */
 const UPTOWN = { lat: 35.2271, lng: -80.8431 };
 const CMC = { lat: 35.2046, lng: -80.8384 };

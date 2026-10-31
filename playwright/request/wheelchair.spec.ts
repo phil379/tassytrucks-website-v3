@@ -1,13 +1,12 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 import { PLACES, stubPlaces } from '../support/maps-stub';
-import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE } from '../../lib/price-fallback';
-import { WAV_PARTNER_LINE } from '../../lib/wav';
 
 /**
- * Wheelchair rides while the Tassy Care WAV switch (lib/wav.ts, NEXT_PUBLIC_WAV_LIVE) is OFF,
- * which is how CI builds the app. The booking is still taken, no price is printed, and the row
- * is marked for a dispatcher. The ON state is covered by scripts/test-wav-switch.ts, because the
- * flag is read at build time and this rig is built once.
+ * Wheelchair rides with the Tassy Care WAV switch (lib/wav.ts, NEXT_PUBLIC_WAV_LIVE) OFF, which is
+ * how CI builds the app and how production runs today: the booking is priced on the Care WAV card
+ * and stored with that price, and none of the ON-only "book and pay" wording appears. The ON state
+ * (same prices, plus that wording) is covered by scripts/test-wav-switch.ts, because the flag is
+ * read at build time and this rig is built once.
  *
  * Runs on the 3947 rig (playwright.config.ts): an in-memory Supabase on 3946.
  */
@@ -62,36 +61,41 @@ function payload(serviceLine: string, email: string) {
   };
 }
 
-test.describe('switch OFF: wheelchair is booked, priced by a dispatcher', () => {
+test.describe('switch OFF (today): wheelchair is booked at the card price', () => {
   for (const line of ['care', 'recovery', 'concierge']) {
-    test(`${line}: the booking is taken, carries no price, and is marked for a dispatcher`, async ({ request }) => {
+    test(`${line}: the booking is taken and stored with the WAV card price`, async ({ request }) => {
       const email = unique(line);
       const res = await request.post('/api/trip-request', { data: payload(line, email) });
       expect(res.status(), await res.text()).toBe(200);
       const json = await res.json();
       expect(json.ok).toBe(true);
-      expect(json.price).toBeNull();
-      expect(json.priceUnavailable).toBe(true);
+      expect(json.price).not.toBeNull();
+      expect(json.priceUnavailable).toBe(false);
 
       const row = (await rowFor(request, email))!;
       expect(row.mobility).toBe('wheelchair');
-      expect(row.estimate_low_cents ?? null).toBeNull();
-      expect(row.estimate_shown).toBe(false);
-      expect(String(row.internal_notes).startsWith(NEEDS_PRICE_MARKER)).toBe(true);
-      expect(String(row.internal_notes)).toContain('wheelchair');
+      expect(Number(row.estimate_low_cents)).toBeGreaterThanOrEqual(10900);
+      expect(row.internal_notes ?? null).toBeNull();
     });
   }
 
-  test('the form says who runs the ride and prints no price', async ({ page }) => {
+  test('the form prices the ride on the Care WAV card and shows no book-and-pay wording', async ({ page }) => {
     await stubPlaces(page);
     await page.goto('/request?service=care&mobility=wheelchair');
     await expect(page.locator('#mobility')).toHaveValue('wheelchair');
+    await page.locator('#pickupAddress').tap();
+    await page.locator('#pickupAddress').pressSequentially('1220 Tourmaline');
+    await page.getByRole('option', { name: /1220 Tourmaline Rd/ }).tap();
+    await page.locator('#dropoffAddress').tap();
+    await page.locator('#dropoffAddress').pressSequentially('3106 Aransas');
+    await page.getByRole('option', { name: /3106 Aransas Rd/ }).tap();
     const panel = page.locator('[data-testid=trip-estimate]');
-    await expect(panel).toContainText(WAV_PARTNER_LINE);
-    await expect(panel).not.toContainText('$');
+    await expect(panel).toContainText('Tassy Care WAV');
+    await expect(panel).toContainText('$');
+    await expect(page.getByTestId('wav-book-and-pay')).toHaveCount(0);
   });
 
-  test('the confirmation tells the guest a dispatcher will confirm the price', async ({ page, request }) => {
+  test('the confirmation shows the price the guest was quoted', async ({ page, request }) => {
     await stubPlaces(page);
     const email = unique('ui');
     await page.goto('/request?service=care&mobility=wheelchair');
@@ -113,7 +117,7 @@ test.describe('switch OFF: wheelchair is booked, priced by a dispatcher', () => 
     await page.locator('form button[type=submit]').tap();
 
     await expect(page.getByRole('heading', { name: 'Request received' })).toBeVisible();
-    await expect(page.getByTestId('price-pending')).toContainText(PRICE_PENDING_MESSAGE);
+    await expect(page.getByTestId('confirmed-price')).toBeVisible();
     expect(((await rowFor(request, email))!).mobility).toBe('wheelchair');
   });
 });

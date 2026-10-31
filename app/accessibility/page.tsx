@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import { WAV_PARTNER_LINE } from '@/lib/wav';
 
 // MEGA_TASSY_PUBLISH_READY (2026-07-02) — footer linked /accessibility but no route existed (404).
 export const metadata: Metadata = {
@@ -23,8 +23,7 @@ export default function AccessibilityPage() {
             <h2 className="serif text-2xl font-semibold">On the road</h2>
             <p className="mt-3 ink-soft leading-relaxed">
               Accessible transportation is our core business, not an add-on. {WAV_PARTNER_LINE}{' '}
-              You stay in your chair for the whole trip, and{' '}
-              {wavLive() ? 'the price is on our pricing page' : 'a dispatcher quotes the route'}. Every other trip is door-through-door as standard. Tell
+              You stay in your chair for the whole trip, and the price is on our pricing page. Every other trip is door-through-door as standard. Tell
               us what you need when you book — mobility equipment, a service animal, extra time,
               or a caregiver riding along — and we will plan the trip around it at no extra charge
               for the accommodation itself.

@@ -56,17 +56,11 @@ export function beyondBandsNote(miles: number | null): string {
   );
 }
 
-/** Same marker, other cause: a wheelchair ride while the Tassy Care WAV card is unpublished (lib/wav.ts). */
-export const WAV_UNPUBLISHED_NOTE =
-  `${NEEDS_PRICE_MARKER} No price was computed: wheelchair rides are quoted by a dispatcher while the Care WAV card is not published. ` +
-  'Quote the trip and confirm the price with the customer before anything is charged.';
-
 /**
  * Does this estimate result leave the row with no price a dispatcher must supply, and if so what
  * goes in internal_notes? Two cases, one marker:
  *   null                      an end could not be placed (typed address, no ZIP)
  *   quote-only, beyond-bands  past the last price band
- *   quote-only, wheelchair    the Care WAV card is not published yet (lib/wav.ts)
  * Scholar and other quoted lines are NOT here: they are priced by plan, not missing a price.
  */
 export function unpricedFor(
@@ -76,9 +70,6 @@ export function unpricedFor(
   if (quoted === null) return { priceUnavailable: true, note: needsPriceNote(ends) };
   if (quoted.kind === 'quote-only' && quoted.reason === 'beyond-bands') {
     return { priceUnavailable: true, note: beyondBandsNote(quoted.miles) };
-  }
-  if (quoted.kind === 'quote-only' && quoted.reason === 'wheelchair') {
-    return { priceUnavailable: true, note: WAV_UNPUBLISHED_NOTE };
   }
   return { priceUnavailable: false, note: null };
 }

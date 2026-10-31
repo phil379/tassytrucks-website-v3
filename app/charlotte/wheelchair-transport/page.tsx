@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
-import WavRates from '@/components/pricing/WavRates';
-import { WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import RateTable, { returnRows } from '@/components/pricing/RateTable';
+import { CARE_WAV } from '@/lib/quote';
+import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -16,9 +17,10 @@ export const metadata: Metadata = {
 const CTA_HREF = seoRequest('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
 
 /**
- * The price, on the page the rider actually lands on. <WavRates> reads CARE_WAV when the switch in
- * lib/wav.ts is on and says "a dispatcher quotes it" when it is off; this page types no number.
+ * The price, on the page the rider actually lands on. Derived from CARE_WAV, never typed: reprice
+ * in lib/quote.ts and this page follows with /pricing on the next build.
  */
+const WAV_ROWS = returnRows(CARE_WAV);
 
 export default function WheelchairTransportPage() {
   return (
@@ -166,17 +168,21 @@ export default function WheelchairTransportPage() {
         <section className="border-b border-line">
           <div className="container-x py-12">
             <h2 className="h-section max-w-2xl">What a wheelchair ride costs</h2>
-            {wavLive() && (
-              <p className="ink-soft mt-3 max-w-2xl leading-relaxed">
-                Priced by distance, like every other Tassy line. You get the number before you
-                book and it does not move afterwards &mdash; no meter, no surge, and no
-                &ldquo;we&rsquo;ll quote you on the call&rdquo;.
-              </p>
-            )}
+            <p className="ink-soft mt-3 max-w-2xl leading-relaxed">
+              Priced by distance, like every other Tassy line. You get the number before you
+              book and it does not move afterwards &mdash; no meter, no surge, and no
+              &ldquo;we&rsquo;ll quote you on the call&rdquo;.
+            </p>
             <div className="mt-7 max-w-2xl">
-              <WavRates
+              <RateTable
                 id="wheelchair-pricing"
                 heading="Tassy Care WAV"
+                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. 20 minutes of on-site wait included.${wavLive() ? ` ${WAV_BOOK_AND_PAY_NOTE}` : ''}`}
+                colA="One way"
+                colASub="ramp-equipped vehicle"
+                colB="There and back"
+                colBSub="20 min wait included"
+                rows={WAV_ROWS}
                 href={CTA_HREF}
                 cta="Request a wheelchair ride"
               />

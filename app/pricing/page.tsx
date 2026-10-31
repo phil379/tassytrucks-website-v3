@@ -7,8 +7,7 @@ import {
   bandLabel, dollars, overBandLabel, roundTripCents,
 } from '@/lib/quote';
 import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
-import WavRates from '@/components/pricing/WavRates';
-import { wavLive } from '@/lib/wav';
+import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
 import { SCHOOL_PLANS } from '@/lib/school-plans';
 import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
 
@@ -17,7 +16,7 @@ const WAIT_LINES = [
   { label: 'Tassy Care', card: CARE },
   { label: 'Tassy Recovery', card: RECOVERY },
   { label: 'Winnie Ride', card: WINNIE_CARD },
-  ...(wavLive() ? [{ label: 'Tassy Care WAV', card: CARE_WAV }] : []),
+  { label: 'Tassy Care WAV', card: CARE_WAV },
 ]
   .filter((w) => w.card.waitIncludedMin > 0)
   .map((w) => ({ label: w.label, cents: w.card.waitOverage }));
@@ -45,6 +44,7 @@ export const metadata: Metadata = {
 const MEDICAL: Row[] = pairRows(CARE, RECOVERY);
 const CONCIERGE: Row[] = returnRows(CONCIERGE_CARD);
 const WINNIE: Row[] = returnRows(WINNIE_CARD);
+const WAV: Row[] = returnRows(CARE_WAV);
 // Treatment Day beside two ordinary Care legs, both read from lib/quote.ts: the
 // premium is visible and cannot drift from what the request form charges.
 const TREATMENT_ROWS: Row[] = [
@@ -133,9 +133,15 @@ export default function PricingPage() {
                 href={TREATMENT_HREF}
                 cta="Set up flat-price rides"
               />
-              <WavRates
+              <RateTable
                 id="wheelchair"
                 heading="Tassy Care WAV &mdash; wheelchair"
+                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. Priced by distance like every other line, so you know the number before you book. 20 minutes of on-site wait included.${wavLive() ? ` ${WAV_BOOK_AND_PAY_NOTE}` : ''}`}
+                colA="One way"
+                colASub="ramp-equipped vehicle"
+                colB="There and back"
+                colBSub="20 min wait included"
+                rows={WAV}
                 href={request.nemt}
                 cta="Request a wheelchair ride"
               />

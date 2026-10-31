@@ -5,10 +5,6 @@ import {
 } from '../lib/quote';
 import type { ServiceLine } from '../lib/trip-request';
 
-// These tests exercise the published Care WAV card, so the switch (lib/wav.ts) is on for them.
-// scripts/test-wav-switch.ts covers the off state.
-process.env.NEXT_PUBLIC_WAV_LIVE = 'true';
-
 let n = 0;
 function t(name: string, fn: () => void) {
   fn();

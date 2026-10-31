@@ -3,6 +3,10 @@ import { PRICE_RANGE_NOTE, PICK_TO_SEE_PRICE, priceKind, priceLabel } from '../l
 import { buildRequesterText } from '../lib/notifications';
 import { estimateTrip, formatRange, roundTripForced } from '../lib/quote';
 
+// These tests exercise the published Care WAV card, so the switch (lib/wav.ts) is on for them.
+// scripts/test-wav-switch.ts covers the off state.
+process.env.NEXT_PUBLIC_WAV_LIVE = 'true';
+
 let n = 0;
 function t(name: string, fn: () => void) {
   fn();

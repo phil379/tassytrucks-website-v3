@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { wavLive } from '@/lib/wav';
 import { CARE, CARE_WAV, RECOVERY, TREATMENT_DAY, CONCIERGE, WINNIE, SURCHARGES, ESCORT_CENTS } from '@/lib/quote';
 
 /**
@@ -13,6 +14,9 @@ export function GET() {
   return NextResponse.json({
     cards: [CARE, CARE_WAV, RECOVERY, TREATMENT_DAY, CONCIERGE, WINNIE].map((c) => ({
       label: c.label,
+      // False only for Tassy Care WAV while the switch in lib/wav.ts is off: the card is real but
+      // the site does not print it, so a reader of this list should not show it to guests either.
+      publishedOnSite: c === CARE_WAV ? wavLive() : true,
       bands: c.bands,
       waitIncludedMin: c.waitIncludedMin,
       waitOverageCents: c.waitOverage,

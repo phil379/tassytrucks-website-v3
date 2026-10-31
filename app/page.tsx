@@ -15,6 +15,7 @@ import { request } from '@/lib/request-links';
 // $95 -- the same drift that had /pricing advertising $49 Winnie against a $69
 // engine on 2026-09-30. A headline price is a promise; derive it.
 import { CARE as CARE_CARD, CARE_WAV, dollars } from '@/lib/quote';
+import { wavLive } from '@/lib/wav';
 
 const CARE_FROM = dollars(CARE_CARD.bands[0].cents);
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
@@ -52,7 +53,7 @@ const verticals: Vertical[] = [
     blurb: 'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
     bullets: [
       `Flat rates from ${CARE_FROM}, one way`,
-      `Wheelchair from ${WAV_FROM}, priced by distance`,
+      wavLive() ? `Wheelchair from ${WAV_FROM}, priced by distance` : 'Wheelchair rides quoted by a dispatcher',
     ],
     cta: 'Request a Tassy Care trip',
     bookHref: request.nemt,

@@ -22,6 +22,33 @@ export function wavLive(): boolean {
 export const WAV_PARTNER_LINE =
   'Wheelchair rides are run in ramp-equipped vehicles from our partner network.';
 
-/** Shown only while the switch is ON: next to the wheelchair price on the form and the tables. */
+/**
+ * EVERY SENTENCE THAT DESCRIBES WHEELCHAIR AS PRICED OR BOOKABLE LIVES HERE, and is rendered only
+ * through the helpers below, which return nothing while the switch is OFF. scripts/test-wav-copy.ts
+ * fails if any of these phrases appears in a page, component or library file other than this one.
+ * Do not turn the switch ON until Phil confirms the partner paperwork (see the PR's "Needs Phil").
+ */
 export const WAV_BOOK_AND_PAY_NOTE =
   'Book at this price. When a dispatcher confirms your ride, we send a payment link.';
+export const WAV_PRICE_ON_PAGE_CLAUSE = 'and the price is on our pricing page';
+export const WAV_STANDARD_BOOKING_CLAUSE =
+  'wheelchair rides in partner-network vehicles are a standard booking, not a special request';
+
+/** The "Book at this price" note, or '' while the switch is OFF. */
+export function wavBookAndPayNote(): string {
+  return wavLive() ? WAV_BOOK_AND_PAY_NOTE : '';
+}
+
+/** /accessibility: OFF is the neutral sentence; ON adds the pricing-page clause. */
+export function wavAccessibilitySentence(): string {
+  return wavLive()
+    ? `You stay in your chair for the whole trip, ${WAV_PRICE_ON_PAGE_CLAUSE}.`
+    : 'You stay in your chair for the whole trip.';
+}
+
+/** /partners: OFF is neutral partner-network wording; ON may call it a standard booking. */
+export function wavPartnersClause(): string {
+  return wavLive()
+    ? WAV_STANDARD_BOOKING_CLAUSE
+    : 'wheelchair rides are run in ramp-equipped vehicles from our partner network';
+}

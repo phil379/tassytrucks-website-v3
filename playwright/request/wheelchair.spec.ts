@@ -120,4 +120,15 @@ test.describe('switch OFF (today): wheelchair is booked at the card price', () =
     await expect(page.getByTestId('confirmed-price')).toBeVisible();
     expect(((await rowFor(request, email))!).mobility).toBe('wheelchair');
   });
+
+  test('no page carries an ON-only "priced or bookable" wheelchair sentence', async ({ request }) => {
+    const ON_ONLY = [/book at this price/i, /price is on our pricing page/i, /standard booking, not a special request/i, /we send a payment link/i];
+    for (const path of ['/accessibility', '/partners', '/pricing', '/charlotte/wheelchair-transport', '/nemt', '/request?service=care&mobility=wheelchair']) {
+      const html = await (await request.get(path)).text();
+      for (const re of ON_ONLY) expect(html, `${path} ${re}`).not.toMatch(re);
+    }
+    // The wheelchair price table is still the Care WAV card, as on main.
+    const pricing = await (await request.get('/pricing')).text();
+    expect(pricing).toContain('$109');
+  });
 });

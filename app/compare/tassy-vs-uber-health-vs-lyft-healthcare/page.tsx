@@ -124,7 +124,7 @@ export default function ComparePage() {
       eyebrow="Comparison · Charlotte Medical Transport"
       h1="Tassy Transportation vs Uber Health vs Lyft Healthcare — Charlotte Medical Transport Compared"
       heroSubtitle="An honest look at when a national rideshare platform is the right call — and when a dedicated local NEMT provider is."
-      quickAnswer="Uber Health and Lyft Healthcare are strong options for low-acuity, fully ambulatory rides booked at scale by healthcare organizations. Tassy Transportation is a Charlotte-based NEMT and concierge provider built for everything those platforms aren't designed for: wheelchair securement, post-anesthesia pickups, recurring dialysis schedules, and a dispatch line a person actually answers."
+      quickAnswer="Uber Health and Lyft Healthcare are strong options for low-acuity, fully ambulatory rides booked at scale by healthcare organizations. Tassy Transportation is a Charlotte-based NEMT and concierge provider built for everything those platforms aren't designed for: wheelchair rides, post-anesthesia pickups, recurring dialysis schedules, and a dispatch line a person actually answers."
       ctaText="See if Tassy is right for you"
       ctaHref={CTA_HREF}
       schemaServiceType="Non-Emergency Medical Transportation"

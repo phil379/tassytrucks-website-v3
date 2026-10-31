@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import RateTable, { returnRows } from '@/components/pricing/RateTable';
 import { CARE_WAV } from '@/lib/quote';
-import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import { WAV_PARTNER_LINE, wavBookAndPayNote } from '@/lib/wav';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -29,8 +29,8 @@ export default function WheelchairTransportPage() {
       primaryKeyword="wheelchair transport charlotte nc"
       eyebrow="Wheelchair Transport · Charlotte, North Carolina"
       h1="Wheelchair Transport in Charlotte, NC — Accessible Rides, Door Through Door"
-      heroSubtitle="Ramp-equipped vehicles from our partner network, with four-point securement and dispatch that asks the right questions before the van ever rolls."
-      quickAnswer="Wheelchair transport is a scheduled ride in a vehicle equipped with a ramp or lift and four-point securement, for riders who travel in their wheelchair. Tassy Transportation books wheelchair-accessible transport across Charlotte and Mecklenburg County, run in ramp-equipped vehicles from our partner network, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
+      heroSubtitle="Ramp-equipped vehicles from our partner network, and dispatch that asks the right questions before the van ever rolls."
+      quickAnswer="Wheelchair transport is a scheduled ride in a ramp-equipped vehicle, for riders who travel in their wheelchair. Tassy Transportation books wheelchair-accessible transport across Charlotte and Mecklenburg County, run in ramp-equipped vehicles from our partner network, with phone dispatch at (704) 941-8508. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
       ctaText="Request a wheelchair ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Wheelchair Accessible Transportation"
@@ -41,12 +41,9 @@ export default function WheelchairTransportPage() {
             <>
               <p>
                 A wheelchair-accessible ride is more than a van with a ramp. It
-                means you board in your own chair, the chair is secured at four
-                points so it cannot shift in transit, and you ride with a
-                separate lap and shoulder belt — the same way every trip. The
-                driver handles the ramp or lift, the securement, and the
-                release at the other end. You never transfer out of your chair
-                unless you choose to.
+                means you board in your own chair and stay in it for the whole
+                trip, with the driver helping you on and off at either end. You
+                never transfer out of your chair unless you choose to.
               </p>
               <p>
                 {WAV_PARTNER_LINE} Tassy Transportation books them as a core part
@@ -107,7 +104,7 @@ export default function WheelchairTransportPage() {
               </p>
               <p>
                 Wheelchair transport sits in the practical middle: a scheduled,
-                securement-equipped vehicle with a driver who helps at the door,
+                ramp-equipped vehicle with a driver who helps at the door,
                 at a fraction of ambulance cost. For medical
                 appointments, dialysis, therapy, and family events alike, it is
                 usually the right tool. If your trips repeat on a schedule —
@@ -133,10 +130,9 @@ export default function WheelchairTransportPage() {
                 at the curb is the worst possible time. So when you book,
                 dispatch asks the type of chair — power or manual — and its
                 rough dimensions and weight. Power chairs are heavier and often
-                wider, which determines the vehicle and securement setup we
-                send. Manual chairs are simpler, but we still confirm, because
-                &ldquo;the right vehicle the first time&rdquo; is the whole
-                point of asking.
+                wider, which determines which partner vehicle we can book.
+                Manual chairs are simpler, but we still confirm, because
+                planning the right vehicle is the whole point of asking.
               </p>
               <p>
                 Companion riders are welcome at no drama and no surprise.
@@ -177,7 +173,7 @@ export default function WheelchairTransportPage() {
               <RateTable
                 id="wheelchair-pricing"
                 heading="Tassy Care WAV"
-                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. 20 minutes of on-site wait included.${wavLive() ? ` ${WAV_BOOK_AND_PAY_NOTE}` : ''}`}
+                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. 20 minutes of on-site wait included.${wavBookAndPayNote() ? ` ${wavBookAndPayNote()}` : ''}`}
                 colA="One way"
                 colASub="ramp-equipped vehicle"
                 colB="There and back"
@@ -201,11 +197,11 @@ export default function WheelchairTransportPage() {
       faqs={[
         {
           q: 'Do I have to transfer out of my wheelchair during the ride?',
-          a: 'No. You board and ride in your own chair. The driver secures it at four points and fits a separate lap and shoulder belt. If you prefer to transfer to a vehicle seat and stow the chair, that works too — tell dispatch when you request the ride.',
+          a: 'No. You board and ride in your own chair. If you prefer to transfer to a vehicle seat and stow the chair, that works too — tell dispatch when you request the ride.',
         },
         {
           q: 'Can you transport power wheelchairs in Charlotte?',
-          a: 'Yes. When you book, dispatch asks whether your chair is power or manual, plus approximate dimensions and weight, so we can match the ride to a partner vehicle with the right ramp or lift capacity and securement setup.',
+          a: 'Yes. When you book, dispatch asks whether your chair is power or manual, plus approximate dimensions and weight, so we can match the ride to a partner vehicle that fits your chair.',
         },
         {
           q: 'Can a family member or aide ride along?',
@@ -213,7 +209,7 @@ export default function WheelchairTransportPage() {
         },
         {
           q: 'Is wheelchair transport the same as an ambulance?',
-          a: 'No. An ambulance is for emergencies and stretcher-bound patients needing medical monitoring. Wheelchair transport is a scheduled ride in a securement-equipped vehicle with a driver who provides courtesy assistance, not medical care — and it costs far less.',
+          a: 'No. An ambulance is for emergencies and stretcher-bound patients needing medical monitoring. Wheelchair transport is a scheduled ride in a ramp-equipped vehicle with a driver who provides courtesy assistance, not medical care — and it costs far less.',
         },
         {
           q: 'How far in advance should I book a wheelchair ride in Charlotte?',

@@ -8,7 +8,12 @@ import {
   cardFor, estimateTrip, isQuoteOnly, roundTripCents, type Quote, type QuoteOnly, type QuoteInput,
 } from '../lib/quote';
 import { unpricedFor } from '../lib/price-fallback';
-import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '../lib/wav';
+import {
+  WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, WAV_PRICE_ON_PAGE_CLAUSE, WAV_STANDARD_BOOKING_CLAUSE,
+  wavAccessibilitySentence, wavBookAndPayNote, wavLive, wavPartnersClause,
+} from '../lib/wav';
+import { returnRows } from '../components/pricing/RateTable';
+import { bandLabel, dollars } from '../lib/quote';
 import { GET as priceList } from '../app/api/price-list/route';
 import { tripRequestSchema, type ServiceLine } from '../lib/trip-request';
 
@@ -150,6 +155,32 @@ await t('the book-and-pay note is ON-only wording: it names no dollar figure and
   assert.ok(!/\$\d/.test(WAV_BOOK_AND_PAY_NOTE));
   assert.ok(!/ambulance|medicaid|medicare|VA\b/i.test(WAV_BOOK_AND_PAY_NOTE + WAV_PARTNER_LINE));
   assert.ok(WAV_PARTNER_LINE.includes('partner network'));
+});
+
+await t('OFF: every ON-only sentence is absent or neutral (no pricing or "bookable" claim)', () => {
+  off();
+  assert.equal(wavBookAndPayNote(), '');
+  assert.equal(wavAccessibilitySentence(), 'You stay in your chair for the whole trip.');
+  assert.equal(wavPartnersClause(), 'wheelchair rides are run in ramp-equipped vehicles from our partner network');
+  const all = [wavBookAndPayNote(), wavAccessibilitySentence(), wavPartnersClause()].join(' ');
+  assert.ok(!/\$|price|book|payment|standard/i.test(all.replace(/ramp-equipped vehicles from our partner network/i, '')), all);
+});
+
+await t('ON: the ON-only sentences appear, and the price shown matches the CARE_WAV card', () => {
+  on();
+  assert.equal(wavBookAndPayNote(), WAV_BOOK_AND_PAY_NOTE);
+  assert.ok(wavAccessibilitySentence().includes(WAV_PRICE_ON_PAGE_CLAUSE));
+  assert.equal(wavPartnersClause(), WAV_STANDARD_BOOKING_CLAUSE);
+  // The table the pages print is derived from CARE_WAV: every row equals the card, none typed.
+  const rows = returnRows(CARE_WAV);
+  CARE_WAV.bands.forEach((b, i) => {
+    assert.equal(rows[i]!.band, bandLabel(CARE_WAV.bands, i));
+    assert.equal(rows[i]!.a, dollars(b.cents));
+    assert.equal(rows[i]!.b, dollars(roundTripCents(CARE_WAV, b.cents)));
+    // ...and the booking engine shows that same one-way price.
+    assert.equal(estimate(trip('care', { mobility: 'wheelchair', roadMiles: b.upToMiles })).lowCents, b.cents);
+  });
+  off();
 });
 
 off();

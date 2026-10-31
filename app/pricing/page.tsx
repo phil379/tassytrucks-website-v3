@@ -7,7 +7,7 @@ import {
   bandLabel, dollars, overBandLabel, roundTripCents,
 } from '@/lib/quote';
 import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
-import { WAV_BOOK_AND_PAY_NOTE, WAV_PARTNER_LINE, wavLive } from '@/lib/wav';
+import { WAV_PARTNER_LINE, wavBookAndPayNote } from '@/lib/wav';
 import { SCHOOL_PLANS } from '@/lib/school-plans';
 import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
 
@@ -136,7 +136,7 @@ export default function PricingPage() {
               <RateTable
                 id="wheelchair"
                 heading="Tassy Care WAV &mdash; wheelchair"
-                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. Priced by distance like every other line, so you know the number before you book. 20 minutes of on-site wait included.${wavLive() ? ` ${WAV_BOOK_AND_PAY_NOTE}` : ''}`}
+                note={`${WAV_PARTNER_LINE} You stay in your chair for the whole trip. Priced by distance like every other line, so you know the number before you book. 20 minutes of on-site wait included.${wavBookAndPayNote() ? ` ${wavBookAndPayNote()}` : ''}`}
                 colA="One way"
                 colASub="ramp-equipped vehicle"
                 colB="There and back"

@@ -61,7 +61,7 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
     h: 'Accessibility and wheelchair trips',
     body: [
       <>
-        Tell us what you need when you book: a wheelchair or other mobility equipment, a service animal, extra time, or a caregiver riding with you. Wheelchair trips are run in ramp-equipped vehicles from our partner network. If your equipment cannot be carried safely in the vehicle we would send, we will tell you before the day of the trip. More about our service and this website is on our{' '}
+        Tell us what you need when you book: a wheelchair or other mobility equipment, a service animal, extra time, or a caregiver riding with you. Wheelchair trips are run in ramp-equipped vehicles with an operator trained in securement. If your equipment cannot be carried safely in the vehicle we would send, we will tell you before the day of the trip. More about our service and this website is on our{' '}
         <Link href="/accessibility" className={LINK}>Accessibility</Link> page.
       </>,
     ],

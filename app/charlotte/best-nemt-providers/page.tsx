@@ -179,7 +179,7 @@ export default function BestNemtProvidersPage() {
         },
         {
           q: 'Does the best NEMT provider mean the most expensive one?',
-          a: 'No. Price should track the service level — wheelchair securement, door-to-door assistance, recurring scheduling — not marketing. Get a clear quote in writing before the first ride; our pricing page explains how we structure ours.',
+          a: 'No. Price should track the service level — wheelchair access, door-to-door assistance, recurring scheduling — not marketing. Get a clear quote in writing before the first ride; our pricing page explains how we structure ours.',
         },
         {
           q: 'Can I switch NEMT providers if my current one keeps running late?',

@@ -743,6 +743,11 @@ export type Quote = {
   distanceMeasured: boolean;
   /** $45 when a Tassy Escort was asked for, 0 otherwise. Already in the total. */
   escortCents: number;
+  /**
+   * Set only on a hotel zone price (lib/hotel-price.ts). The panel prints this instead of a
+   * mileage, because a fixed hotel price is not worked out from the route.
+   */
+  flatLabel?: string;
 };
 
 export type QuoteOnly = {

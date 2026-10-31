@@ -110,7 +110,7 @@ export default function DialysisTransportPage() {
               </p>
               <p>
                 Riders who use a wheelchair full-time or on tired days ride in
-                our wheelchair-accessible vehicles with proper securement —
+                ramp-equipped vehicles from our partner network —
                 details on our{' '}
                 <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   wheelchair transport page
@@ -177,8 +177,8 @@ export default function DialysisTransportPage() {
           a: 'That is normal after dialysis, and our drivers plan for it. They wait for you at the center, offer a steadying arm on your non-access side, and walk you to your own door — not the curb. Drivers provide courtesy assistance, not medical care; if you feel unwell beyond the usual fatigue, tell the center staff before leaving.',
         },
         {
-          q: 'Do you have wheelchair-accessible vehicles for dialysis rides?',
-          a: 'Yes. If you use a wheelchair full-time, or only on treatment days when you are too tired to walk far, we will put your series in a wheelchair-accessible vehicle with proper securement. Tell dispatch when you book so the right vehicle shows up every time.',
+          q: 'Can you book a wheelchair ride for dialysis?',
+          a: 'Yes. If you use a wheelchair full-time, or only on treatment days when you are too tired to walk far, we will arrange your rides in a ramp-equipped vehicle from our partner network. Tell dispatch when you book so the right vehicle is planned.',
         },
         {
           q: 'How do dialysis centers partner with Tassy Transportation?',

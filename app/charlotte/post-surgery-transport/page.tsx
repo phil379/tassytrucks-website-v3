@@ -179,8 +179,8 @@ export default function PostSurgeryTransportPage() {
               Health Carolinas Medical Center or Novant Health Presbyterian, or
               at one of the freestanding surgery and endoscopy centers scattered
               across SouthPark, Ballantyne, and University City, we have driven
-              that route. Wheelchair-accessible vehicles are available if you
-              expect to need one going home — just tell dispatch when you request the ride.
+              that route. If you expect to need a wheelchair-accessible
+              ride home, tell dispatch when you request it; those rides are run in ramp-equipped vehicles from our partner network.
             </p>
           ),
         },

@@ -106,10 +106,10 @@ export default function VeteranTransportPage() {
             <>
               <p>
                 Some riders walk to the vehicle with a steady arm; others use a
-                wheelchair full-time. We run both ambulatory and
-                wheelchair-accessible vehicles, and dispatch will ask a few
-                quick questions when you book to put you in the right one the
-                first time. Door-to-door is our standard on every trip — drivers
+                wheelchair full-time. We book both ambulatory rides and
+                wheelchair rides (the latter in ramp-equipped vehicles from our
+                partner network), and dispatch will ask a few quick questions
+                when you book to plan the right one. Door-to-door is our standard on every trip — drivers
                 help with entryways, steps, and getting checked in, not just the
                 curb. Details on accessible vehicles are on our{' '}
                 <Link href="/charlotte/wheelchair-transport" className="underline decoration-[color:var(--gold)] underline-offset-2">
@@ -190,8 +190,8 @@ export default function VeteranTransportPage() {
           a: 'Yes — recurring scheduling is standard. We book the full series in one call, whether that is weekly physical therapy, recurring specialty visits, or any other standing appointment, with the same pickup window each time.',
         },
         {
-          q: 'Do you have wheelchair-accessible vehicles?',
-          a: 'Yes. We run both ambulatory and wheelchair-accessible vehicles. Tell dispatch about any mobility equipment when you book and we will assign the right vehicle the first time.',
+          q: 'Can you book a wheelchair ride for a veteran?',
+          a: 'Yes. Wheelchair rides are run in ramp-equipped vehicles from our partner network. Tell dispatch about any mobility equipment when you book so the right vehicle is planned.',
         },
         {
           q: 'Can a family member or case manager book on my behalf?',

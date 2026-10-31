@@ -25,7 +25,8 @@ import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/Ad
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
-import { SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
+import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
+import { wavBookAndPayNote } from '@/lib/wav';
 import {
   PICK_ADDRESS_MESSAGE,
   PICK_TO_SEE_PRICE,
@@ -1287,6 +1288,12 @@ export default function RequestForm({
                     ? PRICE_RANGE_NOTE
                     : 'An estimate, not a final price. A dispatcher confirms the exact figure before your trip is booked.'}
               </p>
+              {/* ON only (lib/wav.ts): the wheelchair card price can be booked at that price. */}
+              {wavBookAndPayNote() && estimate.cardLabel === CARE_WAV.label && (
+                <p className="ink-soft mt-2 text-xs" data-testid="wav-book-and-pay">
+                  {wavBookAndPayNote()}
+                </p>
+              )}
             </>
           ) : quoted?.kind === 'quote-only' ? (
             /* Measurable, but not a table lookup. Say which, and why. */

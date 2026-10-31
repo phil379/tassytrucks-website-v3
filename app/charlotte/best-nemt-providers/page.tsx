@@ -151,11 +151,11 @@ export default function BestNemtProvidersPage() {
                 available on request, same as we provide to facility partners.
               </p>
               <p>
-                Operations: door-to-door is our standard, not an add-on. We run
-                wheelchair-accessible vehicles, book recurring series in a
+                Operations: door-to-door is our standard, not an add-on. We book
+                wheelchair rides in ramp-equipped vehicles from our partner network, book recurring series in a
                 single call, and run a dispatch line at (704) 941-8508.
                 A dispatcher usually confirms your driver and your price within 2 hours during business hours. We are
-                a direct provider based in Charlotte, serving all of
+                based in Charlotte, serving all of
                 Mecklenburg County plus Matthews, Huntersville, Concord, and
                 Gastonia. Put us through the same checklist you would apply to
                 anyone else; that is exactly how we want to be chosen.
@@ -179,7 +179,7 @@ export default function BestNemtProvidersPage() {
         },
         {
           q: 'Does the best NEMT provider mean the most expensive one?',
-          a: 'No. Price should track the service level — wheelchair securement, door-to-door assistance, recurring scheduling — not marketing. Get a clear quote in writing before the first ride; our pricing page explains how we structure ours.',
+          a: 'No. Price should track the service level — wheelchair access, door-to-door assistance, recurring scheduling — not marketing. Get a clear quote in writing before the first ride; our pricing page explains how we structure ours.',
         },
         {
           q: 'Can I switch NEMT providers if my current one keeps running late?',

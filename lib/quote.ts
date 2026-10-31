@@ -1,6 +1,7 @@
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { isPetLine, type ServiceLine } from '@/lib/trip-request';
 import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
+import { WAV_PARTNER_LINE } from '@/lib/wav';
 import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
 
 /**
@@ -23,7 +24,7 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
  * THE SIX LINES
  * ─────────────────────────────────────────────────────────────────────────────
  *   Tassy Care        one way, ambulatory medical              from $49
- *   Tassy Care WAV    wheelchair — QUOTED, not published        see below
+ *   Tassy Care WAV    wheelchair, partner-run vehicles          from $109
  *   Tassy Recovery    round trip + wait, after a procedure     from $129
  *   Tassy Concierge   one way, premium, nothing medical        from $69
  *   Winnie Ride       pet transport, owner not travelling      from $49
@@ -42,10 +43,11 @@ import { resolvePoint, zipPlace } from '@/lib/zip-centroids';
  *     elastic, sold to the rider. Putting a trained medical operator in a golf
  *     trip is pure cost against a customer who will not pay for it.
  *
- *  2. CARE WAV IS NOT PRICED HERE. Tassy owns no wheelchair-accessible vehicle;
- *     the floor is whatever a WAV subcontractor quotes, and that quote does not
- *     exist yet. Printing six numbers we cannot hold to is worse than saying
- *     "quoted on the call", which is what this engine returns.
+ *  2. CARE WAV IS PRICED HERE (CARE_WAV, published 2026-09-30). Tassy owns no
+ *     wheelchair-accessible vehicle; the rides are run in partner-owned vehicles,
+ *     so the card is a number the business holds by subcontract. The partner
+ *     paperwork and insurance are still open: see lib/wav.ts, which gates only the
+ *     new "book and pay at the card price" wording, never the price itself.
  *
  *  3. THE ENTRY BAND IS 3 MILES, NOT 5. Widening it was tested so the headline
  *     could read "under five miles, $49". It costs 7 points of margin and $10
@@ -421,27 +423,23 @@ const QUOTE_ONLY_MESSAGE: Partial<Record<ServiceLine, string>> = {
     'Tassy Guardian is quoted individually. Send the request and a dispatcher will call you back with a price.',
 };
 
-/** The message shown when Tassy Care is requested for a wheelchair passenger. */
-const WAV_MESSAGE =
-  'Tassy Care WAV uses a ramp-equipped vehicle and an operator trained in securement, booked through our partner network. We quote your route on the call rather than print a rate we cannot hold to — send the request or call and you will have a price in minutes.';
+/** Shown when a wheelchair request still falls through to a person (no card for the line). */
+const WAV_MESSAGE = `${WAV_PARTNER_LINE} A dispatcher quotes your route: send the request and you will have a price before anything is booked. ${CONFIRMATION_PROMISE}`;
 
 /**
- * TASSY CARE WAV — wheelchair-accessible, ramp-equipped, operator trained in
- * securement.
+ * TASSY CARE WAV — wheelchair rides in ramp-equipped partner vehicles.
  *
- * STILL NOT LIVE, and deliberately so: Tassy owns no WAV. These are the numbers
- * to publish the day one is in the fleet, not before -- a printed rate Tassy
- * cannot hold to is worse than a quote on the call.
+ * Tassy owns no WAV: the rides are run in vehicles owned by partners in our partner network
+ * (first partner agreed 60 / 35 / 5). The card is published. What a WAV policy costs is still
+ * unknown and has to come out of Tassy's 40%.
  *
  * Anchored to the North Carolina private-pay market: $65-110 base, $3.00-5.50
  * per mile, against a $88 national average base. The card below tracks the
  * middle of that range and mirrors Care's band structure so the two read as one
  * price list rather than two products.
  *
- * pay_rates already carries a `care_wav` row at 40% with $8 insurance, flagged
- * there as an estimate because there is no WAV to insure yet. Both this card and
- * that row need the real insurance quote before either is trusted -- a WAV
- * policy is the single biggest unknown in Tassy's cost base.
+ * The `care_wav` pay_rates row is the partner's share. Its live value needs a read-back: see
+ * docs/proposed-migrations/WAV_01_care_wav_partner_60.sql.
  *
  * The prize this unlocks is not private pay. VA non-emergent WHEELCHAIR
  * transport is a 100% SDVOSB set-aside under 38 U.S.C. 8127(d) -- competitors
@@ -518,7 +516,7 @@ export const CARE_WAV: Card = {
  *
  * WHEELCHAIR IS THE ONE PLACE THE PASSENGER, NOT THE SERVICE LINE, DECIDES.
  * Someone who picks Tassy Care or Tassy Recovery and then says wheelchair needs
- * a ramp-equipped vehicle and an operator trained in securement. Quoting them
+ * a ramp-equipped vehicle with securement. Quoting them
  * the ambulatory price is a promise the operation cannot keep -- a sedan cannot
  * carry that passenger at any price.
  *
@@ -529,10 +527,7 @@ export const CARE_WAV: Card = {
  * comment above warns about, on the line where the passenger is least able to
  * absorb it.
  *
- * Phil's model is partner-supplied wheelchair vehicles rather than a WAV Tassy
- * owns, so a published rate IS holdable once a WAV operator is under contract.
- * Until one is, the rate is a number the operation has to honour by subcontract.
- * See CARE_WAV for the market anchoring.
+ * Tassy's model is partner-supplied wheelchair vehicles. See CARE_WAV for the market anchoring.
  */
 export function cardFor(serviceLine: ServiceLine, mobility?: string | null): Card | null {
   // EVERY passenger line, not just Care. mobilityOptionsFor() offers Wheelchair

@@ -75,6 +75,25 @@ export function hotelTripFor(
   return null;
 }
 
+/**
+ * Is this contact email a hotel SMOKE TEST? Only an address AT tassytrucks.com WITH a plus tag
+ * (phil+smoke@tassytrucks.com), case-insensitive. Nothing else: not name+tag@gmail.com, not a
+ * subdomain, not tassytrucks.com.evil.com, not an untagged phil@tassytrucks.com.
+ *
+ * Why this is narrower than lib/test-data.ts: a row stored is_test_data = true is hidden from the
+ * ops board and the KPI counts AND is ignored by the intro (no clock, no 20-booking count). The
+ * shared rule marks ANY domain's `+test` / `+qa` / `+demo` tag as test data, so a real hotel guest
+ * at guest+qa@gmail.com would vanish from the board and not count toward the intro. For a hotel
+ * ride the route uses this rule instead (app/api/trip-request/route.ts).
+ */
+export function isHotelSmokeTest(email: string | null | undefined): boolean {
+  if (typeof email !== 'string') return false;
+  const m = /^([^@\s]+)@([^@\s]+)$/.exec(email.trim().toLowerCase());
+  if (!m) return false;
+  const [, local, domain] = m;
+  return domain === 'tassytrucks.com' && /\+[^+]+$/.test(local!);
+}
+
 const DAY_MS = 86_400_000;
 
 /**

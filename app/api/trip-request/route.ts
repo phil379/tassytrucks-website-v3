@@ -6,7 +6,7 @@ import {
   UNAVAILABLE_SERVICE_LINES,
 } from '@/lib/trip-request';
 import { estimateTrip, formatRange } from '@/lib/quote';
-import { hotelPriceMismatch, quoteFromHotel } from '@/lib/hotel-price';
+import { hotelPriceMismatch, isHotelSmokeTest, quoteFromHotel } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { resolvePoint } from '@/lib/zip-centroids';
 import { withUnit } from '@/lib/address-unit';
@@ -529,8 +529,12 @@ export async function POST(request: Request) {
         // retail check alone would miss Phil walking the funnel as a test
         // facility and put the trip on the real dispatch board. Check the
         // signed-in coordinator too.
-        is_test_data:
-          looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
+        // A HOTEL ride uses the narrower smoke-test rule (lib/hotel-price.ts): only
+        // name+tag@tassytrucks.com is test data, so a real guest at name+qa@gmail.com stays on the
+        // board and counts toward the intro. A signed-in facility coordinator is still checked.
+        is_test_data: hotel
+          ? isHotelSmokeTest(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail)
+          : looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
         preferred_contact: data.preferredContact,
         pickup_address: pickupStored,
         dropoff_address: dropoffStored,

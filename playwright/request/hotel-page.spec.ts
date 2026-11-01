@@ -59,7 +59,7 @@ test.describe('a hotel page shows one price', () => {
   });
 });
 
-test.describe('a smoke-test hotel booking is test data', () => {
+test.describe('what is test data on a hotel booking', () => {
   type Row = Record<string, unknown>;
   async function rowFor(api: APIRequestContext, email: string): Promise<Row | undefined> {
     const rows = (await (await api.get(`${STUB_DB}/__rows/trip_requests`)).json()) as Row[];
@@ -86,15 +86,18 @@ test.describe('a smoke-test hotel booking is test data', () => {
     expect(res.status(), await res.text()).toBe(200);
   }
 
-  test('a plus-tagged smoke-test address is stored as test data, a real guest address is not', async ({ request }) => {
-    const smoke = `phil+smoke-hotel${Date.now()}@tassytrucks.com`;
-    const guest = `guest${Date.now()}@hotel-guest.com`;
-    await book(request, smoke);
-    await book(request, guest);
-    const a = (await rowFor(request, smoke))!;
-    const b = (await rowFor(request, guest))!;
-    expect(a.hotel_zone).toBe('uptown');
-    expect(a.is_test_data, 'the smoke booking must not start the intro clock or count toward the cap').toBe(true);
-    expect(b.is_test_data).toBe(false);
+  test('only name+tag@tassytrucks.com is test data on a hotel ride: a gmail+tag guest and an untagged Phil are normal rows', async ({ request }) => {
+    const stamp = Date.now();
+    const smoke = `Phil+Smoke-hotel${stamp}@TassyTrucks.com`;
+    const gmailTag = `guest+qa${stamp}@gmail.com`;
+    const untagged = `Phil${stamp}@TassyTrucks.com`;
+    const plain = `guest${stamp}@hotel-guest.com`;
+    for (const email of [smoke, gmailTag, untagged, plain]) await book(request, email);
+    const rows = await Promise.all([smoke, gmailTag, untagged, plain].map((e) => rowFor(request, e)));
+    for (const r of rows) expect(r?.hotel_zone).toBe('uptown');
+    expect(rows[0]!.is_test_data, 'the smoke booking must not start the intro clock or count toward the cap').toBe(true);
+    expect(rows[1]!.is_test_data, 'a real guest at name+qa@gmail.com stays on the board and counts').toBe(false);
+    expect(rows[2]!.is_test_data).toBe(false);
+    expect(rows[3]!.is_test_data).toBe(false);
   });
 });

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { CONCIERGE, estimateTrip, haversineMiles } from '../lib/quote';
 import {
   HOTEL_FLOOR_CENTS, atTerminal, driverPayDollarsFromCard, hotelAt, hotelBySlug, hotelPriceMismatch,
-  hotelQuote, quoteFromHotel, referralCreditAllowed, type HotelQuoteInput,
+  hotelQuote, isHotelSmokeTest, quoteFromHotel, referralCreditAllowed, type HotelQuoteInput,
 } from '../lib/hotel-price';
 import { CLT_TERMINAL, HOTEL_MATCH_RADIUS_M, HOTEL_ZONES, ZONE_INTROS } from '../lib/hotel-zones';
 import { looksLikeTestIdentity } from '../lib/test-data';
@@ -98,17 +98,29 @@ t('the server reads the zone\'s first booking (oldest first, test rows out) and 
   assert.ok(/introFirstBookingAt: first/.test(src), 'the first booking is passed into the price');
 });
 
-t('a smoke-test booking is test data: it neither starts the intro clock nor counts toward the 20-booking cap', () => {
-  // The booking route marks a row is_test_data from the contact email (lib/test-data.ts). A smoke
-  // test of a hotel booking MUST use such an address, e.g. phil+smoke@tassytrucks.com.
-  for (const email of ['phil+smoke@tassytrucks.com', 'phil+test01@tassytrucks.com', 'qa+e2e@tassytrucks.com', 'x@pw-facility.invalid']) {
-    assert.equal(looksLikeTestIdentity(email), true, email);
+t('what marks a hotel booking as test data: only name+tag@tassytrucks.com, case-insensitive', () => {
+  // Test data (does not start the intro clock, does not count toward the 20):
+  for (const email of ['phil+smoke@tassytrucks.com', 'PHIL+Smoke@TASSYTRUCKS.COM', ' phil+qa@tassytrucks.com ', 'anyone+x@tassytrucks.com']) {
+    assert.equal(isHotelSmokeTest(email), true, email);
   }
-  for (const email of ['guest@marriott.com', 'phil@tassytrucks.com', 'jo@hotel-guest.com']) {
-    assert.equal(looksLikeTestIdentity(email), false, `${email} is a real guest and must count`);
+  // A normal row (starts the clock, counts): real guests, an untagged Phil, look-alikes.
+  for (const email of [
+    'guest+tag@gmail.com', 'guest+test@gmail.com', 'guest+qa@gmail.com', 'guest+smoke@gmail.com', // plus tag on another domain
+    'Phil@TassyTrucks.com', 'phil@tassytrucks.com', // no tag
+    'phil+@tassytrucks.com', // empty tag
+    'phil+smoke@mail.tassytrucks.com', 'phil+smoke@tassytrucks.com.evil.com', 'phil+smoke@nottassytrucks.com', // not that domain
+    'phil+smoke@example.com', 'x@pw-facility.invalid', // reserved domains are test elsewhere, NOT for a hotel ride
+    '', null, undefined, 'not an email', 'a+b@c@tassytrucks.com',
+  ]) {
+    assert.equal(isHotelSmokeTest(email as string), false, String(email));
   }
+  // The shared rule is wider (any domain's +test/+qa tag): the very reason a hotel ride does not use it.
+  assert.equal(looksLikeTestIdentity('guest+qa@gmail.com'), true);
+  assert.equal(isHotelSmokeTest('guest+qa@gmail.com'), false);
+  // The route uses the hotel rule for a hotel ride, and the intro queries exclude test rows.
   const route = readFileSync('app/api/trip-request/route.ts', 'utf8');
-  assert.ok(/is_test_data:\s*looksLikeTestIdentity\(data\.contactEmail\)/.test(route), 'the booking route marks test identities');
+  assert.ok(/is_test_data: hotel\s*\?\s*isHotelSmokeTest\(data\.contactEmail\)/.test(route), 'a hotel ride is marked with isHotelSmokeTest');
+  assert.ok(/:\s*looksLikeTestIdentity\(data\.contactEmail\) \|\| looksLikeTestIdentity\(facilityUserEmail\)/.test(route), 'every other ride keeps the shared rule');
   const server = readFileSync('lib/hotel-price.server.ts', 'utf8');
   assert.equal((server.match(/\.eq\('is_test_data', false\)/g) ?? []).length, 2, 'both the booking count and the first-booking clock exclude test rows');
 });

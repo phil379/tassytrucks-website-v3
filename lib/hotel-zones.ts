@@ -16,12 +16,13 @@
  * (needs GOOGLE_MAPS_API_KEY) before launch. A coordinate that is wrong by more than
  * HOTEL_MATCH_RADIUS_M only ever fails SAFE: that hotel quotes the normal ladder.
  *
- * SMOKE TESTS. A test booking of a hotel ride MUST use a test email (plus-tagged, e.g.
- * phil+smoke@tassytrucks.com, or an example.* / *.invalid address: lib/test-data.ts). The booking
- * route stores such a row with is_test_data = true, and both intro limits ignore those rows: it
- * neither starts the 30-day clock nor counts toward the 20-booking cap. A smoke test made with an
- * ordinary address WOULD start the clock and use up one of the 20. (Tests: scripts/test-hotel-zones.ts,
- * playwright/request/hotel-page.spec.ts.)
+ * SMOKE TESTS. A test booking of a hotel ride MUST use a plus-tagged tassytrucks.com address, e.g.
+ * phil+smoke@tassytrucks.com (isHotelSmokeTest in lib/hotel-price.ts; case-insensitive). For a hotel
+ * ride that is the ONLY test-data rule: name+tag@gmail.com is a normal row, and so is an untagged
+ * phil@tassytrucks.com. The booking route stores a smoke row with is_test_data = true, and both
+ * intro limits ignore those rows: it neither starts the 30-day clock nor counts toward the
+ * 20-booking cap. A smoke test made with any other address WOULD start the clock and use up one of
+ * the 20. (Tests: scripts/test-hotel-zones.ts, playwright/request/hotel-page.spec.ts.)
  *
  * TODO(Phil): NO-SHOW FEE. Add a $25-35 no-show line to the Concierge terms once the amount is
  * decided. Nothing charges it in code today, and no page promises it. (Separate from this: if

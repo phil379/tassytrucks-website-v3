@@ -20,12 +20,16 @@ const hotel = (slug: string) => {
   assert.ok(h, `hotel ${slug} exists`);
   return { lat: h!.lat, lng: h!.lng };
 };
-/** Before the intro ends (Nov 10, 2026) and after (Dec 20, 2026). */
+/**
+ * The intro window starts at the zone's first hotel booking (here Nov 1, 2026) and runs
+ * ZONE_INTROS.<zone>.introDays days. IN_INTRO is 9 days in; AFTER_INTRO is 49 days in.
+ */
+const FIRST_BOOKING = '2026-11-01T15:00:00Z';
 const IN_INTRO = new Date('2026-11-10T15:00:00Z');
 const AFTER_INTRO = new Date('2026-12-20T15:00:00Z');
 
 function q(slug: string, o: Partial<HotelQuoteInput> = {}) {
-  return hotelQuote({ serviceLine: 'concierge', pickup: hotel(slug), dropoff: CLT, now: AFTER_INTRO, ...o });
+  return hotelQuote({ serviceLine: 'concierge', pickup: hotel(slug), dropoff: CLT, now: AFTER_INTRO, introFirstBookingAt: FIRST_BOOKING, ...o });
 }
 const cents = (slug: string, o: Partial<HotelQuoteInput> = {}) => q(slug, o)?.chargedCents;
 
@@ -60,6 +64,37 @@ t('the introductory price also ends after introMaxRides bookings in the zone', (
   const max = ZONE_INTROS.uptown.introMaxRides!;
   assert.equal(cents('jw', { now: IN_INTRO, introRidesUsed: max - 1 }), 8900);
   assert.equal(cents('jw', { now: IN_INTRO, introRidesUsed: max }), 9900);
+});
+
+t('the intro has no calendar date to set: it starts at the zone\'s first booking and runs introDays days', () => {
+  for (const z of Object.values(ZONE_INTROS)) assert.ok(!('introEndsAt' in z), 'no hard-coded end date remains');
+  assert.equal(ZONE_INTROS.uptown.introDays, 30);
+  assert.equal(ZONE_INTROS.southpark.introDays, 30);
+  const day = 86_400_000;
+  const start = Date.parse(FIRST_BOOKING);
+  // No booking yet: the window has not started, so the intro is on at any date (only the cap applies).
+  assert.equal(cents('jw', { now: new Date('2027-06-01T00:00:00Z'), introFirstBookingAt: null }), 8900);
+  assert.equal(cents('jw', { now: new Date(start), introFirstBookingAt: FIRST_BOOKING }), 8900, 'day 0');
+  assert.equal(cents('jw', { now: new Date(start + 29 * day), introFirstBookingAt: FIRST_BOOKING }), 8900, 'day 29');
+  assert.equal(cents('jw', { now: new Date(start + 30 * day), introFirstBookingAt: FIRST_BOOKING }), 9900, 'day 30: ended');
+  assert.equal(cents('ac-southpark', { now: new Date(start + 30 * day), introFirstBookingAt: FIRST_BOOKING }), 10900);
+  assert.equal(cents('ac-southpark', { now: new Date(start + 29 * day), introFirstBookingAt: FIRST_BOOKING }), 9900);
+  // An unreadable start closes the intro rather than guessing a lower price.
+  assert.equal(cents('jw', { now: IN_INTRO, introFirstBookingAt: 'not a date' }), 9900);
+  // The two limits are independent: 20 bookings ends it inside the 30 days.
+  assert.equal(ZONE_INTROS.uptown.introMaxRides, 20);
+  assert.equal(cents('jw', { now: new Date(start + 5 * day), introFirstBookingAt: FIRST_BOOKING, introRidesUsed: 19 }), 8900);
+  assert.equal(cents('jw', { now: new Date(start + 5 * day), introFirstBookingAt: FIRST_BOOKING, introRidesUsed: 20 }), 9900);
+  // Airport hotels never have an intro, whatever the window says.
+  assert.equal(cents('hampton-airport', { now: IN_INTRO, introFirstBookingAt: null }), 8900);
+  assert.equal(q('hgi-airport', { now: IN_INTRO, introFirstBookingAt: null })?.introApplied, false);
+});
+
+t('the server reads the zone\'s first booking (oldest first, test rows out) and a database error closes the intro', () => {
+  const src = readFileSync('lib/hotel-price.server.ts', 'utf8');
+  assert.ok(/\.eq\('hotel_zone', zone\)[\s\S]*\.eq\('is_test_data', false\)[\s\S]*\.order\('created_at', \{ ascending: true \}\)[\s\S]*\.limit\(1\)/.test(src));
+  assert.ok(/if \(error\) return new Date\(0\)\.toISOString\(\)/.test(src), 'an error returns the epoch, so the window is long over');
+  assert.ok(/introFirstBookingAt: first/.test(src), 'the first booking is passed into the price');
 });
 
 // ── Same hotel, same price, whatever the route says.
@@ -170,7 +205,7 @@ t('FLAT: a Saturday 4 AM quote, a holiday quote and a weekday quote are the same
   const hq = q('jw')!;
   const prices = times.map((requestedAt) => {
     // A hotel quote takes no time; the extra key is ignored, and the Quote it builds has no surcharge.
-    const h = hotelQuote({ serviceLine: 'concierge', pickup: hotel('jw'), dropoff: CLT, now: AFTER_INTRO, requestedAt } as HotelQuoteInput)!;
+    const h = hotelQuote({ serviceLine: 'concierge', pickup: hotel('jw'), dropoff: CLT, now: AFTER_INTRO, introFirstBookingAt: FIRST_BOOKING, requestedAt } as HotelQuoteInput)!;
     const quote = quoteFromHotel(h);
     assert.deepEqual(quote.surcharges, [], requestedAt);
     assert.equal(quote.lowCents, quote.highCents);

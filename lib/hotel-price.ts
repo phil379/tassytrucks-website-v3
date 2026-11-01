@@ -75,11 +75,26 @@ export function hotelTripFor(
   return null;
 }
 
-/** True while the zone's introductory price is on offer. */
-export function introActive(zone: HotelZoneId, now: Date, ridesUsed: number): boolean {
+const DAY_MS = 86_400_000;
+
+/**
+ * True while the zone's introductory price is on offer: fewer than `introMaxRides` bookings, and
+ * fewer than `introDays` days since the zone's first hotel booking. With no first booking yet
+ * (null) the day window has not started, so only the booking cap applies.
+ */
+export function introActive(
+  zone: HotelZoneId,
+  now: Date,
+  ridesUsed: number,
+  firstBookingAt: Date | string | null = null,
+): boolean {
   const intro = ZONE_INTROS[zone];
   if (intro.introCents === null) return false;
-  if (intro.introEndsAt !== null && now.getTime() >= Date.parse(intro.introEndsAt)) return false;
+  if (intro.introDays !== null && firstBookingAt !== null) {
+    const started = firstBookingAt instanceof Date ? firstBookingAt.getTime() : Date.parse(firstBookingAt);
+    // An unreadable start closes the intro: a wrong lower price is worse than the card price.
+    if (!Number.isFinite(started) || now.getTime() >= started + intro.introDays * DAY_MS) return false;
+  }
   if (intro.introMaxRides !== null && ridesUsed >= intro.introMaxRides) return false;
   return true;
 }
@@ -111,6 +126,8 @@ export type HotelQuoteInput = {
   now?: Date;
   /** Bookings already taken at the introductory price in this zone. */
   introRidesUsed?: number;
+  /** When the zone's first hotel booking was made (starts the intro day window), or null/absent if none yet. */
+  introFirstBookingAt?: Date | string | null;
 };
 
 /**
@@ -134,7 +151,7 @@ export function hotelQuote(input: HotelQuoteInput): HotelQuote | null {
 
   const now = input.now ?? new Date();
   const intro = ZONE_INTROS[trip.hotel.zone];
-  const introOn = introActive(trip.hotel.zone, now, input.introRidesUsed ?? 0);
+  const introOn = introActive(trip.hotel.zone, now, input.introRidesUsed ?? 0, input.introFirstBookingAt ?? null);
 
   const overrideApplied = trip.hotel.overrideCents !== null;
   let oneWay = band.cents;

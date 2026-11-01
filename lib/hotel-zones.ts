@@ -78,9 +78,12 @@ export const HOTEL_ZONES: readonly HotelZoneRow[] = [
 ];
 
 /**
- * Introductory prices, per zone. Ending an intro is a one-line change: set `introCents` to null,
- * or move `introEndsAt` into the past. The intro ends at whichever comes first: the date, or
- * `introMaxRides` bookings in the zone (counted on the server, see lib/hotel-price.server.ts).
+ * Introductory prices, per zone. Ending an intro is a one-line change: set `introCents` to null.
+ *
+ * NO CALENDAR DATE TO SET ON MERGE DAY. The window starts by itself at the zone's FIRST hotel
+ * booking and runs `introDays` days; until that first booking exists the window has not started.
+ * The intro ends at whichever comes first: `introDays` after the first booking, or `introMaxRides`
+ * bookings in the zone (both read from the database on the server, see lib/hotel-price.server.ts).
  *
  * The intro is a charge-side discount only. Driver pay is worked out from the card price that is
  * stored beside it (`card_price_cents`), never from the intro price. It is never combined with a
@@ -88,14 +91,13 @@ export const HOTEL_ZONES: readonly HotelZoneRow[] = [
  */
 export type ZoneIntro = {
   introCents: number | null;
-  /** ISO instant the intro stops, or null for no date limit. */
-  introEndsAt: string | null;
+  /** Days the intro runs, counted from the zone's first hotel booking. Null = no time limit. */
+  introDays: number | null;
   introMaxRides: number | null;
 };
 
 export const ZONE_INTROS: Record<HotelZoneId, ZoneIntro> = {
-  // Assumes a launch around Nov 5, 2026. Move the date when the PR merges.
-  uptown: { introCents: 8900, introEndsAt: '2026-12-05T05:00:00Z', introMaxRides: 20 },
-  southpark: { introCents: 9900, introEndsAt: '2026-12-05T05:00:00Z', introMaxRides: 20 },
-  'airport-area': { introCents: null, introEndsAt: null, introMaxRides: null },
+  uptown: { introCents: 8900, introDays: 30, introMaxRides: 20 },
+  southpark: { introCents: 9900, introDays: 30, introMaxRides: 20 },
+  'airport-area': { introCents: null, introDays: null, introMaxRides: null },
 };

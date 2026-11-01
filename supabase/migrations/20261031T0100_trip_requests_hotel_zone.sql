@@ -13,7 +13,10 @@
 --   hotel_intro        true when the introductory price was charged
 --
 -- Additive and nullable. Every non-hotel row leaves all four empty, so nothing else changes.
--- `card_price_cents` is also added by the ops [Pay] PR; `if not exists` makes either order safe.
+-- `card_price_cents` is created ONLY by this migration. The ops [Pay] PR (#113) does not create,
+-- read or write it: it works the card price out of list_cents / agreed_cents / quoted_cents. A
+-- separate ops follow-up PR will read card_price_cents, so apply this migration BEFORE that PR is
+-- deployed. `if not exists` just makes re-running this file safe.
 
 alter table public.trip_requests
   add column if not exists card_price_cents integer,

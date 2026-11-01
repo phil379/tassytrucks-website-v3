@@ -27,6 +27,7 @@ import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
 import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
 import { wavBookAndPayNote } from '@/lib/wav';
+import { quoteFromHotelPrice } from '@/lib/hotel-price';
 import {
   PICK_ADDRESS_MESSAGE,
   PICK_TO_SEE_PRICE,
@@ -146,8 +147,14 @@ export default function RequestForm({
   servicePreselected = false,
   googleMapsApiKey,
   facility,
+  hotelPrefill,
 }: {
   initialService: ServiceLine;
+  /**
+   * From /airport?hotel=<slug>: the two addresses to start with, already picked. Display and
+   * pre-fill only. The price is decided on the server from the coordinates, never from this.
+   */
+  hotelPrefill?: { pickup: ResolvedPlace; dropoff: ResolvedPlace; price?: { slug: string; chargedCents: number } };
   /** True when the URL carried ?service= — see the decided line below. */
   servicePreselected?: boolean;
   /** Set on /facility/request only. Undefined is the retail form, unchanged. */
@@ -248,11 +255,11 @@ export default function RequestForm({
   // Lifted out of the address fields so the estimate can react to them. Null
   // whenever the visitor edits an address after picking it — a price that
   // describes a corrected address is worse than no price.
-  const [pickupPlace, setPickupPlace] = useState<ResolvedPlace | null>(null);
-  const [dropoffPlace, setDropoffPlace] = useState<ResolvedPlace | null>(null);
+  const [pickupPlace, setPickupPlace] = useState<ResolvedPlace | null>(hotelPrefill?.pickup ?? null);
+  const [dropoffPlace, setDropoffPlace] = useState<ResolvedPlace | null>(hotelPrefill?.dropoff ?? null);
   /** Raw field text. Feeds the ZIP fallback when no place could be picked. */
-  const [pickupText, setPickupText] = useState(facility?.address ?? '');
-  const [dropoffText, setDropoffText] = useState('');
+  const [pickupText, setPickupText] = useState(hotelPrefill?.pickup.address ?? facility?.address ?? '');
+  const [dropoffText, setDropoffText] = useState(hotelPrefill?.dropoff.address ?? '');
   /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
   const [pickupSuggest, setPickupSuggest] = useState(false);
   const [dropoffSuggest, setDropoffSuggest] = useState(false);
@@ -376,8 +383,88 @@ export default function RequestForm({
     };
   }, [pickupLat, pickupLng, dropoffLat, dropoffLng]);
 
+  /**
+   * A hotel zone price, asked of the server (/api/hotel-price) from the two picked places. No hotel
+   * on every trip that is not a listed hotel <-> CLT Concierge ride. The server decides; this only
+   * shows what it said and sends it back at submit so a stale number is refused.
+   *
+   * ONE PRICE ON SCREEN. The answer is keyed to the exact coordinates and leg it was worked out for.
+   * Until the answer for the CURRENT trip is known (seeded from the server on /airport, or fetched),
+   * a Concierge trip shows no price at all: the normal ladder says $109 for the same Uptown trip the
+   * hotel price says $99, and a guest must never see both, not even for a moment.
+   */
+  type HotelAnswer = { key: string; hotel: { slug: string; chargedCents: number } | null };
+  const hotelKeyFor = (a: { lat?: number | null; lng?: number | null }, b: { lat?: number | null; lng?: number | null }, back: boolean) =>
+    `${a.lat},${a.lng}|${b.lat},${b.lng}|${back ? 'rt' : 'ow'}`;
+  const [hotelAnswer, setHotelAnswer] = useState<HotelAnswer | null>(() =>
+    hotelPrefill?.price
+      ? {
+          key: hotelKeyFor(hotelPrefill.pickup, hotelPrefill.dropoff, false),
+          hotel: { slug: hotelPrefill.price.slug, chargedCents: hotelPrefill.price.chargedCents },
+        }
+      : null,
+  );
+  const hotelCheckApplies =
+    service === 'concierge' &&
+    mobility !== 'wheelchair' &&
+    pickupLat !== null &&
+    pickupLng !== null &&
+    dropoffLat !== null &&
+    dropoffLng !== null;
+  const hotelKey = hotelCheckApplies
+    ? hotelKeyFor({ lat: pickupLat!, lng: pickupLng! }, { lat: dropoffLat!, lng: dropoffLng! }, returnTrip)
+    : null;
+  const hotelCurrent = hotelKey !== null && hotelAnswer?.key === hotelKey ? hotelAnswer : null;
+  const hotelPrice = hotelCurrent?.hotel ?? null;
+  /** A Concierge trip whose hotel answer is not in yet: show no price rather than the ladder's. */
+  const hotelPending = hotelCheckApplies && hotelCurrent === null;
+  useEffect(() => {
+    if (!hotelCheckApplies || hotelKey === null || hotelAnswer?.key === hotelKey) return;
+    let cancelled = false;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch('/api/hotel-price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceLine: service,
+          mobility,
+          returnTrip,
+          pickup: { lat: pickupLat, lng: pickupLng },
+          dropoff: { lat: dropoffLat, lng: dropoffLng },
+        }),
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data: { hotel?: { slug?: string } | null; chargedCents?: number } | null) => {
+          if (cancelled) return;
+          setHotelAnswer({
+            key: hotelKey,
+            hotel:
+              data?.hotel?.slug && typeof data.chargedCents === 'number'
+                ? { slug: data.hotel.slug, chargedCents: data.chargedCents }
+                : null,
+          });
+        })
+        .catch(() => {
+          // Could not ask: fall back to the normal engine. The server still decides at submit.
+          if (!cancelled) setHotelAnswer({ key: hotelKey, hotel: null });
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [hotelCheckApplies, hotelKey, hotelAnswer, service, mobility, returnTrip, pickupLat, pickupLng, dropoffLat, dropoffLng]);
+
   const quoted = useMemo(() => {
     if (!estimatesEnabled) return null;
+    if (hotelPending) return null;
+    if (hotelPrice) {
+      const flat = quoteFromHotelPrice(hotelPrice.chargedCents, returnTrip);
+      return flat;
+    }
     return estimateTrip({
       serviceLine: service,
       roadMiles,
@@ -401,6 +488,8 @@ export default function RequestForm({
     });
   }, [
     estimatesEnabled,
+    hotelPrice,
+    hotelPending,
     roadMiles,
     details.escort,
     details.flat_round_trip,
@@ -571,6 +660,9 @@ export default function RequestForm({
       // Only the FLAG. The server recomputes the amounts from the coordinates
       // it received — a price the browser could edit is not defensible.
       estimateShown: Boolean(estimate),
+      // The hotel price on screen, when there is one. The server works it out again and refuses a
+      // booking whose price differs. Null on every other ride.
+      hotelQuotedCents: estimate?.flatLabel && hotelPrice ? hotelPrice.chargedCents : null,
       contactFirstName: String(fd.get('contactFirstName') ?? ''),
       contactLastName: String(fd.get('contactLastName') ?? ''),
       contactPhone: String(fd.get('contactPhone') ?? ''),
@@ -889,7 +981,8 @@ export default function RequestForm({
         <AddressAutocomplete
           name="pickupAddress"
           label="Pickup address"
-          defaultValue={facility?.address ?? ''}
+          defaultValue={hotelPrefill?.pickup.address ?? facility?.address ?? ''}
+          initialPlace={hotelPrefill?.pickup}
           apiKey={googleMapsApiKey}
           autoComplete="street-address"
           required
@@ -908,6 +1001,8 @@ export default function RequestForm({
         <AddressAutocomplete
           name="dropoffAddress"
           label="Destination"
+          defaultValue={hotelPrefill?.dropoff.address ?? ''}
+          initialPlace={hotelPrefill?.dropoff}
           apiKey={googleMapsApiKey}
           required
           hasError={Boolean(errors.dropoffAddress)}
@@ -1261,9 +1356,11 @@ export default function RequestForm({
                     customer checking our number against their own phone must
                     not find it short. */}
                 {estimate.cardLabel} ·{' '}
-                {estimate.distanceMeasured
-                  ? `${estimate.miles} miles driving`
-                  : `about ${estimate.miles} miles`}
+                {estimate.flatLabel
+                  ? `${estimate.flatLabel} · same price at any hour, any day`
+                  : estimate.distanceMeasured
+                    ? `${estimate.miles} miles driving`
+                    : `about ${estimate.miles} miles`}
                 {estimate.roundTrip ? ' · both legs included' : ''}
                 {estimate.waitIncludedMin > 0
                   ? ` · includes ${estimate.waitIncludedMin} min on-site wait`
@@ -1295,6 +1392,8 @@ export default function RequestForm({
                 </p>
               )}
             </>
+          ) : hotelPending ? (
+            <p className="ink-soft text-sm" data-testid="hotel-price-pending">Working out your price…</p>
           ) : quoted?.kind === 'quote-only' ? (
             /* Measurable, but not a table lookup. Say which, and why. */
             <p className="ink-soft text-sm">{quoted.message}</p>

@@ -6,6 +6,7 @@ import {
   hotelQuote, quoteFromHotel, referralCreditAllowed, type HotelQuoteInput,
 } from '../lib/hotel-price';
 import { CLT_TERMINAL, HOTEL_MATCH_RADIUS_M, HOTEL_ZONES, ZONE_INTROS } from '../lib/hotel-zones';
+import { looksLikeTestIdentity } from '../lib/test-data';
 
 let n = 0;
 function t(name: string, fn: () => void) {
@@ -97,6 +98,29 @@ t('the server reads the zone\'s first booking (oldest first, test rows out) and 
   assert.ok(/introFirstBookingAt: first/.test(src), 'the first booking is passed into the price');
 });
 
+t('a smoke-test booking is test data: it neither starts the intro clock nor counts toward the 20-booking cap', () => {
+  // The booking route marks a row is_test_data from the contact email (lib/test-data.ts). A smoke
+  // test of a hotel booking MUST use such an address, e.g. phil+smoke@tassytrucks.com.
+  for (const email of ['phil+smoke@tassytrucks.com', 'phil+test01@tassytrucks.com', 'qa+e2e@tassytrucks.com', 'x@pw-facility.invalid']) {
+    assert.equal(looksLikeTestIdentity(email), true, email);
+  }
+  for (const email of ['guest@marriott.com', 'phil@tassytrucks.com', 'jo@hotel-guest.com']) {
+    assert.equal(looksLikeTestIdentity(email), false, `${email} is a real guest and must count`);
+  }
+  const route = readFileSync('app/api/trip-request/route.ts', 'utf8');
+  assert.ok(/is_test_data:\s*looksLikeTestIdentity\(data\.contactEmail\)/.test(route), 'the booking route marks test identities');
+  const server = readFileSync('lib/hotel-price.server.ts', 'utf8');
+  assert.equal((server.match(/\.eq\('is_test_data', false\)/g) ?? []).length, 2, 'both the booking count and the first-booking clock exclude test rows');
+});
+
+t('the form never shows the normal ladder for a Concierge trip while the hotel answer is pending', () => {
+  const form = readFileSync('components/request/RequestForm.tsx', 'utf8');
+  assert.ok(/if \(hotelPending\) return null;[\s\S]*if \(hotelPrice\) \{/.test(form), 'pending returns no quote before the engine runs');
+  assert.ok(/hotelPrefill\?\.price/.test(form), 'the form opens on the server price');
+  const page = readFileSync('app/airport/page.tsx', 'utf8');
+  assert.ok(/price: shown \?/.test(page), 'the /airport page hands its server price to the form');
+});
+
 // ── Same hotel, same price, whatever the route says.
 t('the same hotel quotes the same price when the engine distance comes back 6.7, 6.9, 7.1 or 7.4 miles', () => {
   const engine = [6.7, 6.9, 7.1, 7.4].map((roadMiles) => {
@@ -137,7 +161,11 @@ t('the ?hotel= parameter alone changes nothing: the price has no slug input', ()
   const withSlug = { serviceLine: 'concierge', pickup: near, dropoff: CLT, now: AFTER_INTRO, hotel: 'hampton-airport', slug: 'hampton-airport' } as HotelQuoteInput;
   assert.equal(hotelQuote(withSlug), null, 'naming a hotel does not make a trip a hotel trip');
   const page = readFileSync('app/airport/page.tsx', 'utf8');
-  assert.ok(!/hotelPrefill=\{[^}]*price/i.test(page), 'the page passes addresses to the form, not a price');
+  // The page may hand the form the SERVER's price (so it opens on one price, not the ladder's), but
+  // never a number that came from the URL: it is `shown`, worked out from coordinates by the engine.
+  assert.ok(/price: shown \?/.test(page), 'the form is seeded with the server quote');
+  assert.ok(/const shown = quote \?\? /.test(page) && /hotelQuoteServer\(\{ serviceLine: 'concierge', pickup, dropoff \}\)/.test(page), 'that quote is the engine\'s');
+  assert.ok(!/searchParams[^;]*(price|cents|amount)/i.test(page), 'no price is read from the URL');
 });
 
 t('only a hotel <-> CLT trip counts: hotel to hotel, hotel to elsewhere and CLT to elsewhere are not hotel trips', () => {

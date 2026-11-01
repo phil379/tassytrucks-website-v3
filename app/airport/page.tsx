@@ -91,7 +91,16 @@ export default async function AirportPage({
                 initialService="concierge"
                 servicePreselected
                 googleMapsApiKey={googleMapsApiKey}
-                hotelPrefill={pickup && dropoff ? { pickup, dropoff } : undefined}
+                hotelPrefill={
+                  pickup && dropoff
+                    ? {
+                        pickup,
+                        dropoff,
+                        // The server's price, so the form opens on it and never shows the normal ladder's.
+                        price: shown ? { slug: shown.slug, chargedCents: shown.chargedCents } : undefined,
+                      }
+                    : undefined
+                }
               />
             </Suspense>
           </div>

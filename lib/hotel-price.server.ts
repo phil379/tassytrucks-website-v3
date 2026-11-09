@@ -3,6 +3,17 @@ import { ZONE_INTROS, type HotelZoneId } from '@/lib/hotel-zones';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 
 /**
+ * Says WHY the intro closed. Both lookups below fail closed (card price), which is right, but they
+ * used to do it silently: a Vercel preview without SUPABASE_SERVICE_ROLE_KEY (it is set for
+ * Production only) showed the Uptown card price ($99) instead of the intro ($89) with nothing in
+ * the logs to say so. The message names a missing variable at most, never a value.
+ */
+function warnIntroClosed(zone: HotelZoneId, lookup: string, err: unknown): void {
+  const message = err instanceof Error ? err.message : typeof err === 'object' && err && 'message' in err ? String((err as { message: unknown }).message) : String(err);
+  console.warn(`[hotel-price] intro closed for ${zone}: ${lookup} failed (${message}); quoting the card price`);
+}
+
+/**
  * Bookings already taken at the zone's introductory price.
  *
  * Counts hotel bookings in the zone that were not cancelled or a no-show, test rows excluded.
@@ -23,9 +34,13 @@ export async function introRidesUsed(zone: HotelZoneId): Promise<number> {
       .eq('hotel_intro', true)
       .eq('is_test_data', false)
       .not('status', 'in', '("cancelled","no_show")');
-    if (error || count === null) return cap;
+    if (error || count === null) {
+      warnIntroClosed(zone, 'ride count', error ?? 'no count returned');
+      return cap;
+    }
     return count;
-  } catch {
+  } catch (err) {
+    warnIntroClosed(zone, 'ride count', err);
     return cap;
   }
 }
@@ -47,9 +62,13 @@ export async function introFirstBookingAt(zone: HotelZoneId): Promise<string | n
       .eq('is_test_data', false)
       .order('created_at', { ascending: true })
       .limit(1);
-    if (error) return new Date(0).toISOString();
+    if (error) {
+      warnIntroClosed(zone, 'first booking', error);
+      return new Date(0).toISOString();
+    }
     return data && data.length > 0 && typeof data[0].created_at === 'string' ? data[0].created_at : null;
-  } catch {
+  } catch (err) {
+    warnIntroClosed(zone, 'first booking', err);
     return new Date(0).toISOString();
   }
 }

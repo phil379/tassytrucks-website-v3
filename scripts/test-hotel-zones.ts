@@ -94,7 +94,9 @@ t('the intro has no calendar date to set: it starts at the zone\'s first booking
 t('the server reads the zone\'s first booking (oldest first, test rows out) and a database error closes the intro', () => {
   const src = readFileSync('lib/hotel-price.server.ts', 'utf8');
   assert.ok(/\.eq\('hotel_zone', zone\)[\s\S]*\.eq\('is_test_data', false\)[\s\S]*\.order\('created_at', \{ ascending: true \}\)[\s\S]*\.limit\(1\)/.test(src));
-  assert.ok(/if \(error\) return new Date\(0\)\.toISOString\(\)/.test(src), 'an error returns the epoch, so the window is long over');
+  assert.ok(/if \(error\) \{[^}]*return new Date\(0\)\.toISOString\(\)/.test(src), 'an error returns the epoch, so the window is long over');
+  // A closed intro must say why in the logs (a preview without the service-role key showed $99 silently).
+  assert.equal((src.match(/warnIntroClosed\(zone, /g) ?? []).length, 4, 'every failure path of both lookups logs why the intro closed');
   assert.ok(/introFirstBookingAt: first/.test(src), 'the first booking is passed into the price');
 });
 

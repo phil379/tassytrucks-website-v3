@@ -962,3 +962,52 @@ export async function notifyOperatorUnsubscribe(email: string): Promise<void> {
     text: `${email} used the unsubscribe link. Add this address to the do-not-email list now (the table is not set up yet, so this email is the record). Never send marketing or outreach email to it again.`,
   });
 }
+
+/**
+ * A rider rated a trip 1-3 (lib/ride-ratings.ts). Tell the operator now.
+ *
+ * PII RULE — see the header. The push carries the trip ref and the score, nothing else: no name, no
+ * phone, no comment. The operator email (a mailbox we control) also carries the rider's comment and
+ * whether the issue was opened in incident_reports. NEVER THROWS: the rating is already stored.
+ */
+export async function notifyOperatorLowRating(info: {
+  tripId: string;
+  ratingId: string;
+  score: number;
+  comment: string | null;
+  issueId: string | null;
+}): Promise<void> {
+  const ref = shortRef(info.tripId);
+  const message: PushMessage = {
+    title: `LOW RATING - ${info.score} of 5`,
+    body: `Ref ${ref}. Open the issues list.`,
+    priority: 'high',
+    tags: ['warning'],
+  };
+  const operator = process.env.OPERATOR_EMAIL;
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    operator
+      ? sendResendEmail({
+          to: operator,
+          subject: `Low rating (${info.score} of 5) - ref ${ref}`,
+          text: [
+            `A rider rated trip ref ${ref} ${info.score} out of 5.`,
+            '',
+            `Comment: ${info.comment ?? '(none)'}`,
+            '',
+            info.issueId
+              ? `An issue was opened in the issues list (incident_reports id ${info.issueId}).`
+              : 'The issue could NOT be opened in incident_reports automatically. Please add it by hand.',
+            `Rating id: ${info.ratingId}`,
+            '',
+            opsUrl(),
+          ].join('\n'),
+        })
+      : Promise.reject(new Error('OPERATOR_EMAIL is not set')),
+  ]);
+  for (const r of results) {
+    if (r.status === 'rejected') console.error('[ride-ratings] low-rating alert leg failed for', ref, r.reason);
+  }
+}

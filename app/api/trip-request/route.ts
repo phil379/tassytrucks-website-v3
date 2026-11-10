@@ -6,6 +6,8 @@ import {
   UNAVAILABLE_SERVICE_LINES,
 } from '@/lib/trip-request';
 import { estimateTrip, formatRange } from '@/lib/quote';
+import { hotelPriceMismatch, isHotelSmokeTest, quoteFromHotel } from '@/lib/hotel-price';
+import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { resolvePoint } from '@/lib/zip-centroids';
 import { withUnit } from '@/lib/address-unit';
 import { unpricedFor } from '@/lib/price-fallback';
@@ -442,10 +444,36 @@ export async function POST(request: Request) {
     mobility: data.mobility,
   });
 
+  // HOTEL ZONE PRICE. Decided here, from the coordinates, never from a `?hotel=` link or from the
+  // price the browser says it saw. Null for every trip that is not a listed hotel <-> CLT ride, and
+  // then nothing below changes. A hotel price is flat: no surcharge of any kind (lib/hotel-price.ts).
+  const hotel = await hotelQuoteServer({
+    serviceLine: data.serviceLine,
+    mobility: data.mobility,
+    pickup: pickupPoint,
+    dropoff: dropoffPoint,
+    returnTrip: data.returnTrip,
+  });
+  // A client that SENT a hotel price must have been shown the same one. Anything else (another
+  // amount, or a hotel price for a trip that is not a hotel trip) is refused with nothing stored.
+  if (hotelPriceMismatch(data.hotelQuotedCents, hotel)) {
+    console.warn(
+      `[trip-request] refused: client hotel price ${data.hotelQuotedCents} vs server ${hotel?.chargedCents ?? 'none'}`,
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'That price is out of date. Reload the page to see the current price, or call (704) 941-8508.',
+        fieldErrors: { hotelQuotedCents: 'Price changed' },
+      },
+      { status: 409 },
+    );
+  }
+
   // Only a real estimate is stored as a number. A 'quote-only' answer (Scholar,
   // or a trip past the last band) is NOT a price and must not be written into
   // the estimate columns, where /ops would read it as one.
-  const estimate = quoted?.kind === 'estimate' ? quoted : null;
+  const estimate = hotel ? quoteFromHotel(hotel) : quoted?.kind === 'estimate' ? quoted : null;
   // What the confirmation screen and the auto-reply email tell the customer, so the price is
   // never first heard on a later phone call.
   // A range (low and high differ) is an estimate however it was measured, so it is never
@@ -462,10 +490,12 @@ export async function POST(request: Request) {
   // dispatcher would see a row that looks like any other. See lib/price-fallback.ts.
   // A trip past the last price band ('quote-only', reason 'beyond-bands') is the same situation
   // for the dispatcher - no number, someone must quote it - so it gets the same marker.
-  const { priceUnavailable, note: unpricedNote } = unpricedFor(quoted, {
-    pickup: !resolvePoint({ lat: data.pickupLat, lng: data.pickupLng }, data.pickupAddress),
-    dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
-  });
+  const { priceUnavailable, note: unpricedNote } = hotel
+    ? { priceUnavailable: false, note: null }
+    : unpricedFor(quoted, {
+        pickup: !resolvePoint({ lat: data.pickupLat, lng: data.pickupLng }, data.pickupAddress),
+        dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
+      });
 
   // What dispatch reads: the picked address, then the door. The estimate above was
   // computed from the address alone, so a unit can never break the match.
@@ -499,8 +529,12 @@ export async function POST(request: Request) {
         // retail check alone would miss Phil walking the funnel as a test
         // facility and put the trip on the real dispatch board. Check the
         // signed-in coordinator too.
-        is_test_data:
-          looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
+        // A HOTEL ride uses the narrower smoke-test rule (lib/hotel-price.ts): only
+        // name+tag@tassytrucks.com is test data, so a real guest at name+qa@gmail.com stays on the
+        // board and counts toward the intro. A signed-in facility coordinator is still checked.
+        is_test_data: hotel
+          ? isHotelSmokeTest(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail)
+          : looksLikeTestIdentity(data.contactEmail) || looksLikeTestIdentity(facilityUserEmail),
         preferred_contact: data.preferredContact,
         pickup_address: pickupStored,
         dropoff_address: dropoffStored,
@@ -537,6 +571,17 @@ export async function POST(request: Request) {
         // Null unless a payer-billed Tassy Care ride. See the block above.
         care_intake: careIntake,
         source,
+        // Only on a hotel zone booking, so every other insert is unchanged (and keeps working before
+        // the migration is applied). card_price_cents is the standard card price for the booking;
+        // driver pay is derived from it in the ops repo, never from the charged amount above.
+        ...(hotel
+          ? {
+              card_price_cents: hotel.cardPriceCents,
+              hotel_slug: hotel.slug,
+              hotel_zone: hotel.zone,
+              hotel_intro: hotel.introApplied,
+            }
+          : {}),
         // Empty for every retail booking, so this spread changes nothing there.
         // See the facility-context block above for where these come from and
         // why facility_id is not among the fields a form may set.

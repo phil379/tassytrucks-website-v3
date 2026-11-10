@@ -61,6 +61,7 @@ export default function AddressAutocomplete({
   hasError,
   describedBy,
   defaultValue = '',
+  initialPlace,
   onResolve,
   onText,
   onSuggestionsReady,
@@ -74,6 +75,11 @@ export default function AddressAutocomplete({
   hasError?: boolean;
   describedBy?: string;
   defaultValue?: string;
+  /**
+   * A place that is already picked when the field first renders (the /airport hotel link). It is
+   * dropped the moment the visitor edits the text, like any picked place (rule 2).
+   */
+  initialPlace?: ResolvedPlace;
   /**
    * Fires whenever the resolved place changes, INCLUDING to null when the
    * visitor edits the text after picking. The parent needs that null as much as
@@ -108,7 +114,7 @@ export default function AddressAutocomplete({
   const { places, failed, status } = useGooglePlaces(apiKey);
 
   const [text, setText] = useState(defaultValue);
-  const [resolved, setResolved] = useState<ResolvedPlace | null>(null);
+  const [resolved, setResolved] = useState<ResolvedPlace | null>(initialPlace ?? null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);

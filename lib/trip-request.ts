@@ -244,6 +244,16 @@ const tripRequestObject = z
     // the customer a price. Only a real true, or the string "true", counts.
     estimateShown: z.preprocess((v) => v === true || v === 'true', z.boolean()),
 
+    /**
+     * The hotel zone price the visitor SAW, in cents, when the panel showed one. Never trusted: the
+     * server works the hotel price out again from the coordinates and refuses the booking when
+     * the two differ (lib/hotel-price.server.ts). Absent on every ride that is not a hotel ride.
+     */
+    hotelQuotedCents: z.preprocess(
+      (v) => (v === null || v === undefined || v === '' ? undefined : Number(v)),
+      z.number().int().min(0).max(1_000_000).optional(),
+    ),
+
     contactFirstName: trimmed(100).min(1, 'Enter your first name'),
     contactLastName: trimmed(100).min(1, 'Enter your last name'),
     contactPhone: trimmed(40).min(7, 'Enter a phone number we can reach you on'),

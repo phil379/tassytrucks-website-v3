@@ -22,6 +22,18 @@ const nextConfig = {
         has: [{ type: 'host', value: '(.*)\\.vercel\\.app' }],
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
+      /**
+       * The private "where is my ride" page (/ride/<token>): the token must never leak to another
+       * site through the Referer header, and the page must never be indexed or cached.
+       */
+      {
+        source: '/ride/:path*',
+        headers: [
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
     ];
   },
   // Permanent redirects so old URLs keep working after we cut over from v2 landing

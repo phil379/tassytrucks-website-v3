@@ -268,6 +268,14 @@ const tripRequestObject = z
     smsConsent: z.boolean().optional().default(false),
 
     /**
+     * Up to two family numbers to text the "where is my ride" link to (lib/ride-link.ts). Raw
+     * strings here; the route validates and normalises them with buildFamilyPhones(), and only
+     * when RIDE_TRACKING_LINK_ENABLED is on and the booking opted into texts. Otherwise ignored.
+     */
+    familyPhone1: z.string().max(40).optional().nullable(),
+    familyPhone2: z.string().max(40).optional().nullable(),
+
+    /**
      * The per-service answers, as raw strings off the form.
      *
      * Deliberately UNTYPED here. The shape depends on the service line, and the

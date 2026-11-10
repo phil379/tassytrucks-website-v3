@@ -148,6 +148,7 @@ export default function RequestForm({
   googleMapsApiKey,
   facility,
   hotelPrefill,
+  rideTrackingEnabled = false,
 }: {
   initialService: ServiceLine;
   /**
@@ -166,7 +167,15 @@ export default function RequestForm({
    * fields degrade to plain text inputs.
    */
   googleMapsApiKey?: string;
+  /**
+   * RIDE_TRACKING_LINK_ENABLED, read on the server and passed down like googleMapsApiKey. When on,
+   * a booking that opts into texts can list up to two family numbers for the "where is my ride" link.
+   */
+  rideTrackingEnabled?: boolean;
 }) {
+  const [smsChecked, setSmsChecked] = useState(false);
+  /** The family-number fields: feature on, a retail booking, and the text box ticked. */
+  const familyFieldsShown = rideTrackingEnabled && !facility && smsChecked;
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -569,6 +578,8 @@ export default function RequestForm({
     contactFirstName: 'First name',
     contactLastName: 'Last name',
     contactPhone: 'Phone',
+    familyPhone1: 'Family number 1',
+    familyPhone2: 'Family number 2',
     contactEmail: 'Email',
     preferredContact: 'Preferred contact',
     facilityRef: 'Your reference',
@@ -669,6 +680,9 @@ export default function RequestForm({
       contactEmail: String(fd.get('contactEmail') ?? '') || null,
       preferredContact: String(fd.get('preferredContact') ?? 'phone'),
       smsConsent: !facility && fd.get('smsConsent') === 'on',
+      // Only sent when the feature is on and the box is ticked; the server ignores them otherwise.
+      familyPhone1: familyFieldsShown ? String(fd.get('familyPhone1') ?? '').trim() || null : null,
+      familyPhone2: familyFieldsShown ? String(fd.get('familyPhone2') ?? '').trim() || null : null,
       hp_token: String(fd.get('hp_token') ?? ''),
       elapsedMs: Date.now() - renderedAtRef.current,
       // Raw strings. The server re-validates them against the same spec and
@@ -1318,6 +1332,7 @@ export default function RequestForm({
               name="smsConsent"
               data-testid="sms-consent"
               className="mt-1 h-5 w-5 shrink-0"
+              onChange={(e) => setSmsChecked(e.currentTarget.checked)}
             />
             <span className="text-sm">
               <span className="font-medium">{SMS_CONSENT_LABEL}</span>
@@ -1334,6 +1349,29 @@ export default function RequestForm({
             </span>
           </label>
         </div>
+      )}
+
+      {/* "Where is my ride" family numbers. Only with the feature on and the text box ticked: they are
+          texted the ride link on this booking's consent, never on their own. */}
+      {familyFieldsShown && (
+        <fieldset data-testid="family-phones">
+          <legend className={labelCls}>Also text the ride link to family (optional)</legend>
+          <p className="ink-soft text-xs mb-3">
+            Up to two US mobile numbers. They get the same driver-assigned text with a link to follow this ride.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label className={labelCls} htmlFor="familyPhone1">Family number 1</label>
+              <input {...fieldProps('familyPhone1')} type="tel" autoComplete="off" />
+              <FieldError name="familyPhone1" />
+            </div>
+            <div>
+              <label className={labelCls} htmlFor="familyPhone2">Family number 2</label>
+              <input {...fieldProps('familyPhone2')} type="tel" autoComplete="off" />
+              <FieldError name="familyPhone2" />
+            </div>
+          </div>
+        </fieldset>
       )}
 
       {estimatesEnabled && (

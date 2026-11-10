@@ -8,6 +8,7 @@ import {
 import { estimateTrip, formatRange } from '@/lib/quote';
 import { hotelPriceMismatch, isHotelSmokeTest, quoteFromHotel } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
+import { attributionSlug } from '@/lib/hotel-card';
 import { resolvePoint } from '@/lib/zip-centroids';
 import { withUnit } from '@/lib/address-unit';
 import { unpricedFor } from '@/lib/price-fallback';
@@ -270,7 +271,12 @@ export async function POST(request: Request) {
   // coordinator ticking a box cannot consent for them. Merged AFTER validation because
   // validateDetails() drops keys it does not know, which is right for answers and wrong here.
   const smsConsent = wantsFacilityBooking ? null : buildSmsConsent(data.smsConsent, data.contactPhone);
-  const tripDetails = smsConsent ? { ...(validatedDetails ?? {}), ...smsConsent } : validatedDetails;
+  const withConsent = smsConsent ? { ...(validatedDetails ?? {}), ...smsConsent } : validatedDetails;
+  // HOTEL CARD ATTRIBUTION (lib/hotel-card.ts). Which hotel's card or link the booking came from,
+  // kept only when it is a listed slug. Merged after validation for the same reason as consent.
+  // It is NOT a price input: the price below is worked out from the two addresses alone.
+  const sourceHotelSlug = attributionSlug(data.sourceHotelSlug);
+  const tripDetails = sourceHotelSlug ? { ...(withConsent ?? {}), source_hotel_slug: sourceHotelSlug } : withConsent;
 
   // ───────────────────────────────────────────────────────── facility context
   //

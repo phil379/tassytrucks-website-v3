@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
-import { markTextLinkOpened } from '@/lib/text-to-book.server';
+import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';

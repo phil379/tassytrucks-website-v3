@@ -18,7 +18,7 @@ import { parseFormBody, validTwilioSignature } from '@/lib/twilio-signature';
  * No real person gets a text until Twilio carrier registration (A2P 10DLC) is approved and Phil sets live.
  *
  * Every dependency (store, clock, quote, rate limiter) is passed in, so the tests touch no database
- * and no network. The production wiring is lib/text-to-book.server.ts.
+ * and no network. The production wiring is lib/text-to-book-db.server.ts.
  */
 
 export type TextToBookMode = 'off' | 'dry_run' | 'live';

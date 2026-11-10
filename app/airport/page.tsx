@@ -4,7 +4,7 @@ import RequestForm from '@/components/request/RequestForm';
 import { hotelBySlug, hotelQuote } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { CLT_TERMINAL } from '@/lib/hotel-zones';
-import { markTextLinkOpened } from '@/lib/text-to-book.server';
+import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { formatUsd } from '@/lib/quote';
 
 /**

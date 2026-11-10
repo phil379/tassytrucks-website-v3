@@ -398,7 +398,7 @@ await t('dry_run never sends: no <Message>, no fetch to api.twilio.com, the woul
   assert.ok(!JSON.stringify(s.rows).includes('7045550999'));
   assert.ok(!logs.join('\n').includes('7045550999'));
   // The source has no outbound Twilio call to make.
-  for (const f of ['lib/text-to-book.ts', 'lib/text-to-book.server.ts', 'lib/twilio-signature.ts', 'app/api/sms/inbound/route.ts']) {
+  for (const f of ['lib/text-to-book.ts', 'lib/text-to-book-db.server.ts', 'lib/twilio-signature.ts', 'app/api/sms/inbound/route.ts']) {
     const src = readFileSync(join(fileURLToPath(new URL('..', import.meta.url)), f), 'utf8');
     assert.ok(!/api\.twilio\.com|from ['"]twilio['"]|require\(['"]twilio['"]\)/.test(src), f);
   }

@@ -1,5 +1,5 @@
 import { handleInbound } from '@/lib/text-to-book';
-import { defaultInboundDeps, signedUrlFor } from '@/lib/text-to-book.server';
+import { defaultInboundDeps, signedUrlFor } from '@/lib/text-to-book-db.server';
 
 /**
  * POST /api/sms/inbound — Twilio's "A message comes in" webhook for text-to-book.

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
+import { markTextLinkOpened } from '@/lib/text-to-book.server';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';
@@ -64,11 +65,13 @@ const requestPageLd = {
  */
 export const dynamic = 'force-dynamic';
 
-export default function RequestPage({
+export default async function RequestPage({
   searchParams,
 }: {
-  searchParams: { service?: string };
+  searchParams: { service?: string; ttb?: string };
 }) {
+  // A link from a text-to-book reply: note that it was opened. Never throws, never blocks the page.
+  await markTextLinkOpened(searchParams.ttb);
   const initialService = coerceServiceLine(searchParams.service);
 
   // Necessarily public — Google's JS API runs in the browser. What protects it

@@ -263,7 +263,11 @@ export default function RequestForm({
   /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
   const [pickupSuggest, setPickupSuggest] = useState(false);
   const [dropoffSuggest, setDropoffSuggest] = useState(false);
-  const [whenValue, setWhenValue] = useState('');
+  // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link). Only that exact shape is used.
+  const [whenValue, setWhenValue] = useState(() => {
+    const w = searchParams.get('when');
+    return w && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(w) ? w : '';
+  });
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');

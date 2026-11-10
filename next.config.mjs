@@ -22,6 +22,14 @@ const nextConfig = {
         has: [{ type: 'host', value: '(.*)\\.vercel\\.app' }],
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
+      /**
+       * Self-hosted fonts (app/fonts.css). File names are content hashes, so they never change in
+       * place and can be cached for a year, as next/font's own /_next/static/media files were.
+       */
+      {
+        source: '/fonts/:file*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
     ];
   },
   // Permanent redirects so old URLs keep working after we cut over from v2 landing

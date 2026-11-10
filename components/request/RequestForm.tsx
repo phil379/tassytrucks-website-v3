@@ -674,6 +674,9 @@ export default function RequestForm({
       // The hotel price on screen, when there is one. The server works it out again and refuses a
       // booking whose price differs. Null on every other ride.
       hotelQuotedCents: estimate?.flatLabel && hotelPrice ? hotelPrice.chargedCents : null,
+      // Which hotel's card or link brought the visitor here. Attribution only; the server ignores
+      // anything that is not a listed hotel and never prices from it.
+      sourceHotelSlug: searchParams?.get('hotel') ?? null,
       contactFirstName: String(fd.get('contactFirstName') ?? ''),
       contactLastName: String(fd.get('contactLastName') ?? ''),
       contactPhone: String(fd.get('contactPhone') ?? ''),

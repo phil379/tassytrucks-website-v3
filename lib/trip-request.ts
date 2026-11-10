@@ -249,6 +249,15 @@ const tripRequestObject = z
      * server works the hotel price out again from the coordinates and refuses the booking when
      * the two differ (lib/hotel-price.server.ts). Absent on every ride that is not a hotel ride.
      */
+    /**
+     * ATTRIBUTION ONLY: the hotel whose card or link the visitor came from (/airport?hotel=<slug>).
+     * Stored as trip_details.source_hotel_slug when it names a listed hotel; never read by pricing.
+     */
+    sourceHotelSlug: z.preprocess(
+      (v) => (typeof v === 'string' && v.trim() !== '' ? v.trim().slice(0, 64) : undefined),
+      z.string().optional(),
+    ),
+
     hotelQuotedCents: z.preprocess(
       (v) => (v === null || v === undefined || v === '' ? undefined : Number(v)),
       z.number().int().min(0).max(1_000_000).optional(),

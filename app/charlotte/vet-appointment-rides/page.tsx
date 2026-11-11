@@ -79,8 +79,8 @@ export default function VetAppointmentRidesPage() {
               <p>
                 <strong>We confirm.</strong> The pet&rsquo;s owner confirms rabies
                 status when booking, so everything is settled before a wheel
-                turns. We coordinate with your
-                clinic on drop-off and pickup timing so your pet is not sitting in
+                turns. Tell us the appointment time and we plan
+                drop-off and pickup around it so your pet is not sitting in
                 a lobby longer than necessary.
               </p>
               <p>

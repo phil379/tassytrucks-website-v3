@@ -52,7 +52,11 @@ export function keywordOf(body: string | null | undefined): Keyword {
 
 export const STOP_REPLY = `${BUSINESS.tradeName}: You are unsubscribed and will get no more texts from us. Reply START to resubscribe.`;
 export const START_REPLY = `${BUSINESS.tradeName}: You are resubscribed. Text a trip like "CLT from JW Marriott Fri 6am" for a price. Reply HELP for help, STOP to opt out.`;
-export const HELP_REPLY = `${BUSINESS.tradeName}: Text a trip like "CLT from JW Marriott Fri 6am" for a price and booking link. Questions: call ${BUSINESS.phoneDisplay}. Msg & data rates may apply. Reply STOP to opt out.`;
+/**
+ * HELP is answered ALWAYS, even after STOP (Phil, 2026-11-12, per carrier rules): business name,
+ * phone, and how to restart. It sends no offer and no link, so it is safe for an opted-out number.
+ */
+export const HELP_REPLY = `${BUSINESS.tradeName}: Text a trip like "CLT from JW Marriott Fri 6am" for a price and booking link. Help: call ${BUSINESS.phoneDisplay}. Reply STOP to opt out, START to restart. Msg & data rates may apply.`;
 
 // ── Phone numbers ──────────────────────────────────────────────────────────────────────────────
 
@@ -301,7 +305,11 @@ export async function handleInbound(req: InboundRequest, deps: InboundDeps): Pro
     return finish(null, { rateLimited: true }, null);
   }
 
-  // 5. Opted out? A failed lookup sends NOTHING (fail closed).
+  // 5. HELP is answered always, even after STOP and even if the opt-out lookup fails: it carries only
+  //    the business name, phone and STOP/START instructions (Phil, 2026-11-12).
+  if (keyword === 'help') return finish(HELP_REPLY, { keyword }, null);
+
+  // 6. Opted out? A failed lookup sends NOTHING (fail closed).
   let optedOut: boolean;
   try {
     optedOut = await deps.store.isOptedOut(hash);
@@ -317,12 +325,13 @@ export async function handleInbound(req: InboundRequest, deps: InboundDeps): Pro
       log(`[text-to-book] opt-in NOT recorded for ***${last4}: ${String(err)}`);
       return finish(null, { keyword, recorded: false }, null);
     }
-    return finish(START_REPLY, { keyword, recorded: true }, null);
+    // ONE confirmation, only when this actually re-subscribes a number that had sent STOP. A
+    // repeated START/YES (or a "yes" from someone who never opted out) gets no extra text.
+    return finish(optedOut ? START_REPLY : null, { keyword, recorded: true, resubscribed: optedOut }, null);
   }
   if (optedOut) return finish(null, { optedOut: true }, null);
-  if (keyword === 'help') return finish(HELP_REPLY, { keyword }, null);
 
-  // 6. A trip.
+  // 7. A trip.
   const token = (deps.newToken ?? newLinkToken)();
   let reply: Reply;
   try {

@@ -421,13 +421,22 @@ await t('STOP suppresses every later reply; START re-enables; STOP is confirmed 
   assert.ok(messageOf(before.body));
   const stop = await text('stop', d);
   assert.equal(stop.reply, STOP_REPLY);
-  for (const body of ['CLT from JW Friday 6am', 'HELP', 'STOP', 'Stop', 'hello', 'info']) {
+  for (const body of ['CLT from JW Friday 6am', 'STOP', 'Stop', 'hello']) {
     const res = await text(body, d);
     assert.equal(res.reply, null, body);
     assert.equal(res.body, EMPTY_TWIML, body);
   }
+  // HELP is still answered after STOP (Phil, 2026-11-12), and says how to restart.
+  for (const body of ['HELP', 'info']) {
+    const res = await text(body, d);
+    assert.equal(res.reply, HELP_REPLY, body);
+    assert.ok(res.reply!.includes('START to restart'));
+  }
   const start = await text('Start', d);
   assert.equal(start.reply, START_REPLY);
+  // One confirmation only: a second START or a YES changes nothing and sends nothing.
+  assert.equal((await text('START', d)).reply, null);
+  assert.equal((await text('yes', d)).reply, null);
   const after = await text('CLT from JW Friday 6am', deps({ store: s.store }));
   assert.ok(messageOf(after.body)?.includes('Fri Nov 13'));
   // Every STOP word, any case, whole message only.
@@ -439,19 +448,22 @@ await t('STOP suppresses every later reply; START re-enables; STOP is confirmed 
 
 await t('fail closed: if the opt-out lookup fails (table missing), nothing is sent', async () => {
   const s = memoryStore({ failLookup: true });
-  for (const body of ['CLT from JW Friday 6am', 'HELP', 'START', 'STOP']) {
+  for (const body of ['CLT from JW Friday 6am', 'START', 'STOP']) {
     const res = await text(body, deps({ store: s.store }));
     assert.equal(res.reply, null, body);
     assert.equal(res.body, EMPTY_TWIML, body);
   }
+  // HELP needs no opt-out lookup and is always answered.
+  assert.equal((await text('HELP', deps({ store: s.store }))).reply, HELP_REPLY);
   // No pepper configured: also nothing sent.
   const noPepper = deps();
   noPepper.env.pepper = undefined;
   assert.equal((await text('HELP', noPepper)).reply, null);
 });
 
-await t('HELP reply: business name, (704) 941-8508, "Reply STOP to opt out"', async () => {
+await t('HELP reply: business name, (704) 941-8508, "Reply STOP to opt out, START to restart"', async () => {
   const res = await text('help', deps());
+  assert.ok(res.reply!.includes('START to restart'));
   assert.ok(res.reply!.includes('Tassy Transportation'));
   assert.ok(res.reply!.includes('(704) 941-8508'));
   assert.ok(res.reply!.includes('Reply STOP to opt out'));

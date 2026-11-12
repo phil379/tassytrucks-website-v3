@@ -88,9 +88,9 @@ export function RatingThanks({ score, googleUrl }: { score: number; googleUrl: s
           ? 'Thank you for telling us. We are sorry the ride fell short, and your feedback has gone straight to our team.'
           : 'Thank you for your feedback. We are glad the ride went well.'}
       </p>
-      {googleUrl && score >= 4 ? (
+      {googleUrl ? (
         <p style={{ ...P, marginTop: 22 }} data-testid="google-review-prompt">
-          Would you share this on Google? It helps other families find us.
+          Would you share your experience on Google? It helps other families find us.
           <br />
           <a
             href={googleUrl}

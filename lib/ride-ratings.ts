@@ -13,7 +13,8 @@ import { createHash, randomBytes, timingSafeEqual } from 'crypto';
  *   4. The rider opens the page (a GET records nothing; email scanners follow links), picks 1-5,
  *      optionally writes a comment and submits (POST, server action).
  *   5. Score 1-3: the admin is alerted and an issue is opened in public.incident_reports.
- *      Score 4-5: a polite "share this on Google?" link, only when GOOGLE_REVIEW_URL is set.
+ *      Every score: a polite "share this on Google?" link, only when GOOGLE_REVIEW_URL is set
+ *      (Phil, 2026-11-12: show it to everyone who rates, not only 4-5).
  *
  * One rating per trip: a unique constraint on ride_ratings.trip_id, plus code that checks first and
  * treats a duplicate insert as "already rated" and shows the thank-you.
@@ -32,7 +33,7 @@ export function ratingsEnabled(env: Env = process.env): boolean {
 }
 
 /**
- * The Google review link shown after a 4 or 5. Read from env GOOGLE_REVIEW_URL (there is no settings
+ * The Google review link shown after every rating (any score). Read from env GOOGLE_REVIEW_URL (there is no settings
  * table on the website). Empty, unset, unparseable or non-https means "hide the prompt".
  */
 export function googleReviewUrl(env: Env = process.env): string | null {
@@ -263,9 +264,9 @@ export type PageState =
   | { kind: 'open' }
   | { kind: 'thanks'; score: number; googleUrl: string | null };
 
-/** The thank-you, with the Google prompt only for a 4-5 and only when a URL is configured. */
+/** The thank-you, with the Google prompt for EVERY score whenever a URL is configured (Phil, 2026-11-12). */
 export function thanksState(score: number, env?: Env): PageState {
-  return { kind: 'thanks', score, googleUrl: score >= 4 ? googleReviewUrl(env) : null };
+  return { kind: 'thanks', score, googleUrl: googleReviewUrl(env) };
 }
 
 type Resolved =

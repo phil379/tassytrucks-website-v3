@@ -301,7 +301,7 @@ async function main() {
       const f = fake();
       const token = await mintToken(f);
       const r = await submitRating(deps(f), { token, score: String(score), comment: '  Driver was late  ' });
-      assert.deepEqual(r, { kind: 'thanks', score, googleUrl: null });
+      assert.deepEqual(r, { kind: 'thanks', score, googleUrl: 'https://g.page/r/example/review' });
       assert.equal(f.incidents.length, 1);
       const inc = f.incidents[0]!;
       assert.equal(inc.trip_id, TRIP);
@@ -365,18 +365,17 @@ async function main() {
     assert.ok(!html.includes('google-review-prompt') && !/Google/i.test(html), html);
   });
 
-  await t('Google prompt shows for 4-5 with an https URL, never for 1-3', async () => {
-    const html = renderToStaticMarkup(createElement(RatingThanks, { score: 4, googleUrl: 'https://g.page/r/example/review' }));
-    assert.ok(html.includes('Would you share this on Google?'));
-    assert.ok(html.includes('href="https://g.page/r/example/review"'));
-    assert.ok(html.includes('rel="noopener noreferrer"'));
-    const low = renderToStaticMarkup(createElement(RatingThanks, { score: 3, googleUrl: 'https://g.page/r/example/review' }));
-    assert.ok(!/Google/.test(low));
-
-    const f = fake();
-    const token = await mintToken(f);
-    const r = await submitRating(deps(f), { token, score: '3', comment: '' });
-    assert.deepEqual(r, { kind: 'thanks', score: 3, googleUrl: null });
+  await t('Google prompt shows for EVERY score 1-5 when an https URL is set (Phil, 2026-11-12)', async () => {
+    for (const score of [1, 2, 3, 4, 5]) {
+      const html = renderToStaticMarkup(createElement(RatingThanks, { score, googleUrl: 'https://g.page/r/example/review' }));
+      assert.ok(html.includes('Would you share your experience on Google?'), `score ${score}`);
+      assert.ok(html.includes('href="https://g.page/r/example/review"'));
+      assert.ok(html.includes('rel="noopener noreferrer"'));
+      const f = fake();
+      const token = await mintToken(f);
+      const r = await submitRating(deps(f), { token, score: String(score), comment: '' });
+      assert.deepEqual(r, { kind: 'thanks', score, googleUrl: 'https://g.page/r/example/review' });
+    }
   });
 
   await t('only an https Google review URL is accepted', () => {

@@ -176,9 +176,19 @@ export function rideStatusFrom(
   return rowStatus === 'assigned' ? 'assigned' : 'none';
 }
 
-/** The map is only ever drawn while the driver is coming or waiting, and only with a real location. */
+/**
+ * The map is drawn only while the ride is ACTIVE (on the way, arrived, in progress) and only with a
+ * location the driver app actually reported. It stops at drop-off: never on assigned or completed
+ * (Phil, 2026-11-12).
+ */
+export const ACTIVE_STATUSES: readonly RideStatus[] = ['on_the_way', 'arrived', 'in_progress'];
+
+export function isActiveRide(status: RideStatus | 'none' | 'inactive'): boolean {
+  return (ACTIVE_STATUSES as readonly string[]).includes(status);
+}
+
 export function canShowMap(status: RideStatus, location: DriverLocation | null | undefined): boolean {
-  if (status !== 'on_the_way' && status !== 'arrived') return false;
+  if (!isActiveRide(status)) return false;
   return !!location && Number.isFinite(location.lat) && Number.isFinite(location.lng);
 }
 
@@ -297,11 +307,17 @@ export const FAMILY_PHONE_ERROR = 'Enter a 10-digit US mobile number, or leave i
  * number that repeats the rider's or the other family number is dropped; anything that is not a
  * US number is an error. Only called when the flag is on and the booking opted into texts.
  */
+export { FAMILY_PERMISSION_LABEL } from '@/lib/ride-link-copy';
+export const FAMILY_PERMISSION_ERROR = 'Please confirm these family members agreed to get ride texts, or clear the numbers';
+
+export type FamilyPhoneValues = { family_phone_1?: string; family_phone_2?: string; family_permission_confirmed?: true };
+
 export function buildFamilyPhones(
   raw1: unknown,
   raw2: unknown,
   contactPhone: string,
-): { ok: true; values: { family_phone_1?: string; family_phone_2?: string } } | { ok: false; errors: Record<string, string> } {
+  permission: unknown = false,
+): { ok: true; values: FamilyPhoneValues } | { ok: false; errors: Record<string, string> } {
   const errors: Record<string, string> = {};
   const rider = normalizeUsPhone(contactPhone);
   const kept: string[] = [];
@@ -316,13 +332,26 @@ export function buildFamilyPhones(
     if (phone !== rider && !kept.includes(phone)) kept.push(phone);
   });
   if (Object.keys(errors).length) return { ok: false, errors };
-  const values: { family_phone_1?: string; family_phone_2?: string } = {};
+  if (kept.length === 0) return { ok: true, values: {} };
+  // A family number is stored only with the booker's confirmation that the person agreed.
+  if (permission !== true && permission !== 'true' && permission !== 'on') {
+    return { ok: false, errors: { familyPermission: FAMILY_PERMISSION_ERROR } };
+  }
+  const values: FamilyPhoneValues = { family_permission_confirmed: true };
   if (kept[0]) values.family_phone_1 = kept[0];
   if (kept[1]) values.family_phone_2 = kept[1];
   return { ok: true, values };
 }
 
-export type RideRecipient = { phone: string; role: 'rider' | 'family' };
+/**
+ * Who gets a ride text, and when (Phil, 2026-11-12):
+ *   rider   the booker, at assignment, at any hour            -> sendWhen 'any_hour'
+ *   family  up to two numbers, ONLY with the booker's confirmed permission, and only while the
+ *           ride is active (on the way, arrived, in progress)  -> sendWhen 'while_active'
+ * One text per audience per ride; nothing to a number after it texted STOP (TassyOps' STOP list).
+ */
+export type RideAudience = 'rider' | 'family';
+export type RideRecipient = { phone: string; role: RideAudience; sendWhen: 'any_hour' | 'while_active' };
 
 /**
  * Who may be texted the link. Consent is recorded per booking: trip_details.sms_consent === true,
@@ -342,10 +371,12 @@ export function rideRecipients(trip: {
   const consented = normalizeUsPhone(d.sms_consent_phone);
   if (!rider || !consented || rider !== consented) return [];
 
-  const out: RideRecipient[] = [{ phone: rider, role: 'rider' }];
+  const out: RideRecipient[] = [{ phone: rider, role: 'rider', sendWhen: 'any_hour' }];
+  // Family numbers only when the booker confirmed, on the form, that these people agreed to the texts.
+  if (d.family_permission_confirmed !== true) return out;
   for (const key of ['family_phone_1', 'family_phone_2'] as const) {
     const phone = normalizeUsPhone(d[key]);
-    if (phone && !out.some((r) => r.phone === phone)) out.push({ phone, role: 'family' });
+    if (phone && !out.some((r) => r.phone === phone)) out.push({ phone, role: 'family', sendWhen: 'while_active' });
   }
   return out;
 }
@@ -376,9 +407,9 @@ export interface RideLinkStore {
   getEvents(tripId: string): Promise<RideEvent[]>;
   /** Nothing stores a driver's position today, so the real store always answers null. */
   getDriverLocation(tripId: string): Promise<DriverLocation | null>;
-  insertToken(row: { tripId: string; tokenHash: string; expiresAt: string }): Promise<{ id: string }>;
-  /** Revoke every still-active token for the trip except `keepId`. */
-  revokeOtherTokens(tripId: string, keepId: string, at: string): Promise<void>;
+  insertToken(row: { tripId: string; tokenHash: string; expiresAt: string; audience: RideAudience }): Promise<{ id: string }>;
+  /** True when a not-revoked link was already issued for this trip and audience (one text per ride). */
+  hasIssued(tripId: string, audience: RideAudience): Promise<boolean>;
   findTokenByHash(tokenHash: string): Promise<RideTokenRecord | null>;
 }
 
@@ -393,22 +424,32 @@ export type MintResult =
   | { kind: 'not_found' }
   | { kind: 'not_active' }
   | { kind: 'no_recipients' }
-  | { kind: 'minted'; url: string; recipients: RideRecipient[]; expiresAt: string };
+  | { kind: 'already_sent' }
+  | { kind: 'minted'; url: string; recipients: RideRecipient[]; expiresAt: string; audience: RideAudience };
+
+export function isAudience(value: unknown): value is RideAudience {
+  return value === 'rider' || value === 'family';
+}
 
 /**
- * Mint the link for an assigned trip. Minting again for the same trip issues a fresh token and
- * revokes the older ones, so only the newest link works (the raw token is never stored, so it
- * cannot be "reused"; replacing it is the safe equivalent). With no consented recipient, nothing is
- * minted at all. Throws only on a database failure; the route turns that into a 503.
+ * Mint the link for one AUDIENCE of a trip (Phil, 2026-11-12):
+ *   'rider'   the booker, once the trip is assigned or active; ops may text it at any hour.
+ *   'family'  the confirmed family numbers, only while the ride is active (on the way, arrived,
+ *             in progress); 'not_active' otherwise.
+ * ONE link per audience per ride: a second call returns 'already_sent' and mints nothing, so ops
+ * never texts the same people twice. With no consented recipient in the audience, nothing is minted.
+ * Throws only on a database failure; the route turns that into a 503.
  */
 export async function mintRideLink(opts: {
   store: RideLinkStore;
   tripId: string;
   enabled: boolean;
+  audience?: RideAudience;
   now?: Date;
   token?: string;
 }): Promise<MintResult> {
   if (!opts.enabled) return { kind: 'disabled' };
+  const audience: RideAudience = opts.audience ?? 'rider';
   const now = opts.now ?? new Date();
   const trip = await opts.store.getTrip(opts.tripId);
   if (!trip) return { kind: 'not_found' };
@@ -416,15 +457,16 @@ export async function mintRideLink(opts: {
   const events = await opts.store.getEvents(trip.id);
   const status = rideStatusFrom(trip, events);
   if (status === 'inactive' || status === 'completed') return { kind: 'not_active' };
+  if (audience === 'family' && !isActiveRide(status)) return { kind: 'not_active' };
 
-  const recipients = rideRecipients(trip);
+  const recipients = rideRecipients(trip).filter((r) => r.role === audience);
   if (recipients.length === 0) return { kind: 'no_recipients' };
+  if (await opts.store.hasIssued(trip.id, audience)) return { kind: 'already_sent' };
 
   const token = opts.token ?? generateRideToken();
   const expiresAt = hardCapExpiry(trip, now).toISOString();
-  const { id } = await opts.store.insertToken({ tripId: trip.id, tokenHash: hashRideToken(token), expiresAt });
-  await opts.store.revokeOtherTokens(trip.id, id, now.toISOString());
-  return { kind: 'minted', url: rideUrlFor(token), recipients, expiresAt };
+  await opts.store.insertToken({ tripId: trip.id, tokenHash: hashRideToken(token), expiresAt, audience });
+  return { kind: 'minted', url: rideUrlFor(token), recipients, expiresAt, audience };
 }
 
 export type RidePageResult = { kind: 'neutral' } | { kind: 'ride'; view: RideView };

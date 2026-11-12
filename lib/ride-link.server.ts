@@ -81,21 +81,23 @@ export function supabaseRideStore(db: SupabaseClient): RideLinkStore {
     async insertToken(row) {
       const { data, error } = await db
         .from(RIDE_TOKENS_TABLE)
-        .insert({ trip_id: row.tripId, token_hash: row.tokenHash, expires_at: row.expiresAt })
+        .insert({ trip_id: row.tripId, token_hash: row.tokenHash, expires_at: row.expiresAt, audience: row.audience })
         .select('id')
         .single();
       if (error || !data) throw new Error(`token insert: ${error?.message ?? 'no row'}`);
       return { id: String((data as Row).id) };
     },
 
-    async revokeOtherTokens(tripId, keepId, at) {
-      const { error } = await db
+    async hasIssued(tripId, audience) {
+      const { data, error } = await db
         .from(RIDE_TOKENS_TABLE)
-        .update({ revoked_at: at })
+        .select('id')
         .eq('trip_id', tripId)
-        .neq('id', keepId)
-        .is('revoked_at', null);
-      if (error) throw new Error(`token revoke: ${error.message}`);
+        .eq('audience', audience)
+        .is('revoked_at', null)
+        .limit(1);
+      if (error) throw new Error(`token issued lookup: ${error.message}`);
+      return Array.isArray(data) && data.length > 0;
     },
 
     async findTokenByHash(tokenHash) {

@@ -283,6 +283,8 @@ const tripRequestObject = z
      */
     familyPhone1: z.string().max(40).optional().nullable(),
     familyPhone2: z.string().max(40).optional().nullable(),
+    /** The booker's confirmation that the family members agreed to ride texts (lib/ride-link.ts). */
+    familyPermission: z.preprocess((v) => v === true || v === 'true' || v === 'on', z.boolean()).optional(),
 
     /**
      * The per-service answers, as raw strings off the form.

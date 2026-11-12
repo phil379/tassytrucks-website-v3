@@ -1,5 +1,6 @@
 'use client';
 
+import { FAMILY_PERMISSION_LABEL } from '@/lib/ride-link-copy';
 import { SMS_CONSENT_LABEL, SMS_CONSENT_DISCLOSURE } from '@/lib/sms-consent';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -580,6 +581,7 @@ export default function RequestForm({
     contactPhone: 'Phone',
     familyPhone1: 'Family number 1',
     familyPhone2: 'Family number 2',
+    familyPermission: 'Family permission',
     contactEmail: 'Email',
     preferredContact: 'Preferred contact',
     facilityRef: 'Your reference',
@@ -686,6 +688,7 @@ export default function RequestForm({
       // Only sent when the feature is on and the box is ticked; the server ignores them otherwise.
       familyPhone1: familyFieldsShown ? String(fd.get('familyPhone1') ?? '').trim() || null : null,
       familyPhone2: familyFieldsShown ? String(fd.get('familyPhone2') ?? '').trim() || null : null,
+      familyPermission: familyFieldsShown && fd.get('familyPermission') === 'on',
       hp_token: String(fd.get('hp_token') ?? ''),
       elapsedMs: Date.now() - renderedAtRef.current,
       // Raw strings. The server re-validates them against the same spec and
@@ -1360,7 +1363,7 @@ export default function RequestForm({
         <fieldset data-testid="family-phones">
           <legend className={labelCls}>Also text the ride link to family (optional)</legend>
           <p className="ink-soft text-xs mb-3">
-            Up to two US mobile numbers. They get the same driver-assigned text with a link to follow this ride.
+            Up to two US mobile numbers. Each gets one text with a link to follow this ride while it is under way.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
@@ -1374,6 +1377,11 @@ export default function RequestForm({
               <FieldError name="familyPhone2" />
             </div>
           </div>
+          <label className="flex items-start gap-3 mt-4 text-sm">
+            <input type="checkbox" name="familyPermission" data-testid="family-permission" className="mt-1" />
+            <span>{FAMILY_PERMISSION_LABEL}</span>
+          </label>
+          <FieldError name="familyPermission" />
         </fieldset>
       )}
 

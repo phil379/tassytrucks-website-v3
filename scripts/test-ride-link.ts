@@ -67,12 +67,13 @@ function trip(over: Partial<RideTripRecord> = {}): RideTripRecord {
       sms_consent_phone: RIDER_PHONE,
       family_phone_1: '+17045550177',
       family_phone_2: '+18285550123',
+      family_permission_confirmed: true,
     },
     ...over,
   };
 }
 
-type TokenRow = { id: string; tripId: string; tokenHash: string; expiresAt: string; revokedAt: string | null };
+type TokenRow = { id: string; tripId: string; tokenHash: string; expiresAt: string; revokedAt: string | null; audience: string };
 
 /** In-memory RideLinkStore. Records every write, so "nothing was minted" is checkable. */
 function memoryStore(opts: {
@@ -115,9 +116,9 @@ function memoryStore(opts: {
       tokens.push({ id, ...row, revokedAt: null });
       return { id };
     },
-    async revokeOtherTokens(tripId, keepId, at) {
-      fail('revokeOtherTokens');
-      for (const r of tokens) if (r.tripId === tripId && r.id !== keepId && !r.revokedAt) r.revokedAt = at;
+    async hasIssued(tripId, audience) {
+      fail('hasIssued');
+      return tokens.some((r) => r.tripId === tripId && r.audience === audience && !r.revokedAt);
     },
     async findTokenByHash(hash) {
       fail('findTokenByHash');
@@ -230,10 +231,11 @@ await t('expired and wrong tokens show the same neutral page, with nothing that 
 });
 
 await t('a revoked token, a cancelled or no-show trip and a database failure are the neutral page too', async () => {
-  const { store } = memoryStore();
+  const { store, tokens } = memoryStore();
   const first = await mintFor(store);
+  tokens[0]!.revokedAt = NOW.toISOString(); // ops or Phil revoked it
   const second = await mintFor(store);
-  assert.deepEqual(await loadRidePage({ store, token: tokenOf(first.url), enabled: true, now: NOW }), { kind: 'neutral' }, 're-minting revokes the old link');
+  assert.deepEqual(await loadRidePage({ store, token: tokenOf(first.url), enabled: true, now: NOW }), { kind: 'neutral' }, 'a revoked link is neutral');
   assert.equal((await loadRidePage({ store, token: tokenOf(second.url), enabled: true, now: NOW })).kind, 'ride');
 
   const cancelled: RideLinkStore = { ...store, getTrip: async () => trip({ status: 'cancelled' }) };
@@ -337,25 +339,26 @@ await t('no consent means nothing is sent and no recipient is returned', async (
 
 await t('with consent: the rider, then up to two family numbers, de-duplicated, as +1 numbers', async () => {
   assert.deepEqual(rideRecipients(trip()), [
-    { phone: '+17045550142', role: 'rider' },
-    { phone: '+17045550177', role: 'family' },
-    { phone: '+18285550123', role: 'family' },
+    { phone: '+17045550142', role: 'rider', sendWhen: 'any_hour' },
+    { phone: '+17045550177', role: 'family', sendWhen: 'while_active' },
+    { phone: '+18285550123', role: 'family', sendWhen: 'while_active' },
   ]);
   const dup = trip({ tripDetails: { ...trip().tripDetails, family_phone_1: '+17045550142', family_phone_2: 'junk' } });
-  assert.deepEqual(rideRecipients(dup), [{ phone: '+17045550142', role: 'rider' }]);
+  assert.deepEqual(rideRecipients(dup), [{ phone: '+17045550142', role: 'rider', sendWhen: 'any_hour' }]);
+  // The rider's link (the default audience) goes to the rider only.
   const { store } = memoryStore();
   const minted = await mintFor(store);
-  assert.equal(minted.recipients.length, 3);
+  assert.deepEqual(minted.recipients.map((r) => r.role), ['rider']);
 });
 
 await t('family numbers: validated, normalised, blanks and repeats dropped', () => {
-  assert.deepEqual(buildFamilyPhones(FAMILY_1, FAMILY_2, RIDER_PHONE), {
+  assert.deepEqual(buildFamilyPhones(FAMILY_1, FAMILY_2, RIDER_PHONE, true), {
     ok: true,
-    values: { family_phone_1: '+17045550177', family_phone_2: '+18285550123' },
+    values: { family_permission_confirmed: true, family_phone_1: '+17045550177', family_phone_2: '+18285550123' },
   });
   assert.deepEqual(buildFamilyPhones('', '  ', RIDER_PHONE), { ok: true, values: {} });
-  assert.deepEqual(buildFamilyPhones(RIDER_PHONE, FAMILY_1, RIDER_PHONE), { ok: true, values: { family_phone_1: '+17045550177' } });
-  assert.deepEqual(buildFamilyPhones(FAMILY_1, FAMILY_1, RIDER_PHONE), { ok: true, values: { family_phone_1: '+17045550177' } });
+  assert.deepEqual(buildFamilyPhones(RIDER_PHONE, FAMILY_1, RIDER_PHONE, true), { ok: true, values: { family_permission_confirmed: true, family_phone_1: '+17045550177' } });
+  assert.deepEqual(buildFamilyPhones(FAMILY_1, FAMILY_1, RIDER_PHONE, true), { ok: true, values: { family_permission_confirmed: true, family_phone_1: '+17045550177' } });
   const bad = buildFamilyPhones('12345', '011 44 20 7946 0958', RIDER_PHONE);
   assert.equal(bad.ok, false);
   assert.deepEqual(Object.keys((bad as { errors: Record<string, string> }).errors).sort(), ['familyPhone1', 'familyPhone2']);
@@ -381,7 +384,7 @@ await t('the booking route stores family numbers only with the flag on and the t
 await t('a completed trip hides the map, even with a driver location', async () => {
   const loc: DriverLocation = { lat: 35.2271, lng: -80.8431, at: '2026-11-10T19:55:00Z' };
   assert.equal(canShowMap('completed', loc), false);
-  assert.equal(canShowMap('in_progress', loc), false);
+  assert.equal(canShowMap('in_progress', loc), true, 'the ride is still active until drop-off');
   assert.equal(canShowMap('assigned', loc), false);
   assert.equal(canShowMap('on_the_way', loc), true);
   assert.equal(canShowMap('arrived', loc), true);
@@ -510,6 +513,59 @@ await t('the migration is additive, server-only and stores a hash', () => {
   assert.ok(/enable row level security/.test(sql));
   assert.ok(!/create policy/i.test(sql), 'no policies: service role only');
   assert.ok(!/\btoken\s+text\b/.test(sql), 'no raw token column');
+});
+
+
+/* ─────────────────────── Phil's decisions, 2026-11-12 */
+
+await t('family numbers need the booker to confirm the people agreed; without it, nothing is stored', () => {
+  for (const permission of [false, undefined, 'no', 1]) {
+    const r = buildFamilyPhones(FAMILY_1, '', RIDER_PHONE, permission);
+    assert.equal(r.ok, false, String(permission));
+    assert.ok('familyPermission' in (r as { errors: Record<string, string> }).errors);
+  }
+  for (const permission of [true, 'true', 'on']) assert.equal(buildFamilyPhones(FAMILY_1, '', RIDER_PHONE, permission).ok, true);
+  // Recorded numbers without the confirmation flag are never texted.
+  const noFlag = trip({ tripDetails: { ...trip().tripDetails, family_permission_confirmed: undefined } });
+  assert.deepEqual(rideRecipients(noFlag).map((r) => r.role), ['rider']);
+  const form = readFileSync('components/request/RequestForm.tsx', 'utf8');
+  assert.ok(/name="familyPermission"/.test(form) && /FAMILY_PERMISSION_LABEL/.test(form));
+});
+
+await t('family texts only while the ride is active; the rider at assignment, any hour', async () => {
+  const assigned = memoryStore();
+  assert.deepEqual(await mintRideLink({ store: assigned.store, tripId: TRIP_ID, enabled: true, audience: 'family', now: NOW }), { kind: 'not_active' });
+  assert.equal(assigned.tokens.length, 0, 'nothing minted for family before the ride is active');
+  for (const ev of ['en_route', 'arrived', 'picked_up']) {
+    const active = memoryStore({ events: [{ event: ev, at: '2026-11-10T20:00:00Z' }] });
+    const r = await mintRideLink({ store: active.store, tripId: TRIP_ID, enabled: true, audience: 'family', now: NOW });
+    assert.equal(r.kind, 'minted', ev);
+    assert.deepEqual((r as { recipients: { role: string; sendWhen: string }[] }).recipients.map((x) => `${x.role}:${x.sendWhen}`), ['family:while_active', 'family:while_active']);
+  }
+  const done = memoryStore({ events: [{ event: 'dropped_off', at: '2026-11-10T20:30:00Z' }] });
+  assert.deepEqual(await mintRideLink({ store: done.store, tripId: TRIP_ID, enabled: true, audience: 'family', now: NOW }), { kind: 'not_active' });
+  const rider = await mintRideLink({ store: memoryStore().store, tripId: TRIP_ID, enabled: true, audience: 'rider', now: NOW });
+  assert.equal(rider.kind, 'minted');
+  assert.equal((rider as { recipients: { sendWhen: string }[] }).recipients[0]!.sendWhen, 'any_hour');
+});
+
+await t('one text per ride: a second call for the same audience is "already_sent" and mints nothing', async () => {
+  const { store, tokens } = memoryStore({ events: [{ event: 'en_route', at: '2026-11-10T20:00:00Z' }] });
+  assert.equal((await mintRideLink({ store, tripId: TRIP_ID, enabled: true, audience: 'rider', now: NOW })).kind, 'minted');
+  assert.deepEqual(await mintRideLink({ store, tripId: TRIP_ID, enabled: true, audience: 'rider', now: NOW }), { kind: 'already_sent' });
+  assert.equal((await mintRideLink({ store, tripId: TRIP_ID, enabled: true, audience: 'family', now: NOW })).kind, 'minted');
+  assert.deepEqual(await mintRideLink({ store, tripId: TRIP_ID, enabled: true, audience: 'family', now: NOW }), { kind: 'already_sent' });
+  assert.equal(tokens.length, 2);
+  const route = readFileSync('app/api/internal/ride-link/route.ts', 'utf8');
+  assert.ok(/case 'already_sent':[\s\S]*status: 409/.test(route));
+  const sql = readFileSync('supabase/migrations/20261110T0200_ride_tracking_tokens.sql', 'utf8');
+  assert.ok(/unique index if not exists ride_tracking_tokens_one_per_audience[\s\S]*\(trip_id, audience\)[\s\S]*where revoked_at is null/.test(sql));
+});
+
+await t('the map shows only while the ride is active and stops at drop-off', () => {
+  const loc = { lat: 35.22, lng: -80.84, at: '2026-11-10T20:00:00Z' };
+  for (const st of ['on_the_way', 'arrived', 'in_progress'] as const) assert.equal(canShowMap(st, loc), true, st);
+  for (const st of ['assigned', 'completed'] as const) assert.equal(canShowMap(st, loc), false, st);
 });
 
 console.log(`\n${n} ride-link tests passed`);

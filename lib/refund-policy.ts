@@ -25,6 +25,13 @@
  *   applies to the per-ride Scholar plans (Weekly and After-School).
  * No code in the pricing path charges a cancellation fee or issues a refund today:
  * fees and refunds are handled by hand by Phil (Stripe / TassyOps).
+ *
+ * -- CONCIERGE NO-SHOW (Phil, approved 2026-11-12) -- FOR COUNSEL REVIEW --
+ * A Concierge no-show is a FLAT $35 fee. Long Concierge trips keep the Oct 24 rule:
+ * 100% of the trip price. "Long" = over conciergeNoShow.longTripOverMiles (30, the end of
+ * the Concierge price card; longer trips are quoted by a person). Waivable case by case
+ * (mayWaiveCaseByCase). Every other line keeps the Oct 24 numbers above. Counsel should
+ * review this wording before it is relied on. Still nothing charges it in code.
  */
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
@@ -60,7 +67,22 @@ export const CANCELLATION = {
   refundStartBusinessDays: 3,
   /** Tassy may waive a fee case by case. */
   mayWaiveCaseByCase: true,
+  /**
+   * Tassy Concierge no-show (Phil, 2026-11-12; FOR COUNSEL REVIEW). A flat fee instead of 100%,
+   * except long trips, which keep 100% of the trip price.
+   */
+  conciergeNoShow: {
+    flatFeeCents: 3500,
+    longTripOverMiles: 30,
+    longTripNoShowFeePercent: 100,
+    counselReview: true,
+  },
 } as const;
+
+/** "$35", from the config, so the page never types the amount. */
+export function conciergeNoShowFeeText(): string {
+  return `$${(CANCELLATION.conciergeNoShow.flatFeeCents / 100).toFixed(0)}`;
+}
 
 /** What Phil proposed on 2026-10-24, kept so a change is a one-line decision. */
 export const PHIL_PROPOSED = {

@@ -24,9 +24,16 @@
  * 20-booking cap. A smoke test made with any other address WOULD start the clock and use up one of
  * the 20. (Tests: scripts/test-hotel-zones.ts, playwright/request/hotel-page.spec.ts.)
  *
- * TODO(Phil): NO-SHOW FEE. Add a $25-35 no-show line to the Concierge terms once the amount is
- * decided. Nothing charges it in code today, and no page promises it. (Separate from this: if
- * the guest no-shows, the driver's $25 callout fee is an ops-repo rule, not built here.)
+ * APPROVED by Phil, 2026-11-12 (scripts/test-approved-pricing.ts pins every number):
+ *   Uptown $99 (driver $54), SouthPark AC Hotel $109 ($59), Sheraton and Hampton Inn $89 ($48),
+ *   Hilton Garden Inn and Hilton Airport $99 ($54). Intro: Uptown $89, SouthPark $99, for the
+ *   first 30 days or 20 rides, then the card price. Driver pay is always floor(0.55 x card price),
+ *   never from the intro price. Flat, no surcharges, never below $89. No hotel incentive (no guest
+ *   discount, no referral credit).
+ *
+ * NO-SHOW FEE: decided 2026-11-12. A Concierge no-show is $35 flat (trips over 30 miles: 100%),
+ * waivable case by case, in lib/refund-policy.ts (marked for counsel review). Nothing charges it in
+ * code. (Separate from this: the driver's $25 callout fee is an ops-repo rule, not built here.)
  */
 
 export type HotelZoneId = 'uptown' | 'southpark' | 'airport-area';

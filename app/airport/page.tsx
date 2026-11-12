@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
+import { rideTrackingEnabled } from '@/lib/ride-link';
 import { hotelBySlug, hotelQuote } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { CLT_TERMINAL } from '@/lib/hotel-zones';
@@ -91,6 +92,7 @@ export default async function AirportPage({
                 initialService="concierge"
                 servicePreselected
                 googleMapsApiKey={googleMapsApiKey}
+                rideTrackingEnabled={rideTrackingEnabled()}
                 hotelPrefill={
                   pickup && dropoff
                     ? {

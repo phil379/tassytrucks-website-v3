@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
+import { rideTrackingEnabled } from '@/lib/ride-link';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';
@@ -105,6 +106,7 @@ export default function RequestPage({
                 */
                 servicePreselected={serviceWasHonoured(searchParams.service)}
                 googleMapsApiKey={googleMapsApiKey}
+                rideTrackingEnabled={rideTrackingEnabled()}
               />
             </Suspense>
           </div>

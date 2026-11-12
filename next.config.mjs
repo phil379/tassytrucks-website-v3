@@ -23,6 +23,18 @@ const nextConfig = {
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       /**
+       * The private "where is my ride" page (/ride/<token>): the token must never leak to another
+       * site through the Referer header, and the page must never be indexed or cached.
+       */
+      {
+        source: '/ride/:path*',
+        headers: [
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
+      /**
        * Self-hosted fonts (app/fonts.css). File names are content hashes, so they never change in
        * place and can be cached for a year, as next/font's own /_next/static/media files were.
        */

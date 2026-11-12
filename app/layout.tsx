@@ -1,27 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Newsreader, Inter } from 'next/font/google';
+import './fonts.css';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ConsentManager from '@/components/ConsentManager';
 
-// MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent C) — was a render-blocking
-// <link> to fonts.googleapis.com. next/font self-hosts (zero CLS, no
-// third-party request, no preconnect) and exposes CSS variables consumed by
-// globals.css (.serif → --font-newsreader · body → --font-inter).
-const newsreader = Newsreader({
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-newsreader',
-  display: 'swap',
-});
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+// Fonts are self-hosted from public/fonts via app/fonts.css (same files, weights and subsets that
+// next/font/google used to download on every build). app/fonts.css defines the CSS variables
+// consumed by globals.css (.serif -> --font-newsreader, body -> --font-inter) on :root.
+// The Latin files are preloaded below, exactly as next/font did.
+const PRELOAD_FONTS = [
+  '/fonts/4b9bb515ce6d026f.p.woff2', // Newsreader italic, latin
+  '/fonts/5611c55482296524.p.woff2', // Newsreader normal, latin
+  '/fonts/e4af272ccee01ff0-s.p.woff2', // Inter, latin
+];
 
 export const metadata: Metadata = {
   title: {
@@ -106,8 +98,11 @@ const localBusinessLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${newsreader.variable} ${inter.variable}`}>
+    <html lang="en">
       <head>
+        {PRELOAD_FONTS.map((href) => (
+          <link key={href} rel="preload" href={href} as="font" type="font/woff2" crossOrigin="" />
+        ))}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }}

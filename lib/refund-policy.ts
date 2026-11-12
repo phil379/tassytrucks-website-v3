@@ -1,3 +1,5 @@
+import { CONCIERGE } from '@/lib/quote';
+
 /**
  * Cancellation, no-show and refund numbers, in ONE place. The /refunds page, the
  * request form and the confirmation email read from here.
@@ -28,11 +30,19 @@
  *
  * -- CONCIERGE NO-SHOW (Phil, approved 2026-11-12) -- FOR COUNSEL REVIEW --
  * A Concierge no-show is a FLAT $35 fee. Long Concierge trips keep the Oct 24 rule:
- * 100% of the trip price. "Long" = over conciergeNoShow.longTripOverMiles (30, the end of
- * the Concierge price card; longer trips are quoted by a person). Waivable case by case
+ * 100% of the trip price. "Long" = over conciergeNoShow.longTripOverMiles, which is READ from
+ * the Concierge price card's last band (lib/quote.ts, CONCIERGE), today 30 miles: any trip the
+ * website does not price. Exactly 30 is still priced, so it is not long. Phil confirmed this
+ * definition on 2026-11-12. Change the card and the no-show threshold moves with it. Waivable case by case
  * (mayWaiveCaseByCase). Every other line keeps the Oct 24 numbers above. Counsel should
  * review this wording before it is relied on. Still nothing charges it in code.
  */
+
+/**
+ * The furthest a Concierge trip can go and still get a website price: the last band of the
+ * Concierge card. A trip OVER this is a "long trip" for the no-show rule (Phil, 2026-11-12).
+ */
+export const CONCIERGE_PRICED_MAX_MILES: number = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
 export const REFUND_POLICY_UPDATED = 'October 24, 2026';
@@ -73,7 +83,8 @@ export const CANCELLATION = {
    */
   conciergeNoShow: {
     flatFeeCents: 3500,
-    longTripOverMiles: 30,
+    /** The last mileage the website prices for Concierge. Never typed: read from the card. */
+    longTripOverMiles: CONCIERGE_PRICED_MAX_MILES,
     longTripNoShowFeePercent: 100,
     counselReview: true,
   },

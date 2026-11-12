@@ -4,7 +4,8 @@ import {
   HOTEL_FLOOR_CENTS, driverPayDollarsFromCard, hotelBySlug, hotelQuote, referralCreditAllowed,
 } from '../lib/hotel-price';
 import { CLT_TERMINAL, HOTEL_ZONES, ZONE_INTROS } from '../lib/hotel-zones';
-import { CANCELLATION, conciergeNoShowFeeText } from '../lib/refund-policy';
+import { CANCELLATION, CONCIERGE_PRICED_MAX_MILES, conciergeNoShowFeeText } from '../lib/refund-policy';
+import { CONCIERGE, bandFor } from '../lib/quote';
 
 /**
  * Phil's decisions, approved 2026-11-12. These numbers are pinned here so a change to the card,
@@ -92,7 +93,7 @@ t('no hotel incentive: the intro is never combined with a referral credit, and n
 t('Concierge no-show: $35 flat, trips over 30 miles 100%, waivable, marked for counsel review', () => {
   assert.equal(CANCELLATION.conciergeNoShow.flatFeeCents, 3500);
   assert.equal(conciergeNoShowFeeText(), '$35');
-  assert.equal(CANCELLATION.conciergeNoShow.longTripOverMiles, 30);
+  assert.equal(CANCELLATION.conciergeNoShow.longTripOverMiles, 30, 'today the card ends at 30 miles');
   assert.equal(CANCELLATION.conciergeNoShow.longTripNoShowFeePercent, 100);
   assert.equal(CANCELLATION.conciergeNoShow.counselReview, true);
   assert.equal(CANCELLATION.mayWaiveCaseByCase, true);
@@ -102,6 +103,20 @@ t('Concierge no-show: $35 flat, trips over 30 miles 100%, waivable, marked for c
   const page = readFileSync('app/refunds/page.tsx', 'utf8');
   assert.ok(/conciergeNoShowFeeText\(\)/.test(page), '/refunds reads the amount from the config');
   assert.ok(!/\$35/.test(page), 'the page never types the amount');
+});
+
+t('a "long trip" is exactly what the website does not price: read from the Concierge card, never typed', () => {
+  const last = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
+  assert.equal(CONCIERGE_PRICED_MAX_MILES, last);
+  assert.equal(CANCELLATION.conciergeNoShow.longTripOverMiles, last);
+  // Exactly the last band is still priced (not long); anything past it is not priced (long).
+  assert.ok(bandFor(CONCIERGE, last), `${last} miles is priced`);
+  assert.equal(bandFor(CONCIERGE, last + 0.01), null, `${last + 0.01} miles is past the card`);
+  // The policy file reads the card; it does not type the number.
+  const src = readFileSync('lib/refund-policy.ts', 'utf8');
+  assert.ok(/longTripOverMiles: CONCIERGE_PRICED_MAX_MILES,/.test(src));
+  assert.ok(/CONCIERGE\.bands\[CONCIERGE\.bands\.length - 1\]!\.upToMiles/.test(src));
+  assert.ok(!/longTripOverMiles:\s*\d/.test(src), 'no typed mileage');
 });
 
 console.log(`${n} approved pricing checks passed`);

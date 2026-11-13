@@ -9,7 +9,7 @@ import ConsoleShell from '@/components/facility/ConsoleShell';
 import TeamPanel from '@/components/facility/TeamPanel';
 
 export const metadata: Metadata = {
-  title: 'Team — Tassy Transportation',
+  title: { absolute: 'Team — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 export const dynamic = 'force-dynamic';

@@ -3,7 +3,7 @@ import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'IV therapy & med-spa rides in Charlotte | Tassy Transportation',
+  title: 'IV therapy & med-spa rides in Charlotte',
   description:
     'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
   alternates: { canonical: '/renew' },

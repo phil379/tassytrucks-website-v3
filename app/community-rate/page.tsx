@@ -23,7 +23,7 @@ const COMMUNITY_RATE = {
 } as const;
 
 export const metadata: Metadata = {
-  title: 'Veteran Rate and Senior Day (preview) | Tassy Transportation',
+  title: { absolute: 'Veteran Rate and Senior Day (preview) | Tassy Transportation' },
   description: 'Preview of the Tassy Community Rate: 5% off for veterans every day and for riders 70 and over every Tuesday.',
   robots: { index: false, follow: false },
 };

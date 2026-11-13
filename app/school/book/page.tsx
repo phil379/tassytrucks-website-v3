@@ -9,7 +9,7 @@ import {
 } from '@/lib/school-household';
 
 export const metadata: Metadata = {
-  title: 'Daily school transport in Charlotte NC · Tassy Scholar',
+  title: { absolute: 'Daily school transport in Charlotte NC · Tassy Scholar' },
   description:
     'Committed daily school transport in Charlotte. Three recurring plans for one child, with a schedule reviewed and confirmed before service begins. Pricing varies by school.',
   alternates: { canonical: '/school/book' },

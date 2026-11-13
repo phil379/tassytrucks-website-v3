@@ -9,7 +9,7 @@ import { whenLabel } from '@/components/facility/bits';
 import { markThreadRead } from './actions';
 
 export const metadata: Metadata = {
-  title: 'Messages — Tassy Transportation',
+  title: { absolute: 'Messages — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 export const dynamic = 'force-dynamic';

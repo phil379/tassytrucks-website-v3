@@ -15,7 +15,7 @@ import { canBook, passengerNoun } from '@/lib/facility';
 import { serviceLabel } from '@/lib/trip-request';
 
 export const metadata: Metadata = {
-  title: 'Your account — Tassy Transportation',
+  title: { absolute: 'Your account — Tassy Transportation' },
   // Behind a magic link and specific to one facility. Never indexed.
   robots: { index: false, follow: false },
 };

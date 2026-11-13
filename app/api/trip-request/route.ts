@@ -25,6 +25,7 @@ import {
   buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isPayerEnabled,
 } from '@/lib/care-intake';
 import { buildSmsConsent } from '@/lib/sms-consent';
+import { buildFamilyPhones, rideTrackingEnabled, type FamilyPhoneValues } from '@/lib/ride-link';
 import { parseLocalDateTime } from '@/lib/time';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { resolvePayer } from '@/lib/facility.server';
@@ -271,7 +272,17 @@ export async function POST(request: Request) {
   // coordinator ticking a box cannot consent for them. Merged AFTER validation because
   // validateDetails() drops keys it does not know, which is right for answers and wrong here.
   const smsConsent = wantsFacilityBooking ? null : buildSmsConsent(data.smsConsent, data.contactPhone);
-  const withConsent = smsConsent ? { ...(validatedDetails ?? {}), ...smsConsent } : validatedDetails;
+  // "Where is my ride" family numbers. Only with the flag on AND the booking's text opt-in: they are
+  // texted on the booking's consent, so without it they are not stored at all (lib/ride-link.ts).
+  let familyPhones: FamilyPhoneValues = {};
+  if (rideTrackingEnabled() && smsConsent) {
+    const family = buildFamilyPhones(data.familyPhone1, data.familyPhone2, data.contactPhone, data.familyPermission === true);
+    if (!family.ok) {
+      return NextResponse.json({ ok: false, error: 'Please check the form.', fieldErrors: family.errors }, { status: 400 });
+    }
+    familyPhones = family.values;
+  }
+  const withConsent = smsConsent ? { ...(validatedDetails ?? {}), ...smsConsent, ...familyPhones } : validatedDetails;
   // HOTEL CARD ATTRIBUTION (lib/hotel-card.ts). Which hotel's card or link the booking came from,
   // kept only when it is a listed slug. Merged after validation for the same reason as consent.
   // It is NOT a price input: the price below is worked out from the two addresses alone.

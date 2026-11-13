@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { textToBookActive } from '@/lib/text-to-book';
+import { rideTrackingEnabled } from '@/lib/ride-link';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';
@@ -112,6 +113,7 @@ export default async function RequestPage({
                 */
                 servicePreselected={serviceWasHonoured(searchParams.service)}
                 googleMapsApiKey={googleMapsApiKey}
+                rideTrackingEnabled={rideTrackingEnabled()}
               />
             </Suspense>
           </div>

@@ -31,7 +31,7 @@
 html, body { background: var(--bg); color: var(--ink); }
 html { scroll-behavior: smooth; }
 body {
-  /* next/font/google self-hosts these (see app/layout.tsx) — the CSS var falls
+  /* Self-hosted from public/fonts (see app/fonts.css) — the CSS var falls
      back to the family name / system stack if the font var isn't applied. */
   font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;

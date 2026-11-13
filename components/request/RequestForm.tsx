@@ -2,6 +2,7 @@
 
 import { SMS_CONSENT_LABEL, SMS_CONSENT_DISCLOSURE } from '@/lib/sms-consent';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { prefillWhen } from '@/lib/text-link-prefill';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import {
@@ -143,6 +144,7 @@ export type FacilityContext = {
 };
 
 export default function RequestForm({
+  textLinkPrefill = false,
   initialService,
   servicePreselected = false,
   googleMapsApiKey,
@@ -166,6 +168,11 @@ export default function RequestForm({
    * fields degrade to plain text inputs.
    */
   googleMapsApiKey?: string;
+  /**
+   * TEXT_TO_BOOK_MODE is on (dry_run or live), read on the server and passed down. Only then does a
+   * `?when=` link pre-fill the pickup time. Off (the default) ignores it.
+   */
+  textLinkPrefill?: boolean;
 }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -263,11 +270,9 @@ export default function RequestForm({
   /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
   const [pickupSuggest, setPickupSuggest] = useState(false);
   const [dropoffSuggest, setDropoffSuggest] = useState(false);
-  // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link). Only that exact shape is used.
-  const [whenValue, setWhenValue] = useState(() => {
-    const w = searchParams.get('when');
-    return w && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(w) ? w : '';
-  });
+  // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link), ONLY when the server passed
+  // textLinkPrefill (TEXT_TO_BOOK_MODE on). Off: ignored, the form opens as before.
+  const [whenValue, setWhenValue] = useState(() => prefillWhen(searchParams.get('when'), textLinkPrefill));
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');

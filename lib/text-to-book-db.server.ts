@@ -1,6 +1,7 @@
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { rateLimit } from '@/lib/rate-limit';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { textToBookActive } from '@/lib/text-to-book';
 import {
   HOUR_MS,
   INBOUND_PER_HOUR,
@@ -112,11 +113,20 @@ export function signedUrlFor(request: Request): string {
 /**
  * Records that a texted booking link was opened (?ttb=<token> on the landing page). Harmless by
  * design: a bad token, a missing table or no database config does nothing and never throws.
+ *
+ * GATED (Phil, 2026-11-13): with TEXT_TO_BOOK_MODE off or unset it returns BEFORE touching the
+ * database, so a `?ttb=` link changes nothing for a visitor. `opts` exist only so tests can pass a
+ * mode and a fake client.
  */
-export async function markTextLinkOpened(token: unknown, at: Date = new Date()): Promise<void> {
+export async function markTextLinkOpened(
+  token: unknown,
+  at: Date = new Date(),
+  opts: { mode?: string | null; db?: () => ReturnType<typeof supabaseAdmin> } = {},
+): Promise<void> {
+  if (!textToBookActive(opts.mode === undefined ? process.env.TEXT_TO_BOOK_MODE : opts.mode)) return;
   if (!isLinkToken(token)) return;
   try {
-    const { error } = await supabaseAdmin()
+    const { error } = await (opts.db ?? supabaseAdmin)()
       .from(MESSAGES_TABLE)
       .update({ link_opened_at: at.toISOString() })
       .eq('link_token', token)

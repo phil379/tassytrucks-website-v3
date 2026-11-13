@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
+import { textToBookActive } from '@/lib/text-to-book';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';
@@ -70,8 +71,10 @@ export default async function RequestPage({
 }: {
   searchParams: { service?: string; ttb?: string };
 }) {
-  // A link from a text-to-book reply: note that it was opened. Never throws, never blocks the page.
-  await markTextLinkOpened(searchParams.ttb);
+  // A link from a text-to-book reply: note that it was opened, ONLY while TEXT_TO_BOOK_MODE is on.
+  // With the mode off this page behaves exactly as before: no database write, no time prefill.
+  const textLinks = textToBookActive();
+  if (textLinks) await markTextLinkOpened(searchParams.ttb);
   const initialService = coerceServiceLine(searchParams.service);
 
   // Necessarily public — Google's JS API runs in the browser. What protects it
@@ -99,6 +102,7 @@ export default async function RequestPage({
             <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
               <RequestForm
                 initialService={initialService}
+                textLinkPrefill={textLinks}
                 /*
                   Whether the visitor ARRIVED with a choice, not merely which
                   line is selected. coerceServiceLine always returns something,

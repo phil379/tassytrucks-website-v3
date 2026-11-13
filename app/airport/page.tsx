@@ -5,6 +5,7 @@ import { hotelBySlug, hotelQuote } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
 import { CLT_TERMINAL } from '@/lib/hotel-zones';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
+import { textToBookActive } from '@/lib/text-to-book';
 import { formatUsd } from '@/lib/quote';
 
 /**
@@ -34,8 +35,10 @@ export default async function AirportPage({
 }: {
   searchParams: { hotel?: string; dir?: string; ttb?: string };
 }) {
-  // A link from a text-to-book reply: note that it was opened. Never throws, never blocks the page.
-  await markTextLinkOpened(searchParams.ttb);
+  // A link from a text-to-book reply: note that it was opened, ONLY while TEXT_TO_BOOK_MODE is on.
+  // With the mode off this page behaves exactly as before: no database write, no time prefill.
+  const textLinks = textToBookActive();
+  if (textLinks) await markTextLinkOpened(searchParams.ttb);
   const hotel = hotelBySlug(searchParams.hotel);
   const fromAirport = searchParams.dir === 'from';
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -93,6 +96,7 @@ export default async function AirportPage({
               <RequestForm
                 initialService="concierge"
                 servicePreselected
+                textLinkPrefill={textLinks}
                 googleMapsApiKey={googleMapsApiKey}
                 hotelPrefill={
                   pickup && dropoff

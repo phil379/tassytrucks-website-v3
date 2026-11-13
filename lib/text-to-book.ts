@@ -28,6 +28,15 @@ export function textToBookMode(value: string | null | undefined): TextToBookMode
   return v === 'dry_run' || v === 'live' ? v : 'off';
 }
 
+/**
+ * True only when TEXT_TO_BOOK_MODE is dry_run or live. With the mode off or unset, the booking
+ * pages must behave exactly as before text-to-book existed: no `?when=` prefill and no database
+ * write for `?ttb=` links (Phil, 2026-11-13).
+ */
+export function textToBookActive(value: string | null | undefined = process.env.TEXT_TO_BOOK_MODE): boolean {
+  return textToBookMode(value) !== 'off';
+}
+
 /** The service lines text-to-book may offer: a text like this is Concierge. Each must be live (isRequestable). */
 export const TEXT_TO_BOOK_SERVICE_LINES: readonly ServiceLine[] = ['concierge'];
 

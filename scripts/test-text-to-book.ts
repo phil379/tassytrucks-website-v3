@@ -536,6 +536,52 @@ await t('replies never contain insurance or licensing claims (or any banned / un
   }
 });
 
+
+// ── Mode off is inert for visitors (Phil, 2026-11-13) ──
+
+await t('mode off: a ?when= link does NOT pre-fill the pickup time; mode on does', async () => {
+  const { prefillWhen } = await import('../lib/text-link-prefill');
+  assert.equal(prefillWhen('2026-11-13T06:00', false), '', 'off: ignored');
+  assert.equal(prefillWhen('2026-11-13T06:00', true), '2026-11-13T06:00', 'on: applied');
+  assert.equal(prefillWhen('6am friday', true), '', 'on: only the exact shape');
+  assert.equal(prefillWhen(null, true), '');
+  const { textToBookActive } = await import('../lib/text-to-book');
+  for (const v of [undefined, null, '', 'off', 'OFF', 'Live', 'dry-run', 'true']) assert.equal(textToBookActive(v as string | undefined), false, String(v));
+  for (const v of ['dry_run', 'live']) assert.equal(textToBookActive(v), true, v);
+  // The form only prefills through prefillWhen(…, textLinkPrefill), and the prop defaults to false.
+  const form = readFileSync(join(fileURLToPath(new URL('..', import.meta.url)), 'components/request/RequestForm.tsx'), 'utf8');
+  assert.ok(/textLinkPrefill = false,/.test(form), 'prop defaults to off');
+  assert.ok(/useState\(\(\) => prefillWhen\(searchParams\.get\('when'\), textLinkPrefill\)\)/.test(form));
+  assert.ok(!/searchParams\.get\('when'\)(?![^\n]*prefillWhen)/.test(form.replace(/useState\(\(\) => prefillWhen\(searchParams\.get\('when'\), textLinkPrefill\)\)/, '')), 'no other ?when= read');
+});
+
+await t('mode off: a ?ttb= link makes NO database call; mode on records link_opened_at', async () => {
+  const { markTextLinkOpened } = await import('../lib/text-to-book-db.server');
+  const calls: string[] = [];
+  const fakeDb = () => {
+    calls.push('db');
+    const chain: Record<string, unknown> = {};
+    chain.from = (table: string) => { calls.push(`from:${table}`); return chain; };
+    chain.update = (row: Record<string, unknown>) => { calls.push(`update:${Object.keys(row).join(',')}`); return chain; };
+    chain.eq = () => chain;
+    chain.is = () => Promise.resolve({ error: null });
+    return chain as unknown as ReturnType<typeof import('../lib/supabase-admin').supabaseAdmin>;
+  };
+  const token = 'a'.repeat(16); // a valid link token (16 url-safe characters)
+  for (const mode of [undefined, null, '', 'off', 'LIVE']) {
+    await markTextLinkOpened(token, new Date(), { mode: mode as string | null, db: fakeDb });
+  }
+  assert.equal(calls.length, 0, 'off: the database is never touched');
+  await markTextLinkOpened(token, new Date(), { mode: 'dry_run', db: fakeDb });
+  assert.ok(calls.includes('from:text_to_book_messages') && calls.includes('update:link_opened_at'), `on: ${calls.join(' ')}`);
+  // Both landing pages gate the call AND the prefill on the same switch.
+  for (const page of ['app/airport/page.tsx', 'app/request/page.tsx']) {
+    const src = readFileSync(join(fileURLToPath(new URL('..', import.meta.url)), page), 'utf8');
+    assert.ok(/const textLinks = textToBookActive\(\);\n\s*if \(textLinks\) await markTextLinkOpened\(searchParams\.ttb\);/.test(src), page);
+    assert.ok(/textLinkPrefill=\{textLinks\}/.test(src), `${page} passes the switch to the form`);
+  }
+});
+
 globalThis.fetch = realFetch;
 assert.equal(fetchCalls.length, 0, 'no network call was attempted');
 console.log(`\n${n} text-to-book tests passed`);

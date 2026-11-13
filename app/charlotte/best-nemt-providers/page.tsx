@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Best NEMT Providers in Charlotte — How to Choose',
@@ -154,10 +155,8 @@ export default function BestNemtProvidersPage() {
                 Operations: door-to-door is our standard, not an add-on. We book
                 wheelchair rides in ramp-equipped vehicles from our partner network, book recurring series in a
                 single call, and run a dispatch line at (704) 941-8508.
-                A dispatcher usually confirms your driver and your price within 2 hours during business hours. We are
-                based in Charlotte, serving all of
-                Mecklenburg County plus Matthews, Huntersville, Concord, and
-                Gastonia. Put us through the same checklist you would apply to
+                A dispatcher usually confirms your driver and your price within 2 hours during business hours. We
+                serve {SERVICE_AREA}. Put us through the same checklist you would apply to
                 anyone else; that is exactly how we want to be chosen.
               </p>
             </>

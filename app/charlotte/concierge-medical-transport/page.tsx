@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Concierge Medical Transport in Charlotte NC',
@@ -114,7 +115,7 @@ export default function ConciergeMedicalTransportPage() {
                 <Link href="/renew" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Tassy Wellness
                 </Link>
-                , our wellness transport vertical.
+                , our Wellness &amp; med-spa service line.
               </p>
             </>
           ),
@@ -151,10 +152,8 @@ export default function ConciergeMedicalTransportPage() {
           h2: 'Where we drive',
           body: (
             <p>
-              Our base is Charlotte, and we serve the practices and patients of
-              Mecklenburg County daily — SouthPark, Uptown, Ballantyne,
-              Dilworth — along with the surrounding towns clients actually
-              travel from: Matthews, Pineville, Huntersville, and Concord.
+              We serve {SERVICE_AREA} &mdash; SouthPark, Uptown, Ballantyne,
+              Dilworth.
               Coming in from farther out for a procedure with a Charlotte
               surgeon? Call (704) 941-8508 and dispatch will quote the trip
               directly.

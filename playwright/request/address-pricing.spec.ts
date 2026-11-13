@@ -71,7 +71,9 @@ test.describe('path 1: block the submit until both addresses are picked', () => 
   test('the reported case: a typed pickup is stopped with a plain message under that field', async ({ page, request }) => {
     const email = unique('typed');
     await page.goto('/request?service=winnie&utm_source=tassyops&utm_medium=staff');
-    await page.locator('#pickupAddress').fill('1220 Tourmaline Rd, Apt 1910');
+    // A fragment, not an address: since 2026-11-13 a complete street address is matched for the
+    // rider (lib/address-match.ts), so only a partial one is still stopped here.
+    await page.locator('#pickupAddress').fill('1220 Tourmaline, Apt 1910');
     await pick(page, 'dropoffAddress', '3106 Aransas', /3106 Aransas Rd/);
     await fillWinnieRest(page, email);
 
@@ -88,7 +90,7 @@ test.describe('path 1: block the submit until both addresses are picked', () => 
   test('picking the address clears the message, and the booking then goes through with a price', async ({ page, request }) => {
     const email = unique('picked');
     await page.goto('/request?service=winnie');
-    await page.locator('#pickupAddress').fill('1220 Tourmaline Rd');
+    await page.locator('#pickupAddress').fill('1220 Tourmaline');
     await pick(page, 'dropoffAddress', '3106 Aransas', /3106 Aransas Rd/);
     await fillWinnieRest(page, email);
     await send(page).tap();
@@ -155,7 +157,9 @@ test.describe('path 2: when a price still cannot be computed', () => {
     await blockPlaces(page);
     const email = unique('nosuggest');
     await page.goto('/request?service=winnie');
-    await page.locator('#pickupAddress').fill('1220 Tourmaline Rd, Apt 1910');
+    // A fragment, not an address: since 2026-11-13 a complete street address is matched for the
+    // rider (lib/address-match.ts), so only a partial one is still stopped here.
+    await page.locator('#pickupAddress').fill('1220 Tourmaline, Apt 1910');
     await page.locator('#dropoffAddress').fill('3106 Aransas Rd');
     await fillWinnieRest(page, email);
     // The form discards a submit that arrives under 3 seconds after it rendered (the bot

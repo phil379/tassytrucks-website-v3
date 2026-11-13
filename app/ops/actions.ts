@@ -278,7 +278,7 @@ export async function confirmAndSend(formData: FormData) {
     backWithNotice('no_price');
   }
 
-  // Facility accounts are invoiced monthly and must NOT be sent a card link.
+  // Facility accounts are invoiced weekly and must NOT be sent a card link.
   const onAccount = formData.get('onAccount') === 'on';
 
   // The work itself lives in lib/ops-confirm.ts, shared with the TassyOps one-tap confirm.

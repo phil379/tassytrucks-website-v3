@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Post-Surgery Transport in Charlotte NC',
@@ -173,8 +174,7 @@ export default function PostSurgeryTransportPage() {
           h2: 'Where we drive in and around Charlotte',
           body: (
             <p>
-              We are based in Charlotte and cover all of Mecklenburg County,
-              plus Matthews, Pineville, Huntersville, Concord, and Gastonia.
+              We serve {SERVICE_AREA}.
               Whether your procedure is at a major hospital campus like Atrium
               Health Carolinas Medical Center or Novant Health Presbyterian, or
               at one of the freestanding surgery and endoscopy centers scattered

@@ -179,7 +179,7 @@ export const COPY = {
     /** One sentence on every booking form, so no rider wonders when or how they pay (Muse F20). */
   howYouPay: 'We confirm your price first, then send a secure link to pay. No card is taken on this form.',
   howYouPayScholar:
-    'We confirm your plan and price first. Scholar is billed monthly, by secure link. No card is taken on this form.',
+    'We confirm your plan and price first, then send a secure link to pay. Scholar is billed monthly. No card is taken on this form.',
   waitTime:
     'Tassy Recovery covers the trip there, the wait, and the trip home, with 20 minutes of on-site wait included. Longer than that is $35 per extra half hour — quoted to you before it is charged, never after.',
 } as const;

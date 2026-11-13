@@ -1,0 +1,6 @@
+{
+  "name": "invoice-monthly",
+  "pattern": "invoice monthly|account with monthly invoicing",
+  "flags": "i",
+  "reason": "Facilities are invoiced weekly on 7-day terms (Phil, Oct 2026). Render FACILITY_INVOICING from lib/copy.ts."
+}

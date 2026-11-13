@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'NEMT in Charlotte NC — Request Medical Transport',
@@ -131,10 +132,8 @@ export default function NemtRidesPage() {
           h2: 'Where we drive',
           body: (
             <p>
-              Our home base is Charlotte, and we cover all of Mecklenburg County —
-              Uptown, South End, University City, Steele Creek, Ballantyne — plus
-              the surrounding towns patients actually travel between: Matthews,
-              Pineville, Huntersville, Concord, and Gastonia. If your appointment is
+              We serve {SERVICE_AREA} &mdash; Uptown, South End, University
+              City, Steele Creek, Ballantyne. If your appointment is
               at a major Charlotte hospital campus or a neighborhood clinic, we have
               almost certainly been there this week.
             </p>
@@ -160,7 +159,7 @@ export default function NemtRidesPage() {
         },
         {
           q: 'What areas around Charlotte do you serve?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, Huntersville, Concord, and Gastonia. For trips beyond that range, call us — longer-distance medical transport is quoted case by case.',
+          a: `We serve ${SERVICE_AREA}. For trips beyond that range, call us — longer-distance medical transport is quoted case by case.`,
         },
       ]}
       relatedLinks={[

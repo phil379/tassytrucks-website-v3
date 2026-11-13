@@ -1,0 +1,6 @@
+{
+  "name": "service-area-town-list",
+  "pattern": "Matthews, Pineville, Huntersville, Concord, and Gastonia|Mecklenburg County plus Matthews|Matthews, Pineville, Huntersville, and Concord|Huntersville, Pineville, and Concord are the backbone|Mecklenburg \\+ surrounding towns",
+  "flags": "i",
+  "reason": "The service area is Charlotte and Mecklenburg County, with no town list. Render SERVICE_AREA from lib/copy.ts."
+}

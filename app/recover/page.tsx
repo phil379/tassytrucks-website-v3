@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
+import { FACILITY_INVOICING } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: { absolute: 'Tassy Recovery — ride home after surgery or sedation | Charlotte' },
@@ -91,7 +92,7 @@ export default function RecoverPage() {
       ]}
       partnerCta={{
         title: 'Surgery centers, dental practices and med spas',
-        body: 'Add a private transportation option to your discharge workflow. We book on account, invoice monthly, and your patient is collected from the desk by a named driver at a time you set. Preferred rates from 10 trips a month.',
+        body: `Add a private transportation option to your discharge workflow. We book on account, invoice ${FACILITY_INVOICING}, and your patient is collected from the desk by a named driver at a time you set. Preferred rates from 10 trips a month.`,
         href: 'mailto:phil@tassytrucks.com?subject=Facility%20account%20—%20Tassy%20Recovery',
         label: 'Ask for the facility packet',
       }}

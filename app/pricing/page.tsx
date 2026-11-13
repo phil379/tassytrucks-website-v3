@@ -10,6 +10,7 @@ import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/
 import { WAV_PARTNER_LINE, wavBookAndPayNote } from '@/lib/wav';
 import { SCHOOL_PLANS } from '@/lib/school-plans';
 import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
+import { TREATMENT_DAY_DRIVER } from '@/lib/copy';
 
 /** Wait rates, read from the rate cards (not typed), for the lines that include some on-site wait. */
 const WAIT_LINES = [
@@ -124,7 +125,7 @@ export default function PricingPage() {
               <RateTable
                 id="treatment-day"
                 heading="Tassy Care &mdash; Treatment Day"
-                note="One flat price for the round trip to recurring visits, in a late-model SUV that is wiped down before your ride. Your driver takes you there and comes back when you call. Treatment Day is $11 more than two one-way Care rides: that covers the late-model SUV and a driver held for your return, with no wait charges however long the day runs. A companion rides free. Add-ons for early mornings, nights, weekends and holidays are shown before you book."
+                note={`One flat price for the round trip to recurring visits, in a late-model SUV that is wiped down before your ride. Your driver takes you there and comes back when you call. Treatment Day is $11 more than two one-way Care rides: that covers the late-model SUV and a driver ${TREATMENT_DAY_DRIVER}, with no wait charges however long the day runs. A companion rides free. Add-ons for early mornings, nights, weekends and holidays are shown before you book.`}
                 colA="Two Care rides"
                 colASub="there, then back"
                 colB="Treatment Day"

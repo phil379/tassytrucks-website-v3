@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { partnerSignup } from '@/lib/partner-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Facility Transport Partnerships in Charlotte NC',
@@ -233,7 +234,7 @@ export default function PartnersPage() {
         },
         {
           q: 'What is your service area?',
-          a: 'We are based in Charlotte and serve all of Mecklenburg County, plus Matthews, Pineville, Huntersville, Concord, and Gastonia. If your facility regularly discharges patients beyond that range, raise it on the intro call and we will tell you what we can commit to.',
+          a: `We serve ${SERVICE_AREA}. If your facility regularly discharges patients beyond that range, raise it on the intro call and we will tell you what we can commit to.`,
         },
         {
           q: 'Do you bill directly or through us?',

@@ -16,7 +16,7 @@ export default function RenewPage() {
       eyebrow="Wellness &amp; med-spa appointments"
       title="Two ways to get to a wellness appointment."
       tagline="Which one you need depends on how you will feel afterwards."
-      description="Wellness and med-spa runs used to be their own service line. They are now handled by the two lines that actually fit: Tassy Concierge when you are simply going there and back under your own steam, and Tassy Recovery when the procedure means you should not be driving and someone needs to wait for you. Same company, clearer pricing, and you are never sold the expensive one when the cheaper one is right."
+      description="Wellness and med-spa runs are one of our six service lines. Which ride you book depends on how you will feel afterwards: Tassy Concierge when you are simply going there and back under your own steam, and Tassy Recovery when the procedure means you should not be driving and someone needs to wait for you. Same company, clearer pricing, and you are never sold the expensive one when the cheaper one is right."
       bookHref={request.renew}
       bookLabel="Book a ride"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}

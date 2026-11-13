@@ -35,25 +35,24 @@ export default function Footer() {
             <div>SDVOSB Certified · {BUSINESS_LOCATION}</div>
           </div>
 
-          {/* HIRE Vets medallion. White chip because the footer is dark and the
-              medal's outer ring is navy -- without a light backing the ring
-              disappears and it reads as a floating gold disc. The badge is not
-              recoloured or cropped. */}
-          <div className="mt-6 flex items-center gap-3">
-            <div className="rounded-full bg-white p-1.5 shrink-0">
-              <img
-                src="/brand/hirevets-2023-gold.png"
-                alt="2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor"
-                width={56}
-                height={56}
-                loading="lazy"
-                className="h-11 w-11 block"
-              />
-            </div>
-            <div className="text-xs opacity-70 leading-snug">
-              <div className="font-semibold opacity-100">2023 HIRE Vets Medallion</div>
-              <div>Gold Award · U.S. Dept. of Labor</div>
-            </div>
+          {/* The same two badges as the home page, smaller. Phil's files, unaltered; not links. */}
+          <div data-testid="footer-trust-badges" className="mt-6 flex flex-wrap items-center gap-3">
+            <img
+              src="/brand/hirevets-2023-gold-banner.webp"
+              alt="2023 HIRE Vets Medallion Award Gold Winner -- U.S. Department of Labor, HIREVets.gov"
+              width={840}
+              height={439}
+              loading="lazy"
+              className="block h-auto w-[220px] max-w-full rounded-md"
+            />
+            <img
+              src="/brand/sba-sdvosb-certified.webp"
+              alt="U.S. Small Business Administration -- Service-Disabled Veteran-Owned Certified"
+              width={400}
+              height={500}
+              loading="lazy"
+              className="block h-auto w-[92px]"
+            />
           </div>
         </div>
 

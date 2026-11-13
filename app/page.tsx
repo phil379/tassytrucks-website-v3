@@ -159,36 +159,28 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* 2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor (Phil's award).
-                Moved up from the founder section on 2026-11-13: Phil said it was too small to
-                notice. The badge file is the original (320x320), shown at 112px so it is sharp at
-                2x and up. The caption is the wording the site already used, unchanged; it says what
-                the award is and who gives it, and implies no endorsement of the service. The year
-                stays visible: it is a 2023 award, not a current-year one. */}
-            <div
-              data-testid="hirevets-medallion"
-              className="mt-8 flex items-center gap-5 rounded-tile border border-line p-4 sm:p-5 max-w-xl"
-              style={{ background: 'var(--surface)' }}
-            >
-              {/* White chip: the medal's outer ring is navy and disappears on the dark surface. */}
-              <div className="rounded-full bg-white p-1.5 shrink-0">
-                <img
-                  src="/brand/hirevets-2023-gold.png"
-                  alt="2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor"
-                  width={320}
-                  height={320}
-                  className="h-24 w-24 sm:h-28 sm:w-28 block"
-                />
-              </div>
-              <div>
-                <div className="serif text-lg sm:text-xl font-semibold leading-snug">
-                  2023 HIRE Vets Medallion Award &mdash; Gold
-                </div>
-                <div className="text-sm ink-soft mt-1 leading-relaxed">
-                  Awarded by the U.S. Department of Labor to employers who recruit,
-                  hire and retain veterans.
-                </div>
-              </div>
+            {/* Trust row (Phil, 2026-11-13: the medallion alone was too small to read). Phil's own badge
+                files, unaltered and uncropped, so every word on them is readable on a phone: the
+                HIRE Vets banner (840x439 = 2x of its 340-420px display) and the SBA certification
+                badge (400x500 = 2x of 200px). No caption: the site adds no words beyond the badges'
+                own, and neither image is a link. */}
+            <div data-testid="trust-badges" className="mt-8 flex flex-wrap items-center gap-4">
+              <img
+                data-testid="hirevets-banner"
+                src="/brand/hirevets-2023-gold-banner.webp"
+                alt="2023 HIRE Vets Medallion Award Gold Winner -- U.S. Department of Labor, HIREVets.gov"
+                width={840}
+                height={439}
+                className="block h-auto w-full max-w-[340px] sm:w-[360px] sm:max-w-none rounded-lg"
+              />
+              <img
+                data-testid="sba-sdvosb-badge"
+                src="/brand/sba-sdvosb-certified.webp"
+                alt="U.S. Small Business Administration -- Service-Disabled Veteran-Owned Certified"
+                width={400}
+                height={500}
+                className="block h-auto w-[200px] sm:w-[150px]"
+              />
             </div>
           </div>
 
@@ -374,7 +366,9 @@ export default function HomePage() {
 
       {/* ───────────── FOUNDER ───────────── */}
       <section id="founder" className="bg-surface border-y border-line">
-        <div className="container-x py-24 grid lg:grid-cols-2 gap-14 items-center">
+        {/* grid-cols-1 (a 0-minimum track) so the one-column phone layout can shrink to a 320px
+            screen; an auto track grew to the widest line and scrolled sideways by 33px. */}
+        <div className="container-x py-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
           <div className="aspect-square rounded-tile border border-line overflow-hidden">
             {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png) */}
             <img
@@ -448,7 +442,9 @@ export default function HomePage() {
                 without something behind it is how the unsourced version got
                 onto this page the first time. */}
             <div className="mt-8 rounded-tile border border-line p-6 max-w-xl">
-              <div className="flex items-baseline gap-4">
+              {/* flex-wrap: on a 320px screen the label drops under the number instead of
+                  pushing the card 8px past the edge. */}
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <div className="serif text-5xl font-semibold" style={{ color: 'var(--gold)' }}>
                   15,000+
                 </div>

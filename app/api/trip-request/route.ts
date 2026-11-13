@@ -213,7 +213,7 @@ export async function POST(request: Request) {
   // as the legacy single `contactName` field: keep the old shape working.
   const suppliedDetails = data.tripDetails !== undefined && data.tripDetails !== null;
   const detailCheck: DetailValidation = suppliedDetails
-    ? validateDetails(data.serviceLine, data.tripDetails)
+    ? validateDetails(data.serviceLine, data.tripDetails, { passengers: data.passengers })
     : { ok: true, values: {} };
 
   if (!detailCheck.ok) {

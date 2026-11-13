@@ -807,7 +807,7 @@ export default function RequestForm({
     // Client-side validation is a courtesy. The server re-runs this same schema
     // and is the authority.
     const check = tripRequestSchema.safeParse(payload);
-    const detailCheck = validateDetails(payload.serviceLine, details);
+    const detailCheck = validateDetails(payload.serviceLine, details, { passengers });
     // Same schema the route runs, for the same reason it is shared: the MRN
     // guard should catch a pasted record number here, in front of the person
     // who pasted it, rather than after a round trip. The server still enforces
@@ -1204,6 +1204,7 @@ export default function RequestForm({
       <TripDetailsFields
         service={service}
         values={details}
+        passengers={passengers}
         errors={detailErrors}
         onChange={(key, value) => setDetails((current) => ({ ...current, [key]: value }))}
       />

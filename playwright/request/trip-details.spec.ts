@@ -231,6 +231,28 @@ test.describe('breed suggestions', () => {
     }
   });
 
+  // Muse, Winnie deep-dive 2026-11-13: two pets were booked and one was stored.
+  test('more than one pet: the other pets are asked for, required and stored', () => {
+    const field = detailsFor('pet')!.fields.find((f) => f.key === 'other_pets')!;
+    expect(fieldVisible(field, {}, { passengers: 1 })).toBe(false);
+    expect(fieldVisible(field, {})).toBe(false);
+    expect(fieldVisible(field, {}, { passengers: 2 })).toBe(true);
+
+    const VALID_PET = { pet_name: 'Bo', species: 'dog', rabies: 'current', carrier: 'owner' };
+    const missing = validateDetails('pet', VALID_PET, { passengers: 2 });
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) expect(missing.errors.other_pets).toBe('Your other pets is required');
+
+    const two = validateDetails('pet', { ...VALID_PET, other_pets: 'Milo, cat' }, { passengers: 2 });
+    expect(two.ok).toBe(true);
+    expect(two.values.other_pets).toBe('Milo, cat');
+
+    // One pet: the answer is not asked for and, if a stale form sends it, not stored.
+    const one = validateDetails('pet', { ...VALID_PET, other_pets: 'Milo, cat' }, { passengers: 1 });
+    expect(one.ok).toBe(true);
+    expect(one.values.other_pets).toBeUndefined();
+  });
+
   test('a breed that is not on the list is still accepted', () => {
     const result = validateDetails('pet', {
       pet_name: 'Bo',

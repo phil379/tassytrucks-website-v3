@@ -196,6 +196,20 @@ test.describe('with address suggestions', () => {
   });
 });
 
+test('Winnie: a second pet brings up a box for the other pets, and one pet hides it again', async ({ page }) => {
+  await page.goto('/request?service=winnie');
+  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+  await page.locator('#passengers').fill('2');
+  await expect(page.locator('#details-other_pets')).toBeVisible();
+  await expect(page.locator('label[for=details-other_pets]')).toContainText('Your other pets');
+  await page.locator('#passengers').fill('1');
+  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+  // Not a Winnie question: Care with two riders never shows it.
+  await page.goto('/request?service=care');
+  await page.locator('#passengers').fill('2');
+  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+});
+
 test('F20: every booking form says how the ride is paid', async ({ page }) => {
   for (const service of ['recovery', 'winnie', 'concierge', 'scholar']) {
     await page.goto(`/request?service=${service}`);

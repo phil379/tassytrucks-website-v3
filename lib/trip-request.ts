@@ -176,6 +176,10 @@ export const COPY = {
     'Please do not include medical details, diagnoses, or procedure names.',
   confirmation:
     `${CONFIRMATION_PROMISE} You see the price before anything is booked or charged, and if anything about the trip changes, you hear the new price from us first.`,
+    /** One sentence on every booking form, so no rider wonders when or how they pay (Muse F20). */
+  howYouPay: 'We confirm your price first, then send a secure link to pay. No card is taken on this form.',
+  howYouPayScholar:
+    'We confirm your plan and price first. Scholar is billed monthly, by secure link. No card is taken on this form.',
   waitTime:
     'Tassy Recovery covers the trip there, the wait, and the trip home, with 20 minutes of on-site wait included. Longer than that is $35 per extra half hour — quoted to you before it is charged, never after.',
 } as const;

@@ -1,4 +1,5 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
+import { fillWhen } from '../support/when';
 import { PLACES, stubPlaces } from '../support/maps-stub';
 
 /**
@@ -105,7 +106,7 @@ test.describe('switch OFF (today): wheelchair is booked at the card price', () =
     await page.locator('#dropoffAddress').tap();
     await page.locator('#dropoffAddress').pressSequentially('3106 Aransas');
     await page.getByRole('option', { name: /3106 Aransas Rd/ }).tap();
-    await page.locator('#requestedAt').fill(whenValue());
+    await fillWhen(page, whenValue());
     await page.locator('#details-rider_is').selectOption('self');
     await page.locator('#details-assistance').selectOption('door');
     await page.locator('#careIntake-dob').fill('1950-03-02');

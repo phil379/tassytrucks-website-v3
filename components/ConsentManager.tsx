@@ -19,7 +19,7 @@ import {
 
 // Both buttons share this one class string on purpose: equal weight, no nudging.
 const BUTTON =
-  'inline-flex min-h-[44px] flex-1 items-center justify-center rounded-lg border-2 border-[color:var(--gold)] bg-transparent px-5 py-2 text-base font-semibold text-[color:var(--ink)] hover:bg-[rgba(200,147,46,0.15)] sm:flex-none';
+  'inline-flex min-h-[44px] flex-1 items-center justify-center rounded-lg border-2 border-[color:var(--gold)] bg-transparent px-3 py-2 text-sm font-semibold text-[color:var(--ink)] hover:bg-[rgba(200,147,46,0.15)] sm:whitespace-nowrap sm:px-4';
 
 function readStored(): ReturnType<typeof parseConsent> {
   try {
@@ -123,17 +123,26 @@ export default function ConsentManager() {
       aria-labelledby="consent-title"
       aria-describedby="consent-desc"
       data-testid="consent-banner"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--line)] bg-[#1B1A17] shadow-[0_-8px_30px_rgba(0,0,0,0.45)]"
+      /* Compact (Muse, 2026-11-13): the old bar was full width and about a quarter of the screen
+         tall, and covered the hero buttons on first paint. On a phone it is now a short bar with
+         one line of text and the two buttons side by side; from tablet up it is a small card in
+         the bottom-right corner, clear of the "Request a Ride" buttons on the left. Both buttons
+         stay the same size and weight. */
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-[color:var(--line)] bg-[#1B1A17] shadow-[0_-8px_30px_rgba(0,0,0,0.45)] sm:inset-x-auto sm:bottom-4 sm:right-4 sm:max-w-md sm:rounded-xl sm:border"
     >
-      <div className="container-x py-5">
-        <h2 id="consent-title" ref={titleRef} tabIndex={-1} className="serif text-lg font-semibold outline-none">
+      <div className="px-4 py-3 sm:p-5">
+        <h2 id="consent-title" ref={titleRef} tabIndex={-1} className="serif text-base font-semibold outline-none sm:text-lg">
           Cookies and visitor counting
         </h2>
-        <p id="consent-desc" className="ink-soft mt-2 max-w-3xl text-sm leading-relaxed">
+        {/* Phone: one line. The full explanation is one tap away on the Cookies page. */}
+        <p className="ink-soft mt-1 text-sm leading-snug sm:hidden">
+          Booking works whatever you choose. Accept to let us count page visits.{' '}
+          <Link href="/cookies" className="underline underline-offset-2">Details</Link>
+        </p>
+        <p id="consent-desc" className="ink-soft mt-2 hidden max-w-3xl text-sm leading-relaxed sm:block">
           Booking, payment and address suggestions work whatever you choose. If you accept, we also
-          use Vercel Web Analytics to count which pages are visited, so we can fix what is confusing.
-          If you reject, we do not load it. Address suggestions on the booking form come from Google
-          Maps. Details are on our{' '}
+          use Vercel Web Analytics to count which pages are visited. If you reject, we do not load
+          it. Details are on our{' '}
           <Link href="/cookies" className="underline underline-offset-2">Cookies page</Link>.
         </p>
         {current !== null && (
@@ -141,7 +150,7 @@ export default function ConsentManager() {
             Your current choice: {current ? 'Accept' : 'Reject non-essential'}.
           </p>
         )}
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-3 flex flex-row gap-2 sm:mt-4 sm:gap-3">
           <button type="button" className={BUTTON} onClick={() => choose(true)}>
             Accept
           </button>

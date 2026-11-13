@@ -742,8 +742,16 @@ export type Quote = {
    * Google Maps and finds it short concludes the price is wrong too.
    */
   distanceMeasured: boolean;
-  /** $45 when a Tassy Escort was asked for, 0 otherwise. Already in the total. */
+    /** $45 when a Tassy Escort was asked for, 0 otherwise. Already in the total. */
   escortCents: number;
+  /**
+   * The rung the measured distance landed in: over `bandOverMiles`, up to `bandUpToMiles`.
+   * Null when the distance is a range across rungs. A rung's ceiling is exact (12.0 miles is
+   * the 12-mile price, 12.2 is the next rung), and the panel says so when a trip is just over
+   * one, so the price does not read as a mistake (Muse F16, 2026-11-13).
+   */
+  bandOverMiles?: number | null;
+  bandUpToMiles?: number | null;
   /**
    * Set only on a hotel zone price (lib/hotel-price.ts). The panel prints this instead of a
    * mileage, because a fixed hotel price is not worked out from the route.
@@ -985,8 +993,10 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     roundTrip: bothLegs,
     exact,
     measuredFrom: exact || !fromPlace || !toPlace ? null : `${fromPlace} to ${toPlace}`,
-    distanceMeasured: measured !== null,
+        distanceMeasured: measured !== null,
     escortCents,
+    bandOverMiles: lowBand === highBand ? (card.bands[card.bands.indexOf(lowBand) - 1]?.upToMiles ?? 0) : null,
+    bandUpToMiles: lowBand === highBand ? lowBand.upToMiles : null,
   };
 }
 

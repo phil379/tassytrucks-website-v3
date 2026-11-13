@@ -8,6 +8,7 @@ import {
   checkAdult,
 } from '@/lib/care-intake';
 import type { CarePaymentValue } from '@/lib/care-intake';
+import { COPY } from '@/lib/trip-request';
 
 /**
  * Payment method and age check on a Tassy Care request.
@@ -87,7 +88,7 @@ export default function CareIntakeFields({
             ))}
           </select>
           <p className="ink-soft mt-1.5 text-xs">
-            We confirm your price first, then send a secure link to pay. No card is taken on this form.
+            {COPY.howYouPay}
           </p>
         </div>
 

@@ -47,6 +47,12 @@ export default function SchoolPlanSetupPage({ params }: { params: { plan: string
         {plan.planLabel}
       </h1>
       <p className="mt-3 text-center text-sm text-[color:var(--ink-soft)]">{plan.commitment}</p>
+      {/* The price, before the first question (Muse F22: the Scholar booking showed no price
+          anywhere, even for the published $850 plan). Read from lib/school-plans.ts. */}
+      <p className="mt-4 text-center text-sm" data-testid="scholar-plan-price">
+        <strong>{plan.price}.</strong> {plan.priceNote}. A dispatcher confirms your price before
+        anything is booked or charged.
+      </p>
 
       <div className="mt-10">
         <SchoolEligibilityGate plan={plan} googleMapsApiKey={googleMapsApiKey} />

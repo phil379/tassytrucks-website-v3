@@ -24,10 +24,12 @@ import {
   serviceShortName,
 } from '@/lib/trip-request';
 import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
+import DateTimeField from '@/components/request/DateTimeField';
+import { SCHOOL_PLANS, planBySlug } from '@/lib/school-plans';
 import TripDetailsFields from '@/components/request/TripDetailsFields';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
-import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly } from '@/lib/quote';
+import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly, surchargesFor } from '@/lib/quote';
 import { wavBookAndPayNote } from '@/lib/wav';
 import { quoteFromHotelPrice } from '@/lib/hotel-price';
 import {
@@ -570,6 +572,24 @@ export default function RequestForm({
     });
   }, [pickupPlace, dropoffPlace]);
 
+    /** What a weekend or an early/late pickup adds on THIS service, asked of the price engine. */
+  const undatedNote = (() => {
+    const add = (when: string) => surchargesFor(when, service).reduce((sum, s) => sum + s.cents, 0);
+    const weekend = add('2026-11-14T12:00'); // a Saturday at noon, not a holiday
+    const offHours = add('2026-11-17T05:00'); // a Tuesday at 5 AM
+    if (!weekend && !offHours) return null;
+    return [
+      'Weekday daytime price.',
+      weekend ? `Weekends add ${formatUsd(weekend)}.` : '',
+      offHours ? `Early morning and evening pickups add ${formatUsd(offHours)}.` : '',
+      'Choose your date and time to see your exact price.',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  })();
+
+    const scholarPlanChosen = service === 'scholar' ? planBySlug(searchParams.get('plan') ?? '') ?? null : null;
+
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
   /**
    * The error summary: each problem ONCE, led by the name of the field it belongs to. Without
@@ -647,6 +667,36 @@ export default function RequestForm({
         {errors[name]}
       </p>
     );
+  }
+
+    /**
+   * A flagged field clears the moment it is corrected, not at the next submit (Muse F17: a
+   * valid phone number kept its red message, so the customer could not tell the fix had worked).
+   * Courtesy only: the full check still runs on submit and on the server.
+   */
+  function clearCorrected(event: React.FormEvent<HTMLFormElement>) {
+    const el = event.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    const raw = el.name || el.id || '';
+    if (!raw) return;
+    const id = el.id || '';
+    const keys = new Set([raw, id, id.replace(/-time$/, ''), id.replace('-', '.'), raw.replace('-', '.')]);
+    const value = el instanceof HTMLInputElement && el.type === 'checkbox' ? (el.checked ? 'on' : '') : String(el.value ?? '').trim();
+    let fixed = value.length > 0;
+    if (el instanceof HTMLInputElement && el.type === 'tel') fixed = value.replace(/\D/g, '').length >= 10;
+    if (el instanceof HTMLInputElement && el.type === 'email') fixed = /^\S+@\S+\.\S+$/.test(value);
+    if (!fixed) return;
+    setErrors((current) => {
+      let next = current;
+      for (const key of keys) {
+        // Address errors clear when the address is picked (see the effect above), not on typing.
+        if (key === 'pickupAddress' || key === 'dropoffAddress') continue;
+        if (key && next[key]) {
+          if (next === current) next = { ...current };
+          delete next[key];
+        }
+      }
+      return next;
+    });
   }
 
   function announce(next: Record<string, string>, message?: string) {
@@ -907,7 +957,7 @@ export default function RequestForm({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-6">
+    <form onSubmit={onSubmit} onInput={clearCorrected} onChange={clearCorrected} noValidate className="space-y-6">
       {/*
         Honeypot — hidden from everyone, including screen readers.
 
@@ -1046,21 +1096,22 @@ export default function RequestForm({
       </div>
 
       <div>
-        <label className={labelCls} htmlFor="requestedAt">
+        <label className={labelCls} htmlFor="requestedAt" id="requestedAt-label">
           Date &amp; time <span aria-hidden="true">*</span>
           <span className="sr-only">(required)</span>
         </label>
-        <input
-          {...fieldProps('requestedAt')}
-          type="datetime-local"
-          min={minDateTime}
+        {/* Two plain fields, not one datetime-local: typed dates were corrupting the year. */}
+        <DateTimeField
+          name="requestedAt"
           value={whenValue}
-          onChange={(e) => setWhenValue(e.target.value)}
-          aria-describedby={errors.requestedAt ? 'requestedAt-error requestedAt-help' : 'requestedAt-help'}
+          onChange={setWhenValue}
+          minDateTime={minDateTime}
+          hasError={Boolean(errors.requestedAt)}
+          describedBy={errors.requestedAt ? 'requestedAt-error requestedAt-help' : 'requestedAt-help'}
           required
         />
         <p id="requestedAt-help" className="ink-soft text-xs mt-1.5">
-          Earliest pickup is 4 hours from now.
+          Type the date or pick it, then choose a time. Earliest pickup is 4 hours from now.
         </p>
         <FieldError name="requestedAt" />
       </div>
@@ -1079,10 +1130,15 @@ export default function RequestForm({
 
         {returnTrip && (
           <div className="mt-3">
-            <label className={labelCls} htmlFor="returnAt">
+            <label className={labelCls} htmlFor="returnAt" id="returnAt-label">
               Return date &amp; time
             </label>
-            <input {...fieldProps('returnAt')} type="datetime-local" min={minDateTime} />
+            <DateTimeField
+              name="returnAt"
+              minDateTime={minDateTime}
+              hasError={Boolean(errors.returnAt)}
+              describedBy={errors.returnAt ? 'returnAt-error' : undefined}
+            />
             <FieldError name="returnAt" />
           </div>
         )}
@@ -1337,6 +1393,17 @@ export default function RequestForm({
         </div>
       </fieldset>
 
+            {/* How you pay, in the same words on every line. Care carries it inside its own payment
+          section (CareIntakeFields); a facility booking is invoiced to the facility. */}
+      {!facility && service !== 'care' && (
+        <div className="rounded-lg border border-line p-4" data-testid="how-you-pay">
+          <p className="text-sm font-medium">How you pay</p>
+          <p className="ink-soft mt-1 text-sm">
+            {service === 'scholar' ? COPY.howYouPayScholar : COPY.howYouPay}
+          </p>
+        </div>
+      )}
+
       {/* Text updates opt-in. Unchecked by default and never required. Hidden on a facility booking,
           where the phone is the passenger's and a coordinator cannot consent for them. */}
       {!facility && (
@@ -1428,6 +1495,28 @@ export default function RequestForm({
                   ? ` · includes ${estimate.surcharges.map((x) => `${x.label.toLowerCase()} +${formatUsd(x.cents)}`).join(' and ')}`
                   : ''}
               </p>
+                            {/* Just over a rung's ceiling: say which rung, so 12.2 miles at the 13-17 price
+                  does not look like an error (Muse F16). */}
+              {estimate.distanceMeasured &&
+                !estimate.flatLabel &&
+                typeof estimate.bandOverMiles === 'number' &&
+                typeof estimate.bandUpToMiles === 'number' &&
+                estimate.bandOverMiles > 0 &&
+                estimate.miles > estimate.bandOverMiles &&
+                estimate.miles < estimate.bandOverMiles + 1 && (
+                  <p className="ink-soft mt-2 text-xs" data-testid="band-note">
+                    {estimate.miles} miles is over {estimate.bandOverMiles}, so the {estimate.bandOverMiles + 1} to{' '}
+                    {estimate.bandUpToMiles} mile price applies.
+                  </p>
+                )}
+              {/* No date yet: this is the weekday daytime price. Say so before a Saturday rider
+                  plans around a number that is about to go up (Muse F19). The amounts are read
+                  from the price engine for this service, never typed here. */}
+              {!whenValue && !estimate.flatLabel && undatedNote && (
+                <p className="mt-2 text-xs" data-testid="undated-note">
+                  {undatedNote}
+                </p>
+              )}
               {/* A ZIP-derived price is a good estimate and a bad promise. Say which. */}
               {!estimate.exact && (
                 <p className="ink-soft mt-2 text-xs">
@@ -1453,8 +1542,27 @@ export default function RequestForm({
           ) : hotelPending ? (
             <p className="ink-soft text-sm" data-testid="hotel-price-pending">Working out your price…</p>
           ) : quoted?.kind === 'quote-only' ? (
-            /* Measurable, but not a table lookup. Say which, and why. */
-            <p className="ink-soft text-sm">{quoted.message}</p>
+                        /* Measurable, but not a table lookup. Say which, and why. */
+            <>
+              {/* The plan the parent chose on /school or /pricing, with its published price
+                  (Muse F22: the Scholar form showed no price even for the $850 plan). */}
+                            {service === 'scholar' && (
+                <p className="text-sm mb-2" data-testid="scholar-plan-price">
+                  {scholarPlanChosen ? (
+                    <>
+                      <strong>{scholarPlanChosen.name}:</strong> {scholarPlanChosen.price}. {scholarPlanChosen.priceNote}.
+                    </>
+                  ) : (
+                    <>
+                      <strong>{SCHOOL_PLANS[0]!.name}:</strong> {SCHOOL_PLANS[0]!.price}. Weekly and after-school
+                      plans are priced per route.
+                    </>
+                  )}{' '}
+                  A dispatcher confirms your price before anything is booked or charged.
+                </p>
+              )}
+              <p className="ink-soft text-sm">{quoted.message}</p>
+            </>
           ) : (
             <p className="ink-soft text-sm">
               {/* Never a guess — but a picked suggestion or a ZIP is enough to

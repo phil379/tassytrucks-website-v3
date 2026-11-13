@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { fillWhen } from '../support/when';
 import { PLACES, blockPlaces, stubPlaces } from '../support/maps-stub';
 import { PICK_ADDRESS_MESSAGE, PICK_TO_SEE_PRICE, PRICE_RANGE_NOTE } from '../../lib/price-fallback';
 
@@ -55,7 +56,7 @@ const panel = (page: Page) => page.locator('[data-testid=trip-estimate]');
 const panelText = async (page: Page) => (await panel(page).innerText()).replace(/\s+/g, ' ').trim();
 
 async function fillContact(page: Page, email: string) {
-  await page.locator('#requestedAt').fill(whenValue());
+  await fillWhen(page, whenValue());
   await page.locator('#contactFirstName').fill('Pat');
   await page.locator('#contactLastName').fill('Tester');
   await page.locator('#contactPhone').fill('7045550142');
@@ -93,14 +94,28 @@ test.describe('1. no ZIP-based price while suggestions work', () => {
     });
   }
 
-  test('one end picked, the other typed with a ZIP: still no price', async ({ page }) => {
+  test('one end picked, the other typed but not a full match: still no price', async ({ page }) => {
+    await stubPlaces(page);
+    await page.goto('/request?service=winnie');
+    await page.waitForTimeout(700);
+    // Street and ZIP but no city: not certain enough to take for the rider, so it is not priced.
+    await typeAddress(page, 'pickupAddress', '1220 Tourmaline, 28205');
+    await pick(page, 'dropoffAddress', '3106 Aransas', /3106 Aransas Rd/);
+    await expect(panel(page)).toContainText(PICK_TO_SEE_PRICE);
+    expect(await panelText(page)).not.toContain('$');
+  });
+
+  // Changed 2026-11-13 (Muse F21). This used to expect NO price: a rider who typed the whole
+  // address and moved on was shown nothing. A complete typed address is now matched to Google's
+  // own suggestion when the field is left, exactly as if it had been tapped.
+  test('one end picked, the other typed IN FULL and left: it is matched and priced', async ({ page }) => {
     await stubPlaces(page);
     await page.goto('/request?service=winnie');
     await page.waitForTimeout(700);
     await typeAddress(page, 'pickupAddress', ZIP.pickup);
     await pick(page, 'dropoffAddress', '3106 Aransas', /3106 Aransas Rd/);
-    await expect(panel(page)).toContainText(PICK_TO_SEE_PRICE);
-    expect(await panelText(page)).not.toContain('$');
+    await expect(panel(page)).toContainText('$');
+    await expect(page.locator('input[name=pickupAddressPlaceId]')).not.toHaveValue('');
   });
 
   test('with suggestions off (Maps blocked) the ZIP estimate is still shown: nothing else could price the trip', async ({ page }) => {

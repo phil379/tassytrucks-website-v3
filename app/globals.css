@@ -399,3 +399,18 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .site-header, .site-header-row, .site-header-logo { transition: none; }
 }
+
+/* Footer links were 16-17px tall, under the 24px minimum tap size (WCAG 2.2, 2.5.8) and easy to
+   mis-tap on a phone, including the phone number. Same text and spacing; only the tap area grows. */
+footer[data-site-chrome] a,
+footer[data-site-chrome] button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+@media (max-width: 639px) {
+  footer[data-site-chrome] a,
+  footer[data-site-chrome] button {
+    min-height: 36px;
+  }
+}

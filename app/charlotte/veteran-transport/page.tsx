@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Veteran Medical Transport in Charlotte NC',
@@ -160,9 +161,7 @@ export default function VeteranTransportPage() {
           h2: 'Where we drive',
           body: (
             <p>
-              Our home base is Charlotte, and we cover all of Mecklenburg County
-              plus the surrounding towns where Charlotte-area veterans actually
-              live: Matthews, Pineville, Huntersville, Concord, and Gastonia.
+              We serve {SERVICE_AREA}.
               Whether your appointment is at a VA clinic, a major hospital
               campus like Atrium Health or Novant Health, or a community
               specialist in Ballantyne or University City, it is a route we

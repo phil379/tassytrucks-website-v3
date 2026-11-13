@@ -241,8 +241,9 @@ test.describe('3. the error summary names each field, once', () => {
     await stubPlaces(page);
     await page.goto('/request?service=winnie');
     await page.waitForTimeout(700);
-    await typeAddress(page, 'pickupAddress', '1220 Tourmaline Rd, Apt 1910');
-    await typeAddress(page, 'dropoffAddress', '3106 Aransas Rd');
+    // Fragments: a complete street address is now matched for the rider (Muse item 24).
+    await typeAddress(page, 'pickupAddress', '1220 Tourmaline, Apt 1910');
+    await typeAddress(page, 'dropoffAddress', '3106 Aransas');
     await fillWinnie(page, unique('summary'));
     await send(page).tap();
 

@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { useGooglePlaces } from '@/lib/google-maps';
+import { pickTypedMatch, splitUnit } from '@/lib/address-match';
 
 /**
  * Address field with Google Places suggestions.
@@ -34,6 +35,12 @@ import { useGooglePlaces } from '@/lib/google-maps';
 const CHARLOTTE = { lat: 35.2271, lng: -80.8431 };
 /** Places API (New) caps the bias radius at 50,000m. */
 const BIAS_RADIUS_M = 49_000;
+
+/** Under the field when something is typed and nothing is picked. */
+export const TAP_HINT =
+  'Tap your address in the list so we can price your trip. Click back into the box to see the list.';
+/** The same instruction on top of the open list, where "click back to see the list" would be odd. */
+export const TAP_HINT_OPEN = 'Tap your address in the list so we can price your trip.';
 
 const MIN_QUERY_LENGTH = 3;
 const DEBOUNCE_MS = 250;
@@ -117,7 +124,7 @@ export default function AddressAutocomplete({
   const [resolved, setResolved] = useState<ResolvedPlace | null>(initialPlace ?? null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(-1);
   /** Typed, left the field, and nothing was picked or matched: show the "tap your address" line. */
   const [needsPick, setNeedsPick] = useState(false);
   // What the blur handler reads 150ms later, after any tap on a suggestion has landed.
@@ -212,24 +219,28 @@ export default function AddressAutocomplete({
     [places],
   );
 
-    /**
-   * A complete address that was typed or pasted, then left (Muse F21, 2026-11-13). Before this,
-   * only a tapped suggestion priced the trip, so a rider who typed the whole address and tabbed
-   * on saw "Pick your address to see your price" and concluded the form was broken.
+  /**
+   * A complete address that was typed or pasted, then left (Muse F21 and item 24, 2026-11-13).
+   * Before this, only a tapped suggestion priced the trip, so a rider who typed the whole address
+   * and tabbed on saw "Pick your address to see your price" and concluded the form was broken.
    *
-   * Ask Google once for what was typed. If a suggestion IS that address (same street number and
-   * street at the start, same city later in the text) take it, exactly as a tap would. Anything
-   * less certain is not guessed at: the visitor is told, in words, to tap their address.
+   * Ask Google once for what was typed. If a suggestion IS that address (lib/address-match.ts:
+   * same street number and street; the typed city if one was typed, otherwise the Charlotte
+   * match) take it, exactly as a tap would. Anything less certain is not guessed at: the visitor
+   * is told, in words, to tap their address.
+   *
+   * An apartment typed in this box ("... Apt 200") stops Google matching the building, so it is
+   * left out of the question and moved to the Apt box underneath, where dispatch reads it.
    */
   async function matchTyped() {
     const typed = textRef.current.trim();
     if (!places || resolvedRef.current || typed.length < MIN_QUERY_LENGTH) return;
-    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const { street, unit } = splitUnit(typed);
     const seq = ++requestSeq.current;
     try {
       if (!sessionToken.current) sessionToken.current = new places.AutocompleteSessionToken();
       const { suggestions: results } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-        input: typed,
+        input: street,
         sessionToken: sessionToken.current,
         includedRegionCodes: ['us'],
         locationBias: {
@@ -251,13 +262,14 @@ export default function AddressAutocomplete({
           prediction,
         });
       }
-      const t = norm(typed);
-      const hit = mapped.find((s) => {
-        const main = norm(s.mainText);
-        const city = norm(s.secondaryText.split(',')[0] ?? '');
-        return /^\d/.test(s.mainText.trim()) && main.length >= 5 && city.length > 0 && t.startsWith(main) && t.indexOf(city, main.length) >= 0;
-      });
+      const hit = mapped[pickTypedMatch(typed, mapped)];
       if (hit) {
+        if (unit) {
+          // Uncontrolled input rendered by the form right under this field. Never overwrite
+          // something the visitor already typed there.
+          const box = document.getElementById(name.replace(/Address$/, 'Unit'));
+          if (box instanceof HTMLInputElement && !box.value) box.value = unit.slice(0, box.maxLength > 0 ? box.maxLength : 40);
+        }
         await choose(hit);
         return;
       }
@@ -289,7 +301,7 @@ export default function AddressAutocomplete({
   async function choose(suggestion: Suggestion) {
     const fallback = [suggestion.mainText, suggestion.secondaryText].filter(Boolean).join(', ');
     setText(fallback);
-        setOpen(false);
+    setOpen(false);
     setSuggestions([]);
     setActiveIndex(-1);
     setNeedsPick(false);
@@ -366,6 +378,7 @@ export default function AddressAutocomplete({
     }
   }
 
+  const listOpen = open && suggestions.length > 0;
   const activeId = activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined;
   const help = [describedBy, statusId].filter(Boolean).join(' ') || undefined;
 
@@ -391,7 +404,8 @@ export default function AddressAutocomplete({
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
         onKeyDown={onKeyDown}
-                onFocus={() => {
+        onFocus={() => {
+          if (blurTimer.current) clearTimeout(blurTimer.current);
           setNeedsPick(false);
           if (suggestions.length > 0) setOpen(true);
         }}
@@ -399,6 +413,10 @@ export default function AddressAutocomplete({
           // Delay so a click on an option lands before the list unmounts.
           blurTimer.current = setTimeout(() => {
             setOpen(false);
+            // A keystroke lookup still waiting on its 250ms timer would otherwise fire after
+            // this, cancel the match below (newest request wins) and reopen the list on a
+            // field nobody is in. That is how a quickly typed destination never priced.
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
             void matchTyped();
           }, 150);
         }}
@@ -421,43 +439,55 @@ export default function AddressAutocomplete({
           : ''}
       </p>
 
-      <ul
-        id={listId}
-        role="listbox"
-        aria-label={`${label} suggestions`}
+      {/*
+        The "tap your address" line sits on top of the open list (Muse item 25): under the
+        input it would be covered by the list it is talking about.
+      */}
+      <div
         className={
-          open && suggestions.length > 0
+          listOpen
             ? 'absolute z-30 mt-1 w-full overflow-hidden rounded-xl border border-line bg-[#0f141a] shadow-xl'
             : 'hidden'
         }
       >
-        {suggestions.map((suggestion, index) => (
-          <li
-            key={suggestion.placeId}
-            id={`${listId}-option-${index}`}
-            role="option"
-            aria-selected={index === activeIndex}
-            className={`flex min-h-[48px] cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${
-              index === activeIndex ? 'bg-[color:var(--gold)]/20' : ''
-            }`}
-            onMouseEnter={() => setActiveIndex(index)}
-            // onMouseDown, not onClick: mousedown fires before the input's blur,
-            // so the choice registers even though blur is racing to close the list.
-            onMouseDown={(e) => {
-              e.preventDefault();
-              void choose(suggestion);
-            }}
-          >
-            <MapPin className="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
-            <span className="min-w-0">
-              <span className="block truncate">{suggestion.mainText}</span>
-              {suggestion.secondaryText && (
-                <span className="ink-soft block truncate text-xs">{suggestion.secondaryText}</span>
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
+        {listOpen && !resolved && (
+          <p className="border-b border-line px-4 py-2 text-xs" data-testid={`${name}-pick-hint`}>
+            {TAP_HINT_OPEN}
+          </p>
+        )}
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label={`${label} suggestions`}
+        >
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={suggestion.placeId}
+              id={`${listId}-option-${index}`}
+              role="option"
+              aria-selected={index === activeIndex}
+              className={`flex min-h-[48px] cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${
+                index === activeIndex ? 'bg-[color:var(--gold)]/20' : ''
+              }`}
+              onMouseEnter={() => setActiveIndex(index)}
+              // onMouseDown, not onClick: mousedown fires before the input's blur,
+              // so the choice registers even though blur is racing to close the list.
+              onMouseDown={(e) => {
+                e.preventDefault();
+                void choose(suggestion);
+              }}
+            >
+              <MapPin className="h-4 w-4 shrink-0 opacity-60" aria-hidden="true" />
+              <span className="min-w-0">
+                <span className="block truncate">{suggestion.mainText}</span>
+                {suggestion.secondaryText && (
+                  <span className="ink-soft block truncate text-xs">{suggestion.secondaryText}</span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/*
         What the form actually posts alongside the text. Empty unless a
@@ -467,10 +497,14 @@ export default function AddressAutocomplete({
       <input type="hidden" name={`${name}Lat`} value={resolved?.lat ?? ''} />
       <input type="hidden" name={`${name}Lng`} value={resolved?.lng ?? ''} />
 
-            {/* Typed but not matched. Plain words, visible, and announced. */}
-      {needsPick && !resolved && (
+      {/*
+        Something is typed and no address is picked. Plain words, visible, and announced. Shown
+        while typing as well as after leaving the field (Muse item 25): it used to wait for a
+        failed match on blur and vanish again on focus, so "Charlotte" alone never showed it.
+      */}
+      {!listOpen && !resolved && (needsPick || (text.trim() !== '' && suggestions.length > 0)) && (
         <p className="mt-1.5 text-xs" role="status" data-testid={`${name}-pick-hint`}>
-          Tap your address in the list so we can price your trip. Click back into the box to see the list.
+          {TAP_HINT}
         </p>
       )}
 

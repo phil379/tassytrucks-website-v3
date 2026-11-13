@@ -92,7 +92,8 @@ export function isNeedsPrice(note: string | null | undefined): boolean {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Shown in the price panel, in place of a price, while address suggestions are working. */
-export const PICK_TO_SEE_PRICE = 'Pick your address to see your price';
+export const PICK_TO_SEE_PRICE =
+  'Type your address - we\'ll match it as you type, or tap your address in the list to price your trip.';
 
 /** Follows any price range, on screen and in the email. */
 export const PRICE_RANGE_NOTE = 'A dispatcher will confirm the exact price before you’re charged.';

@@ -1,0 +1,6 @@
+{
+  "name": "wellness-retired",
+  "pattern": "Retired lines: \\*\\*Tassy Wellness\\*\\*|used to be their own service line|wellness transport vertical",
+  "flags": "i",
+  "reason": "Wellness & med-spa is a live service line (Phil, Nov 2026)."
+}

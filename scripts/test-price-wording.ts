@@ -13,7 +13,10 @@ function t(name: string, fn: () => void) {
 const q = (lowCents: number, highCents: number) => ({ lowCents, highCents }) as Parameters<typeof formatRange>[0];
 
 t('the two sentences are exactly what was agreed', () => {
-  assert.equal(PICK_TO_SEE_PRICE, 'Pick your address to see your price');
+  assert.equal(
+    PICK_TO_SEE_PRICE,
+    "Type your address - we'll match it as you type, or tap your address in the list to price your trip.",
+  );
   assert.equal(PRICE_RANGE_NOTE, 'A dispatcher will confirm the exact price before you’re charged.');
 });
 

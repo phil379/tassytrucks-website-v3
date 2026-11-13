@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Request a Medical Ride for Someone Else — Charlotte NC',
@@ -126,8 +127,7 @@ export default function FamilyMedicalRidesPage() {
                   dialysis transport page
                 </Link>{' '}
                 — those riders are the reason our dispatch obsesses over
-                punctuality. Recurring riders across Mecklenburg County,
-                Huntersville, Pineville, and Concord are the backbone of our
+                punctuality. Recurring riders across {SERVICE_AREA} are the backbone of our
                 schedule, and standing bookings get first claim on it.
               </p>
             </>

@@ -10,6 +10,7 @@ import { nextStatus } from '@/lib/ops-status';
 import ElapsedSince from '@/components/ops/ElapsedSince';
 import { isNeedsPrice } from '@/lib/price-fallback';
 import { agreedPriceDefault } from '@/lib/ops-price-input';
+import { FACILITY_INVOICING } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Ops queue',
@@ -332,9 +333,9 @@ export default async function OpsPage({
 
                   <label className="mt-3 flex items-center gap-3 text-sm cursor-pointer select-none min-h-[44px]">
                     <input type="checkbox" name="onAccount" className="h-5 w-5 rounded border-line" />
-                    {/* A facility on account is invoiced monthly. Sending them a
+                    {/* A facility on account is invoiced weekly. Sending them a
                         card link is how an account customer pays twice. */}
-                    On account — invoice monthly, no payment link
+                    On account — invoiced {FACILITY_INVOICING}, no payment link
                   </label>
 
                   <PendingButton

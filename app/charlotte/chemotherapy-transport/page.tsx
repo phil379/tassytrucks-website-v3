@@ -6,6 +6,7 @@ import { seoRequest } from '@/lib/request-links';
 // Tassy Care Treatment Day card (a flat round trip), so every price below is
 // read from lib/quote.ts and cannot drift from what the request form charges.
 import { TREATMENT_DAY, dollars } from '@/lib/quote';
+import { FACILITY_INVOICING, TREATMENT_DAY_DRIVER } from '@/lib/copy';
 
 const FROM = dollars(TREATMENT_DAY.bands[0].cents);
 const TOP = dollars(TREATMENT_DAY.bands[TREATMENT_DAY.bands.length - 1].cents);
@@ -69,9 +70,10 @@ export default function ChemotherapyTransportPage() {
                 A companion rides with you at no extra charge.
               </p>
               <p>
-                We do not keep a driver waiting in a parking lot while you are
-                in the chair. Your driver takes you there, and when you call
-                that you are close to done, we send one back for you. Early
+                Your driver is {TREATMENT_DAY_DRIVER}, so a long day costs you
+                nothing extra &mdash; no wait charges however long the day
+                runs. Call when you are close to done and we bring the car
+                around. Early
                 mornings, nights, weekends and a short list of holidays carry
                 the same flat add-ons as every Tassy ride, shown before you
                 book. If you treat every week, ask about the standing ride plan
@@ -158,7 +160,7 @@ export default function ChemotherapyTransportPage() {
               hospital social worker rather than the patient. You can book on
               someone&rsquo;s behalf and receive the confirmations yourself —
               the patient just gets the ride. Centers that send us patients
-              regularly can set up an account with monthly invoicing; see our{' '}
+              regularly can set up an account with invoicing {FACILITY_INVOICING}; see our{' '}
               <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                 facility partnership page
               </Link>{' '}
@@ -182,7 +184,7 @@ export default function ChemotherapyTransportPage() {
         },
         {
           q: 'What if my infusion runs longer than expected?',
-          a: 'Call dispatch at (704) 941-8508 when you know. Your ride home is dispatched when you call, so a long day costs you nothing extra. Give us your estimated finish when you book so the first plan is close.',
+          a: `Call dispatch at (704) 941-8508 when you know. Your driver is ${TREATMENT_DAY_DRIVER}, so a long day costs you nothing extra - no wait charges however long the day runs. Call when you are close to done and we bring the car around. Give us your estimated finish when you book so the first plan is close.`,
         },
         {
           q: 'Do your drivers provide medical care or help with a port or IV?',

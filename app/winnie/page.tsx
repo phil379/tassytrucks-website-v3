@@ -5,6 +5,7 @@ import ServicePage from '@/components/ServicePage';
 import PawIcon from '@/components/seo/PawIcon';
 
 import { request } from '@/lib/request-links';
+import { WINNIE_LEAD_WORD } from '@/lib/copy';
 
 const charlotteServices = [
   { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — how it works, what it costs, and what your pet needs to ride.' },
@@ -31,7 +32,7 @@ export default function WinniePage() {
       eyebrow="Winnie Ride · Pet transport"
       title="Your pet gets there. You don't have to leave work."
       tagline="Vet, groomer, daycare, boarding — and you don't travel with them."
-      description="Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, $106 there and back with the wait included."
+      description={`Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, $106 there and back with the wait included. Book with at least ${WINNIE_LEAD_WORD} hours' notice for routine rides.`}
       bookHref={request.winnie}
       bookLabel="Request a pet ride"
       serviceName="Winnie Ride — Pet Transportation"

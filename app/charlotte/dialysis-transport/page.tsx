@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Dialysis Transport in Charlotte NC',
@@ -151,8 +152,7 @@ export default function DialysisTransportPage() {
           h2: 'Where we drive dialysis patients',
           body: (
             <p>
-              Our home base is Charlotte and we cover all of Mecklenburg County,
-              plus Matthews, Pineville, Huntersville, Concord, and Gastonia.
+              We serve {SERVICE_AREA}.
               Whether your treatments are at a neighborhood dialysis clinic in
               University City or near a major campus like Atrium Health
               Carolinas Medical Center or Novant Health Presbyterian, the route

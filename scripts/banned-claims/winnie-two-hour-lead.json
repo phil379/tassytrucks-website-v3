@@ -1,0 +1,6 @@
+{
+  "name": "winnie-two-hour-lead",
+  "pattern": "two hours.? notice|2-hr lead",
+  "flags": "i",
+  "reason": "Winnie Ride routine rides need four hours' notice (Phil, Nov 13 2026). Render WINNIE_LEAD_HOURS from lib/copy.ts."
+}

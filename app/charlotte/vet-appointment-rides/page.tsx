@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoRequest } from '@/lib/request-links';
+import { WINNIE_LEAD_WORD } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Rides to the Vet in Charlotte — Winnie Ride',
@@ -27,7 +28,7 @@ export default function VetAppointmentRidesPage() {
       trustExtras={['Current rabies vaccination required', 'Charlotte-based']}
       h1="Rides to the Vet in Charlotte — Pet Transport for Appointments You Can't Make"
       heroSubtitle="Your clinic closes at 5 and your job doesn't — Winnie Ride picks up your pet, handles the appointment trip, and brings them home while you stay at work."
-      quickAnswer="Winnie Ride provides scheduled rides to the vet across Charlotte and Mecklenburg County when you can't leave work — we pick up your dog or cat, deliver them to the clinic, and bring them home. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Book with at least two hours' notice or call (704) 941-8508."
+      quickAnswer={`Winnie Ride provides scheduled rides to the vet across Charlotte and Mecklenburg County when you can't leave work — we pick up your dog or cat, deliver them to the clinic, and bring them home. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Book with at least ${WINNIE_LEAD_WORD} hours' notice or call (704) 941-8508.`}
       ctaText="Schedule a vet ride"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"

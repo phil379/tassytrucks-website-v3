@@ -5,6 +5,7 @@ import RateTable, { returnRows } from '@/components/pricing/RateTable';
 import { CARE_WAV } from '@/lib/quote';
 import { WAV_PARTNER_LINE, wavBookAndPayNote } from '@/lib/wav';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Wheelchair Transport in Charlotte NC',
@@ -148,9 +149,8 @@ export default function WheelchairTransportPage() {
           h2: 'Where we drive in and around Charlotte',
           body: (
             <p>
-              We are based in Charlotte and cover all of Mecklenburg County —
-              Uptown, South End, University City, Steele Creek, Ballantyne —
-              plus Matthews, Pineville, Huntersville, Concord, and Gastonia.
+              We serve {SERVICE_AREA} &mdash; Uptown, South End, University
+              City, Steele Creek, Ballantyne.
               Appointments at major campuses like Atrium Health Carolinas
               Medical Center or Novant Health Presbyterian, neighborhood
               clinics, therapy offices, and family gatherings are all standard

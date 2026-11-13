@@ -39,7 +39,7 @@ export type ConfirmedTrip = {
   vehicleDescription?: string | null;
   /**
    * Stripe payment link. Optional on purpose — a facility on account is
-   * invoiced monthly and must NOT be sent a card link, and a deployment with
+   * invoiced weekly and must NOT be sent a card link, and a deployment with
    * no Stripe key still has to be able to confirm a trip.
    */
   payUrl?: string | null;

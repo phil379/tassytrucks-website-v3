@@ -1,0 +1,6 @@
+{
+  "name": "broker-arrangements",
+  "pattern": "broker arrangements",
+  "flags": "i",
+  "reason": "We do not bill insurance or broker networks at this time."
+}

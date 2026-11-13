@@ -4,6 +4,7 @@ import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA, WINNIE_LEAD_HOURS } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Winnie Ride vs Uber Pet vs Lyft Pet — Compared',
@@ -38,13 +39,13 @@ const rows: Row[] = [
   { label: 'Recurring scheduling', winnie: <>{yes} Weekly grooming, chronic care</>, uber: no, lyft: no },
   {
     label: 'Same-day booking',
-    winnie: 'When vehicles are available (2-hr lead on routine rides)',
+    winnie: `When vehicles are available (${WINNIE_LEAD_HOURS}-hr lead on routine rides)`,
     uber: 'On-demand',
     lyft: 'On-demand, select cities',
   },
   {
     label: 'Service area',
-    winnie: 'Charlotte + Mecklenburg + surrounding towns',
+    winnie: SERVICE_AREA,
     uber: 'Most major markets',
     lyft: 'Select cities',
   },

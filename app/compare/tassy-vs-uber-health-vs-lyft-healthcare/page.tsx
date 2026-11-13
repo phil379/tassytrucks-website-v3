@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: { absolute: 'Tassy vs Uber Health vs Lyft Healthcare — Compared' },
@@ -147,8 +148,7 @@ export default function ComparePage() {
                 Charlotte. We own our vehicles, train our drivers on patient
                 handling, and take bookings directly from patients and families as
                 well as from facilities. We are a Service-Disabled Veteran-Owned
-                Small Business, serving
-                Mecklenburg County plus Matthews, Concord, and Gastonia. See our{' '}
+                Small Business. We serve {SERVICE_AREA}. See our{' '}
                 <Link href="/charlotte/nemt-rides" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   Charlotte NEMT page
                 </Link>{' '}
@@ -246,7 +246,7 @@ export default function ComparePage() {
         },
         {
           q: 'Does Tassy work with NEMT brokers like the big platforms do?',
-          a: 'We serve riders through facility partnerships and broker arrangements as well as direct private-pay bookings. Call (704) 941-8508 and we will tell you how your specific ride can be covered.',
+          a: 'Not at this time. We serve riders through facility partnerships and direct private-pay bookings. We are not a Medicaid or Medicare provider and we do not bill insurance or broker networks at this time.',
         },
         {
           q: 'Is this comparison up to date?',

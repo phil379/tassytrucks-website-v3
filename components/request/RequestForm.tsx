@@ -285,6 +285,11 @@ export default function RequestForm({
   // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link), ONLY when the server passed
   // textLinkPrefill (TEXT_TO_BOOK_MODE on). Off: ignored, the form opens as before.
   const [whenValue, setWhenValue] = useState(() => prefillWhen(searchParams.get('when'), textLinkPrefill));
+  /**
+   * The date on its own, before a time is chosen (Muse item 28). A Saturday costs more whatever
+   * the hour, so the panel prices the date at midday instead of showing a weekday number.
+   */
+  const [whenDate, setWhenDate] = useState('');
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');
@@ -502,7 +507,7 @@ export default function RequestForm({
       // thing that can produce a price. See lib/zip-centroids.ts.
       pickupAddress: pickupText,
       dropoffAddress: dropoffText,
-      requestedAt: whenValue,
+      requestedAt: whenValue || (whenDate ? `${whenDate}T12:00` : ''),
       passengers,
       returnTrip,
       mobility,
@@ -520,6 +525,7 @@ export default function RequestForm({
     pickupText,
     dropoffText,
     whenValue,
+    whenDate,
     passengers,
     returnTrip,
     mobility,
@@ -588,7 +594,19 @@ export default function RequestForm({
       .join(' ');
   })();
 
-    const scholarPlanChosen = service === 'scholar' ? planBySlug(searchParams.get('plan') ?? '') ?? null : null;
+  /** Shown once a date is typed and before a time is chosen. */
+  const untimedNote = (() => {
+    const offHours = surchargesFor('2026-11-17T05:00', service).reduce((sum, s) => sum + s.cents, 0);
+    return [
+      'Daytime price for that date.',
+      offHours ? `Early morning and evening pickups add ${formatUsd(offHours)}.` : '',
+      'Choose your time to see your exact price.',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  })();
+
+  const scholarPlanChosen = service === 'scholar' ? planBySlug(searchParams.get('plan') ?? '') ?? null : null;
 
   const showWaitCopy = WAIT_TIME_LINES.includes(service);
   /**
@@ -1105,13 +1123,14 @@ export default function RequestForm({
           name="requestedAt"
           value={whenValue}
           onChange={setWhenValue}
+          onDateChange={setWhenDate}
           minDateTime={minDateTime}
           hasError={Boolean(errors.requestedAt)}
           describedBy={errors.requestedAt ? 'requestedAt-error requestedAt-help' : 'requestedAt-help'}
           required
         />
         <p id="requestedAt-help" className="ink-soft text-xs mt-1.5">
-          Type the date or pick it, then choose a time. Earliest pickup is 4 hours from now.
+          Type the date as month, day, year, or tap the calendar, then choose a time. Earliest pickup is 4 hours from now.
         </p>
         <FieldError name="requestedAt" />
       </div>
@@ -1512,9 +1531,15 @@ export default function RequestForm({
               {/* No date yet: this is the weekday daytime price. Say so before a Saturday rider
                   plans around a number that is about to go up (Muse F19). The amounts are read
                   from the price engine for this service, never typed here. */}
-              {!whenValue && !estimate.flatLabel && undatedNote && (
+              {!whenValue && !whenDate && !estimate.flatLabel && undatedNote && (
                 <p className="mt-2 text-xs" data-testid="undated-note">
                   {undatedNote}
+                </p>
+              )}
+              {/* A date and no time yet: the price already counts the day of the week. */}
+              {!whenValue && whenDate && !estimate.flatLabel && (
+                <p className="mt-2 text-xs" data-testid="untimed-note">
+                  {untimedNote}
                 </p>
               )}
               {/* A ZIP-derived price is a good estimate and a bad promise. Say which. */}
@@ -1572,7 +1597,7 @@ export default function RequestForm({
                   no price. Name the faster route first. */}
               {suggestionsOn
                 ? PICK_TO_SEE_PRICE
-                : 'Pick each address from the suggestions to see your price — or type the ZIP codes if the address is not listed.'}
+                : 'Type your address with its ZIP code to see your price.'}
             </p>
           )}
         </div>

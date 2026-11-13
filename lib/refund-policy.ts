@@ -1,3 +1,5 @@
+import { CONCIERGE } from '@/lib/quote';
+
 /**
  * Cancellation, no-show and refund numbers, in ONE place. The /refunds page, the
  * request form and the confirmation email read from here.
@@ -25,7 +27,22 @@
  *   applies to the per-ride Scholar plans (Weekly and After-School).
  * No code in the pricing path charges a cancellation fee or issues a refund today:
  * fees and refunds are handled by hand by Phil (Stripe / TassyOps).
+ *
+ * -- CONCIERGE NO-SHOW (Phil, approved 2026-11-12) -- FOR COUNSEL REVIEW --
+ * A Concierge no-show is a FLAT $35 fee. Long Concierge trips keep the Oct 24 rule:
+ * 100% of the trip price. "Long" = over conciergeNoShow.longTripOverMiles, which is READ from
+ * the Concierge price card's last band (lib/quote.ts, CONCIERGE), today 30 miles: any trip the
+ * website does not price. Exactly 30 is still priced, so it is not long. Phil confirmed this
+ * definition on 2026-11-12. Change the card and the no-show threshold moves with it. Waivable case by case
+ * (mayWaiveCaseByCase). Every other line keeps the Oct 24 numbers above. Counsel should
+ * review this wording before it is relied on. Still nothing charges it in code.
  */
+
+/**
+ * The furthest a Concierge trip can go and still get a website price: the last band of the
+ * Concierge card. A trip OVER this is a "long trip" for the no-show rule (Phil, 2026-11-12).
+ */
+export const CONCIERGE_PRICED_MAX_MILES: number = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
 export const REFUND_POLICY_UPDATED = 'October 24, 2026';
@@ -60,7 +77,23 @@ export const CANCELLATION = {
   refundStartBusinessDays: 3,
   /** Tassy may waive a fee case by case. */
   mayWaiveCaseByCase: true,
+  /**
+   * Tassy Concierge no-show (Phil, 2026-11-12; FOR COUNSEL REVIEW). A flat fee instead of 100%,
+   * except long trips, which keep 100% of the trip price.
+   */
+  conciergeNoShow: {
+    flatFeeCents: 3500,
+    /** The last mileage the website prices for Concierge. Never typed: read from the card. */
+    longTripOverMiles: CONCIERGE_PRICED_MAX_MILES,
+    longTripNoShowFeePercent: 100,
+    counselReview: true,
+  },
 } as const;
+
+/** "$35", from the config, so the page never types the amount. */
+export function conciergeNoShowFeeText(): string {
+  return `$${(CANCELLATION.conciergeNoShow.flatFeeCents / 100).toFixed(0)}`;
+}
 
 /** What Phil proposed on 2026-10-24, kept so a change is a one-line decision. */
 export const PHIL_PROPOSED = {

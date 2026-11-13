@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import LegalPage from '@/components/legal/LegalPage';
-import { CANCELLATION, REFUND_POLICY_UPDATED } from '@/lib/refund-policy';
+import { CANCELLATION, REFUND_POLICY_UPDATED, conciergeNoShowFeeText } from '@/lib/refund-policy';
 import { BUSINESS, businessIdentityLine } from '@/lib/business';
 
 export const metadata: Metadata = {
@@ -68,11 +68,22 @@ export default function RefundsPage() {
                   <tbody>
                     <tr>
                       <th className={`${cell} text-left font-medium`} scope="row">
-                        Tassy Care, Tassy Concierge, Tassy Recovery, Winnie Ride
+                        Tassy Care, Tassy Recovery, Winnie Ride
                       </th>
                       <td className={cell}>Up to {T.trip.freeUntilHoursBefore} hours before pickup</td>
                       <td className={cell}>{T.trip.lateCancelFeePercent}% of the trip price</td>
                       <td className={cell}>{T.trip.noShowFeePercent}% of the trip price</td>
+                    </tr>
+                    <tr>
+                      <th className={`${cell} text-left font-medium`} scope="row">
+                        Tassy Concierge
+                      </th>
+                      <td className={cell}>Up to {T.trip.freeUntilHoursBefore} hours before pickup</td>
+                      <td className={cell}>{T.trip.lateCancelFeePercent}% of the trip price</td>
+                      <td className={cell} data-testid="concierge-no-show">
+                        {conciergeNoShowFeeText()} flat. Trips over {T.conciergeNoShow.longTripOverMiles} miles:{' '}
+                        {T.conciergeNoShow.longTripNoShowFeePercent}% of the trip price
+                      </td>
                     </tr>
                     <tr>
                       <th className={`${cell} text-left font-medium`} scope="row">

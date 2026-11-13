@@ -401,16 +401,19 @@ body {
 }
 
 /* Footer links were 16-17px tall, under the 24px minimum tap size (WCAG 2.2, 2.5.8) and easy to
-   mis-tap on a phone, including the phone number. Same text and spacing; only the tap area grows. */
+   mis-tap on a phone, including the phone number. Same text and spacing; only the tap area grows.
+   inline-block + padding (not flex) so long unbroken text such as an email address still wraps
+   inside a 320px screen. */
 footer[data-site-chrome] a,
 footer[data-site-chrome] button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding-block: 4px;
 }
 @media (max-width: 639px) {
   footer[data-site-chrome] a,
   footer[data-site-chrome] button {
-    min-height: 36px;
+    padding-block: 10px;
   }
 }

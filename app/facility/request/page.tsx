@@ -40,7 +40,7 @@ import { coordinatorContact } from '@/lib/facility-team.server';
  */
 
 export const metadata: Metadata = {
-  title: 'Request a ride — Tassy Transportation',
+  title: { absolute: 'Request a ride — Tassy Transportation' },
   // Behind a magic link and specific to one facility. Never indexed.
   robots: { index: false, follow: false },
 };

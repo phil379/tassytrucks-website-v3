@@ -5,7 +5,7 @@ import PawIcon from '@/components/seo/PawIcon';
 import { partnerSignup } from '@/lib/partner-links';
 
 export const metadata: Metadata = {
-  title: 'Veterinary Partnerships — Pet Transport | Winnie Ride',
+  title: { absolute: 'Veterinary Partnerships — Pet Transport | Winnie Ride' },
   description:
     'Partner with Winnie Ride for pet transport to and from your Charlotte veterinary practice. Current rabies vaccination required. Book a 15-min intro call.',
   alternates: { canonical: '/partners/veterinary' },

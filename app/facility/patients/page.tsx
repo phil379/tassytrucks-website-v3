@@ -11,7 +11,7 @@ import PatientForm from '@/components/facility/PatientForm';
 import { dayLabel, Empty } from '@/components/facility/bits';
 
 export const metadata: Metadata = {
-  title: 'Saved passengers — Tassy Transportation',
+  title: { absolute: 'Saved passengers — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 export const dynamic = 'force-dynamic';

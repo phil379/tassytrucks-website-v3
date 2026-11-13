@@ -3,7 +3,7 @@ import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Concierge — reserved private car, Charlotte | From $89',
+  title: { absolute: 'Tassy Concierge — reserved private car, Charlotte | From $89' },
   description:
     'Airport runs, golf, dinner, events and client pickups in Charlotte. A reserved vehicle and a professional driver, booked for a time you chose. Flat rates from $89. No surge.',
   alternates: { canonical: '/vip' },

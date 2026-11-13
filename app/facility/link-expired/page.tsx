@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Your setup link has expired — Tassy Transportation',
+  title: { absolute: 'Your setup link has expired — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 

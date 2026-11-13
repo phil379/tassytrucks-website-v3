@@ -5,7 +5,7 @@ import PawIcon from '@/components/seo/PawIcon';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Dog Grooming Pickup Service in Charlotte NC | Winnie Ride',
+  title: { absolute: 'Dog Grooming Pickup Service in Charlotte NC | Winnie Ride' },
   description:
     'Dog grooming pickup and drop-off in Charlotte NC. Same-day rides when available, recurring slots for standing appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/dog-grooming-pickup' },

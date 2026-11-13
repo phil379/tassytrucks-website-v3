@@ -55,12 +55,14 @@ export default function Header() {
               framed to rhyme with the founder photo tile (rounded-tile · border-line ·
               overflow-hidden · object-cover). */}
           <span className="site-header-logo block shrink-0 rounded-tile border border-line overflow-hidden hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(27,26,23,0.2)]">
+            {/* The emblem cropped from logo-master.png (same artwork, black padding removed),
+                384x259 = 2x the largest tile, so it stays sharp on retina screens. */}
             <img
-              src="/brand/logo-cream.svg"
+              src="/brand/logo-emblem.webp"
               alt="Tassy Transportation — veteran-owned premium transport in Charlotte NC"
-              width={128}
-              height={128}
-              className="w-full h-full object-cover"
+              width={384}
+              height={259}
+              className="w-full h-full object-contain bg-black"
             />
           </span>
           {/* FIX_PROD_143 — hidden below sm. At 375px the row needed 398px inside a
@@ -131,7 +133,8 @@ export default function Header() {
               login (portal.login → /login), a public discoverable link into an internal
               admin surface. Existing users have the app URL; the marketing site funnels
               to booking, not the backend login. */}
-          <a href={request.ride} className="btn-gold text-sm">
+          {/* One line on phones (it wrapped beside the wider logo): tighter side padding below sm. */}
+          <a href={request.ride} className="btn-gold text-sm min-[360px]:whitespace-nowrap max-sm:!px-4">
             Request a Ride <ArrowRight size={16} />
           </a>
 

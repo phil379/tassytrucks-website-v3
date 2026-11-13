@@ -377,11 +377,21 @@ body {
    so the bar is exactly the height the margin below is calculated against: the 50px Request-a-Ride
    button is taller than the compact logo and would otherwise decide the height instead. */
 .site-header-row { height: calc(var(--hdr-logo) + 2 * var(--hdr-pad)); padding-top: 0; padding-bottom: 0; transition: height .2s ease; }
+/* The tile shows the emblem cropped from logo-master.png (public/brand/logo-emblem.webp, 1.483:1),
+   so the artwork fills the tile instead of floating in black padding. Heights are unchanged (the
+   bar is no taller); only the width follows the emblem's shape. */
 .site-header-logo {
-  width: var(--hdr-logo);
+  width: calc(var(--hdr-logo) * var(--hdr-logo-aspect));
   height: var(--hdr-logo);
   transition: width .2s ease, height .2s ease, transform .2s ease, box-shadow .2s ease;
 }
+/* Tile width by screen: the phone row also holds the one-line Request-a-Ride button and the menu,
+   so the tile widens only as far as the row allows. Below 360px it stays square (as before); the
+   emblem is letterboxed, never cropped. */
+.site-header { --hdr-logo-aspect: 1; }
+@media (min-width: 360px) { .site-header { --hdr-logo-aspect: 1.06; } }
+@media (min-width: 390px) { .site-header { --hdr-logo-aspect: 1.3; } }
+@media (min-width: 640px) { .site-header { --hdr-logo-aspect: 1.483; } }
 @media (max-width: 767px) {
   html[data-hdr-scrolled] .site-header {
     --hdr-logo: 48px;

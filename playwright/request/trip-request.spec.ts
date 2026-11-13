@@ -1,4 +1,5 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
+import { fillWhen } from '../support/when';
 
 /**
  * Trip Request pipeline.
@@ -96,7 +97,7 @@ async function fillMinimalValidForm(page: import('@playwright/test').Page) {
 
   await page.locator('#pickupAddress').fill('1200 Elizabeth Ave, Charlotte NC');
   await page.locator('#dropoffAddress').fill('1000 Blythe Blvd, Charlotte NC');
-  await page.locator('#requestedAt').fill(local);
+  await fillWhen(page, local);
   await page.locator('#contactFirstName').fill('Playwright');
   await page.locator('#contactLastName').fill('Test');
   await page.locator('#contactPhone').fill('704-555-0142');

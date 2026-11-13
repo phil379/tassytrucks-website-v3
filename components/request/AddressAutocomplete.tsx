@@ -117,7 +117,14 @@ export default function AddressAutocomplete({
   const [resolved, setResolved] = useState<ResolvedPlace | null>(initialPlace ?? null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
+    const [activeIndex, setActiveIndex] = useState(-1);
+  /** Typed, left the field, and nothing was picked or matched: show the "tap your address" line. */
+  const [needsPick, setNeedsPick] = useState(false);
+  // What the blur handler reads 150ms later, after any tap on a suggestion has landed.
+  const textRef = useRef(text);
+  textRef.current = text;
+  const resolvedRef = useRef(resolved);
+  resolvedRef.current = resolved;
 
   // Reported to the parent via effect rather than inside the handlers, so the
   // parent sees exactly the value that rendered — no path can update one
@@ -205,8 +212,67 @@ export default function AddressAutocomplete({
     [places],
   );
 
+    /**
+   * A complete address that was typed or pasted, then left (Muse F21, 2026-11-13). Before this,
+   * only a tapped suggestion priced the trip, so a rider who typed the whole address and tabbed
+   * on saw "Pick your address to see your price" and concluded the form was broken.
+   *
+   * Ask Google once for what was typed. If a suggestion IS that address (same street number and
+   * street at the start, same city later in the text) take it, exactly as a tap would. Anything
+   * less certain is not guessed at: the visitor is told, in words, to tap their address.
+   */
+  async function matchTyped() {
+    const typed = textRef.current.trim();
+    if (!places || resolvedRef.current || typed.length < MIN_QUERY_LENGTH) return;
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const seq = ++requestSeq.current;
+    try {
+      if (!sessionToken.current) sessionToken.current = new places.AutocompleteSessionToken();
+      const { suggestions: results } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: typed,
+        sessionToken: sessionToken.current,
+        includedRegionCodes: ['us'],
+        locationBias: {
+          center: new google.maps.LatLng(CHARLOTTE.lat, CHARLOTTE.lng),
+          radius: BIAS_RADIUS_M,
+        },
+      });
+      // The visitor came back and typed, or tapped a suggestion, while we were asking.
+      if (seq !== requestSeq.current || resolvedRef.current || textRef.current.trim() !== typed) return;
+
+      const mapped: Suggestion[] = [];
+      for (const result of results) {
+        const prediction = result.placePrediction;
+        if (!prediction?.placeId) continue;
+        mapped.push({
+          placeId: prediction.placeId,
+          mainText: prediction.mainText?.toString() ?? prediction.text.toString(),
+          secondaryText: prediction.secondaryText?.toString() ?? '',
+          prediction,
+        });
+      }
+      const t = norm(typed);
+      const hit = mapped.find((s) => {
+        const main = norm(s.mainText);
+        const city = norm(s.secondaryText.split(',')[0] ?? '');
+        return /^\d/.test(s.mainText.trim()) && main.length >= 5 && city.length > 0 && t.startsWith(main) && t.indexOf(city, main.length) >= 0;
+      });
+      if (hit) {
+        await choose(hit);
+        return;
+      }
+      // Keep the list ready so one tap back into the field shows it.
+      setSuggestions(mapped);
+      setNeedsPick(true);
+    } catch {
+      // A failed lookup is not a failed form. Say what to do and move on.
+      setNeedsPick(true);
+    }
+  }
+
   function onTextChange(next: string) {
     setText(next);
+    setNeedsPick(false);
     // Any edit invalidates a previously picked place. See rule 2 above.
     if (resolved) setResolved(null);
 
@@ -223,9 +289,10 @@ export default function AddressAutocomplete({
   async function choose(suggestion: Suggestion) {
     const fallback = [suggestion.mainText, suggestion.secondaryText].filter(Boolean).join(', ');
     setText(fallback);
-    setOpen(false);
+        setOpen(false);
     setSuggestions([]);
     setActiveIndex(-1);
+    setNeedsPick(false);
 
     // Optimistic: keep the address even if resolving the details fails, so the
     // visitor never watches their choice disappear.
@@ -324,12 +391,16 @@ export default function AddressAutocomplete({
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
         onKeyDown={onKeyDown}
-        onFocus={() => {
+                onFocus={() => {
+          setNeedsPick(false);
           if (suggestions.length > 0) setOpen(true);
         }}
         onBlur={() => {
           // Delay so a click on an option lands before the list unmounts.
-          blurTimer.current = setTimeout(() => setOpen(false), 150);
+          blurTimer.current = setTimeout(() => {
+            setOpen(false);
+            void matchTyped();
+          }, 150);
         }}
         role="combobox"
         aria-expanded={open}
@@ -395,6 +466,13 @@ export default function AddressAutocomplete({
       <input type="hidden" name={`${name}PlaceId`} value={resolved?.placeId ?? ''} />
       <input type="hidden" name={`${name}Lat`} value={resolved?.lat ?? ''} />
       <input type="hidden" name={`${name}Lng`} value={resolved?.lng ?? ''} />
+
+            {/* Typed but not matched. Plain words, visible, and announced. */}
+      {needsPick && !resolved && (
+        <p className="mt-1.5 text-xs" role="status" data-testid={`${name}-pick-hint`}>
+          Tap your address in the list so we can price your trip. Click back into the box to see the list.
+        </p>
+      )}
 
       {/* Deliberately silent when `failed` — see rule 1. Nothing is broken. */}
       {!failed && !places && (

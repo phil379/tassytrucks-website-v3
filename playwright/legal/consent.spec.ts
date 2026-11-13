@@ -102,3 +102,24 @@ test('/cookies page says what is stored and has the settings control', async ({ 
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Cookies');
   await expect(page.getByText('tassy-consent').first()).toBeVisible();
 });
+
+// Muse testing, 2026-11-13: the banner was full width, about a quarter of the screen, and covered
+// the hero buttons on first paint. It is now a short bar on a phone and a corner card above that.
+for (const size of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+  test(`first visit at ${size.width}px: the banner is small and does not cover Request a Ride`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await page.goto('/');
+    const banner = page.getByTestId('consent-banner');
+    await expect(banner).toBeVisible();
+    const b = (await banner.boundingBox())!;
+    // Phone: a short bar, never more than a quarter of the screen tall.
+    // Larger screens: a corner card, never more than an eighth of the screen's area.
+    if (size.width < 640) expect(b.height).toBeLessThanOrEqual(size.height * 0.25);
+    else expect(b.width * b.height).toBeLessThanOrEqual(size.width * size.height * 0.125);
+    const cta = page.locator('main a', { hasText: /Request a Ride/i }).first();
+    await expect(cta).toBeVisible();
+    const c = (await cta.boundingBox())!;
+    const overlaps = c.x < b.x + b.width && c.x + c.width > b.x && c.y < b.y + b.height && c.y + c.height > b.y;
+    expect(overlaps, `banner ${JSON.stringify(b)} overlaps the button ${JSON.stringify(c)}`).toBe(false);
+  });
+}

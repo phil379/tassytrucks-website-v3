@@ -1,4 +1,5 @@
 import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
+import { fillWhen } from '../support/when';
 import { PLACES, blockPlaces, stubPlaces } from '../support/maps-stub';
 import { NEEDS_PRICE_MARKER, PICK_ADDRESS_MESSAGE, PRICE_PENDING_MESSAGE } from '../../lib/price-fallback';
 
@@ -49,7 +50,7 @@ async function pick(page: Page, field: 'pickupAddress' | 'dropoffAddress', query
 }
 
 async function fillWinnieRest(page: Page, email: string) {
-  await page.locator('#requestedAt').fill(whenValue());
+  await fillWhen(page, whenValue());
   await page.locator('#details-pet_name').fill('Maple');
   await page.locator('#details-species').selectOption('dog');
   await page.locator('#details-rabies').selectOption('current');

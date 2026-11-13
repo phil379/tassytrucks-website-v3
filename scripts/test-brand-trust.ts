@@ -16,26 +16,50 @@ const home = readFileSync('app/page.tsx', 'utf8');
 const header = readFileSync('components/Header.tsx', 'utf8');
 const css = readFileSync('app/globals.css', 'utf8');
 
-t('the medallion sits in the hero, above the services section, with the original badge file', () => {
-  const card = home.indexOf('data-testid="hirevets-medallion"');
-  assert.ok(card > 0, 'medallion card present');
-  assert.ok(card < home.indexOf('id="services"'), 'before the services section');
-  assert.equal((home.match(/hirevets-2023-gold\.png/g) ?? []).length, 1, 'shown once on the home page');
-  assert.ok(existsSync('public/brand/hirevets-2023-gold.png'));
+const HIRE_ALT = '2023 HIRE Vets Medallion Award Gold Winner -- U.S. Department of Labor, HIREVets.gov';
+const SBA_ALT = 'U.S. Small Business Administration -- Service-Disabled Veteran-Owned Certified';
+const footer = readFileSync('components/Footer.tsx', 'utf8');
+const stripComments = (src: string) => src.replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+const imgTag = (src: string, file: string) => {
+  const i = src.indexOf(`src="/brand/${file}"`);
+  assert.ok(i > 0, `${file} is shown`);
+  return src.slice(src.lastIndexOf('<img', i), src.indexOf('/>', i) + 2);
+};
+
+t('home: both badges sit in the hero trust row, above the services section', () => {
+  const row = home.indexOf('data-testid="trust-badges"');
+  assert.ok(row > 0, 'trust row present');
+  assert.ok(row < home.indexOf('id="services"'), 'near the top, before the services section');
+  for (const f of ['hirevets-2023-gold-banner.webp', 'sba-sdvosb-certified.webp']) {
+    assert.ok(existsSync(`public/brand/${f}`), f);
+    assert.equal(home.split(`/brand/${f}`).length - 1, 1, `${f} shown once on the home page`);
+    assert.ok(home.indexOf(`/brand/${f}`) > row && home.indexOf(`/brand/${f}`) < home.indexOf('id="services"'));
+  }
+  assert.ok(!/hirevets-2023-gold\.png/.test(home), 'the small cropped medallion is replaced by the full banner');
 });
 
-t('medallion: alt text, 320px source shown at 96-112px (sharp at 2x and up)', () => {
-  const block = home.slice(home.indexOf('data-testid="hirevets-medallion"'), home.indexOf('data-testid="hirevets-medallion"') + 1600);
-  assert.ok(block.includes('alt="2023 HIRE Vets Medallion Award, Gold -- U.S. Department of Labor"'));
-  assert.ok(/width=\{320\}/.test(block) && /height=\{320\}/.test(block));
-  assert.ok(/h-24 w-24 sm:h-28 sm:w-28/.test(block), '96px on phones, 112px from sm up');
+t('badges: exact alt text (only the words on the images), 2x size, never links', () => {
+  for (const [src, where] of [[home, 'home'], [footer, 'footer']] as const) {
+    const hire = imgTag(src, 'hirevets-2023-gold-banner.webp');
+    const sba = imgTag(src, 'sba-sdvosb-certified.webp');
+    assert.ok(hire.includes(`alt="${HIRE_ALT}"`), `${where} banner alt`);
+    assert.ok(sba.includes(`alt="${SBA_ALT}"`), `${where} SBA alt`);
+    assert.ok(/width=\{840\}/.test(hire) && /height=\{439\}/.test(hire), `${where} banner 840x439`);
+    assert.ok(/width=\{400\}/.test(sba) && /height=\{500\}/.test(sba), `${where} SBA 400x500`);
+    const before = src.slice(Math.max(0, src.indexOf(hire) - 400), src.indexOf(hire));
+    assert.ok(!/<a\b[^>]*>(?![\s\S]*<\/a>)/.test(before), `${where}: badges are not inside a link`);
+  }
+  // Displayed at no more than half the file width, so they stay sharp on 2x screens.
+  assert.ok(/max-w-\[340px\] sm:w-\[360px\]/.test(imgTag(home, 'hirevets-2023-gold-banner.webp')));
+  assert.ok(/w-\[200px\] sm:w-\[150px\]/.test(imgTag(home, 'sba-sdvosb-certified.webp')));
 });
 
-t('medallion caption: the award facts only, no endorsement of the service', () => {
-  const block = home.slice(home.indexOf('data-testid="hirevets-medallion"'), home.indexOf('data-testid="hirevets-medallion"') + 1600);
-  assert.ok(block.includes('2023 HIRE Vets Medallion Award &mdash; Gold'));
-  assert.ok(block.includes('Awarded by the U.S. Department of Labor to employers who recruit,'));
-  assert.ok(!/endorse|approved by|recommended by|certified by the|official partner/i.test(block.replace(/\{\/\*[\s\S]*?\*\/\}/g, '')), 'no endorsement wording');
+t('trust row: no added caption or endorsement wording around the badges', () => {
+  const start = home.lastIndexOf('<div', home.indexOf('data-testid="trust-badges"'));
+  const row = stripComments(home.slice(start, home.indexOf('{/* Hero visual */}')));
+  const text = row.replace(/<img[\s\S]*?\/>/g, '').replace(/<[^>]+>/g, '').trim();
+  assert.equal(text, '', 'no words beyond the badges themselves');
+  assert.ok(!/endorse|approved by|recommended by|official partner/i.test(row));
 });
 
 t('header logo: the cropped emblem at 2x, heights unchanged, width follows the screen', () => {

@@ -64,7 +64,7 @@ export default function DogGroomingPickupPage() {
               <p>
                 When your groomer has a last-minute opening, call our dispatch
                 line at (704) 941-8508. If a vehicle is available, we can run a
-                same-day trip — we ask for a 2-hour minimum lead time on routine
+                same-day trip — we ask for a 4-hour minimum lead time on routine
                 rides, which is usually shorter than the window the groomer gives
                 you anyway.
               </p>
@@ -154,7 +154,7 @@ export default function DogGroomingPickupPage() {
       faqs={[
         {
           q: 'Can you pick up my dog for a grooming appointment today?',
-          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 2-hour minimum lead time on routine trips. Call dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
+          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 4-hour minimum lead time on routine trips. Call dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
         },
         {
           q: 'Do you offer recurring rides for standing grooming appointments?',

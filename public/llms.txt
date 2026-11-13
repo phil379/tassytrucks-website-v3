@@ -32,11 +32,10 @@
 - **Winnie Ride** (/winnie) — dedicated pet transport with the owner NOT in the
   vehicle: vet, groomer, daycare, boarding. $59-$109 one way, $106-$196 there and
   back with 20 minutes of wait.
-- **Tassy Scholar** — school and after-school routes, priced per ROUTE and billed
-  monthly, never per ride: first child $45 a leg, each sibling at the same address
-  $20, third child at that address free, $55 route minimum. After-school three days
-  a week from $660/month. Daily routes are sold to schools, districts and case
-  managers on account.
+- **Tassy Scholar** — school and after-school routes, sold by the plan and billed
+  monthly, never per ride. Full School Year is from $850/month for routes up to
+  20 minutes. Weekly Pattern and After-School plans are priced per route and
+  quoted. Households with more than one child get a custom quote.
 - Retired lines: **Tassy Wellness** (/renew) now routes to Concierge or Recovery
   depending on whether the procedure leaves the client able to travel alone.
   **Tassy Guardian** is not currently accepting requests.

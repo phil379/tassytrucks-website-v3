@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight, Car, HeartHandshake, Stethoscope, Briefcase } from 'lucide-react';
+import { notFound } from 'next/navigation';
 import { apply, contact } from '@/lib/saas-links';
+import { CAREERS_OPEN } from '@/lib/careers-gate';
 
 /**
  * The careers hub. Shipped 2026-10-01 to retire a stopgap.
@@ -38,7 +40,8 @@ export const metadata: Metadata = {
   description:
     'Open roles at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Apply in about five minutes.',
   alternates: { canonical: '/careers' },
-  robots: { index: true, follow: true },
+  // Not indexed while the page is closed (lib/careers-gate.ts).
+  robots: { index: CAREERS_OPEN, follow: CAREERS_OPEN },
 };
 
 const ROLES = [
@@ -81,6 +84,8 @@ const ROLES = [
 ] as const;
 
 export default function CareersPage() {
+  // Closed until the insurance and counsel gates clear. See lib/careers-gate.ts.
+  if (!CAREERS_OPEN) notFound();
   return (
     <section>
       <div className="container-x py-16 lg:py-24 max-w-4xl">

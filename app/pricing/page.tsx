@@ -124,7 +124,7 @@ export default function PricingPage() {
               <RateTable
                 id="treatment-day"
                 heading="Tassy Care &mdash; Treatment Day"
-                note="One flat price for the round trip to recurring visits, in a late-model SUV that is wiped down before your ride. Your driver takes you there and comes back when you call, so a long day costs nothing extra. A companion rides free. Add-ons for early mornings, nights, weekends and holidays are shown before you book."
+                note="One flat price for the round trip to recurring visits, in a late-model SUV that is wiped down before your ride. Your driver takes you there and comes back when you call. Treatment Day is $11 more than two one-way Care rides: that covers the late-model SUV and a driver held for your return, with no wait charges however long the day runs. A companion rides free. Add-ons for early mornings, nights, weekends and holidays are shown before you book."
                 colA="Two Care rides"
                 colASub="there, then back"
                 colB="Treatment Day"
@@ -164,7 +164,7 @@ export default function PricingPage() {
                   {SCHOOL_PLANS.map((plan) => (
                     <li key={plan.key} className="flex items-baseline justify-between gap-3">
                       <span className="ink-soft">{plan.name}</span>
-                      <strong className="text-cream-text whitespace-nowrap">{plan.price}</strong>
+                      <strong className="text-cream-text text-right">{plan.price}</strong>
                     </li>
                   ))}
                 </ul>

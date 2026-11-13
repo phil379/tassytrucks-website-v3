@@ -1,0 +1,6 @@
+{
+  "name": "real-time-eta",
+  "pattern": "real-time ETA",
+  "flags": "i",
+  "reason": "The facility portal shows trip status, not a live ETA. Do not promise one until it exists (Muse F5, 2026-11-13)."
+}

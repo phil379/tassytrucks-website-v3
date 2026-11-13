@@ -99,7 +99,7 @@ export default function VeterinaryPartnersPage() {
               </p>
               <p>
                 The second reason is reliability. For routine rides we ask for a
-                2-hour minimum lead time, which keeps our scheduling honest and
+                4-hour minimum lead time, which keeps our scheduling honest and
                 your clients&rsquo; arrival times reliable. All of it happens in
                 climate-controlled vehicles, every season.
               </p>
@@ -169,7 +169,7 @@ export default function VeterinaryPartnersPage() {
               <p>
                 For practices that want to go further — coordinated transport
                 for surgical days, standing arrangements with a specialty
-                service — our facility portal supports net-30 invoicing so your
+                service — our facility portal supports weekly invoicing on 7-day terms so your
                 clinic can book on behalf of clients without handling payment at
                 the front desk. The broader program is described on our{' '}
                 <Link href="/partners" className={inlineLink}>

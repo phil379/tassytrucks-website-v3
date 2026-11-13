@@ -34,7 +34,7 @@ const table = (card: Card) => card.bands.map((b) => [b.upToMiles, b.cents / 100]
 // (src/lib/pricing/published-care-edges.test.ts), so repricing one repo alone fails a test.
 t('Care card', () => {
   assert.deepEqual(table(CARE), [[3, 49], [7, 59], [12, 74], [17, 89], [22, 109], [30, 129]]);
-  assert.deepEqual([CARE.returnFactor, CARE.returnFloor, CARE.waitIncludedMin, CARE.waitOverage, CARE.perExtra], [2, 0, 15, 2000, 1000]);
+  assert.deepEqual([CARE.returnFactor, CARE.returnFloor, CARE.waitIncludedMin, CARE.waitOverage, CARE.perExtra], [2, 0, 20, 2000, 1000]);
 });
 t('Care WAV card: 0-5 mi $109, 6-10 mi $129, then $155 / $185 / $225 at 15 / 20 / 30 mi', () => {
   assert.deepEqual(table(CARE_WAV), [[5, 109], [10, 129], [15, 155], [20, 185], [30, 225]]);
@@ -164,7 +164,7 @@ t('wait time: included minutes per card, and Winnie round trips include 20', () 
     assert.ok(r && r.kind === 'estimate');
     return (r as { waitIncludedMin: number }).waitIncludedMin;
   };
-  assert.equal(w('care'), 15);
+  assert.equal(w('care'), 20);
   assert.equal(w('care', { mobility: 'wheelchair' }), 20);
   assert.equal(w('recovery'), 20);
   assert.equal(w('concierge'), 0);

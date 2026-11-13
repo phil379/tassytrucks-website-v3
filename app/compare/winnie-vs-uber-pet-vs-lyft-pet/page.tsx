@@ -200,7 +200,7 @@ export default function WinnieComparePage() {
                 <Link href="/partners/veterinary" className="underline underline-offset-2" style={{ textDecorationColor: '#7C9A5C' }}>
                   partnership program
                 </Link>{' '}
-                adds referral codes and net-30 billing.
+                adds referral codes and weekly invoicing.
               </p>
             </>
           ),

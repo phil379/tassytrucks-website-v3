@@ -73,7 +73,7 @@ export default function VetAppointmentRidesPage() {
                 (704) 941-8508. A dispatcher usually confirms your driver and your
                 price within 2 hours during business hours. Tell us the pickup address,
                 the clinic, and the appointment time. Routine rides need a minimum
-                of two hours&rsquo; lead time; more notice makes your preferred
+                of four hours&rsquo; lead time; more notice makes your preferred
                 window easier to hold.
               </p>
               <p>
@@ -188,7 +188,7 @@ export default function VetAppointmentRidesPage() {
         },
         {
           q: 'How much notice do you need for a vet ride?',
-          a: 'A minimum of two hours for routine rides. Requesting the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
+          a: 'A minimum of four hours for routine rides. Requesting the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
         },
         {
           q: 'Does my pet need vaccines to ride?',

@@ -162,7 +162,7 @@ export default function CalmPetTransportPage() {
                 dispatch line at (704) 941-8508 and talk it through with a person.
                 A dispatcher usually confirms your driver and your price within 2
                 hours during business hours.
-                We ask for a 2-hour minimum lead time on routine rides, and we
+                We ask for a 4-hour minimum lead time on routine rides, and we
                 serve all of Charlotte and Mecklenburg County plus Matthews,
                 Pineville, and Huntersville. If you ride with us regularly,{' '}
                 <Link href="/winnie" className={linkCls}>
@@ -198,7 +198,7 @@ export default function CalmPetTransportPage() {
         },
         {
           q: 'What areas around Charlotte do you cover for anxious-pet transport?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. Routine rides need a 2-hour minimum lead time; call dispatch at (704) 941-8508 for anything time-sensitive.',
+          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. Routine rides need a 4-hour minimum lead time; call dispatch at (704) 941-8508 for anything time-sensitive.',
         },
       ]}
       relatedLinks={[

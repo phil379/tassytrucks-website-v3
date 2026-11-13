@@ -1,0 +1,6 @@
+{
+  "name": "phi-compliant",
+  "pattern": "(PHI|HIPAA)[- ]compliant",
+  "flags": "i",
+  "reason": "No privacy-law compliance promise until counsel has reviewed the facility portal (Muse F5, 2026-11-13)."
+}

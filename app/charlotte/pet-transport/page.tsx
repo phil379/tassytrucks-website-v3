@@ -199,7 +199,7 @@ export default function PetTransportPage() {
                 Requesting a ride takes about two minutes online, or call (704) 941-8508.
                 A dispatcher usually confirms your driver and your price within 2
                 hours during business hours. For routine rides we ask for a minimum of
-                two hours&rsquo; lead time, though more notice always helps us hold
+                four hours&rsquo; lead time, though more notice always helps us hold
                 your preferred window. Have your pet&rsquo;s vaccine records handy
                 the first time; after that, we have them on file.
               </p>
@@ -225,7 +225,7 @@ export default function PetTransportPage() {
       faqs={[
         {
           q: 'How much notice do you need to book a pet ride in Charlotte?',
-          a: 'A minimum of two hours for routine rides. More notice makes it easier to guarantee your preferred pickup window, so book the day before when you can. Call (704) 941-8508 and dispatch will tell you honestly what is available.',
+          a: 'A minimum of four hours for routine rides. More notice makes it easier to guarantee your preferred pickup window, so book the day before when you can. Call (704) 941-8508 and dispatch will tell you honestly what is available.',
         },
         {
           q: 'What vaccines does my pet need to ride?',

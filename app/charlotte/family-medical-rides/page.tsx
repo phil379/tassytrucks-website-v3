@@ -149,8 +149,9 @@ export default function FamilyMedicalRidesPage() {
                 confirmations and updates come to you.
               </p>
               <p>
-                Payment is handled by you at booking, so there is nothing for
-                your loved one to pay or sign at pickup. Costs are quoted
+                You book now, we confirm the price, then we send you a secure
+                payment link, so there is nothing for your loved one to pay or
+                sign at pickup. Costs are quoted
                 up-front — no surprises on either end of the trip. You can
                 also reach us anytime at book@tassytrucks.com.
               </p>
@@ -161,7 +162,7 @@ export default function FamilyMedicalRidesPage() {
       faqs={[
         {
           q: 'Can I book and pay for a medical ride for my parent from out of state?',
-          a: 'Yes. You book online or call (704) 941-8508 from wherever you live, pay at booking, and receive all confirmations and driver updates yourself. Your parent just needs to be ready at the door in the Charlotte area — no app, no smartphone, no payment at pickup.',
+          a: 'Yes. You book online or call (704) 941-8508 from wherever you live, we confirm the price first and send you a secure payment link, and you receive all confirmations and driver updates yourself. Your parent just needs to be ready at the door in the Charlotte area — no app, no smartphone, no payment at pickup.',
         },
         {
           q: 'Does my loved one need a smartphone or the booking link?',

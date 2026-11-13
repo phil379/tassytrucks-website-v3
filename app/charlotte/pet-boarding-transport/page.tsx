@@ -123,7 +123,7 @@ export default function PetBoardingTransportPage() {
                 your occupancy stops depending on their schedules.
               </p>
               <p>
-                Partner facilities get access to our facility portal with net-30
+                Partner facilities get access to our facility portal with weekly
                 invoicing, so transport you arrange on a client&rsquo;s behalf is
                 billed cleanly instead of handled ride by ride. Start at our{' '}
                 <Link href="/partners/veterinary" className={linkCls}>
@@ -145,7 +145,7 @@ export default function PetBoardingTransportPage() {
               Request a ride in about two minutes or call (704) 941-8508. A
               dispatcher usually confirms your driver and your price within 2
               hours during business hours. Routine
-              rides need a 2-hour minimum lead time, but boarding runs are best
+              rides need a 4-hour minimum lead time, but boarding runs are best
               booked as soon as your travel is confirmed so your preferred
               windows are locked in. We cover all of Charlotte and Mecklenburg
               County, plus Matthews, Huntersville, and Concord — and if your
@@ -178,7 +178,7 @@ export default function PetBoardingTransportPage() {
         },
         {
           q: 'How do boarding facilities partner with Winnie Ride?',
-          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with net-30 invoicing. Start at our veterinary partnership page or email book@tassytrucks.com.',
+          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with weekly invoicing. Start at our veterinary partnership page or email book@tassytrucks.com.',
         },
       ]}
       relatedLinks={[

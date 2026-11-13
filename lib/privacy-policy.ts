@@ -76,7 +76,7 @@ export const PROVIDERS: ProviderRow[] = [
   },
   {
     name: 'Tassy’s applicant system (tassytrucksops.vercel.app)',
-    does: 'Handles job applications that start on our Careers page. It is run by Tassy and is a separate website',
+    does: 'Holds the job applications people have sent us. It is run by Tassy and is a separate website. We are not taking new applications on this site right now',
     receives: 'What you enter on the application',
   },
 ];

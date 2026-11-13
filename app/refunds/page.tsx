@@ -95,11 +95,11 @@ export default function RefundsPage() {
                     </tr>
                     <tr>
                       <th className={`${cell} text-left font-medium`} scope="row">
-                        Tassy Scholar, billed per ride (Weekly Pattern, After-School)
+                        Tassy Scholar plans priced per route (Weekly Pattern, After-School)
                       </th>
                       <td className={cell}>Up to {T.scholarPerRide.freeUntilHoursBefore} hours before pickup</td>
-                      <td className={cell}>Charged as {T.scholarPerRide.lateCancelOrNoShowRides} ride</td>
-                      <td className={cell}>Charged as {T.scholarPerRide.lateCancelOrNoShowRides} ride</td>
+                      <td className={cell}>That day stays on the monthly bill</td>
+                      <td className={cell}>That day stays on the monthly bill</td>
                     </tr>
                   </tbody>
                 </table>

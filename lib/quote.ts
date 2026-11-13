@@ -164,7 +164,8 @@ export const CARE: Card = {
     { upToMiles: 22, cents: 10900 },
     { upToMiles: 30, cents: 12900 },
   ],
-  waitIncludedMin: 15,
+  // 20 everywhere on Care (Phil, 2026-11-13; was 15). One number on every page and estimate.
+  waitIncludedMin: 20,
   waitOverage: 2000,
   perExtra: 1000,
   returnFactor: 2,

@@ -10,7 +10,7 @@ import { planBySlug } from '@/lib/school-plans';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Custom transportation request · Tassy Scholar',
+  title: { absolute: 'Custom transportation request · Tassy Scholar' },
   description: 'Tell us about your family’s school schedule and we’ll prepare a personalized transportation plan.',
   // A family mid-request. Nothing here belongs in an index.
   robots: { index: false, follow: false },

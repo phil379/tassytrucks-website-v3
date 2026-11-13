@@ -194,6 +194,51 @@ function Vehicle({ color, kind }: { color: string; kind: 'suv' | 'sedan' }) {
   );
 }
 
+/** The day map's styles. Kept as one string so it can be injected without escaping (see below). */
+const DAY_MAP_CSS = `
+        .cdm{background:linear-gradient(180deg,${DAY_MAP_BG.cardTop},${DAY_MAP_BG.cardBottom});border:1px solid var(--line);
+             border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -28px rgba(0,0,0,.9)}
+        .cdm-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+             padding:16px 18px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+        .cdm-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#878D97;margin:0}
+        .cdm-clock{font-variant-numeric:tabular-nums;font-size:14px;color:#F2EEE4;letter-spacing:.02em}
+        .cdm-clock b{color:var(--gold);font-weight:600}
+        .cdm-stage{position:relative;aspect-ratio:22/23}
+        .cdm-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+        .cdm-node{font-size:8.6px;fill:#878D97;letter-spacing:.07em;text-transform:uppercase;
+             paint-order:stroke;stroke:#13161B;stroke-width:2.6px;stroke-linejoin:round}
+        .cdm-node[data-big="1"]{font-size:10.2px;fill:#A3A9B3;letter-spacing:.09em}
+        .cdm-road{fill:none;stroke:#20262E;stroke-linecap:round}
+        .cdm-rl{font-size:8px;fill:#39424D;letter-spacing:.04em}
+        .cdm-leg{fill:none;stroke-linecap:round;opacity:.1;transition:opacity .6s ease}
+        .cdm-leg[data-on="1"]{opacity:.3}
+        .cdm-glow{opacity:.16;transition:opacity .9s ease}
+        .cdm-glow[data-on="1"]{opacity:1}
+        .cdm-dot{transition:opacity .5s ease,r .5s ease}
+        .cdm-strip{padding:14px 18px 8px;border-top:1px solid var(--line)}
+        .cdm-strip-head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;
+             text-transform:uppercase;color:#878D97;margin-bottom:8px}
+        .cdm-track{position:relative;height:6px;background:#1B2027;border-radius:99px}
+        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.55}
+        .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
+        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
+             color:${DAY_MAP_LABEL.ticks};letter-spacing:.04em;font-variant-numeric:tabular-nums}
+        .cdm-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+             gap:1px;background:var(--line);border-top:1px solid var(--line)}
+        .cdm-leg-item{background:${DAY_MAP_BG.legendCell};padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
+             transition:background .4s ease}
+        .cdm-leg-item[data-on="1"]{background:${DAY_MAP_BG.legendCellOn}}
+        .cdm-swatch{width:8px;height:8px;border-radius:99px;flex:none;margin-top:5px;opacity:.3;transition:opacity .4s ease}
+        .cdm-leg-item[data-on="1"] .cdm-swatch{opacity:1}
+        .cdm-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+        .cdm-name{font-size:12.5px;color:#878D97;transition:color .4s ease;white-space:nowrap}
+        .cdm-leg-item[data-on="1"] .cdm-name{color:#F2EEE4}
+        .cdm-where{font-size:10.5px;color:${DAY_MAP_LABEL.where};line-height:1.3}
+        .cdm-when{font-size:10px;color:${DAY_MAP_LABEL.when};font-variant-numeric:tabular-nums;white-space:nowrap}
+        .cdm-cap{padding:11px 18px 14px;font-size:11px;color:#5F6773;line-height:1.5;border-top:1px solid var(--line)}
+        @media (prefers-reduced-motion:reduce){.cdm-leg,.cdm-glow,.cdm-leg-item,.cdm-swatch,.cdm-dot{transition:none}}
+      `;
+
 export default function CharlotteDayMap() {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hour, setHour] = useState(11.5);
@@ -257,49 +302,10 @@ export default function CharlotteDayMap() {
 
   return (
     <div className="cdm">
-      <style>{`
-        .cdm{background:linear-gradient(180deg,${DAY_MAP_BG.cardTop},${DAY_MAP_BG.cardBottom});border:1px solid var(--line);
-             border-radius:24px;overflow:hidden;box-shadow:0 24px 60px -28px rgba(0,0,0,.9)}
-        .cdm-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
-             padding:16px 18px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-        .cdm-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#878D97;margin:0}
-        .cdm-clock{font-variant-numeric:tabular-nums;font-size:14px;color:#F2EEE4;letter-spacing:.02em}
-        .cdm-clock b{color:var(--gold);font-weight:600}
-        .cdm-stage{position:relative;aspect-ratio:22/23}
-        .cdm-stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-        .cdm-node{font-size:8.6px;fill:#878D97;letter-spacing:.07em;text-transform:uppercase;
-             paint-order:stroke;stroke:#13161B;stroke-width:2.6px;stroke-linejoin:round}
-        .cdm-node[data-big="1"]{font-size:10.2px;fill:#A3A9B3;letter-spacing:.09em}
-        .cdm-road{fill:none;stroke:#20262E;stroke-linecap:round}
-        .cdm-rl{font-size:8px;fill:#39424D;letter-spacing:.04em}
-        .cdm-leg{fill:none;stroke-linecap:round;opacity:.1;transition:opacity .6s ease}
-        .cdm-leg[data-on="1"]{opacity:.3}
-        .cdm-glow{opacity:.16;transition:opacity .9s ease}
-        .cdm-glow[data-on="1"]{opacity:1}
-        .cdm-dot{transition:opacity .5s ease,r .5s ease}
-        .cdm-strip{padding:14px 18px 8px;border-top:1px solid var(--line)}
-        .cdm-strip-head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;
-             text-transform:uppercase;color:#878D97;margin-bottom:8px}
-        .cdm-track{position:relative;height:6px;background:#1B2027;border-radius:99px}
-        .cdm-band{position:absolute;top:0;bottom:0;border-radius:99px;opacity:.55}
-        .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
-        .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
-             color:${DAY_MAP_LABEL.ticks};letter-spacing:.04em;font-variant-numeric:tabular-nums}
-        .cdm-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
-             gap:1px;background:var(--line);border-top:1px solid var(--line)}
-        .cdm-leg-item{background:${DAY_MAP_BG.legendCell};padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
-             transition:background .4s ease}
-        .cdm-leg-item[data-on="1"]{background:${DAY_MAP_BG.legendCellOn}}
-        .cdm-swatch{width:8px;height:8px;border-radius:99px;flex:none;margin-top:5px;opacity:.3;transition:opacity .4s ease}
-        .cdm-leg-item[data-on="1"] .cdm-swatch{opacity:1}
-        .cdm-text{display:flex;flex-direction:column;gap:2px;min-width:0}
-        .cdm-name{font-size:12.5px;color:#878D97;transition:color .4s ease;white-space:nowrap}
-        .cdm-leg-item[data-on="1"] .cdm-name{color:#F2EEE4}
-        .cdm-where{font-size:10.5px;color:${DAY_MAP_LABEL.where};line-height:1.3}
-        .cdm-when{font-size:10px;color:${DAY_MAP_LABEL.when};font-variant-numeric:tabular-nums;white-space:nowrap}
-        .cdm-cap{padding:11px 18px 14px;font-size:11px;color:#5F6773;line-height:1.5;border-top:1px solid var(--line)}
-        @media (prefers-reduced-motion:reduce){.cdm-leg,.cdm-glow,.cdm-leg-item,.cdm-swatch,.cdm-dot{transition:none}}
-      `}</style>
+      {/* Injected raw: as a text child, React escapes the quotes in [data-on="1"] to &quot;, which a
+          browser does not decode inside <style>. The server CSS was then broken and the text did not
+          match on hydration, so React threw away the whole server-rendered page (error #425). */}
+      <style dangerouslySetInnerHTML={{ __html: DAY_MAP_CSS }} />
 
       <div className="cdm-head">
         <p className="cdm-title">A Tassy day · Charlotte</p>

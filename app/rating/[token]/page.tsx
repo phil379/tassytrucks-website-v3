@@ -16,7 +16,7 @@ import { RatingForm, RatingMessage, RatingShell, type FormNotice } from './view'
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Rate your ride · Tassy Transportation',
+  title: { absolute: 'Rate your ride · Tassy Transportation' },
   robots: { index: false, follow: false, nocache: true },
   referrer: 'no-referrer',
 };

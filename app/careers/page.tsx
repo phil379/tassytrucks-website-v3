@@ -34,7 +34,7 @@ import { apply, contact } from '@/lib/saas-links';
  */
 
 export const metadata: Metadata = {
-  title: 'Careers — Drive, Care and Sell with Tassy Transportation',
+  title: { absolute: 'Careers — Drive, Care and Sell with Tassy Transportation' },
   description:
     'Open roles at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Apply in about five minutes.',
   alternates: { canonical: '/careers' },

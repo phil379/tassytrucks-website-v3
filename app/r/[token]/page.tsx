@@ -17,7 +17,7 @@ import { RefreshWhilePending, SaveReceiptButton } from './client';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Your receipt · Tassy Transportation',
+  title: { absolute: 'Your receipt · Tassy Transportation' },
   robots: { index: false, follow: false, nocache: true },
   referrer: 'no-referrer',
 };

@@ -22,7 +22,7 @@ const WAIT_LINES = [
   .map((w) => ({ label: w.label, cents: w.card.waitOverage }));
 
 export const metadata: Metadata = {
-  title: 'Pricing — flat rates by distance | Tassy Transportation Charlotte',
+  title: 'Pricing — flat rates by distance in Charlotte',
   description:
     'Charlotte medical, pet and premium transport priced by distance, not by meter. Tassy Care from $49, Recovery from $129, Concierge from $89, Winnie Ride from $59. No surge.',
   alternates: { canonical: '/pricing' },

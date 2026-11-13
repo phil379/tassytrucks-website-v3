@@ -9,7 +9,7 @@ import { WAV_PARTNER_LINE } from '@/lib/wav';
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 
 export const metadata: Metadata = {
-  title: 'Tassy Care — Charlotte medical transport | Flat rates from $49',
+  title: { absolute: 'Tassy Care — Charlotte medical transport | Flat rates from $49' },
   description:
     'Private medical transport in Charlotte NC. Dialysis, infusion, physical therapy, specialists. Flat rates by distance from $49 — you know the price before you book. (704) 941-8508.',
   alternates: { canonical: '/nemt' },

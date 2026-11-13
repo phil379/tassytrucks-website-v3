@@ -75,8 +75,7 @@ export default function PetBoardingTransportPage() {
                 Give dispatch your flight times and we schedule around them, not
                 the other way around. The same service works for daycare: a
                 standing morning drop-off and evening pickup during a heavy work
-                stretch, with B2C subscriptions from $39/mo for families who run
-                these trips regularly. And if your traveling pet also needs a
+                stretch, with the Winnie Monthly discount (10% off at four trips a month and 15% off at eight) for families who run these trips regularly. And if your traveling pet also needs a
                 bath before you get back, our{' '}
                 <Link href="/charlotte/dog-grooming-pickup" className={linkCls}>
                   dog grooming pickup service
@@ -147,9 +146,7 @@ export default function PetBoardingTransportPage() {
               hours during business hours. Routine
               rides need a 4-hour minimum lead time, but boarding runs are best
               booked as soon as your travel is confirmed so your preferred
-              windows are locked in. We cover all of Charlotte and Mecklenburg
-              County, plus Matthews, Huntersville, and Concord — and if your
-              kennel sits just beyond that, call us and we&rsquo;ll quote it. For
+              windows are locked in. We cover all of Charlotte and Mecklenburg County — and if your kennel sits just beyond that, call us and we&rsquo;ll quote it. For
               everything else Winnie Ride does, see the{' '}
               <Link href="/winnie" className={linkCls}>
                 Winnie Ride overview
@@ -174,7 +171,7 @@ export default function PetBoardingTransportPage() {
         },
         {
           q: 'Can you do recurring daycare drop-offs and pickups?',
-          a: 'Yes. We schedule standing daycare runs — same windows, same driver approach, every time — and B2C subscriptions start at $39/mo for families who use pet transport regularly.',
+          a: 'Yes. We schedule standing daycare runs — same windows, same driver approach, every time — and families who use pet transport regularly get 10% off at four trips a month and 15% off at eight.',
         },
         {
           q: 'How do boarding facilities partner with Winnie Ride?',

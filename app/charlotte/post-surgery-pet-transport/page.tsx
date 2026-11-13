@@ -49,8 +49,7 @@ export default function PostSurgeryPetTransportPage() {
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
                 (SDVOSB). We handle
                 the drive so your only job is meeting your pet at the door. We
-                cover all of Charlotte and Mecklenburg County, plus Matthews,
-                Pineville, and Huntersville. For everyday trips that aren&rsquo;t
+                cover all of Charlotte and Mecklenburg County. For everyday trips that aren&rsquo;t
                 post-op, see our main{' '}
                 <Link href="/charlotte/pet-transport" className={linkCls}>
                   Charlotte pet transport page
@@ -172,7 +171,7 @@ export default function PostSurgeryPetTransportPage() {
         },
         {
           q: 'What areas around Charlotte do you cover for post-op pet pickup?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. If your clinic or home is just outside that range, call us — we quote longer trips case by case.',
+          a: 'All of Charlotte and Mecklenburg County. If your clinic or home is just outside that range, call us — we quote longer trips case by case.',
         },
       ]}
       relatedLinks={[

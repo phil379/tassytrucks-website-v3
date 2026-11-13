@@ -25,7 +25,7 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
   {
     h: 'Requests & pricing',
     body: [
-      'Prices are shown before you confirm a booking — no surge pricing and no hidden fees. Fares are set by distance band and confirmed by a dispatcher before the trip is booked; tolls and wait beyond what is included are quoted to you in advance, never charged afterwards. Standing Ride plans are billed after each ride. Winnie Monthly is billed monthly. Facility accounts are invoiced weekly on 7-day terms. Any recurring plan can be changed or cancelled with 30 days’ notice.',
+      'Prices are shown before you confirm a booking — no surge pricing and no hidden fees. Fares are set by distance band and confirmed by a dispatcher before the trip is booked; tolls and wait beyond what is included are quoted to you in advance, never charged afterwards. Standing Ride and Winnie Monthly plans are billed after each ride. Facility accounts are invoiced weekly on 7-day terms. Any recurring plan can be changed or cancelled with 30 days’ notice.',
     ],
   },
   {

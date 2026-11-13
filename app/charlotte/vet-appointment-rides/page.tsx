@@ -158,18 +158,17 @@ export default function VetAppointmentRidesPage() {
           body: (
             <>
               <p>
-                We cover all of Charlotte and Mecklenburg County, plus Matthews,
-                Pineville, and Huntersville. Home in one town, clinic in another?
+                We cover all of Charlotte and Mecklenburg County. Home on one side of the county, clinic on the other?
                 Cross-town vet runs are most of what we do. If your clinic is
                 farther out, call us and we will quote the trip case by case.
               </p>
               <p>
                 If your pet has a standing rhythm of vet visits, grooming, or
-                daycare, a{' '}
+                daycare, the{' '}
                 <Link href="/winnie" className={linkCls}>
-                  Winnie Ride subscription
+                  Winnie Monthly discount
                 </Link>{' '}
-                from $39/mo usually beats booking one ride at a time.
+                takes 10% off at four trips a month and 15% off at eight.
               </p>
               <p>
                 Requesting a ride is the same two-minute process every time: pickup address,

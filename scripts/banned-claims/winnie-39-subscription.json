@@ -1,0 +1,6 @@
+{
+  "name": "winnie-39-subscription",
+  "pattern": "\\$39\\s*/\\s*mo",
+  "flags": "i",
+  "reason": "There is no $39/month Winnie plan to buy. Removed for launch (Phil, 2026-11-13). The repeat-rider offer is Winnie Monthly: 10% off at four trips, 15% at eight."
+}

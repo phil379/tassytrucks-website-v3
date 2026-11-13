@@ -50,7 +50,7 @@ const rows: Row[] = [
   },
   {
     label: 'Cost transparency',
-    winnie: 'Quoted up front; subscriptions from $39/mo',
+    winnie: 'Price shown before you book; 10–15% off for regulars',
     uber: 'Metered fare + pet fee',
     lyft: 'Metered fare + pet fee',
   },
@@ -149,8 +149,7 @@ export default function WinnieComparePage() {
               </p>
               <p>
                 They are also the only sensible option outside our service area —
-                we cover Charlotte, Mecklenburg County, and the surrounding towns
-                like Matthews, Huntersville, and Concord, while the platforms cover
+                we cover Charlotte and Mecklenburg County, while the platforms cover
                 most major markets.
               </p>
             </>
@@ -213,7 +212,7 @@ export default function WinnieComparePage() {
         },
         {
           q: 'Is Winnie Ride more expensive than Uber Pet?',
-          a: 'For a short ride where you are in the car anyway, yes — rideshare is cheaper. You are paying for a different service: a current rabies vaccination requirement and a pet that travels safely without you. Subscriptions from $39/mo bring per-ride costs down for regulars.',
+          a: 'For a short ride where you are in the car anyway, yes — rideshare is cheaper. You are paying for a different service: a current rabies vaccination requirement and a pet that travels safely without you. Regulars get 10% off at four trips a month and 15% off at eight.',
         },
         {
           q: 'Why do vaccines matter for a car ride?',

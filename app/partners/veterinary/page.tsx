@@ -225,7 +225,7 @@ export default function VeterinaryPartnersPage() {
         },
         {
           q: 'What is your service area?',
-          a: 'Charlotte and all of Mecklenburg County, plus Matthews, Pineville, Huntersville, Concord, and Gastonia. If your practice draws patients from beyond that range, call us — longer trips are quoted case by case.',
+          a: 'Charlotte and all of Mecklenburg County. If your practice draws patients from beyond that range, call us — longer trips are quoted case by case.',
         },
         {
           q: 'Can clients book through our front desk?',

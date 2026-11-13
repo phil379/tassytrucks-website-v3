@@ -60,7 +60,7 @@ customer and quoted the price.
 
 - https://www.tassytrucks.com/ — overview of all service lines
 - https://www.tassytrucks.com/request — request a ride
-- https://www.tassytrucks.com/pricing — subscription tiers and per-ride pricing
+- https://www.tassytrucks.com/pricing — rate cards by distance, plans and discounts
 - https://www.tassytrucks.com/partners — facility and healthcare partnerships
 - https://www.tassytrucks.com/partners/veterinary — veterinary practice partnerships
 - https://www.tassytrucks.com/privacy — privacy policy

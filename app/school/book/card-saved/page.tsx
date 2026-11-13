@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 export const metadata: Metadata = {
-  title: 'Card saved · Tassy Scholar',
+  title: { absolute: 'Card saved · Tassy Scholar' },
   // A parent mid-booking. Nothing here belongs in an index.
   robots: { index: false, follow: false },
 };

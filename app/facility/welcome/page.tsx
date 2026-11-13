@@ -8,7 +8,7 @@ import { accountManagerDisplayName } from '@/lib/facility.server';
 import { invitedByFor } from '@/lib/facility-team.server';
 
 export const metadata: Metadata = {
-  title: 'Finish setting up your account — Tassy Transportation',
+  title: { absolute: 'Finish setting up your account — Tassy Transportation' },
   // Behind a magic link and specific to one facility. Never indexed.
   robots: { index: false, follow: false },
 };

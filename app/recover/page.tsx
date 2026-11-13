@@ -3,7 +3,7 @@ import ServicePage from '@/components/ServicePage';
 import { request } from '@/lib/request-links';
 
 export const metadata: Metadata = {
-  title: 'Tassy Recovery — ride home after surgery or sedation | Charlotte',
+  title: { absolute: 'Tassy Recovery — ride home after surgery or sedation | Charlotte' },
   description:
     'Charlotte rides home after outpatient surgery, sedation, dental work or a hospital discharge. We meet you at the discharge desk, wait, and take you home. From $129, both directions.',
   alternates: { canonical: '/recover' },

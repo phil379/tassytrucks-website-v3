@@ -9,7 +9,7 @@ import ConsoleShell from '@/components/facility/ConsoleShell';
 import { TripRow, Empty } from '@/components/facility/bits';
 
 export const metadata: Metadata = {
-  title: 'Active trips — Tassy Transportation',
+  title: { absolute: 'Active trips — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 export const dynamic = 'force-dynamic';

@@ -17,7 +17,7 @@ import RideStatusView, { NeutralRidePage } from '@/components/ride/RideStatusVie
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Your ride · Tassy Transportation',
+  title: { absolute: 'Your ride · Tassy Transportation' },
   robots: { index: false, follow: false, nocache: true },
   referrer: 'no-referrer',
 };

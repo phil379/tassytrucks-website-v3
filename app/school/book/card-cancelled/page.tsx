@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 export const metadata: Metadata = {
-  title: 'Add your card · Tassy Scholar',
+  title: { absolute: 'Add your card · Tassy Scholar' },
   robots: { index: false, follow: false },
 };
 

@@ -3,7 +3,7 @@ import FacilitySignupForm from '@/components/partners/FacilitySignupForm';
 import { coerceFacilityKind, coerceProspectId } from '@/lib/facility';
 
 export const metadata: Metadata = {
-  title: 'Partner with Tassy Transportation — Facility Accounts',
+  title: { absolute: 'Partner with Tassy Transportation — Facility Accounts' },
   description:
     'Set up a facility account for patient and pet transport across Charlotte. Weekly invoicing or the passenger pays. Get started in 60 seconds — (704) 941-8508.',
   alternates: { canonical: '/partners/signup' },

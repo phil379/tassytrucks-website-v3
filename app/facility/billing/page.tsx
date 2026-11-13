@@ -8,7 +8,7 @@ import ConsoleShell from '@/components/facility/ConsoleShell';
 import { money, Empty } from '@/components/facility/bits';
 
 export const metadata: Metadata = {
-  title: 'Billing — Tassy Transportation',
+  title: { absolute: 'Billing — Tassy Transportation' },
   robots: { index: false, follow: false },
 };
 export const dynamic = 'force-dynamic';

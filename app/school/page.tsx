@@ -10,7 +10,7 @@ import {
 } from '@/lib/school-household';
 
 export const metadata: Metadata = {
-  title: 'Tassy Scholar — daily student transport',
+  title: { absolute: 'Tassy Scholar — daily student transport' },
   description:
     'Parent-direct school transport across Charlotte: choose one of three plans (Full Year, Weekly, After-School) for one child, with a recurring schedule confirmed before service begins.',
   alternates: { canonical: '/school' },

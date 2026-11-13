@@ -14,7 +14,7 @@ import { partnerSignup } from '@/lib/partner-links';
  * verification vendor, and any rep pay. The sign-up link keeps the rep's credit via ?rep= and ?src=.
  */
 export const metadata: Metadata = {
-  title: 'Partner Packet (draft) | Tassy Transportation',
+  title: { absolute: 'Partner Packet (draft) | Tassy Transportation' },
   description: 'Draft partner packet for Charlotte facilities: flat prices, how to request a ride, and the monthly report.',
   robots: { index: false, follow: false },
 };

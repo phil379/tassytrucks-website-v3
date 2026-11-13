@@ -190,10 +190,7 @@ export default function PetTransportPage() {
           body: (
             <>
               <p>
-                We are based in Charlotte and cover all of Mecklenburg County, plus
-                the surrounding towns pet families actually live in — Matthews,
-                Pineville, Huntersville, and Concord. If your vet is in one town
-                and your home is in another, that is a normal Tuesday for us.
+                We are based in Charlotte and cover all of Mecklenburg County. If your vet is on one side of the county and your home is on the other, that is a normal Tuesday for us.
               </p>
               <p>
                 Requesting a ride takes about two minutes online, or call (704) 941-8508.
@@ -205,12 +202,11 @@ export default function PetTransportPage() {
               </p>
               <p>
                 If your pet rides regularly — weekly grooming, recurring vet
-                visits, daycare — a{' '}
+                visits, daycare — the{' '}
                 <Link href="/winnie" className={linkCls}>
-                  Winnie Ride subscription
+                  Winnie Monthly discount
                 </Link>{' '}
-                starting at $39/mo is usually the smarter math than booking trip by
-                trip.
+                takes 10% off at four trips a month and 15% off at eight.
               </p>
               <p>
                 One more thing worth saying plainly: you will never be guessing
@@ -241,7 +237,7 @@ export default function PetTransportPage() {
         },
         {
           q: 'What areas around Charlotte do you cover?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, Huntersville, and Concord. For trips beyond that range, call us and we will quote it case by case.',
+          a: 'All of Charlotte and Mecklenburg County. For trips beyond that range, call us and we will quote it case by case.',
         },
       ]}
       relatedLinks={[

@@ -3,6 +3,7 @@
 import { FAMILY_PERMISSION_LABEL } from '@/lib/ride-link-copy';
 import { SMS_CONSENT_LABEL, SMS_CONSENT_DISCLOSURE } from '@/lib/sms-consent';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { prefillWhen } from '@/lib/text-link-prefill';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import {
@@ -144,6 +145,7 @@ export type FacilityContext = {
 };
 
 export default function RequestForm({
+  textLinkPrefill = false,
   initialService,
   servicePreselected = false,
   googleMapsApiKey,
@@ -173,6 +175,11 @@ export default function RequestForm({
    * a booking that opts into texts can list up to two family numbers for the "where is my ride" link.
    */
   rideTrackingEnabled?: boolean;
+  /**
+   * TEXT_TO_BOOK_MODE is on (dry_run or live), read on the server and passed down. Only then does a
+   * `?when=` link pre-fill the pickup time. Off (the default) ignores it.
+   */
+  textLinkPrefill?: boolean;
 }) {
   const [smsChecked, setSmsChecked] = useState(false);
   /** The family-number fields: feature on, a retail booking, and the text box ticked. */
@@ -273,7 +280,9 @@ export default function RequestForm({
   /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
   const [pickupSuggest, setPickupSuggest] = useState(false);
   const [dropoffSuggest, setDropoffSuggest] = useState(false);
-  const [whenValue, setWhenValue] = useState('');
+  // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link), ONLY when the server passed
+  // textLinkPrefill (TEXT_TO_BOOK_MODE on). Off: ignored, the form opens as before.
+  const [whenValue, setWhenValue] = useState(() => prefillWhen(searchParams.get('when'), textLinkPrefill));
   const [passengers, setPassengers] = useState(1);
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');

@@ -58,7 +58,9 @@ for (const vp of [
 
       await page.evaluate(() => window.scrollTo(0, 600));
       await settled(page, header(page), 72);
-      expect((await box(page, logo(page))).height).toBe(48);
+      // Poll: the bar can reach 72px a frame before the logo's own transition lands on exactly
+      // 48px (CI, 2026-11-13: measured 48.16 mid-transition). Still requires exactly 48.
+      await expect.poll(async () => (await box(page, logo(page))).height, { timeout: 3000 }).toBe(48);
       await expectTapTargets(page);
 
       // No layout shift: the content below the header did not move, the page is the same height.

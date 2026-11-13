@@ -13,7 +13,7 @@ const charlotteServices = [
   { href: '/charlotte/calm-pet-transport', label: 'Calm pet transport', blurb: 'Built for anxious, reactive, and senior pets.' },
   { href: '/charlotte/dog-grooming-pickup', label: 'Dog grooming pickup', blurb: 'Same-day and standing weekly grooming runs.' },
   { href: '/charlotte/pet-boarding-transport', label: 'Pet boarding transport', blurb: 'Home to kennel and back, scheduled around your travel.' },
-  { href: '/partners/veterinary', label: 'For veterinary clinics', blurb: 'Referral partnerships and net-30 billing.' },
+  { href: '/partners/veterinary', label: 'For veterinary clinics', blurb: 'Referral partnerships and weekly invoicing.' },
 ];
 
 export const metadata: Metadata = {
@@ -82,7 +82,7 @@ export default function WinniePage() {
       ]}
       partnerCta={{
         title: 'Vets, groomers and boarding facilities',
-        body: 'Offer transport to clients who cannot get away during your opening hours. We book on account and invoice monthly, with preferred rates from 10 trips a month.',
+        body: 'Offer transport to clients who cannot get away during your opening hours. We book on account and invoice weekly, with preferred rates from 10 trips a month.',
         href: 'mailto:phil@tassytrucks.com?subject=Partner%20account%20—%20Winnie%20Ride',
         label: 'Start a partner account',
       }}

@@ -38,7 +38,7 @@ export default function VipPage() {
         },
         {
           title: 'The vehicle is a full-size SUV',
-          body: 'Room for luggage, golf clubs or four people who do not want to sit shoulder to shoulder. Suburban, Expedition, Yukon or Navigator class.',
+          body: 'Room for luggage, golf clubs and up to six riders. Suburban, Expedition, Yukon or Navigator class.',
         },
       ]}
       tiers={[

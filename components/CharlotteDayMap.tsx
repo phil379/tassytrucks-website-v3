@@ -37,7 +37,7 @@ import { DAY_MAP_BG, DAY_MAP_LABEL } from '@/lib/day-map-colors';
  * ─────────────────────────────────────────────────────────────────────────
  */
 
-type LineId = 'concierge' | 'scholar' | 'care' | 'recovery' | 'winnie';
+type LineId = 'concierge' | 'scholar' | 'care' | 'recovery' | 'winnie' | 'wellness';
 
 type Service = {
   id: LineId;
@@ -60,6 +60,8 @@ const SERVICES: Service[] = [
   { id: 'care',      name: 'Tassy Care',      color: '#5B9DD9',     windows: [[9, 16.5]],          when: '9–4:30',       where: 'Hospitals · clinics',            vehicles: 3, vehicle: 'sedan' },
   { id: 'recovery',  name: 'Tassy Recovery',  color: '#8A78D9',     windows: [[10, 17]],           when: '10–5',         where: 'Hospital to home',               vehicles: 2, vehicle: 'suv' },
   { id: 'winnie',    name: 'Winnie Ride',     color: '#4FB286',     windows: [[9, 16]],            when: '9–4',          where: 'Vet · groomer · boarding',       vehicles: 2, vehicle: 'sedan' },
+  // Sixth line (Phil, 2026-11-13: keep all six in this widget). Hours match Recovery, 10 to 5.
+  { id: 'wellness',  name: 'Tassy Wellness',  color: '#D98AB3',     windows: [[10, 17]],           when: '10–5',         where: 'Med spa · IV therapy',           vehicles: 1, vehicle: 'suv' },
 ];
 
 /**
@@ -101,6 +103,9 @@ const NODES: Node[] = [
   { id: 'provday',    label: 'Providence Day',  x: 338, y: 348, line: 'scholar',   anchor: 'start',  dx: 7, dy: -5 },
   { id: 'catholic',   label: 'Charlotte Catholic', x: 314, y: 395, line: 'scholar', anchor: 'start', dx: 7, dy: 3 },
   { id: 'ardrey',     label: 'Ardrey Kell HS',  x: 338, y: 418, line: 'scholar',   anchor: 'start',  dx: 7, dy: 3 },
+    // Wellness: generic kinds of place, not named businesses.
+  { id: 'medspa',     label: 'Med spa',         x: 372, y: 226, line: 'wellness',  anchor: 'middle', dy: -9 },
+  { id: 'ivtherapy',  label: 'IV therapy',      x: 150, y: 138, line: 'wellness',  anchor: 'middle', dy: -9 },
   // Winnie: pet places. CityVet is a real Uptown clinic (Brooklyn Village); the rest are generic.
   { id: 'cityvet',    label: 'CityVet Uptown',  x: 206, y: 219, line: 'winnie',    anchor: 'end',    dx: -8, dy: 3 },
   { id: 'vet',        label: 'Vet clinic',      x: 140, y: 318, line: 'winnie',    anchor: 'start',  dx: 8, dy: 3 },
@@ -120,6 +125,7 @@ const LEGS: Record<LineId, [string, string][]> = {
   scholar:   [['ballantyne', 'ardrey'], ['southpark', 'myerspark'], ['matthews', 'latin'], ['southpark', 'provday'], ['uptown', 'myerspark'], ['quail', 'provday'], ['southpark', 'catholic'], ['ballantyne', 'catholic']],
   care:      [['matthews', 'cmc'], ['pineville', 'cmc'], ['university', 'presby'], ['southend', 'cmc'], ['huntersville', 'presby'], ['uptown', 'university']],
   recovery:  [['cmc', 'matthews'], ['presby', 'southpark'], ['cmc', 'ballantyne'], ['presby', 'university']],
+    wellness:  [['southpark', 'medspa'], ['uptown', 'ivtherapy'], ['ballantyne', 'medspa'], ['southend', 'ivtherapy']],
   winnie:    [['southend', 'cityvet'], ['pineville', 'groomer'], ['cityvet', 'petstore'], ['southpark', 'vet'], ['uptown', 'cityvet'], ['pineville', 'boarding']],
 };
 

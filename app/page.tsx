@@ -471,13 +471,13 @@ export default function HomePage() {
         <div className="container-x py-24 text-center">
           <h2 className="h-section">Ready when you are.</h2>
           <p className="mt-4 ink-soft max-w-xl mx-auto">
-            Request a one-time ride or set up a recurring subscription — upfront pricing, no surge, no booking fees.
+            Request a one-time ride or set up a recurring plan — upfront pricing, no surge, no booking fees.
           </p>
           {/* FIX_PROD_131 — one primary + one calm secondary (was 3 equal buttons) */}
           <div className="mt-8 flex justify-center items-center gap-5 flex-wrap">
             <a href={request.ride} className="btn-gold">Request a Ride <ArrowRight size={16} /></a>
             <Link href="/pricing" className="nav-link inline-flex items-center gap-1.5 text-base">
-              See subscription pricing <ArrowRight size={15} />
+              See plans and pricing <ArrowRight size={15} />
             </Link>
           </div>
         </div>

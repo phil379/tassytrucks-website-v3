@@ -656,7 +656,7 @@ function ScheduleStep({
           />
         </Field>
         <p className="text-xs text-[color:var(--ink-mute)]">
-          Pay upfront for the season — {plan.price}, quoted once we have the schedule.
+          Pay upfront for the season. {plan.price}: we quote it once we have the schedule, before anything is charged.
         </p>
       </div>
     );

@@ -64,7 +64,7 @@ export default function DogGroomingPickupPage() {
               <p>
                 When your groomer has a last-minute opening, call our dispatch
                 line at (704) 941-8508. If a vehicle is available, we can run a
-                same-day trip — we ask for a 2-hour minimum lead time on routine
+                same-day trip — we ask for a 4-hour minimum lead time on routine
                 rides, which is usually shorter than the window the groomer gives
                 you anyway.
               </p>
@@ -75,11 +75,11 @@ export default function DogGroomingPickupPage() {
                 round-trip and we handle both legs, including the wait-and-return
                 coordination with your groomer&rsquo;s front desk. Request one-way if
                 you can manage drop-off but not pickup — or the reverse. Frequent
-                riders can put the whole routine on a{' '}
+                riders get the{' '}
                 <Link href="/winnie" className={linkCls}>
-                  Winnie Ride subscription
+                  Winnie Monthly discount
                 </Link>
-                , which starts at $39/mo.
+                : 10% off at four trips a month and 15% off at eight.
               </p>
             </>
           ),
@@ -129,8 +129,7 @@ export default function DogGroomingPickupPage() {
           body: (
             <>
               <p>
-                If you run a grooming shop in Charlotte, Matthews, Concord, or
-                Gastonia, you know the math: a no-show because the owner got stuck
+                If you run a grooming shop in Charlotte or elsewhere in Mecklenburg County, you know the math: a no-show because the owner got stuck
                 at work is an empty chair you can&rsquo;t refill. A referral
                 partnership with Winnie Ride gives your clients a transport option
                 you can offer the moment they hesitate — and gives you a way to
@@ -142,8 +141,7 @@ export default function DogGroomingPickupPage() {
                 and we will set it up.
               </p>
               <p>
-                We serve all of Charlotte and Mecklenburg County, plus Matthews,
-                Concord, and Gastonia. Heading out of town and need your dog moved
+                We serve all of Charlotte and Mecklenburg County. Heading out of town and need your dog moved
                 to a boarding facility instead? That is a different trip with its
                 own logistics — see our pet boarding transport page.
               </p>
@@ -154,7 +152,7 @@ export default function DogGroomingPickupPage() {
       faqs={[
         {
           q: 'Can you pick up my dog for a grooming appointment today?',
-          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 2-hour minimum lead time on routine trips. Call dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
+          a: 'Often, yes. Same-day rides run whenever a vehicle is available, with a 4-hour minimum lead time on routine trips. Call dispatch at (704) 941-8508 and we will tell you honestly whether we can make your groomer’s window.',
         },
         {
           q: 'Do you offer recurring rides for standing grooming appointments?',

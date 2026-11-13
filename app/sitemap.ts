@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { CAREERS_OPEN } from '@/lib/careers-gate';
 
 const BASE = 'https://www.tassytrucks.com';
 
@@ -41,7 +42,8 @@ const routes: Array<{ path: string; priority: number }> = [
   // rel=noopener links rather than on an indexable marketing URL.
   // /partners/signup is NOT here on purpose — it is robots noindex, a funnel
   // endpoint, not a landing page.
-  { path: '/careers', priority: 0.6 },
+  // Listed only while Careers is open (lib/careers-gate.ts).
+  ...(CAREERS_OPEN ? [{ path: '/careers', priority: 0.6 }] : []),
   // MEGA_TASSY_PUBLISH_READY — legal / trust pages (were footer 404s)
   { path: '/privacy', priority: 0.3 },
   { path: '/terms', priority: 0.3 },

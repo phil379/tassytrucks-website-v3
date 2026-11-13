@@ -32,7 +32,7 @@ export default function NemtPage() {
       highlights={[
         {
           title: 'A flat price, not a meter',
-          body: 'Anywhere inside 3 miles is $49. Inside 12 miles is $74. The number is agreed before we move and it does not change because the route was slower than we thought.',
+          body: 'Up to 3 miles is $49. 4 to 7 miles is $59. 8 to 12 miles is $74. The number is agreed before we move and it does not change because the route was slower than we thought.',
         },
         {
           title: 'Door to door, not curb to curb',
@@ -67,7 +67,7 @@ export default function NemtPage() {
           name: '8 to 17 miles',
           price: '$74–89',
           cadence: 'one way',
-          features: ['Everything above', 'Across Mecklenburg County', 'Extra passenger $10', '15 minutes of wait included'],
+          features: ['Everything above', 'Across Mecklenburg County', 'Extra passenger $10', '20 minutes of wait included'],
           cta: { label: 'Request this', href: request.nemt },
           highlight: true,
         },

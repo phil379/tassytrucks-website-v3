@@ -1,0 +1,6 @@
+{
+  "name": "medicaid-accepted",
+  "pattern": "serve Medicaid riders|Medicaid broker contracts|accept Medicaid broker",
+  "flags": "i",
+  "reason": "Tassy has no Medicaid or Medicare provider ID. Every ride is private pay or a direct facility agreement (Phil, 2026-10-16; Muse F1, 2026-11-13)."
+}

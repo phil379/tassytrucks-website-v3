@@ -7,7 +7,7 @@ import { partnerSignup } from '@/lib/partner-links';
 export const metadata: Metadata = {
   title: 'Facility Transport Partnerships in Charlotte NC',
   description:
-    'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, dedicated facility portal with net-30 invoicing. (704) 941-8508.',
+    'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, facility portal with weekly invoicing. (704) 941-8508.',
   alternates: { canonical: '/partners' },
   openGraph: { url: '/partners', images: ['/og-image/partners'] },
 };
@@ -92,13 +92,11 @@ export default function PartnersPage() {
                 drop-offs, and {wavPartnersClause()}.
               </p>
               <p>
-                Finally, the paperwork. Your team gets real-time ETA visibility on
-                every trip, so &ldquo;where&rsquo;s the ride?&rdquo; stops being a
-                phone call. And we handle PCS forms — the Physician Certification
-                Statement, the document certifying that a patient&rsquo;s condition
-                requires a given level of transport — electronically, so your
-                staff isn&rsquo;t faxing signatures or chasing paper between
-                departments.
+                Finally, the paperwork. Your team sees every trip you have booked
+                and its status in one place, so &ldquo;where&rsquo;s the
+                ride?&rdquo; is a glance before it is a phone call. If a trip
+                needs a form from your side, tell dispatch when you book and we
+                will work it out with your staff before the ride.
               </p>
             </>
           ),
@@ -195,28 +193,26 @@ export default function PartnersPage() {
               <p>
                 Every contracted facility gets a dedicated portal — not a generic
                 booking form, but a working dashboard for the people who
-                coordinate transport all day. The centerpiece is a live trip
-                board: every ride you&rsquo;ve booked, its status, its driver, and
-                its real-time ETA, visible to your whole team at once. When a
-                family member calls asking where mom&rsquo;s ride is, your front
-                desk answers in one glance.
+                coordinate transport all day. The centerpiece is your trip list: every ride you&rsquo;ve booked
+                and its current status, visible to your whole team at once. When
+                a family member calls asking about mom&rsquo;s ride, your front
+                desk can check the status first and call our dispatch line for
+                anything more.
               </p>
               <p>
-                Billing runs through the portal too. Trips roll up to net-30
-                invoices with line-item reconciliation, so your accounts-payable
-                team matches every charge to a completed trip instead of
-                untangling a monthly statement. Driver and vehicle credentials are
-                available on demand — when your compliance department asks for
-                documentation, you pull it yourself in seconds rather than
-                emailing a vendor and waiting.
+                Billing runs through the portal too. Trips roll up to a weekly
+                invoice on 7-day terms, listed trip by trip, so your
+                accounts-payable team matches every charge to a completed trip
+                instead of untangling a monthly statement. When your compliance
+                department asks for driver or vehicle documentation, ask us and
+                we send it.
               </p>
+              {/* TODO(counsel): the paragraph promising privacy-law-compliant messaging was removed 2026-11-13.
+                  Do not restore a HIPAA/PHI promise until counsel has reviewed the portal. */}
               <p>
-                And because trip details often involve patient information, the
-                portal includes PHI-compliant messaging — PHI meaning protected
-                health information, the patient data covered by federal privacy
-                rules. Your coordinators can communicate pickup notes and mobility
-                needs to dispatch inside the portal instead of over unsecured text
-                or email.
+                Your coordinators can also send pickup notes to dispatch from
+                inside the portal, so the details for a trip stay with that
+                trip. Keep clinical detail to what the driver needs for the ride.
               </p>
             </>
           ),
@@ -225,15 +221,15 @@ export default function PartnersPage() {
       faqs={[
         {
           q: 'What documentation can you provide for our compliance team?',
-          a: 'Our SDVOSB certification, certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all retrievable on demand through the facility portal once you are onboarded.',
+          a: 'Our SDVOSB certification, certificates of insurance for our commercial liability coverage on request, and driver and vehicle credentials — all sent to your compliance team on request.',
         },
         {
           q: 'How fast can you onboard a new facility?',
           a: 'It starts with a 15-minute intro call, followed by a lane assessment, a Master Service Agreement, and a first-week pilot. The overall timeline mostly depends on your credentialing and legal review — on our side, we move as fast as your process allows. Call (704) 941-8508 and we will scope it honestly.',
         },
         {
-          q: 'Do you accept Medicaid broker contracts?',
-          a: 'Yes — we serve Medicaid riders through broker and facility contracts alongside direct facility agreements and private pay. Bring your broker arrangement to the intro call and we will confirm exactly how your trips would flow and be billed.',
+          q: 'How are rides paid for?',
+          a: 'Two ways today: private pay by card, or a direct agreement where your facility is invoiced. We are not a Medicaid or Medicare provider and we do not bill insurance or broker networks at this time. Bring your situation to the intro call and we will tell you plainly what we can do.',
         },
         {
           q: 'What is your service area?',
@@ -241,7 +237,7 @@ export default function PartnersPage() {
         },
         {
           q: 'Do you bill directly or through us?',
-          a: 'For facility contracts, we bill the facility directly on net-30 terms through the facility portal, with line-item reconciliation for every trip. If your trips run through a Medicaid broker instead, billing follows the broker arrangement — we will map it out before the contract is signed.',
+          a: 'For facility agreements, we invoice the facility directly every week on 7-day terms, with every trip listed line by line. Riders who book on their own pay by card through a secure link after we confirm the price.',
         },
       ]}
       /* Credentials block, rendered directly above the FAQ whose first question

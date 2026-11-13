@@ -1,0 +1,6 @@
+{
+  "name": "net-30",
+  "pattern": "net[- ]30",
+  "flags": "i",
+  "reason": "Facilities are invoiced weekly on 7-day terms, never net 30 (Phil, Oct 2026)."
+}

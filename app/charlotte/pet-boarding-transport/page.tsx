@@ -75,8 +75,7 @@ export default function PetBoardingTransportPage() {
                 Give dispatch your flight times and we schedule around them, not
                 the other way around. The same service works for daycare: a
                 standing morning drop-off and evening pickup during a heavy work
-                stretch, with B2C subscriptions from $39/mo for families who run
-                these trips regularly. And if your traveling pet also needs a
+                stretch, with the Winnie Monthly discount (10% off at four trips a month and 15% off at eight) for families who run these trips regularly. And if your traveling pet also needs a
                 bath before you get back, our{' '}
                 <Link href="/charlotte/dog-grooming-pickup" className={linkCls}>
                   dog grooming pickup service
@@ -123,7 +122,7 @@ export default function PetBoardingTransportPage() {
                 your occupancy stops depending on their schedules.
               </p>
               <p>
-                Partner facilities get access to our facility portal with net-30
+                Partner facilities get access to our facility portal with weekly
                 invoicing, so transport you arrange on a client&rsquo;s behalf is
                 billed cleanly instead of handled ride by ride. Start at our{' '}
                 <Link href="/partners/veterinary" className={linkCls}>
@@ -145,11 +144,9 @@ export default function PetBoardingTransportPage() {
               Request a ride in about two minutes or call (704) 941-8508. A
               dispatcher usually confirms your driver and your price within 2
               hours during business hours. Routine
-              rides need a 2-hour minimum lead time, but boarding runs are best
+              rides need a 4-hour minimum lead time, but boarding runs are best
               booked as soon as your travel is confirmed so your preferred
-              windows are locked in. We cover all of Charlotte and Mecklenburg
-              County, plus Matthews, Huntersville, and Concord — and if your
-              kennel sits just beyond that, call us and we&rsquo;ll quote it. For
+              windows are locked in. We cover all of Charlotte and Mecklenburg County — and if your kennel sits just beyond that, call us and we&rsquo;ll quote it. For
               everything else Winnie Ride does, see the{' '}
               <Link href="/winnie" className={linkCls}>
                 Winnie Ride overview
@@ -174,11 +171,11 @@ export default function PetBoardingTransportPage() {
         },
         {
           q: 'Can you do recurring daycare drop-offs and pickups?',
-          a: 'Yes. We schedule standing daycare runs — same windows, same driver approach, every time — and B2C subscriptions start at $39/mo for families who use pet transport regularly.',
+          a: 'Yes. We schedule standing daycare runs — same windows, same driver approach, every time — and families who use pet transport regularly get 10% off at four trips a month and 15% off at eight.',
         },
         {
           q: 'How do boarding facilities partner with Winnie Ride?',
-          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with net-30 invoicing. Start at our veterinary partnership page or email book@tassytrucks.com.',
+          a: 'It is a referral relationship: you recommend us to clients who need transport, and partner facilities get access to our facility portal with weekly invoicing. Start at our veterinary partnership page or email book@tassytrucks.com.',
         },
       ]}
       relatedLinks={[

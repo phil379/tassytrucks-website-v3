@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
+import { CAREERS_OPEN } from '@/lib/careers-gate';
 import { partnerSignup } from '@/lib/partner-links';
 import { BUSINESS, BUSINESS_LOCATION } from '@/lib/business';
 import CookieSettingsButton from '@/components/CookieSettingsButton';
@@ -73,7 +74,8 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Careers */}
+        {/* Careers -- hidden while lib/careers-gate.ts is OFF (Phil, 2026-11-13). */}
+        {CAREERS_OPEN ? (
         <div>
           <div className="eyebrow opacity-60 text-current">Careers</div>
           <ul className="mt-3 space-y-2 text-sm">
@@ -102,6 +104,7 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+        ) : null}
 
         {/* Partners */}
         <div>

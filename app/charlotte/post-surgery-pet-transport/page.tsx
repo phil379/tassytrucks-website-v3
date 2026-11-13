@@ -49,8 +49,7 @@ export default function PostSurgeryPetTransportPage() {
                 Charlotte-based, Service-Disabled Veteran-Owned Small Business
                 (SDVOSB). We handle
                 the drive so your only job is meeting your pet at the door. We
-                cover all of Charlotte and Mecklenburg County, plus Matthews,
-                Pineville, and Huntersville. For everyday trips that aren&rsquo;t
+                cover all of Charlotte and Mecklenburg County. For everyday trips that aren&rsquo;t
                 post-op, see our main{' '}
                 <Link href="/charlotte/pet-transport" className={linkCls}>
                   Charlotte pet transport page
@@ -136,7 +135,7 @@ export default function PostSurgeryPetTransportPage() {
                 window once you have a rough discharge estimate, and call dispatch
                 at (704) 941-8508 if the clinic shifts it. A dispatcher usually confirms your
                 driver and your price within 2 hours during business hours.
-                Routine rides need a 2-hour minimum lead time, so the moment the
+                Routine rides need a 4-hour minimum lead time, so the moment the
                 clinic gives you a window is the moment to request the ride. If your pet has
                 regular checkups ahead, our{' '}
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
@@ -168,11 +167,11 @@ export default function PostSurgeryPetTransportPage() {
         },
         {
           q: 'How soon can you get to the clinic once my pet is discharged?',
-          a: 'Routine rides need a 2-hour minimum lead time, so book as soon as the clinic gives you a discharge estimate. If the time shifts, call (704) 941-8508 and dispatch will adjust the pickup window.',
+          a: 'Routine rides need a 4-hour minimum lead time, so book as soon as the clinic gives you a discharge estimate. If the time shifts, call (704) 941-8508 and dispatch will adjust the pickup window.',
         },
         {
           q: 'What areas around Charlotte do you cover for post-op pet pickup?',
-          a: 'All of Charlotte and Mecklenburg County, plus Matthews, Pineville, and Huntersville. If your clinic or home is just outside that range, call us — we quote longer trips case by case.',
+          a: 'All of Charlotte and Mecklenburg County. If your clinic or home is just outside that range, call us — we quote longer trips case by case.',
         },
       ]}
       relatedLinks={[

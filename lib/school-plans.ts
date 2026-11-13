@@ -35,9 +35,12 @@ export interface SchoolPlan {
   includes: string[];
   billing: string;
   badge: string | null;
-  /** Headline price a parent sees on the plan card. */
+  /** Headline price a parent sees on the plan card.
+   *  Phil, 2026-11-13: Scholar is sold by the plan, NEVER per ride. Only Full School Year
+   *  carries a public number ($850/month, routes up to 20 minutes). The other two plans are
+   *  priced per route and quoted. Do not put a per-ride dollar figure back on any page. */
   price: string;
-  /** The unit under the headline — what it works out to per ride. */
+  /** The line under the headline. No per-ride figure (see above). */
   priceNote: string;
 }
 
@@ -55,10 +58,10 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
       'Recurring schedule reviewed and confirmed before service begins',
       'Priority weather rerouting',
     ],
-    billing: 'Annual subscription · biggest per-ride discount',
+    billing: 'Billed monthly for the school year',
     badge: 'Best value',
-    price: '$850 / month',
-    priceNote: '$21.25 per ride · AM + PM every school day',
+    price: 'from $850 / month',
+    priceNote: 'AM + PM every school day · routes up to 20 minutes, longer routes are quoted',
   },
   {
     key: 'weekly_pattern',
@@ -75,8 +78,8 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Monthly subscription',
     badge: null,
-    price: '$24 per ride',
-    priceNote: 'Billed monthly for the days you pick',
+    price: 'Priced per route',
+    priceNote: 'Quoted for the days you pick · billed monthly, never per ride',
   },
   {
     key: 'after_school',
@@ -93,7 +96,7 @@ export const SCHOOL_PLANS: SchoolPlan[] = [
     ],
     billing: 'Per-program package',
     badge: null,
-    price: '$26 per ride',
+    price: 'Priced per route',
     priceNote: 'Quoted per season once we have the schedule',
   },
 ];

@@ -73,7 +73,7 @@ export default function VetAppointmentRidesPage() {
                 (704) 941-8508. A dispatcher usually confirms your driver and your
                 price within 2 hours during business hours. Tell us the pickup address,
                 the clinic, and the appointment time. Routine rides need a minimum
-                of two hours&rsquo; lead time; more notice makes your preferred
+                of four hours&rsquo; lead time; more notice makes your preferred
                 window easier to hold.
               </p>
               <p>
@@ -158,18 +158,17 @@ export default function VetAppointmentRidesPage() {
           body: (
             <>
               <p>
-                We cover all of Charlotte and Mecklenburg County, plus Matthews,
-                Pineville, and Huntersville. Home in one town, clinic in another?
+                We cover all of Charlotte and Mecklenburg County. Home on one side of the county, clinic on the other?
                 Cross-town vet runs are most of what we do. If your clinic is
                 farther out, call us and we will quote the trip case by case.
               </p>
               <p>
                 If your pet has a standing rhythm of vet visits, grooming, or
-                daycare, a{' '}
+                daycare, the{' '}
                 <Link href="/winnie" className={linkCls}>
-                  Winnie Ride subscription
+                  Winnie Monthly discount
                 </Link>{' '}
-                from $39/mo usually beats booking one ride at a time.
+                takes 10% off at four trips a month and 15% off at eight.
               </p>
               <p>
                 Requesting a ride is the same two-minute process every time: pickup address,
@@ -188,7 +187,7 @@ export default function VetAppointmentRidesPage() {
         },
         {
           q: 'How much notice do you need for a vet ride?',
-          a: 'A minimum of two hours for routine rides. Requesting the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
+          a: 'A minimum of four hours for routine rides. Requesting the day before is ideal, especially for popular morning slots. Call (704) 941-8508 and dispatch will tell you what is available today.',
         },
         {
           q: 'Does my pet need vaccines to ride?',

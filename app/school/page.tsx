@@ -45,6 +45,7 @@ const PLANS = [
     cadence: 'Daily AM + PM · Mon–Fri · Aug–May',
     features: ['AM + PM every school day', 'Consistent driver assignments whenever operationally possible', 'Recurring schedule reviewed and confirmed before service begins', 'Priority on weather days'],
     href: scholarPlan('full-year'),
+    pricing: 'From $850 / month for routes up to 20 minutes. Longer routes are quoted.',
     highlight: true,
   },
   {
@@ -53,6 +54,7 @@ const PLANS = [
     cadence: 'Pick your days · e.g. Tue / Wed / Thu',
     features: ['Choose the days that fit', 'AM and/or PM per day', 'Consistent driver assignments whenever operationally possible', 'Recurring schedule reviewed and confirmed before service begins'],
     href: scholarPlan('weekly'),
+    pricing: 'Priced per route. Request a quote.',
     highlight: false,
   },
   {
@@ -61,6 +63,7 @@ const PLANS = [
     cadence: 'Sports · clubs · programs',
     features: ['Per-program scheduling', 'Sports, clubs & enrichment', 'Pay upfront for the season', 'Recurring schedule reviewed and confirmed before service begins'],
     href: scholarPlan('after-school'),
+    pricing: 'Priced per route. Request a quote.',
     highlight: false,
   },
 ];
@@ -134,7 +137,7 @@ export default function SchoolPage() {
                 </ul>
                 <div className={`mt-5 pt-4 ${p.highlight ? '' : 'border-t border-line'}`} style={p.highlight ? { borderTop: '1px solid rgba(27,26,23,0.15)' } : undefined}>
                   <div className="text-xs uppercase tracking-eyebrow" style={p.highlight ? { color: 'rgba(27,26,23,0.6)' } : { color: 'var(--ink-mute)' }}>Pricing</div>
-                  <div className="text-sm mt-0.5" style={p.highlight ? { color: '#1B1A17' } : undefined}>Varies by school</div>
+                  <div className="text-sm mt-0.5" style={p.highlight ? { color: '#1B1A17' } : undefined}>{p.pricing}</div>
                 </div>
                 <a
                   href={p.href}
@@ -212,7 +215,7 @@ export default function SchoolPage() {
             <div className="h-1 w-12 bg-gold mb-5" />
             <h2 className="serif text-3xl lg:text-4xl font-semibold tracking-tight2 max-w-3xl">Where we operate</h2>
             <p className="mt-5 max-w-3xl text-base leading-relaxed ink-soft">
-              Five metros across the Carolinas plus one outpost in Ohio. Every metro runs the same
+              Four metros across the Carolinas plus one outpost in Ohio. Every metro runs the same
               playbook: vetted drivers, dependable vehicles, and routes that complete on time.
             </p>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl">

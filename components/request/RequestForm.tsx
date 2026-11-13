@@ -66,7 +66,7 @@ function UnitField({ name }: { name: 'pickupUnit' | 'dropoffUnit' }) {
         className="form-field"
         autoComplete="address-line2"
         maxLength={40}
-        placeholder="Apt 1910"
+        placeholder="Apt, suite or unit"
       />
     </div>
   );

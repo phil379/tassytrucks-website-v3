@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { brandLogoUrl, isValidReceiptToken, payPageUrlFor, receiptUrlFor } from '@/lib/receipt-token';
 import { findPaymentAttempt } from '@/lib/payment-attempts';
-import { createBrandedCheckout, paymentLinkUrl, stripeConfigured } from '@/lib/stripe';
+import { createBrandedCheckout, paymentLinkUrl, stripeConfigured, withStripeMode } from '@/lib/stripe';
+import { stripeModeForTrip } from '@/lib/stripe-mode';
 import { serviceShortName } from '@/lib/trip-request';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { payBlockFor, payBlockMessage, type PayBlock } from '@/lib/pay-guard';
@@ -80,7 +81,7 @@ export async function GET(req: Request, { params }: { params: { token: string } 
   const db = supabaseAdmin();
   const { data: row } = await db
     .from(TRIP_REQUESTS_TABLE)
-    .select('id, service_line, status, confirmation_code, agreed_cents, payment_status, stripe_payment_link_id, receipt_token, contact_email, requested_at, pickup_address, dropoff_address, passengers')
+    .select('id, service_line, status, confirmation_code, agreed_cents, payment_status, stripe_payment_link_id, receipt_token, contact_email, requested_at, pickup_address, dropoff_address, passengers, is_test_data')
     .eq('receipt_token', token)
     .maybeSingle();
   if (!row) return notFound();
@@ -93,8 +94,11 @@ export async function GET(req: Request, { params }: { params: { token: string } 
   if (!stripeConfigured()) return notFound();
 
   const linkId = (row.stripe_payment_link_id as string | null) ?? null;
+  // A test booking pays in Stripe test mode (lib/stripe-mode.ts). The Payment Link was made in the
+  // same mode at confirmation, so the fallback has to look it up there too.
+  const mode = stripeModeForTrip(row as { is_test_data?: unknown });
   const fallback = async () => {
-    const url = linkId ? await paymentLinkUrl(linkId) : null;
+    const url = linkId ? await withStripeMode(mode, () => paymentLinkUrl(linkId)) : null;
     return url ? go(url) : new NextResponse('This payment link is not available. Please call (704) 941-8508.', { status: 410, headers: NO_STORE });
   };
 
@@ -105,7 +109,7 @@ export async function GET(req: Request, { params }: { params: { token: string } 
   if (attempt && attempt.status !== 'active') return fallback();
 
   try {
-    const session = await createBrandedCheckout({
+    const session = await withStripeMode(mode, () => createBrandedCheckout({
       amountCents,
       serviceName: serviceShortName(row.service_line as string),
       confirmationCode: row.confirmation_code as string,
@@ -117,7 +121,7 @@ export async function GET(req: Request, { params }: { params: { token: string } 
       logoUrl: brandLogoUrl(),
       customerEmail: (row.contact_email as string | null) ?? null,
       tripSummary: tripSummaryFor(row),
-    });
+    }));
     return go(session.url);
   } catch (e) {
     console.error('[pay] branded checkout failed, using the payment link:', e);

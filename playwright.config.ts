@@ -120,6 +120,8 @@ export default defineConfig({
          * that skips, and a payment path is the last place to accept that.
          */
         STRIPE_WEBHOOK_SECRET: 'whsec_pw_test_secret',
+        // The second Stripe endpoint: test-mode payments for test bookings (lib/stripe-mode.ts).
+        STRIPE_TEST_WEBHOOK_SECRET: 'whsec_pw_testmode_secret',
         /**
          * The push sink, pointed at a loopback port the specs own. Capture
          * server up = "was the operator told?" is observable. Capture server

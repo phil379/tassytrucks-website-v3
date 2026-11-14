@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
-import { getPaymentMethodLabel, verifyWebhookSignature } from '@/lib/stripe';
+import { getPaymentMethodLabel, verifyWebhookSignature, withStripeMode } from '@/lib/stripe';
+import { paymentMayMarkPaid, type StripeMode } from '@/lib/stripe-mode';
 import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
 import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
 import {
@@ -62,21 +63,49 @@ export async function POST(request: Request) {
   // match — this must stay a text read.
   const raw = await request.text();
 
-  const ok = verifyWebhookSignature(
-    raw,
-    request.headers.get('stripe-signature'),
-    process.env.STRIPE_WEBHOOK_SECRET,
-  );
-  if (!ok) {
+  // WHICH STRIPE SENT THIS. The live endpoint and the test endpoint have different signing
+  // secrets, so the secret that verifies the signature says which one it was. The live secret is
+  // tried first and behaves exactly as before. An event signed with the TEST secret is test money:
+  // it is handled in test mode and can only ever settle a test booking (see below).
+  const signature = request.headers.get('stripe-signature');
+  const mode: StripeMode | null = verifyWebhookSignature(raw, signature, process.env.STRIPE_WEBHOOK_SECRET)
+    ? 'live'
+    : verifyWebhookSignature(raw, signature, process.env.STRIPE_TEST_WEBHOOK_SECRET)
+      ? 'test'
+      : null;
+  if (!mode) {
     return NextResponse.json({ ok: false, error: 'Bad signature' }, { status: 400 });
   }
 
-  let event: { type?: string; data?: { object?: CheckoutSession } };
+  let event: { type?: string; livemode?: boolean; data?: { object?: CheckoutSession } };
   try {
     event = JSON.parse(raw);
   } catch {
     return NextResponse.json({ ok: false, error: 'Bad JSON' }, { status: 400 });
   }
+
+  if (mode === 'test') {
+    // The test secret must only ever vouch for test events. A live event arriving under it means
+    // the two secrets were swapped in the dashboard; refuse it loudly instead of guessing.
+    if (event.livemode !== false) {
+      console.error('[stripe] a LIVE event was signed with the TEST webhook secret; refused');
+      return NextResponse.json({ ok: false, error: 'Live event on the test endpoint' }, { status: 400 });
+    }
+    // Test mode covers one thing: paying a test trip. Scholar billing and saved cards are not
+    // part of it, so they are acknowledged and left alone.
+    const s = event.data?.object ?? {};
+    if (event.type !== 'checkout.session.completed' || s.mode === 'setup') {
+      return NextResponse.json({ ok: true, ignored: `test mode: ${event.type ?? 'unknown'}` });
+    }
+  }
+  // Every Stripe lookup below (the card label for the receipt) uses the key that matches.
+  return withStripeMode(mode, () => handleEvent(event, mode));
+}
+
+async function handleEvent(
+  event: { type?: string; livemode?: boolean; data?: { object?: CheckoutSession } },
+  mode: StripeMode,
+): Promise<NextResponse> {
 
   // Scholar monthly billing: a failed payment, a recovery, or an ended subscription. Handled here
   // because the plan lives on standing_orders, not on a trip.
@@ -163,6 +192,28 @@ export async function POST(request: Request) {
   const base = db.from(TRIP_REQUESTS_TABLE).update(patch).neq('payment_status', 'paid');
 
   const tripId = session.metadata?.trip_request_id;
+
+  // TEST MONEY NEVER SETTLES A REAL TRIP. Checked before the write, on the row itself, so a test
+  // payment that somehow names a real trip is refused and reported, not recorded.
+  if (mode === 'test') {
+    const find = tripId
+      ? db.from(TRIP_REQUESTS_TABLE).select('id, is_test_data').eq('id', tripId)
+      : paidLinkId
+        ? db.from(TRIP_REQUESTS_TABLE).select('id, is_test_data').eq('stripe_payment_link_id', paidLinkId)
+        : null;
+    const { data: target, error: findError } = find ? await find.limit(1) : { data: null, error: null };
+    if (findError) {
+      console.error('[stripe] could not check a test payment:', findError.message);
+      return NextResponse.json({ ok: false, error: 'Read failed' }, { status: 500 });
+    }
+    const row = (target?.[0] ?? null) as { is_test_data?: unknown } | null;
+    if (!row) return NextResponse.json({ ok: true, ignored: 'test mode: no matching request' });
+    if (!paymentMayMarkPaid(mode, row)) {
+      console.error('[stripe] a TEST-mode payment named a real trip; NOT recorded. session', session.id);
+      return NextResponse.json({ ok: true, ignored: 'test payment for a real trip' });
+    }
+  }
+
   const query = tripId
     ? base.eq('id', tripId)
     : paidLinkId
@@ -267,7 +318,8 @@ export async function POST(request: Request) {
       };
       await sendRichEmail({
         to: email,
-        subject: receiptSubject(receipt),
+        // A test payment's receipt says so in the subject, so it is never read as money received.
+        subject: `${mode === 'test' ? '[TEST] ' : ''}${receiptSubject(receipt)}`,
         html: receiptHtml(receipt),
         text: receiptText(receipt),
       });

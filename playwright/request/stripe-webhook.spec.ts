@@ -267,3 +267,60 @@ test('a dead push sink does not undo a recorded payment', async ({ request, play
 
   await api.dispose();
 });
+
+/* ─────────────────────────────── test-mode payments for test bookings (lib/stripe-mode.ts) */
+
+const TEST_MODE_SECRET = 'whsec_pw_testmode_secret';
+
+test('test endpoint: a LIVE event signed with the test secret is refused', async ({ request }) => {
+  const body = JSON.stringify({ type: 'checkout.session.completed', livemode: true, data: { object: { id: 'cs_live_x', payment_status: 'paid' } } });
+  const res = await request.post(`${WEBHOOK_ORIGIN}/api/stripe/webhook`, {
+    headers: { 'stripe-signature': sign(body, TEST_MODE_SECRET), 'content-type': 'application/json' },
+    data: body,
+  });
+  expect(res.status()).toBe(400);
+});
+
+test('test endpoint: anything but a trip payment is acknowledged and left alone', async ({ request }) => {
+  for (const body of [
+    JSON.stringify({ type: 'invoice.payment_failed', livemode: false, data: { object: {} } }),
+    JSON.stringify({ type: 'checkout.session.completed', livemode: false, data: { object: { id: 'cs_test_s', mode: 'setup' } } }),
+  ]) {
+    const res = await request.post(`${WEBHOOK_ORIGIN}/api/stripe/webhook`, {
+      headers: { 'stripe-signature': sign(body, TEST_MODE_SECRET), 'content-type': 'application/json' },
+      data: body,
+    });
+    expect(res.status()).toBe(200);
+    expect((await res.json()).ignored).toContain('test mode');
+  }
+});
+
+test('test endpoint: a test-card payment marks a TEST trip paid, and never a real one', async ({ request }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  const send = async (tripId: string) => {
+    const body = JSON.stringify({
+      type: 'checkout.session.completed',
+      livemode: false,
+      data: { object: { id: `cs_test_${Date.now()}`, payment_status: 'paid', amount_total: 12500, metadata: { trip_request_id: tripId } } },
+    });
+    return request.post(`${WEBHOOK_ORIGIN}/api/stripe/webhook`, {
+      headers: { 'stripe-signature': sign(body, TEST_MODE_SECRET), 'content-type': 'application/json' },
+      data: body,
+    });
+  };
+
+  const testTrip = await seedTrip(request, `plink_pw_tm_${Date.now()}`);
+  expect((await send(testTrip)).status()).toBe(200);
+  expect((await readTrip(request, testTrip)).payment_status).toBe('paid');
+
+  // The same event naming a trip that is NOT a test: refused, the trip stays unpaid.
+  const realTrip = await seedTrip(request, `plink_pw_tm_real_${Date.now()}`);
+  await request.patch(`${SUPABASE_URL}/rest/v1/trip_requests?id=eq.${realTrip}`, {
+    headers: { ...h(), 'Content-Type': 'application/json' },
+    data: { is_test_data: false },
+  });
+  const res = await send(realTrip);
+  expect(res.status()).toBe(200);
+  expect((await res.json()).ignored).toBe('test payment for a real trip');
+  expect((await readTrip(request, realTrip)).payment_status).toBe('unpaid');
+});

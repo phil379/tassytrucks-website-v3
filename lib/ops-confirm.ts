@@ -7,7 +7,8 @@ import {
   type ConfirmedTrip,
 } from '@/lib/confirmation-email';
 import { sendRichEmail } from '@/lib/notifications';
-import { createTripPaymentLink, stripeConfigured } from '@/lib/stripe';
+import { createTripPaymentLink, stripeConfigured, withStripeMode } from '@/lib/stripe';
+import { stripeModeForTrip } from '@/lib/stripe-mode';
 import { serviceShortName } from '@/lib/trip-request';
 import { planConfirm, CLOSED_STATUSES } from '@/lib/confirm-plan';
 import { pingTassyOpsConfirmed } from '@/lib/tassyops-notify';
@@ -95,14 +96,18 @@ export async function confirmTrip(args: {
     const receiptToken = await ensureReceiptToken(db, id, (row as { receipt_token?: string | null }).receipt_token);
     let link: Awaited<ReturnType<typeof createTripPaymentLink>> | null = null;
     try {
-      link = await createTripPaymentLink({
-        amountCents,
-        serviceName: serviceShortName(row.service_line),
-        confirmationCode: code,
-        tripRequestId: id,
-        serviceLine: row.service_line,
-        receiptUrl: receiptToken ? receiptUrlFor(receiptToken) : null,
-      });
+      // A test booking (is_test_data, set by the server at booking) gets a Stripe TEST-mode link,
+      // payable with the test card and never with real money. Every other trip: live, as before.
+      link = await withStripeMode(stripeModeForTrip(row as { is_test_data?: unknown }), () =>
+        createTripPaymentLink({
+          amountCents,
+          serviceName: serviceShortName(row.service_line),
+          confirmationCode: code,
+          tripRequestId: id,
+          serviceLine: row.service_line,
+          receiptUrl: receiptToken ? receiptUrlFor(receiptToken) : null,
+        }),
+      );
     } catch (e) {
       console.error('[ops] payment link failed (trip left unchanged):', e);
     }

@@ -1,4 +1,6 @@
 import { createHmac, timingSafeEqual } from 'crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { stripeTestKey, TEST_PAYMENT_LABEL, TEST_PAYMENT_NOTE, type StripeMode } from '@/lib/stripe-mode';
 
 /**
  * Stripe, over the raw HTTP API.
@@ -38,6 +40,33 @@ export function stripeConfigured(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
+/**
+ * TEST MODE (lib/stripe-mode.ts). Every Stripe call made inside withStripeMode('test', ...) uses
+ * the test key instead of the live one, so a caller cannot use the test key for one call and the
+ * live key for the next by forgetting an argument. Outside it, everything is exactly as before.
+ */
+const modeStore = new AsyncLocalStorage<StripeMode>();
+
+export function withStripeMode<T>(mode: StripeMode, run: () => T): T {
+  return modeStore.run(mode, run);
+}
+
+export function currentStripeMode(): StripeMode {
+  return modeStore.getStore() ?? 'live';
+}
+
+/** The key for the current mode. The live key is never used for a test-mode call, or the reverse. */
+function secretKey(): string {
+  if (currentStripeMode() === 'test') {
+    const key = stripeTestKey();
+    if (!key) throw new Error('STRIPE_TEST_SECRET_KEY is not set to a Stripe test key on this deployment');
+    return key;
+  }
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error('STRIPE_SECRET_KEY is not set on this deployment');
+  return key;
+}
+
 type FormValue = string | number | undefined | null;
 
 /** Stripe's API is form-encoded, including its bracketed nested keys. */
@@ -55,8 +84,7 @@ async function post<T>(
   fields: Record<string, FormValue>,
   extraHeaders?: Record<string, string>,
 ): Promise<T> {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error('STRIPE_SECRET_KEY is not set on this deployment');
+  const key = secretKey();
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -87,8 +115,7 @@ async function post<T>(
 }
 
 async function get<T>(path: string): Promise<T> {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error('STRIPE_SECRET_KEY is not set on this deployment');
+  const key = secretKey();
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -149,6 +176,9 @@ function catalogKeyForLine(serviceLine: string | null | undefined): string | nul
  */
 const productIdCache = new Map<string, string | null>();
 async function seededProductId(catalogKey: string): Promise<string | null> {
+  // The catalog is seeded in live mode only. A test trip uses an inline product (the caller's
+  // fallback), which also lets its name say TEST. Never cache across modes: the ids differ.
+  if (currentStripeMode() === 'test') return null;
   const cached = productIdCache.get(catalogKey);
   if (cached !== undefined) return cached;
   const list = await get<{ data: Array<{ id: string; metadata?: Record<string, string> }> }>(
@@ -166,6 +196,9 @@ async function seededProductId(catalogKey: string): Promise<string | null> {
 }
 
 export type PaymentLink = { id: string; url: string };
+
+/** "TEST · " in front of the name on a test-mode pay page, so nobody mistakes it for a charge. */
+const testPrefix = () => (currentStripeMode() === 'test' ? `${TEST_PAYMENT_LABEL} · ` : '');
 
 /**
  * A payment link for one confirmed trip.
@@ -210,7 +243,7 @@ export async function createTripPaymentLink(input: {
     // now the customer-facing line label.
     priceFields.nickname = `${input.serviceName} · ${input.confirmationCode}`;
   } else {
-    priceFields['product_data[name]'] = `${input.serviceName} · ${input.confirmationCode}`;
+    priceFields['product_data[name]'] = `${testPrefix()}${input.serviceName} · ${input.confirmationCode}`;
     priceFields['product_data[metadata][business]'] = STRIPE_BUSINESS;
   }
   const price = await post<{ id: string }>('/prices', priceFields);
@@ -322,10 +355,12 @@ export async function createBrandedCheckout(input: {
   }
   const catalogKey = catalogKeyForLine(input.serviceLine);
   const productId = catalogKey ? await seededProductId(catalogKey).catch(() => null) : null;
-  const label = `${input.serviceName} · ${input.confirmationCode}`;
+  const label = `${testPrefix()}${input.serviceName} · ${input.confirmationCode}`;
+  const isTest = currentStripeMode() === 'test';
 
   const fields: Record<string, FormValue> = {
     mode: 'payment',
+    'metadata[stripe_mode]': isTest ? 'test' : undefined,
     'line_items[0][quantity]': 1,
     'line_items[0][price_data][currency]': 'usd',
     'line_items[0][price_data][unit_amount]': input.amountCents,
@@ -343,7 +378,8 @@ export async function createBrandedCheckout(input: {
   if (input.customerEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.customerEmail)) {
     fields.customer_email = input.customerEmail;
   }
-  if (input.tripSummary) fields['custom_text[submit][message]'] = input.tripSummary.slice(0, 1000);
+  const summary = [isTest ? TEST_PAYMENT_NOTE : '', input.tripSummary ?? ''].filter(Boolean).join(' ');
+  if (summary) fields['custom_text[submit][message]'] = summary.slice(0, 1000);
   if (productId) {
     fields['line_items[0][price_data][product]'] = productId;
   } else {

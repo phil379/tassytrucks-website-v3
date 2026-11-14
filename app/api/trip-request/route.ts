@@ -19,7 +19,7 @@ import { fireNotifications, type FacilityAlertContext } from '@/lib/notification
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { containsNul, MAX_REQUEST_BODY_CHARS } from '@/lib/request-guards';
 import { coerceLatLng, roadDistance } from '@/lib/road-distance';
-import { validateDetails, type DetailValidation } from '@/lib/trip-details';
+import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { createHash } from 'node:crypto';
 import {
   buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isPayerEnabled,
@@ -293,7 +293,23 @@ export async function POST(request: Request) {
   // kept only when it is a listed slug. Merged after validation for the same reason as consent.
   // It is NOT a price input: the price below is worked out from the two addresses alone.
   const sourceHotelSlug = attributionSlug(data.sourceHotelSlug);
-  const tripDetails = sourceHotelSlug ? { ...(withConsent ?? {}), source_hotel_slug: sourceHotelSlug } : withConsent;
+  // RENEW ENTRY POINT (Tassy Wellness & Med-Spa). A booking that arrived on a /renew link
+  // carries utm_source=renew in the stamped source string. The board renders trip_details
+  // keys, so the entry point is stamped here, after validation, the same way as the hotel
+  // slug. Only concierge/recovery can come from /renew; the value is allow-listed, never
+  // free text from the URL.
+  const entryPoint =
+    data.serviceLine === 'concierge' || data.serviceLine === 'recovery'
+      ? entryPointFromSource(typeof raw.source === 'string' ? raw.source : null)
+      : null;
+  const tripDetails =
+    sourceHotelSlug || entryPoint
+      ? {
+          ...(withConsent ?? {}),
+          ...(sourceHotelSlug ? { source_hotel_slug: sourceHotelSlug } : {}),
+          ...(entryPoint ? { entry_point: entryPoint } : {}),
+        }
+      : withConsent;
 
   // ───────────────────────────────────────────────────────── facility context
   //

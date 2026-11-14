@@ -206,12 +206,12 @@ export default function LandingPageShell({
             ))}
             <li className="flex items-center gap-2">
               <Phone size={14} className="opacity-85" />
-              <a href={contact.phone} className="hover:text-[color:var(--gold-warm)]">
+              <a href={contact.phone} className="inline-block py-2 hover:text-[color:var(--gold-warm)]">
                 {contact.phoneDisplay}
               </a>
             </li>
             <li>
-              <a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)] opacity-85">
+              <a href={contact.bookingEmail} className="inline-block py-2 hover:text-[color:var(--gold-warm)] opacity-85">
                 book@tassytrucks.com
               </a>
             </li>

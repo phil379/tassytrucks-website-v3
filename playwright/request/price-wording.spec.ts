@@ -264,8 +264,10 @@ test.describe('3. the error summary names each field, once', () => {
     expect(new Set(items).size).toBe(items.length); // none repeated
     expect(heading).toContain(`There are ${items.length} problems`);
     // Every line starts with the name of the field it is about, as the page labels it.
-    const FIELDS = /^(Date & time|First name|Last name|Phone|Pickup address|Destination|Pet's name|Species|Rabies vaccination|Carrier or crate)\b/;
+    // Email joined the list when #90 made it required (the pay link is emailed).
+    const FIELDS = /^(Date & time|First name|Last name|Phone|Email|Pickup address|Destination|Pet's name|Species|Rabies vaccination|Carrier or crate)\b/;
     for (const item of items) expect(item, item).toMatch(FIELDS);
+    expect(items).toContain('Email: Add an email address — it is how we send your secure pay link and receipt');
     expect(items).toContain('Pickup address: Enter a pickup address');
     expect(items).toContain('Destination: Enter a destination');
     expect(items).toContain('First name: Enter your first name');

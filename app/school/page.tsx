@@ -244,13 +244,13 @@ export default function SchoolPage() {
               <div className="eyebrow opacity-70 text-current">For districts & EverDriven partners</div>
               <p className="mt-2 text-sm opacity-85 leading-relaxed">Coordinating routes or alternative student transport? Reach our team directly.</p>
               <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                <a href={contact.bookingEmail} className="underline underline-offset-2 hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a>
-                <a href={contact.phone} className="underline underline-offset-2 hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a>
+                <a href={contact.bookingEmail} className="inline-block py-2 underline underline-offset-2 hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a>
+                <a href={contact.phone} className="inline-block py-2 underline underline-offset-2 hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a>
               </div>
             </div>
           </div>
           <p className="mt-10 text-sm">
-            <Link href="/" className="underline underline-offset-2 opacity-75 hover:opacity-100 hover:text-[color:var(--gold-warm)]">
+            <Link href="/" className="inline-block py-2 underline underline-offset-2 opacity-75 hover:opacity-100 hover:text-[color:var(--gold-warm)]">
               Back to all six lines of care
             </Link>
           </p>

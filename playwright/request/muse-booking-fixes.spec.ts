@@ -60,11 +60,31 @@ test.describe('date and time', () => {
     await expect(page.getByTestId('requestedAt-value')).toHaveValue(`${f.iso}T10:00`);
   });
 
-  test('the calendar button fills the same box', async ({ page }) => {
+  // Muse, three re-tests: a mouse click on a day closed the browser's popup and left the date
+  // blank. The calendar is now drawn by the page, so this test clicks it like a person would.
+  test('a mouse user can pick a date: open the calendar, click a day, the box is filled', async ({ page }) => {
     await page.goto('/request?service=care');
     const f = far();
-    await page.getByTestId('requestedAt-calendar').fill(f.iso);
+    await page.getByTestId('requestedAt-calendar').click();
+    const grid = page.getByTestId('requestedAt-calendar-grid');
+    await expect(grid).toBeVisible();
+    // Walk forward to the month of the target day, then click it.
+    for (let i = 0; i < 14 && (await grid.locator(`[data-date="${f.iso}"]`).count()) === 0; i++) {
+      await grid.getByRole('button', { name: 'Next month' }).click();
+    }
+    await grid.locator(`[data-date="${f.iso}"]`).click();
+    await expect(grid).toHaveCount(0);
     await expect(page.locator('#requestedAt')).toHaveValue(f.slash);
+    await page.locator('#requestedAt-time').selectOption('10:00');
+    await expect(page.getByTestId('requestedAt-value')).toHaveValue(`${f.iso}T10:00`);
+    // A day that has passed cannot be clicked.
+    await page.getByTestId('requestedAt-calendar').click();
+    for (let i = 0; i < 14 && (await grid.getByRole('button', { name: 'Previous month' }).isEnabled()); i++) {
+      await grid.getByRole('button', { name: 'Previous month' }).click();
+    }
+    await expect(grid.locator('button[data-date]').first()).toBeDisabled();
+    await page.keyboard.press('Escape');
+    await expect(grid).toHaveCount(0);
   });
 
   test('pasting a date works, in the shapes people paste', async ({ page }) => {
@@ -208,6 +228,17 @@ test('Winnie: a second pet brings up a box for the other pets, and one pet hides
   await page.goto('/request?service=care');
   await page.locator('#passengers').fill('2');
   await expect(page.locator('#details-other_pets')).toHaveCount(0);
+});
+
+test('wheelchair: the chair questions appear only for a wheelchair ride', async ({ page }) => {
+  await page.goto('/request?service=care');
+  await expect(page.locator('#details-wheelchair_type')).toHaveCount(0);
+  await page.locator('#mobility').selectOption('wheelchair');
+  await expect(page.locator('#details-wheelchair_type')).toBeVisible();
+  await expect(page.locator('#details-wheelchair_boarding')).toBeVisible();
+  await expect(page.locator('#details-wheelchair_notes')).toBeVisible();
+  await page.locator('#mobility').selectOption('ambulatory');
+  await expect(page.locator('#details-wheelchair_type')).toHaveCount(0);
 });
 
 test('F20: every booking form says how the ride is paid', async ({ page }) => {

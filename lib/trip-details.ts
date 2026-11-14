@@ -83,6 +83,8 @@ export type DetailField = {
    * box on the form, not one of these answers, so it arrives separately (see DetailContext).
    */
   whenPassengersOver?: number;
+  /** Shown only while the form's Mobility box holds one of these values (also not one of these answers). */
+  whenMobility?: readonly string[];
   /** Renders half width on a wide screen. */
   half?: boolean;
   /**
@@ -245,6 +247,45 @@ const CARE: DetailSection = {
         { value: 'through', label: 'Door through door — walked inside and handed over' },
       ],
       help: 'Door through door takes the driver longer and is quoted accordingly.',
+    },
+    // Wheelchair rides (Muse, 2026-11-13): the form asked nothing about the chair, so the right
+    // vehicle and securement had to be worked out by phone. These are about the CHAIR and how the
+    // rider boards. Nothing here asks why the rider uses one.
+    {
+      key: 'wheelchair_type',
+      label: 'Type of wheelchair',
+      type: 'select',
+      required: true,
+      half: true,
+      whenMobility: ['wheelchair'],
+      options: [
+        { value: 'manual', label: 'Manual wheelchair' },
+        { value: 'power', label: 'Power wheelchair' },
+        { value: 'scooter', label: 'Mobility scooter' },
+        { value: 'transport', label: 'Transport chair' },
+        { value: 'unsure', label: 'Not sure' },
+      ],
+    },
+    {
+      key: 'wheelchair_boarding',
+      label: 'During the ride, the rider',
+      type: 'select',
+      required: true,
+      half: true,
+      whenMobility: ['wheelchair'],
+      options: [
+        { value: 'stays', label: 'Stays in the wheelchair' },
+        { value: 'transfers', label: 'Moves to a vehicle seat with help' },
+        { value: 'unsure', label: 'Not sure' },
+      ],
+    },
+    {
+      key: 'wheelchair_notes',
+      label: 'Anything about the chair we should know?',
+      type: 'text',
+      max: 160,
+      whenMobility: ['wheelchair'],
+      help: 'For example: extra wide, reclining, a tall back, or a bag or tank holder attached.',
     },
     { key: 'pickup_steps', label: 'Steps at the pickup door', type: 'select', options: STEPS, half: true },
     {
@@ -551,11 +592,12 @@ export function detailsFor(service: string): DetailSection | null {
 }
 
 /** What a field's visibility can depend on besides the other answers. */
-export type DetailContext = { passengers?: number };
+export type DetailContext = { passengers?: number; mobility?: string | null };
 
 /** Whether a conditional field is currently in play. */
 export function fieldVisible(field: DetailField, values: Record<string, string>, ctx: DetailContext = {}): boolean {
   if (field.whenPassengersOver !== undefined && (ctx.passengers ?? 1) <= field.whenPassengersOver) return false;
+  if (field.whenMobility && !field.whenMobility.includes(ctx.mobility ?? '')) return false;
   if (!field.showWhen) return true;
   return field.showWhen.equals.includes(values[field.showWhen.key] ?? '');
 }

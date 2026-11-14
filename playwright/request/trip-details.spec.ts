@@ -253,6 +253,19 @@ test.describe('breed suggestions', () => {
     expect(one.values.other_pets).toBeUndefined();
   });
 
+  test('wheelchair ride: chair type and boarding are required; other rides never store them', () => {
+    const care = { rider_is: 'me', assistance: 'none' };
+    const base = validateDetails('care', care, { mobility: 'ambulatory' });
+    const wav = validateDetails('care', care, { mobility: 'wheelchair' });
+    // Whatever else Care requires, the wheelchair ride adds exactly these two.
+    const extra = Object.keys(wav.ok ? {} : wav.errors).filter((k) => !(k in (base.ok ? {} : base.errors)));
+    expect(extra.sort()).toEqual(['wheelchair_boarding', 'wheelchair_type']);
+    const filled = validateDetails('care', { ...care, wheelchair_type: 'power', wheelchair_boarding: 'stays' }, { mobility: 'wheelchair' });
+    expect(filled.values.wheelchair_type).toBe('power');
+    const stale = validateDetails('care', { ...care, wheelchair_type: 'power' }, { mobility: 'ambulatory' });
+    expect(stale.values.wheelchair_type).toBeUndefined();
+  });
+
   test('a breed that is not on the list is still accepted', () => {
     const result = validateDetails('pet', {
       pet_name: 'Bo',

@@ -769,6 +769,20 @@ export function validateDetails(service: string, raw: unknown, ctx: DetailContex
 }
 
 /**
+ * Entry point stamped on a booking that arrived on a /renew link (Tassy
+ * Wellness & Med-Spa). The form stamps the full path+query onto the row's
+ * `source`; this reads the utm_source back out of that stamped string.
+ * Allow-listed to 'renew' only — never free text from the URL. Returns null
+ * for any other source, so callers can merge it conditionally.
+ */
+export function entryPointFromSource(source: string | null): 'renew' | null {
+  if (!source) return null;
+  const query = source.split('?')[1];
+  if (!query) return null;
+  return new URLSearchParams(query).get('utm_source') === 'renew' ? 'renew' : null;
+}
+
+/**
  * Stored details as label/value pairs, for the ops queue and the confirmation
  * email. Select values resolve back to the words the customer actually read —
  * a dispatcher should never have to know that `through` means door through

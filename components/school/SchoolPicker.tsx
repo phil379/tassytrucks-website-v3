@@ -243,7 +243,7 @@ export default function SchoolPicker({
               setOpen(false);
               setSchoolId('');
             }}
-            className="underline"
+            className="underline py-1"
           >
             Can&rsquo;t find your school?
           </button>{' '}

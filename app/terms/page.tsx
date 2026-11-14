@@ -101,9 +101,9 @@ const SECTIONS: Array<{ h: string; body: ReactNode[] }> = [
     h: 'Related policies',
     body: [
       <>
-        <Link href="/privacy" className={LINK}>Privacy Policy</Link> ·{' '}
-        <Link href="/refunds" className={LINK}>Cancellations &amp; Refunds</Link> ·{' '}
-        <Link href="/accessibility" className={LINK}>Accessibility</Link>
+        <Link href="/privacy" className={`${LINK} inline-block py-1`}>Privacy Policy</Link> ·{' '}
+        <Link href="/refunds" className={`${LINK} inline-block py-1`}>Cancellations &amp; Refunds</Link> ·{' '}
+        <Link href="/accessibility" className={`${LINK} inline-block py-1`}>Accessibility</Link>
       </>,
     ],
   },

@@ -14,15 +14,26 @@ import CookieSettingsButton from '@/components/CookieSettingsButton';
 export default function Footer() {
   return (
     <footer data-site-chrome className="bg-ink-section">
-      <div className="container-x py-16 grid grid-cols-2 lg:grid-cols-6 gap-10">
-        {/* Brand */}
-        <div className="col-span-2">
-          <div className="flex items-center gap-3">
-            <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-10 w-10 shrink-0" />
+      {/* Large screens: the brand gets the widest column, and Contact is sized to its longest line
+          (partners@tassytrucks.com) so no address ever breaks (Phil, 2026-11-14). */}
+      <div
+        className={`container-x py-16 grid grid-cols-2 gap-10 ${
+          // One link column fewer while Careers is hidden, so Contact always lands in the last,
+          // content-sized track. Both class strings are written out in full for Tailwind.
+          CAREERS_OPEN
+            ? 'lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_max-content]'
+            : 'lg:grid-cols-[minmax(0,2fr)_repeat(2,minmax(0,1fr))_max-content]'
+        }`}
+      >
+        {/* Brand. Phil, 2026-11-14: name and logo were too small. Logo 2x (80px; 64px on phones),
+            name 30px (24px on phones), tagline scaled to match. */}
+        <div className="col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-4">
+            <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-16 w-16 sm:h-20 sm:w-20 shrink-0" />
             <div>
-              <div className="serif text-xl font-semibold leading-none">Tassy Transportation</div>
+              <div className="serif text-2xl sm:text-3xl font-semibold leading-tight">Tassy Transportation</div>
               {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline */}
-              <div className="serif italic text-sm mt-1" style={{ color: 'var(--gold)' }}>
+              <div className="serif italic text-base sm:text-lg mt-1" style={{ color: 'var(--gold)' }}>
                 We Transport With Care.
               </div>
             </div>
@@ -127,13 +138,13 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Contact */}
-        <div>
+        {/* Contact. Every address and the phone number stay on ONE line (Phil, 2026-11-14:
+            "partners@tassytrucks.co / m"). Phones: the column spans the full width, so the
+            179px address fits even at 320px (FIX_PROD_143 had made it break instead). Tablets
+            (2 columns) have room; large screens size this column to its content. */}
+        <div className="col-span-2 sm:col-span-1">
           <div className="eyebrow opacity-60 text-current">Contact</div>
-          {/* FIX_PROD_143 — break-words (inherited): partners@tassytrucks.com is a
-              179px unbreakable token in a ~150px grid column at 375px, which pushed
-              the document to 386px wide. */}
-          <ul className="mt-3 space-y-2 text-sm break-words">
+          <ul className="mt-3 space-y-2 text-sm whitespace-nowrap">
             <li><a href={contact.phone} className="hover:text-[color:var(--gold-warm)]">{contact.phoneDisplay}</a></li>
             <li><a href={contact.bookingEmail} className="hover:text-[color:var(--gold-warm)]">book@tassytrucks.com</a></li>
             <li><a href={contact.salesEmail} className="hover:text-[color:var(--gold-warm)]">partners@tassytrucks.com</a></li>

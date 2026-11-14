@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import ServicePage from '@/components/ServicePage';
-import { request } from '@/lib/request-links';
+import { requestRenew } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'IV therapy & med-spa rides in Charlotte',
@@ -15,12 +15,12 @@ export default function RenewPage() {
     <ServicePage
       eyebrow="Wellness &amp; med-spa appointments"
       title="Two ways to get to a wellness appointment."
-      tagline="Which one you need depends on how you will feel afterwards."
-      description="Wellness and med-spa runs are one of our six service lines. Which ride you book depends on how you will feel afterwards: Tassy Concierge when you are simply going there and back under your own steam, and Tassy Recovery when the procedure means you should not be driving and someone needs to wait for you. Same company, clearer pricing, and you are never sold the expensive one when the cheaper one is right."
-      bookHref={request.renew}
+      tagline="Your clinic's instructions decide which one you need."
+      description="Tassy Wellness & Med-Spa is a way into Tassy Concierge and Tassy Recovery. Your clinic's instructions decide which one you need: Tassy Concierge when you are simply going there and back under your own steam, and Tassy Recovery when the procedure means you should not be driving and someone needs to wait for you. Same company, clearer pricing, and you are never sold the expensive one when the cheaper one is right."
+      bookHref={requestRenew.concierge}
       bookLabel="Book a ride"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
-      serviceName="Wellness and Med-Spa Transportation"
+      serviceName="Tassy Wellness & Med-Spa"
       path="/renew"
       highlightsHeading="Getting to IV therapy, med-spa and aesthetic appointments in Charlotte"
       highlights={[
@@ -38,7 +38,7 @@ export default function RenewPage() {
         },
         {
           title: 'Going regularly?',
-          body: 'A standing course of treatment can go on the Standing Ride Plan — the same driver at the same time each week, 15% off, each ride billed after the ride, minimum eight legs.',
+          body: 'Contact our team to discuss recurring ride arrangements and available plan options.',
         },
       ]}
       tiers={[
@@ -47,14 +47,14 @@ export default function RenewPage() {
           price: 'From $89',
           cadence: 'one way',
           features: ['Reserved for your time', 'Flat rate, no surge', 'Full-size SUV', 'Book the return separately'],
-          cta: { label: 'Reserve a car', href: request.vip },
+          cta: { label: 'Reserve a car', href: requestRenew.concierge },
         },
         {
           name: 'Tassy Recovery',
           price: 'From $129',
           cadence: 'there, the wait, and home',
           features: ['Driver waits 20 minutes', 'One pharmacy stop included', 'Help to the car and to your door', 'Family text on the way home'],
-          cta: { label: 'Book the round trip', href: request.recover },
+          cta: { label: 'Book the round trip', href: requestRenew.recovery },
           highlight: true,
         },
       ]}

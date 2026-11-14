@@ -52,6 +52,17 @@ export const request = {
 };
 
 /**
+ * Tassy Wellness & Med-Spa (/renew) booking links. Same operational services
+ * as the generic links, stamped `utm_source=renew` so dispatch can tell a
+ * Renew booking from a generic Concierge/Recovery one. The form stamps the
+ * whole path+query onto `trip_requests.source`.
+ */
+export const requestRenew = {
+  concierge: to('concierge', { utm_source: 'renew' }),
+  recovery: to('recovery', { utm_source: 'renew' }),
+};
+
+/**
  * Replacement for `seoBook`. The landing pages pass their own attribution
  * (`source: 'seo-dialysis'`, plus prefill hints). Those ride along as query
  * params and the form stamps the whole path+query onto `trip_requests.source`,

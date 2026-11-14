@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Calendar } from 'lucide-react';
 
 /**
@@ -15,8 +15,9 @@ import { Calendar } from 'lucide-react';
  * can be TYPED: the re-test still produced "11/14/0261". So:
  *
  *   - Date: a plain text box that formats what is typed as MM/DD/YYYY and takes eight digits,
- *     never more. Pasting works ("11/21/2026", "2026-11-14"). The calendar button beside it is a
- *     convenience that fills the same box; nothing depends on the browser's own picker.
+ *     never more. Pasting works ("11/21/2026", "2026-11-14"). The calendar button beside it
+ *     opens a calendar this page draws itself and fills the same box; nothing depends on the
+ *     browser's own picker.
  *   - Time: a list in 15-minute steps. Nothing to mistype, no AM/PM segment.
  *
  * The form still posts ONE value under `name`, shaped "YYYY-MM-DDTHH:mm" exactly as before, so
@@ -110,6 +111,121 @@ function split(value: string): { date: string; time: string } {
   return m ? { date: m[1]!, time: m[2]! } : { date: '', time: '' };
 }
 
+const todayIso = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
+};
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+/** "2026-11" plus or minus months, as "YYYY-MM". */
+function shiftMonth(month: string, by: number): string {
+  const [y, m] = month.split('-').map(Number) as [number, number];
+  const d = new Date(Date.UTC(y, m - 1 + by, 1));
+  return `${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}`;
+}
+
+/**
+ * A month of day buttons. Days before `min` or after `max` are shown and cannot be chosen.
+ * Closes on Escape or a click anywhere else.
+ */
+function CalendarGrid({
+  month,
+  selected,
+  min,
+  max,
+  onMonth,
+  onPick,
+  onClose,
+  testId,
+}: {
+  month: string;
+  selected: string;
+  min: string;
+  max: string;
+  onMonth: (month: string) => void;
+  onPick: (iso: string) => void;
+  onClose: () => void;
+  testId: string;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const away = (e: MouseEvent) => {
+      const target = e.target as Node;
+      // The calendar button toggles the grid itself; do not also close it from here.
+      if (box.current && !box.current.parentElement?.contains(target)) onClose();
+    };
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [onClose]);
+
+  const [y, m] = month.split('-').map(Number) as [number, number];
+  const first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+  const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const cells: (string | null)[] = [
+    ...Array.from({ length: first }, () => null),
+    ...Array.from({ length: days }, (_, i) => `${month}-${p2(i + 1)}`),
+  ];
+  const canBack = !min || shiftMonth(month, -1) >= min.slice(0, 7);
+  const canNext = !max || shiftMonth(month, 1) <= max.slice(0, 7);
+  const nav = 'flex h-11 w-11 items-center justify-center rounded-lg text-lg hover:bg-white/10 disabled:opacity-30';
+
+  return (
+    <div
+      ref={box}
+      role="dialog"
+      aria-label="Choose a date"
+      data-testid={testId}
+      className="absolute right-0 z-40 mt-1 w-[19.5rem] max-w-[calc(100vw-2rem)] rounded-xl border border-line bg-[#0f141a] p-3 text-cream-text shadow-xl"
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <button type="button" className={nav} disabled={!canBack} aria-label="Previous month" onClick={() => onMonth(shiftMonth(month, -1))}>
+          &lsaquo;
+        </button>
+        <span className="text-sm font-semibold" aria-live="polite">
+          {MONTHS[m - 1]} {y}
+        </span>
+        <button type="button" className={nav} disabled={!canNext} aria-label="Next month" onClick={() => onMonth(shiftMonth(month, 1))}>
+          &rsaquo;
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-0.5 text-center text-xs">
+        {WEEKDAYS.map((d) => (
+          <span key={d} className="py-1 opacity-60" aria-hidden="true">
+            {d}
+          </span>
+        ))}
+        {cells.map((iso, i) =>
+          iso ? (
+            <button
+              key={iso}
+              type="button"
+              data-date={iso}
+              disabled={(min !== '' && iso < min) || (max !== '' && iso > max)}
+              aria-label={`${MONTHS[m - 1]} ${Number(iso.slice(8))}, ${y}`}
+              aria-pressed={iso === selected}
+              className={`h-10 rounded-lg text-sm disabled:opacity-25 ${
+                iso === selected ? 'bg-gold font-semibold text-charcoal' : 'hover:bg-white/10'
+              }`}
+              onClick={() => onPick(iso)}
+            >
+              {Number(iso.slice(8))}
+            </button>
+          ) : (
+            <span key={`blank-${i}`} />
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DateTimeField({
   name,
   value,
@@ -143,6 +259,9 @@ export default function DateTimeField({
   const [dateText, setDateText] = useState(toUsDate(initial.date));
   const [dateError, setDateError] = useState<string | null>(null);
   const [time, setTime] = useState(initial.time);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  /** The month the calendar is showing, "YYYY-MM". */
+  const [viewMonth, setViewMonth] = useState('');
 
   // A time that is not on a 15-minute step (a prefilled link can carry one) still has to show.
   const options = time && !TIME_OPTIONS.includes(time) ? [...TIME_OPTIONS, time].sort() : TIME_OPTIONS;
@@ -224,33 +343,39 @@ export default function DateTimeField({
             }}
           />
           {/*
-            The calendar. The browser's own date control laid invisibly over the icon, so a tap
-            opens the phone's date wheel or the desktop calendar. It fills the box above and is
-            skipped by the keyboard and by screen readers: the text box is the field.
+            The calendar is drawn by this page, not by the browser. The first version laid the
+            browser's own date control over this icon; in Muse's three re-tests a mouse click on a
+            day closed that popup and left the date blank, and a popup the page does not own
+            cannot be fixed or tested. This one is ordinary buttons, so a click is a click.
           */}
-          <span className="absolute inset-y-0 right-0 flex w-12 items-center justify-center">
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl"
+            aria-label={calendarOpen ? 'Close the calendar' : 'Open the calendar'}
+            aria-expanded={calendarOpen}
+            data-testid={`${name}-calendar`}
+            onClick={() => {
+              setViewMonth((date || minDate || todayIso()).slice(0, 7));
+              setCalendarOpen((v) => !v);
+            }}
+          >
             <Calendar className="h-5 w-5 opacity-70" aria-hidden="true" />
-            <input
-              type="date"
-              tabIndex={-1}
-              aria-hidden="true"
-              data-testid={`${name}-calendar`}
-              className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-              min={minDate || undefined}
+          </button>
+          {calendarOpen && (
+            <CalendarGrid
+              month={viewMonth}
+              selected={date}
+              min={minDate}
               max={maxDate}
-              value={date}
-              onClick={(e) => {
-                try {
-                  e.currentTarget.showPicker?.();
-                } catch {
-                  // Not allowed here (an embedded frame). The text box still works.
-                }
+              onMonth={setViewMonth}
+              onPick={(iso) => {
+                takeIso(iso);
+                setCalendarOpen(false);
               }}
-              onChange={(e) => {
-                if (e.target.value) takeIso(e.target.value);
-              }}
+              onClose={() => setCalendarOpen(false)}
+              testId={`${name}-calendar-grid`}
             />
-          </span>
+          )}
         </div>
         {dateError && (
           <p id={errorId} role="alert" className="mt-1.5 text-xs" data-testid={errorId}>

@@ -40,6 +40,26 @@ function notice(block: PayBlock) {
   return new NextResponse(html, { status, headers: { ...NO_STORE, 'Content-Type': 'text/html; charset=utf-8' } });
 }
 
+/** "Ride TT-46K7HM · Sat, Nov 14, 10:00 AM · 2513 Pruitt St to 1000 Blythe Blvd · 1 rider". */
+function tripSummaryFor(row: Record<string, unknown>): string {
+  const street = (a: unknown) => (typeof a === 'string' ? a.split(',')[0]!.trim() : '');
+  const when =
+    typeof row.requested_at === 'string' && !Number.isNaN(Date.parse(row.requested_at))
+      ? new Date(row.requested_at).toLocaleString('en-US', {
+          timeZone: 'America/New_York',
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        })
+      : '';
+  const from = street(row.pickup_address);
+  const to = street(row.dropoff_address);
+  const count = typeof row.passengers === 'number' && row.passengers > 1 ? `${row.passengers} travelling` : '';
+  return [`Ride ${row.confirmation_code}`, when, from && to ? `${from} to ${to}` : '', count].filter(Boolean).join(' · ');
+}
+
 export async function GET(req: Request, { params }: { params: { token: string } }) {
   const token = params.token;
   if (!isValidReceiptToken(token)) return notFound();
@@ -60,7 +80,7 @@ export async function GET(req: Request, { params }: { params: { token: string } 
   const db = supabaseAdmin();
   const { data: row } = await db
     .from(TRIP_REQUESTS_TABLE)
-    .select('id, service_line, status, confirmation_code, agreed_cents, payment_status, stripe_payment_link_id, receipt_token')
+    .select('id, service_line, status, confirmation_code, agreed_cents, payment_status, stripe_payment_link_id, receipt_token, contact_email, requested_at, pickup_address, dropoff_address, passengers')
     .eq('receipt_token', token)
     .maybeSingle();
   if (!row) return notFound();
@@ -95,6 +115,8 @@ export async function GET(req: Request, { params }: { params: { token: string } 
       successUrl: receiptUrlFor(token),
       cancelUrl: payPageUrlFor(token),
       logoUrl: brandLogoUrl(),
+      customerEmail: (row.contact_email as string | null) ?? null,
+      tripSummary: tripSummaryFor(row),
     });
     return go(session.url);
   } catch (e) {

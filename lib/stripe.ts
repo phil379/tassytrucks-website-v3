@@ -308,6 +308,14 @@ export async function createBrandedCheckout(input: {
   successUrl: string;
   cancelUrl: string;
   logoUrl: string;
+  /** Prefills the email box on the pay page. The rider already gave it to us once. */
+  customerEmail?: string | null;
+  /**
+   * One line shown beside the Pay button: which ride this is (when, from, to). Without it the
+   * page showed a price and a code, and a rider could not tell they were paying for the right
+   * trip (Muse, 2026-11-13).
+   */
+  tripSummary?: string | null;
 }): Promise<{ id: string; url: string; branded: boolean }> {
   if (!Number.isInteger(input.amountCents) || input.amountCents < 50) {
     throw new Error('A checkout needs a whole amount of at least $0.50');
@@ -332,6 +340,10 @@ export async function createBrandedCheckout(input: {
     'payment_intent_data[metadata][trip_request_id]': input.tripRequestId,
     'payment_intent_data[metadata][confirmation_code]': input.confirmationCode,
   };
+  if (input.customerEmail && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.customerEmail)) {
+    fields.customer_email = input.customerEmail;
+  }
+  if (input.tripSummary) fields['custom_text[submit][message]'] = input.tripSummary.slice(0, 1000);
   if (productId) {
     fields['line_items[0][price_data][product]'] = productId;
   } else {

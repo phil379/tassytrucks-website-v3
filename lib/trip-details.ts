@@ -78,6 +78,13 @@ export type DetailField = {
   suggestFrom?: string;
   /** Shown only while another field holds one of these values. */
   showWhen?: { key: string; equals: readonly string[] };
+  /**
+   * Shown only when the booking carries MORE than this many riders or pets. The count is its own
+   * box on the form, not one of these answers, so it arrives separately (see DetailContext).
+   */
+  whenPassengersOver?: number;
+  /** Shown only while the form's Mobility box holds one of these values (also not one of these answers). */
+  whenMobility?: readonly string[];
   /** Renders half width on a wide screen. */
   half?: boolean;
   /**
@@ -183,6 +190,18 @@ const PET: DetailSection = {
       ],
     },
     {
+      // Muse, Winnie deep-dive 2026-11-13: a booking for two pets stored the count and one pet.
+      // The second animal reached dispatch as a number with no name and no species.
+      key: 'other_pets',
+      label: 'Your other pets',
+      type: 'text',
+      required: true,
+      max: 200,
+      whenPassengersOver: 1,
+      placeholder: 'Milo, cat',
+      help: 'Name and species of each other pet on this ride. Every pet needs a current rabies vaccination.',
+    },
+    {
       key: 'pet_notes',
       label: 'Anything else about your pet?',
       type: 'textarea',
@@ -228,6 +247,45 @@ const CARE: DetailSection = {
         { value: 'through', label: 'Door through door — walked inside and handed over' },
       ],
       help: 'Door through door takes the driver longer and is quoted accordingly.',
+    },
+    // Wheelchair rides (Muse, 2026-11-13): the form asked nothing about the chair, so the right
+    // vehicle and securement had to be worked out by phone. These are about the CHAIR and how the
+    // rider boards. Nothing here asks why the rider uses one.
+    {
+      key: 'wheelchair_type',
+      label: 'Type of wheelchair',
+      type: 'select',
+      required: true,
+      half: true,
+      whenMobility: ['wheelchair'],
+      options: [
+        { value: 'manual', label: 'Manual wheelchair' },
+        { value: 'power', label: 'Power wheelchair' },
+        { value: 'scooter', label: 'Mobility scooter' },
+        { value: 'transport', label: 'Transport chair' },
+        { value: 'unsure', label: 'Not sure' },
+      ],
+    },
+    {
+      key: 'wheelchair_boarding',
+      label: 'During the ride, the rider',
+      type: 'select',
+      required: true,
+      half: true,
+      whenMobility: ['wheelchair'],
+      options: [
+        { value: 'stays', label: 'Stays in the wheelchair' },
+        { value: 'transfers', label: 'Moves to a vehicle seat with help' },
+        { value: 'unsure', label: 'Not sure' },
+      ],
+    },
+    {
+      key: 'wheelchair_notes',
+      label: 'Anything about the chair we should know?',
+      type: 'text',
+      max: 160,
+      whenMobility: ['wheelchair'],
+      help: 'For example: extra wide, reclining, a tall back, or a bag or tank holder attached.',
     },
     { key: 'pickup_steps', label: 'Steps at the pickup door', type: 'select', options: STEPS, half: true },
     {
@@ -533,8 +591,13 @@ export function detailsFor(service: string): DetailSection | null {
   return TRIP_DETAILS[service as ServiceLine] ?? null;
 }
 
+/** What a field's visibility can depend on besides the other answers. */
+export type DetailContext = { passengers?: number; mobility?: string | null };
+
 /** Whether a conditional field is currently in play. */
-export function fieldVisible(field: DetailField, values: Record<string, string>): boolean {
+export function fieldVisible(field: DetailField, values: Record<string, string>, ctx: DetailContext = {}): boolean {
+  if (field.whenPassengersOver !== undefined && (ctx.passengers ?? 1) <= field.whenPassengersOver) return false;
+  if (field.whenMobility && !field.whenMobility.includes(ctx.mobility ?? '')) return false;
   if (!field.showWhen) return true;
   return field.showWhen.equals.includes(values[field.showWhen.key] ?? '');
 }
@@ -564,7 +627,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
  *      clamped to the declared bounds, selects must match a declared option.
  *      This column is rendered in the ops queue and in email.
  */
-export function validateDetails(service: string, raw: unknown): DetailValidation {
+export function validateDetails(service: string, raw: unknown, ctx: DetailContext = {}): DetailValidation {
   const section = detailsFor(service);
   if (!section) return { ok: true, values: {} };
 
@@ -583,7 +646,7 @@ export function validateDetails(service: string, raw: unknown): DetailValidation
   const errors: Record<string, string> = {};
 
   for (const field of section.fields) {
-    if (!fieldVisible(field, asText)) continue;
+    if (!fieldVisible(field, asText, ctx)) continue;
 
     const rawValue = input[field.key];
     const text = asText[field.key]!.trim();

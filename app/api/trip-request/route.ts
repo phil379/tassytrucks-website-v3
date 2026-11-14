@@ -143,8 +143,14 @@ export async function POST(request: Request) {
     ? rateLimit(`trip-request:facility:${ip}`, FACILITY_REQUESTS_PER_HOUR, 60 * 60 * 1000)
     : rateLimit(`trip-request:${ip}`, REQUESTS_PER_IP_PER_HOUR, 60 * 60 * 1000);
   if (!limit.ok) {
+    // Say how long. "Too many requests" alone left a tester retrying blind for 16 minutes
+    // (Muse, 2026-11-13). The limit is per connection, so a busy office can share one.
+    const minutes = Math.max(1, Math.ceil(limit.retryAfterSeconds / 60));
     return NextResponse.json(
-      { ok: false, error: 'Too many requests. Please call us at (704) 941-8508.' },
+      {
+        ok: false,
+        error: `We have had several requests from this connection in the last hour. Please try again in about ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}, or call us at (704) 941-8508 and we will book it for you now.`,
+      },
       { status: 429, headers: { 'Retry-After': String(limit.retryAfterSeconds) } },
     );
   }
@@ -213,7 +219,7 @@ export async function POST(request: Request) {
   // as the legacy single `contactName` field: keep the old shape working.
   const suppliedDetails = data.tripDetails !== undefined && data.tripDetails !== null;
   const detailCheck: DetailValidation = suppliedDetails
-    ? validateDetails(data.serviceLine, data.tripDetails)
+    ? validateDetails(data.serviceLine, data.tripDetails, { passengers: data.passengers, mobility: data.mobility })
     : { ok: true, values: {} };
 
   if (!detailCheck.ok) {

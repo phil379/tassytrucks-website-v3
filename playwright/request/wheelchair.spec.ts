@@ -30,7 +30,7 @@ function whenValue() {
 }
 
 const DETAILS: Record<string, Record<string, string>> = {
-  care: { rider_is: 'self', assistance: 'door' },
+  care: { rider_is: 'self', assistance: 'door', wheelchair_type: 'manual', wheelchair_boarding: 'stays' },
   recovery: { patient_is: 'self', responsible_adult: 'me', support_to_car: 'wheelchair' },
   concierge: { occasion: 'airport' },
 };
@@ -109,6 +109,8 @@ test.describe('switch OFF (today): wheelchair is booked at the card price', () =
     await fillWhen(page, whenValue());
     await page.locator('#details-rider_is').selectOption('self');
     await page.locator('#details-assistance').selectOption('door');
+    await page.locator('#details-wheelchair_type').selectOption('manual');
+    await page.locator('#details-wheelchair_boarding').selectOption('stays');
     await page.locator('#careIntake-dob').fill('1950-03-02');
     await page.locator('#contactFirstName').fill('Pat');
     await page.locator('#contactLastName').fill('Tester');

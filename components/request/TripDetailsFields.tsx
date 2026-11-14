@@ -32,8 +32,14 @@ export default function TripDetailsFields({
   values,
   errors,
   onChange,
+  passengers,
+  mobility,
 }: {
   service: string;
+  /** The Pets / Passengers count from the form; some questions only apply above one. */
+  passengers?: number;
+  /** The form's Mobility answer; the wheelchair questions follow it. */
+  mobility?: string;
   values: Record<string, string>;
   /** Keyed by the plain field key, not the `details.` prefixed path. */
   errors: Record<string, string>;
@@ -42,7 +48,7 @@ export default function TripDetailsFields({
   const section: DetailSection | null = detailsFor(service);
   if (!section) return null;
 
-  const visible = section.fields.filter((f) => fieldVisible(f, values));
+  const visible = section.fields.filter((f) => fieldVisible(f, values, { passengers, mobility }));
 
   return (
     <fieldset className="rounded-xl border border-line p-4 sm:p-5">

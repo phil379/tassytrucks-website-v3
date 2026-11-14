@@ -100,7 +100,10 @@ export function validateDate(masked: string, min: string, max: string): { date: 
   if (!/^\d{2}\/\d{2}\/(\d{2}|\d{4})$/.test(masked)) return invalid;
   const iso = parsePastedDate(masked);
   if (!iso) return invalid;
-  if (min && iso < min) return { error: 'That date has passed. Pick a date from today on.' };
+  // The earliest date is named, not "today": past 8pm the 4-hour lead pushes the earliest
+  // date to tomorrow, and "that date has passed" reads as a bug to a rider looking at a
+  // calendar that still shows today. (Muse re-test, 2026-11-13.)
+  if (min && iso < min) return { error: `Pick a date from ${toUsDate(min)} on.` };
   if (max && iso > max) return { error: 'We book up to one year ahead. Pick an earlier date.' };
   return { date: iso };
 }

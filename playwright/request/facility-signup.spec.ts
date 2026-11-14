@@ -115,6 +115,36 @@ test('the client contract: success requires an id, not just ok', async ({ page }
   await expect(page.getByText(/check your (email|inbox)/i)).toHaveCount(0);
 });
 
+test('the client contract: a duplicate email shows "already have an account", not a setup screen', async ({ page }) => {
+  // Muse lifecycle test, 2026-11-13: a signup with an email that already
+  // belongs to a facility used to render "Check your inbox — finish setting
+  // up", which names an account that does not exist and opens the existing
+  // facility's welcome page. The route now answers created:false and sends a
+  // sign-in link; the form must say so.
+  await page.route('**/api/facility-signup', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: true,
+        id: '11111111-2222-3333-4444-555555555555',
+        stored: true,
+        created: false,
+        emailSent: true,
+      }),
+    }),
+  );
+
+  await page.goto('/partners/signup');
+  await page.locator('#facilityName').fill('Pw Facility Duplicate');
+  await page.locator('#workEmail').fill(`pw-ui@${TEST_DOMAIN}`);
+  await page.getByRole('button', { name: /get started|request|continue/i }).first().click();
+
+  await expect(page.getByText(/already have an account/i)).toBeVisible();
+  await expect(page.getByText(/finish setting up/i)).toHaveCount(0);
+  await expect(page.getByText(/check your inbox/i)).toHaveCount(0);
+});
+
 // ── Bot checks ───────────────────────────────────────────────────────────────
 
 test('hp_token filled is rejected and stores nothing', async ({ request, playwright }) => {

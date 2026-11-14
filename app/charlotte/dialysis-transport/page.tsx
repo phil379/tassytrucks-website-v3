@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { seoRequest } from '@/lib/request-links';
+import { partnerSignup } from '@/lib/partner-links';
 import { SERVICE_AREA } from '@/lib/copy';
 
 export const metadata: Metadata = {
@@ -142,8 +143,12 @@ export default function DialysisTransportPage() {
                 <Link href="/partners" className="underline decoration-[color:var(--gold)] underline-offset-2">
                   facility partnership page
                 </Link>{' '}
-                explains how to set that up, or email book@tassytrucks.com
-                and we will walk you through it.
+                explains how to set that up. You can also{' '}
+                <Link href={partnerSignup({ source: 'dialysis-page' })} className="underline decoration-[color:var(--gold)] underline-offset-2">
+                  set up your facility account
+                </Link>{' '}
+                directly, or email book@tassytrucks.com and we will walk you
+                through it.
               </p>
             </>
           ),

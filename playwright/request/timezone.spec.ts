@@ -75,6 +75,8 @@ test.describe('lead-time validation agrees with what the customer picked', () =>
     passengers: 1,
     contactName: 'Test Person',
     contactPhone: '555-0100',
+    // Email is required on a rider booking (Muse lifecycle test, 2026-11-13).
+    contactEmail: 'test@example.com',
     preferredContact: 'phone',
   };
 

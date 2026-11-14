@@ -103,12 +103,28 @@ export async function POST(request: Request) {
     const base = process.env.NEXT_PUBLIC_SITE_URL ?? '';
     const link = await generateFacilityMagicLink(workEmail, `${base}/facility/confirm`);
 
-    await sendRichEmail({
-      to: workEmail,
-      subject: 'Finish setting up your Tassy Transportation account',
-      html: welcomeHtml(facilityName, link),
-      text: welcomeText(facilityName, link),
-    });
+    // Muse lifecycle test, 2026-11-13: a signup with an email that already
+    // belongs to a facility used to get the same "Finish setting up {new name}"
+    // mail, which names an account that does not exist and opens the EXISTING
+    // facility's welcome page — the signer could overwrite it. A duplicate
+    // email gets a sign-in mail instead: it says an account already exists for
+    // this work email and sends the same magic link, without naming the new
+    // facility. The response shape and the operator alert are unchanged.
+    if (created) {
+      await sendRichEmail({
+        to: workEmail,
+        subject: 'Finish setting up your Tassy Transportation account',
+        html: welcomeHtml(facilityName, link),
+        text: welcomeText(facilityName, link),
+      });
+    } else {
+      await sendRichEmail({
+        to: workEmail,
+        subject: 'Your Tassy Transportation facility sign-in link',
+        html: signinHtml(link),
+        text: signinText(link),
+      });
+    }
     emailSent = true;
   } catch (err) {
     console.error('[facility-signup] magic link/email failed:', err instanceof Error ? err.message : err);
@@ -178,6 +194,55 @@ function welcomeText(facilityName: string, link: string): string {
     '',
     'This link works once and expires. If it has, reply and we will send another.',
     'Prefer to talk it through? Call dispatch on (704) 941-8508.',
+    '',
+    emailIdentityText(),
+  ].join('\n');
+}
+
+/**
+ * Sent when the work email already belongs to a facility. Names no facility —
+ * the name typed on this signup may not be the name on the existing account —
+ * and says plainly that the account already exists, so nobody opens the
+ * welcome page thinking they are setting up a new one.
+ */
+function signinHtml(link: string): string {
+  return `
+<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:520px;margin:0 auto;color:#13161B">
+  <p style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#878D97;margin:0 0 6px">
+    Tassy Transportation
+  </p>
+  <h1 style="font-size:22px;margin:0 0 16px">Your facility account already exists</h1>
+  <p style="line-height:1.6;margin:0 0 20px">
+    An account already exists for this work email. Use the button below to
+    sign in to it — there is no password to remember.
+  </p>
+  <p style="margin:0 0 24px">
+    <a href="${link}" style="display:inline-block;background:#C8A96A;color:#13161B;
+       text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:600">
+      Sign in to your facility account
+    </a>
+  </p>
+  <p style="line-height:1.6;color:#5F6773;font-size:13px;margin:0 0 8px">
+    This link works once and expires. If it has, reply to this email and we will send another.
+  </p>
+  <p style="line-height:1.6;color:#5F6773;font-size:13px;margin:0">
+    If you meant to set up a different facility, call dispatch on (704) 941-8508.
+  </p>
+  <p style="line-height:1.6;color:#878D97;font-size:12px;margin:16px 0 0">${emailIdentityText()}</p>
+</div>`.trim();
+}
+
+function signinText(link: string): string {
+  return [
+    'Your facility account already exists',
+    '',
+    'An account already exists for this work email. Use the link below to sign',
+    'in to it — there is no password to remember.',
+    '',
+    link,
+    '',
+    'This link works once and expires. If it has, reply and we will send another.',
+    'If you meant to set up a different facility, call dispatch on (704) 941-8508.',
     '',
     emailIdentityText(),
   ].join('\n');

@@ -274,6 +274,15 @@ const tripRequestObject = z
     preferredContact: z.enum(PREFERRED_CONTACT).default('phone'),
 
     /**
+     * Whether this came from the facility portal (/facility/request). Only
+     * routes the email rule below: a facility booking is invoiced to the
+     * facility, so the rider email stays optional there. The route reads the
+     * same flag off the raw body for auth; keeping it in the parsed data means
+     * the rule and the route cannot disagree about which booking this is.
+     */
+    facilityBooking: z.boolean().optional(),
+
+    /**
      * Optional, unchecked by default. See lib/sms-consent.ts. A strict boolean on purpose:
      * z.coerce.boolean() would turn the string "false" into true, and a text sent to
      * someone who said no is a TCPA problem, not a bug.
@@ -350,12 +359,27 @@ const tripRequestObject = z
       }
     }
 
-    if (data.preferredContact === 'email' && !data.contactEmail) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['contactEmail'],
-        message: 'Add an email address, or choose phone or text instead',
-      });
+    // A rider booking without an email cannot be confirmed: dispatch confirms
+    // the price by emailing a secure pay link, and there is no other channel
+    // for it. (Muse lifecycle test, 2026-11-13: T-20261113-0012 was booked with
+    // no email and sat undispatchable — "Quote it first" with nowhere to send
+    // the quote.) Facility bookings are invoiced to the facility, so the rider
+    // email stays optional there — except when the booker asked to be reached
+    // by email, which is the old rule, kept for that case.
+    if (!data.contactEmail) {
+      if (!data.facilityBooking) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['contactEmail'],
+          message: 'Add an email address — it is how we send your secure pay link and receipt',
+        });
+      } else if (data.preferredContact === 'email') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['contactEmail'],
+          message: 'Add an email address, or choose phone or text instead',
+        });
+      }
     }
 
     // Concierge carries up to 6 riders (Phil, 2026-10-14). The form caps the

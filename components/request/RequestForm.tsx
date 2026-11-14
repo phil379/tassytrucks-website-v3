@@ -1382,8 +1382,24 @@ export default function RequestForm({
         <div>
           <label className={labelCls} htmlFor="contactEmail">
             Email
+            {/* Required on a rider booking: the pay link and receipt go here.
+                A facility booking is invoiced to the facility, so it stays
+                optional there (the facility's email is prefilled below). */}
+            {!facility && (
+              <>
+                {' '}
+                <span aria-hidden="true">*</span>
+                <span className="sr-only">(required)</span>
+              </>
+            )}
           </label>
-          <input {...fieldProps('contactEmail')} type="email" autoComplete="email" defaultValue={facility?.contact?.email ?? ''} />
+          <input
+            {...fieldProps('contactEmail')}
+            type="email"
+            autoComplete="email"
+            defaultValue={facility?.contact?.email ?? ''}
+            required={!facility}
+          />
           <FieldError name="contactEmail" />
         </div>
       </div>

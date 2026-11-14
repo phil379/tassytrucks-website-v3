@@ -78,7 +78,10 @@ function validPayload(marker: string) {
     // works for anything already integrated against the old API.
     contactName: 'Playwright Test',
     contactPhone: '704-555-0142',
-    contactEmail: '',
+    // Email is required on a rider booking (Muse lifecycle test, 2026-11-13):
+    // the base payload has to carry one or every DB-backed test in this file
+    // fails validation before it reaches the route.
+    contactEmail: 'playwright@example.com',
     preferredContact: 'phone',
     hp_token: '',
     source: '/request?utm_source=playwright',
@@ -101,6 +104,9 @@ async function fillMinimalValidForm(page: import('@playwright/test').Page) {
   await page.locator('#contactFirstName').fill('Playwright');
   await page.locator('#contactLastName').fill('Test');
   await page.locator('#contactPhone').fill('704-555-0142');
+  // Email is required on a rider booking, so the minimal form has to fill it
+  // to reach the submit at all.
+  await page.locator('#contactEmail').fill('playwright@example.com');
 
   // Per-service detail fields. Tassy Care requires two; they render as
   // `details-<key>` (components/request/TripDetailsFields.tsx:90).

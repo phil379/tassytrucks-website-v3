@@ -53,7 +53,12 @@ test.describe('date and time', () => {
     await date.fill('');
     await date.pressSequentially('01/02/2020');
     await page.locator('#contactFirstName').click();
-    await expect(page.getByTestId('requestedAt-date-error')).toHaveText('That date has passed. Pick a date from today on.');
+    // The error names the earliest date: past 8pm the 4-hour lead pushes it to tomorrow,
+    // and "that date has passed" read as a bug. The exact date is the test day + 4h in
+    // Charlotte time, so the shape is asserted, not the day.
+    await expect(page.getByTestId('requestedAt-date-error')).toHaveText(
+      /Pick a date from \d{2}\/\d{2}\/\d{4} on\./,
+    );
     await date.fill('');
     await date.pressSequentially(f.slash);
     await expect(page.getByTestId('requestedAt-date-error')).toHaveCount(0);
@@ -216,18 +221,21 @@ test.describe('with address suggestions', () => {
   });
 });
 
-test('Winnie: a second pet brings up a box for the other pets, and one pet hides it again', async ({ page }) => {
+test('Winnie: a second pet brings up its own structured questions, and one pet hides them again', async ({ page }) => {
   await page.goto('/request?service=winnie');
-  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+  await expect(page.locator('#details-pet_2_name')).toHaveCount(0);
   await page.locator('#passengers').fill('2');
-  await expect(page.locator('#details-other_pets')).toBeVisible();
-  await expect(page.locator('label[for=details-other_pets]')).toContainText('Your other pets');
+  await expect(page.locator('#details-pet_2_name')).toBeVisible();
+  await expect(page.locator('label[for=details-pet_2_name]')).toContainText("Second pet's name");
+  await expect(page.locator('#details-pet_2_species')).toBeVisible();
+  await expect(page.locator('#details-pet_2_rabies')).toBeVisible();
+  await expect(page.locator('#details-pet_2_carrier')).toBeVisible();
   await page.locator('#passengers').fill('1');
-  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+  await expect(page.locator('#details-pet_2_name')).toHaveCount(0);
   // Not a Winnie question: Care with two riders never shows it.
   await page.goto('/request?service=care');
   await page.locator('#passengers').fill('2');
-  await expect(page.locator('#details-other_pets')).toHaveCount(0);
+  await expect(page.locator('#details-pet_2_name')).toHaveCount(0);
 });
 
 test('wheelchair: the chair questions appear only for a wheelchair ride', async ({ page }) => {

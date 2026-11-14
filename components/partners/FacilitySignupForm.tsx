@@ -44,6 +44,11 @@ export default function FacilitySignupForm({
   // for an email nobody had sent, and nothing on our side said to follow up.
   const [emailSent, setEmailSent] = useState(true);
   const [sentTo, setSentTo] = useState('');
+  // The API answers created:false when the work email already belongs to a
+  // facility. The route then sends a sign-in link, not a setup link — the
+  // success screen has to say the same, or the signer opens the welcome page
+  // expecting a new account. (Muse lifecycle test, 2026-11-13.)
+  const [alreadyExists, setAlreadyExists] = useState(false);
 
   /** When the form was rendered. The difference at submit is the bot signal. */
   const renderedAtRef = useRef<number>(Date.now());
@@ -103,6 +108,7 @@ export default function FacilitySignupForm({
       // Default to false: a response that does not say the mail went is not a
       // response that says it did.
       setEmailSent(json.emailSent === true);
+      setAlreadyExists(json.created === false);
       setDone(json.id);
     } catch {
       setFormError('We could not reach the server. Please call (704) 941-8508.');
@@ -128,6 +134,27 @@ export default function FacilitySignupForm({
           </p>
           <p className="mt-4 text-sm text-[color:var(--muted)]">
             Do not fill this form in again — your account is already on our side.
+          </p>
+        </div>
+      );
+    }
+
+    // The work email already belongs to a facility. The route emailed a
+    // sign-in link, not a setup link — say so plainly, so nobody opens the
+    // welcome page expecting a new account.
+    if (alreadyExists) {
+      return (
+        <div className="card-tile p-8 text-center" role="status" aria-live="polite">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />
+          <h2 className="serif text-2xl font-semibold mt-4">Already have an account</h2>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--muted)]">
+            An account already exists for <strong>{sentTo}</strong>. We emailed
+            you a fresh sign-in link — open it to get back into your facility
+            account.
+          </p>
+          <p className="mt-4 text-sm text-[color:var(--muted)]">
+            If you meant to set up a different facility, call dispatch on{' '}
+            <a className="underline" href="tel:+17049418508">(704) 941-8508</a>.
           </p>
         </div>
       );

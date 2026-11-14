@@ -23,6 +23,6 @@ assert.deepEqual(v('11/14/26'), { date: '2026-11-14' });
 assert.deepEqual(v('11/14/0261'), { error: 'Enter a valid date, for example 11/13/2026.' });
 assert.deepEqual(v('02/30/2027'), { error: 'Enter a valid date, for example 11/13/2026.' });
 assert.deepEqual(v('11/1'), { error: 'Enter a valid date, for example 11/13/2026.' });
-assert.deepEqual(v('11/12/2026'), { error: 'That date has passed. Pick a date from today on.' });
+assert.deepEqual(v('11/12/2026'), { error: 'Pick a date from 11/13/2026 on.' });
 assert.deepEqual(v('12/01/2027'), { error: 'We book up to one year ahead. Pick an earlier date.' });
 console.log('date-field: ok');

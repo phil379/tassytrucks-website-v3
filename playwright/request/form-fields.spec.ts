@@ -74,6 +74,9 @@ const base = {
   contactFirstName: 'Maria',
   contactLastName: 'Santos',
   contactPhone: '704-555-0142',
+  // Email is required on a rider booking (Muse lifecycle test, 2026-11-13),
+  // so the shared base has to carry one or the "accepted" cases fail here.
+  contactEmail: 'maria@example.com',
   preferredContact: 'phone',
 };
 

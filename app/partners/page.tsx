@@ -23,7 +23,7 @@ export default function PartnersPage() {
       h1="Partner with Tassy Transportation — Charlotte's SDVOSB Medical Transport"
       heroSubtitle="A contracted transport partner for discharge planners and facility coordinators who are tired of chasing no-show rides — with one dispatch line, one portal, and one invoice."
       quickAnswer="Tassy Transportation partners with Charlotte-area hospitals, dialysis centers, and assisted-living facilities to provide reliable non-emergency medical transport (NEMT) and concierge transport. We are SDVOSB certified. A dispatcher usually confirms your driver and your price within 2 hours during business hours."
-      ctaText="Schedule a 15-min intro call"
+      ctaText="Set up your facility account"
       ctaHref={CTA_HREF}
       secondaryCta={{
         label: 'Email us',

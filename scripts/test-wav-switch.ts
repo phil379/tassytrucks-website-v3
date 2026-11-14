@@ -110,6 +110,7 @@ await t('a wheelchair booking is valid on Care, Recovery and Concierge and carri
       serviceLine, mobility: 'wheelchair', pickupAddress: '100 N Tryon St, Charlotte, NC 28202',
       dropoffAddress: '1000 Blythe Blvd, Charlotte, NC 28203', requestedAt: '2099-01-05T10:00',
       contactFirstName: 'QA', contactLastName: 'Probe', contactPhone: '7045550100',
+      contactEmail: 'qa@example.com',
     });
     assert.ok(ok.success, `${serviceLine} + wheelchair is a valid booking`);
   }

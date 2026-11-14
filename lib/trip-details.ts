@@ -128,6 +128,74 @@ const SPECIES = [
   { value: 'other', label: 'Other' },
 ] as const;
 
+/** Shared by the first pet and every extra pet, so the answers stay identical. */
+const RABIES_OPTIONS = [
+  { value: 'current', label: 'Current' },
+  { value: 'due', label: 'Expired or due' },
+  { value: 'unsure', label: 'Not sure' },
+] as const;
+
+const CARRIER_OPTIONS = [
+  { value: 'owner', label: 'We have our own' },
+  { value: 'need', label: 'Please bring one' },
+  { value: 'none', label: 'Travels without one' },
+] as const;
+
+const TEMPERAMENT_OPTIONS = [
+  { value: 'calm', label: 'Calm — happy with new people' },
+  { value: 'shy', label: 'Shy or anxious' },
+  { value: 'reactive', label: 'Reactive — needs careful handling' },
+  { value: 'first_time', label: 'Never been transported before' },
+  { value: 'unsure', label: 'Not sure' },
+] as const;
+
+const ORDINALS = ['Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth'] as const;
+
+/**
+ * One structured group per extra pet (pets 2–8).
+ *
+ * Muse re-test, 2026-11-13: the free-text "Your other pets" box could not carry
+ * what dispatch needs per animal — rabies status and carrier — so the second pet
+ * reached dispatch as a name in a sentence. Each extra pet now gets the same five
+ * questions as the first (name, species, rabies, carrier, temperament), keyed
+ * pet_2_* … pet_8_*, shown only while the Pets count is above that pet's number.
+ * Rows stored under the old free-text `other_pets` key still render: describeDetails
+ * below falls back to the raw key for anything no longer in the spec.
+ */
+function extraPetFields(n: number): DetailField[] {
+  const ordinal = ORDINALS[n - 2]!;
+  const over = n - 1;
+  return [
+    { key: `pet_${n}_name`, label: `${ordinal} pet's name`, type: 'text', required: true, max: 60, half: true, whenPassengersOver: over },
+    { key: `pet_${n}_species`, label: `${ordinal} pet's species`, type: 'select', options: SPECIES, required: true, half: true, whenPassengersOver: over },
+    {
+      key: `pet_${n}_rabies`,
+      label: `${ordinal} pet's rabies vaccination`,
+      type: 'select',
+      required: true,
+      half: true,
+      whenPassengersOver: over,
+      options: RABIES_OPTIONS,
+      help: 'We cannot transport without a current rabies vaccination. Bring the record.',
+    },
+    {
+      key: `pet_${n}_carrier`,
+      label: `${ordinal} pet's carrier or crate`,
+      type: 'select',
+      required: true,
+      whenPassengersOver: over,
+      options: CARRIER_OPTIONS,
+    },
+    {
+      key: `pet_${n}_temperament`,
+      label: `${ordinal} pet's temperament`,
+      type: 'select',
+      whenPassengersOver: over,
+      options: TEMPERAMENT_OPTIONS,
+    },
+  ];
+}
+
 const PET: DetailSection = {
   title: 'About your pet',
   intro:
@@ -152,11 +220,7 @@ const PET: DetailSection = {
       type: 'select',
       required: true,
       half: true,
-      options: [
-        { value: 'current', label: 'Current' },
-        { value: 'due', label: 'Expired or due' },
-        { value: 'unsure', label: 'Not sure' },
-      ],
+      options: RABIES_OPTIONS,
       help: 'We cannot transport without a current rabies vaccination. Bring the record.',
     },
     {
@@ -171,36 +235,23 @@ const PET: DetailSection = {
       label: 'Carrier or crate',
       type: 'select',
       required: true,
-      options: [
-        { value: 'owner', label: 'We have our own' },
-        { value: 'need', label: 'Please bring one' },
-        { value: 'none', label: 'Travels without one' },
-      ],
+      options: CARRIER_OPTIONS,
     },
     {
       key: 'temperament',
       label: 'How is your pet with strangers?',
       type: 'select',
-      options: [
-        { value: 'calm', label: 'Calm — happy with new people' },
-        { value: 'shy', label: 'Shy or anxious' },
-        { value: 'reactive', label: 'Reactive — needs careful handling' },
-        { value: 'first_time', label: 'Never been transported before' },
-        { value: 'unsure', label: 'Not sure' },
-      ],
+      options: TEMPERAMENT_OPTIONS,
     },
-    {
-      // Muse, Winnie deep-dive 2026-11-13: a booking for two pets stored the count and one pet.
-      // The second animal reached dispatch as a number with no name and no species.
-      key: 'other_pets',
-      label: 'Your other pets',
-      type: 'text',
-      required: true,
-      max: 200,
-      whenPassengersOver: 1,
-      placeholder: 'Milo, cat',
-      help: 'Name and species of each other pet on this ride. Every pet needs a current rabies vaccination.',
-    },
+    // One structured group per extra pet (pets 2–8). Replaces the free-text
+    // "Your other pets" box, which could not carry rabies or carrier per pet.
+    ...extraPetFields(2),
+    ...extraPetFields(3),
+    ...extraPetFields(4),
+    ...extraPetFields(5),
+    ...extraPetFields(6),
+    ...extraPetFields(7),
+    ...extraPetFields(8),
     {
       key: 'pet_notes',
       label: 'Anything else about your pet?',

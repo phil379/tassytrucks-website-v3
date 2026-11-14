@@ -22,6 +22,8 @@ const base = {
   contactFirstName: 'QA',
   contactLastName: 'Probe',
   contactPhone: '7045550100',
+  // Email is required on a rider booking (Muse lifecycle test, 2026-11-13).
+  contactEmail: 'qa@example.com',
 };
 
 const shown = (v: unknown) => {

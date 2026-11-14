@@ -231,26 +231,35 @@ test.describe('breed suggestions', () => {
     }
   });
 
-  // Muse, Winnie deep-dive 2026-11-13: two pets were booked and one was stored.
-  test('more than one pet: the other pets are asked for, required and stored', () => {
-    const field = detailsFor('pet')!.fields.find((f) => f.key === 'other_pets')!;
-    expect(fieldVisible(field, {}, { passengers: 1 })).toBe(false);
-    expect(fieldVisible(field, {})).toBe(false);
-    expect(fieldVisible(field, {}, { passengers: 2 })).toBe(true);
+  // Muse re-test, 2026-11-13: the free-text "Your other pets" box could not
+  // carry rabies or carrier per pet, so each extra pet now gets the same five
+  // structured questions as the first.
+  test('more than one pet: each extra pet gets its own structured questions', () => {
+    const secondName = detailsFor('pet')!.fields.find((f) => f.key === 'pet_2_name')!;
+    expect(fieldVisible(secondName, {}, { passengers: 1 })).toBe(false);
+    expect(fieldVisible(secondName, {})).toBe(false);
+    expect(fieldVisible(secondName, {}, { passengers: 2 })).toBe(true);
+    const thirdName = detailsFor('pet')!.fields.find((f) => f.key === 'pet_3_name')!;
+    expect(fieldVisible(thirdName, {}, { passengers: 2 })).toBe(false);
+    expect(fieldVisible(thirdName, {}, { passengers: 3 })).toBe(true);
 
     const VALID_PET = { pet_name: 'Bo', species: 'dog', rabies: 'current', carrier: 'owner' };
+    const SECOND_PET = { pet_2_name: 'Milo', pet_2_species: 'cat', pet_2_rabies: 'current', pet_2_carrier: 'owner' };
     const missing = validateDetails('pet', VALID_PET, { passengers: 2 });
     expect(missing.ok).toBe(false);
-    if (!missing.ok) expect(missing.errors.other_pets).toBe('Your other pets is required');
+    if (!missing.ok) expect(missing.errors.pet_2_name).toBe("Second pet's name is required");
 
-    const two = validateDetails('pet', { ...VALID_PET, other_pets: 'Milo, cat' }, { passengers: 2 });
+    const two = validateDetails('pet', { ...VALID_PET, ...SECOND_PET }, { passengers: 2 });
     expect(two.ok).toBe(true);
-    expect(two.values.other_pets).toBe('Milo, cat');
+    expect(two.values.pet_2_name).toBe('Milo');
+    expect(two.values.pet_2_species).toBe('cat');
+    expect(two.values.pet_2_rabies).toBe('current');
 
-    // One pet: the answer is not asked for and, if a stale form sends it, not stored.
-    const one = validateDetails('pet', { ...VALID_PET, other_pets: 'Milo, cat' }, { passengers: 1 });
+    // One pet: the second-pet answers are not asked for and, if a stale form
+    // sends them, not stored.
+    const one = validateDetails('pet', { ...VALID_PET, ...SECOND_PET }, { passengers: 1 });
     expect(one.ok).toBe(true);
-    expect(one.values.other_pets).toBeUndefined();
+    expect(one.values.pet_2_name).toBeUndefined();
   });
 
   test('wheelchair ride: chair type and boarding are required; other rides never store them', () => {

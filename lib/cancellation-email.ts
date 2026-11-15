@@ -82,6 +82,22 @@ function esc(s: string | null | undefined): string {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * Exact USD, for the HELD variant only. Whole dollars stay whole ("$40"),
+ * but a non-whole amount shows its cents ("$39.50"). formatUsd rounds to
+ * whole dollars, which made a $79 fare's $39.50 fee and $39.50 remainder
+ * both print as "$40" — and $40 + $40 does not foot to $79 on a
+ * customer-facing email. The refund variant keeps formatUsd, unchanged.
+ */
+function fmtUsdExact(cents: number): string {
+  const rounded = Math.round(cents);
+  const sign = rounded < 0 ? '-' : '';
+  const abs = Math.abs(rounded);
+  const dollars = Math.floor(abs / 100).toLocaleString('en-US');
+  const rem = abs % 100;
+  return rem === 0 ? `${sign}$${dollars}` : `${sign}$${dollars}.${String(rem).padStart(2, '0')}`;
+}
+
 function row(label: string, value: string): string {
   return `
     <tr>
@@ -101,6 +117,10 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
   const held = t.refundHeld === true;
   const fare = formatUsd(t.fareCents ?? t.refundCents);
   const fee = formatUsd(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
+  // Held variant only: exact money, so the fee and the remainder foot to the fare.
+  const refundExact = fmtUsdExact(t.refundCents);
+  const fareExact = fmtUsdExact(t.fareCents ?? t.refundCents);
+  const feeExact = fmtUsdExact(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -147,10 +167,10 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
         <div style="color:${MUTE};font-size:12px;letter-spacing:0.4px;text-transform:uppercase;">
           ${held ? 'To be refunded' : 'Refunded'}
         </div>
-        <div style="color:${INK};font-size:30px;font-weight:700;margin-top:2px;">${esc(refund)}</div>
+        <div style="color:${INK};font-size:30px;font-weight:700;margin-top:2px;">${esc(held ? refundExact : refund)}</div>
         <p style="margin:6px 0 0;color:${MUTE};font-size:13px;line-height:1.5;">
-          ${held ? `Your fare was ${esc(fare)}. After the 50% late-cancellation fee (${esc(fee)}), the
-          remaining ${esc(refund)} will be refunded to the card you paid with by our team — it is
+          ${held ? `Your fare was ${esc(fareExact)}. After the 50% late-cancellation fee (${esc(feeExact)}), the
+          remaining ${esc(refundExact)} will be refunded to the card you paid with by our team — it is
           not automatic, so please allow a few business days for us to process it, then 5–10
           business days to appear on your statement. Questions? Call dispatch and quote your
           confirmation number.` : `Refunded in full to the card you paid with. It can take 5–10 business days to appear on
@@ -223,9 +243,13 @@ export function cancellationText(t: CancelledTrip, data: TripRequestInput): stri
   const held = t.refundHeld === true;
   const fare = formatUsd(t.fareCents ?? t.refundCents);
   const fee = formatUsd(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
+  // Held variant only: exact money, so the fee and the remainder foot to the fare.
+  const refundExact = fmtUsdExact(t.refundCents);
+  const fareExact = fmtUsdExact(t.fareCents ?? t.refundCents);
+  const feeExact = fmtUsdExact(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
   const moneyLines = held
     ? [
-        `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside 4 hours of pickup, our late-cancellation policy applies: a 50% fee (${fee}) is kept from your ${fare} fare, and the remaining ${refund} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
+        `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside 4 hours of pickup, our late-cancellation policy applies: a 50% fee (${feeExact}) is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
       ]
     : [
         `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,

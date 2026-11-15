@@ -83,6 +83,7 @@ function memoryStore(opts: {
   failOn?: keyof RideLinkStore;
 } = {}) {
   const tokens: TokenRow[] = [];
+  const urls: Array<{ tokenId: string; tripId: string; audience: string; url: string; expiresAt: string; revokedAt: string | null }> = [];
   let seq = 0;
   const tripRow = opts.trip === undefined ? trip() : opts.trip;
   const fail = (name: keyof RideLinkStore) => {
@@ -125,8 +126,15 @@ function memoryStore(opts: {
       const r = tokens.find((x) => x.tokenHash === hash);
       return r ? { id: r.id, tripId: r.tripId, expiresAt: r.expiresAt, revokedAt: r.revokedAt } : null;
     },
+    async recordLinkUrl(row) {
+      urls.push({ ...row, revokedAt: null });
+    },
+    async revokeIssued(tripId, audience) {
+      for (const r of tokens) if (r.tripId === tripId && r.audience === audience && !r.revokedAt) r.revokedAt = NOW.toISOString();
+      for (const u of urls) if (u.tripId === tripId && u.audience === audience && !u.revokedAt) u.revokedAt = NOW.toISOString();
+    },
   };
-  return { store, tokens };
+  return { store, tokens, urls };
 }
 
 function tokenOf(url: string): string {
@@ -181,7 +189,7 @@ await t('the token is 32 random bytes in base64url, and only its sha256 is store
   const raw = tokenOf(minted.url);
   assert.equal(tokens.length, 1);
   assert.equal(tokens[0].tokenHash, hashRideToken(raw));
-  assert.ok(!JSON.stringify(tokens).includes(raw), 'the raw token is never written');
+  assert.ok(!JSON.stringify(tokens).includes(raw), 'the raw token is never written to the token table (RLINK records the URL separately, for dispatch)');
 });
 
 await t('the URL carries no name, phone or trip number: just /ride/<token>', async () => {
@@ -314,7 +322,7 @@ await t('first name, vehicle and street are cleaned of anything that is not thos
 
 /* ─────────────────────────────────────────────────── consent */
 
-await t('no consent means nothing is sent and no recipient is returned', async () => {
+await t('no consent means no recipient is returned and nothing is sent — but the link still mints (RLINK)', async () => {
   const cases: Array<[string, Partial<RideTripRecord>]> = [
     ['never opted in', { tripDetails: { family_phone_1: '+17045550177' } }],
     ['opted in = false', { tripDetails: { sms_consent: false, sms_consent_phone: RIDER_PHONE, family_phone_1: '+17045550177' } }],
@@ -326,15 +334,48 @@ await t('no consent means nothing is sent and no recipient is returned', async (
   for (const [label, over] of cases) {
     const row = trip(over);
     assert.deepEqual(rideRecipients(row), [], label);
-    const { store, tokens } = memoryStore({ trip: row });
+    const { store, tokens, urls } = memoryStore({ trip: row });
     const r = await mintRideLink({ store, tripId: TRIP_ID, enabled: true, now: NOW });
-    assert.deepEqual(r, { kind: 'no_recipients' }, label);
-    assert.equal(tokens.length, 0, `${label}: no token minted`);
+    // RLINK (Phil, 2026-11-15): consent gates the TEXT, never the link. The link is minted at
+    // every assignment and its URL recorded for dispatch; recipients [] is how ops knows to
+    // text nobody. Before RLINK this returned { kind: 'no_recipients' } and minted nothing —
+    // a rider who never opted into texts had no ride page at all.
+    assert.equal(r.kind, 'minted', label);
+    assert.deepEqual((r as { recipients: unknown[] }).recipients, [], label);
+    assert.equal(tokens.length, 1, `${label}: the token is minted`);
+    assert.equal(urls.length, 1, `${label}: the URL is recorded for dispatch`);
+    assert.equal(urls[0]!.url, (r as { url: string }).url, label);
   }
-  // The route turns no_recipients into exactly this, and sends nothing itself.
+  // The route answers a mint with the URL and whatever recipients consent allows, and sends nothing itself.
   const route = readFileSync('app/api/internal/ride-link/route.ts', 'utf8');
-  assert.ok(/case 'no_recipients':\s*return NextResponse\.json\(\{ ok: true, url: null, recipients: \[\] \}/.test(route));
+  assert.ok(/case 'minted':\s*return NextResponse\.json\(/.test(route));
   assert.ok(!/twilio|fetch\(/i.test(route), 'the endpoint never sends a text itself');
+});
+
+await t('RLINK: a mint records the URL for dispatch, and replace revokes the old link and mints a fresh one', async () => {
+  const { store, tokens, urls } = memoryStore();
+  const first = await mintFor(store);
+  assert.equal(urls.length, 1);
+  assert.equal(urls[0]!.url, first.url);
+  assert.equal(urls[0]!.tokenId, tokens[0]!.id);
+  assert.equal(urls[0]!.audience, 'rider');
+
+  const second = await mintRideLink({ store, tripId: TRIP_ID, enabled: true, now: NOW, replace: true });
+  assert.equal(second.kind, 'minted');
+  const fresh = second as Extract<typeof second, { kind: 'minted' }>;
+  assert.notEqual(fresh.url, first.url);
+  assert.equal(tokens.length, 2);
+  assert.ok(tokens[0]!.revokedAt, 'the old token is revoked');
+  assert.equal(tokens[1]!.revokedAt, null);
+  assert.equal(urls.length, 2);
+  assert.ok(urls[0]!.revokedAt, 'the old URL row is marked revoked');
+  assert.equal(urls[1]!.url, fresh.url);
+
+  // The old link is dead and the new one shows the ride.
+  assert.deepEqual(await loadRidePage({ store, token: tokenOf(first.url), enabled: true, now: NOW }), { kind: 'neutral' });
+  assert.equal((await loadRidePage({ store, token: tokenOf(fresh.url), enabled: true, now: NOW })).kind, 'ride');
+  // And a plain second call is still already_sent — replace is the only way past the one-link rule.
+  assert.deepEqual(await mintRideLink({ store, tripId: TRIP_ID, enabled: true, now: NOW }), { kind: 'already_sent' });
 });
 
 await t('with consent: the rider, then up to two family numbers, de-duplicated, as +1 numbers', async () => {

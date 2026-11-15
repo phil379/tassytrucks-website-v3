@@ -12,6 +12,8 @@ import type { RideLinkStore, RideTripRecord } from '@/lib/ride-link';
  */
 
 export const RIDE_TOKENS_TABLE = 'ride_tracking_tokens';
+/** RLINK_01: the raw URL of each minted link, kept for TassyOps dispatch (service role only). */
+export const RIDE_LINK_URLS_TABLE = 'ride_link_urls';
 
 type Row = Record<string, unknown>;
 
@@ -98,6 +100,41 @@ export function supabaseRideStore(db: SupabaseClient): RideLinkStore {
         .limit(1);
       if (error) throw new Error(`token issued lookup: ${error.message}`);
       return Array.isArray(data) && data.length > 0;
+    },
+
+    async recordLinkUrl(row) {
+      const { error } = await db.from(RIDE_LINK_URLS_TABLE).insert({
+        token_id: row.tokenId,
+        trip_id: row.tripId,
+        audience: row.audience,
+        url: row.url,
+        expires_at: row.expiresAt,
+      });
+      if (error) throw new Error(`link url insert: ${error.message}`);
+    },
+
+    async revokeIssued(tripId, audience) {
+      // The token half is load-bearing — a failure must stop the replace, so it throws (the
+      // caller turns that into a 503 and nothing is minted).
+      const { error } = await db
+        .from(RIDE_TOKENS_TABLE)
+        .update({ revoked_at: new Date().toISOString() })
+        .eq('trip_id', tripId)
+        .eq('audience', audience)
+        .is('revoked_at', null);
+      if (error) throw new Error(`token revoke: ${error.message}`);
+      // The URL half is bookkeeping. Before RLINK_01 is applied the table does not exist and
+      // there are no URL rows to mark; if it does exist, this stamps the same rows the token
+      // update just revoked, so TassyOps stops offering the dead link. A failure here is logged,
+      // never fatal: worst case the trip page offers a link the ride page itself answers with
+      // the neutral page, and a fresh replace fixes it.
+      const { error: urlError } = await db
+        .from(RIDE_LINK_URLS_TABLE)
+        .update({ revoked_at: new Date().toISOString() })
+        .eq('trip_id', tripId)
+        .eq('audience', audience)
+        .is('revoked_at', null);
+      if (urlError) console.error('[ride-link] link url revoke skipped:', urlError.message);
     },
 
     async findTokenByHash(tokenHash) {

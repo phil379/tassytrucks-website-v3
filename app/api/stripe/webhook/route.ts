@@ -91,10 +91,15 @@ export async function POST(request: Request) {
       console.error('[stripe] a LIVE event was signed with the TEST webhook secret; refused');
       return NextResponse.json({ ok: false, error: 'Live event on the test endpoint' }, { status: 400 });
     }
-    // Test mode covers one thing: paying a test trip. Scholar billing and saved cards are not
-    // part of it, so they are acknowledged and left alone.
+    // Test mode covers paying a test trip — and, since the Scholar card fix, recording a TEST
+    // booking's saved card: a completed setup session carrying the Scholar purpose falls through
+    // to handleEvent, which runs inside withStripeMode('test', …) below and reads the session
+    // back with the test key. A setup session without that purpose is not ours and stays ignored.
+    // Test SUBSCRIPTION and billing events are still acknowledged and left alone: test mode
+    // never moves a standing order's billing state.
     const s = event.data?.object ?? {};
-    if (event.type !== 'checkout.session.completed' || s.mode === 'setup') {
+    const scholarCardSetup = s.mode === 'setup' && s.metadata?.purpose === CARD_SETUP_PURPOSE;
+    if (event.type !== 'checkout.session.completed' || (s.mode === 'setup' && !scholarCardSetup)) {
       return NextResponse.json({ ok: true, ignored: `test mode: ${event.type ?? 'unknown'}` });
     }
   }

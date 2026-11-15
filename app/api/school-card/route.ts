@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
+import { stripeModeForTrip } from '@/lib/stripe-mode';
 import {
   BILLING_STATUS,
   STANDING_ORDERS_TABLE,
@@ -67,6 +68,23 @@ export async function GET(request: Request) {
       .maybeSingle();
     if (!student?.parent_email) return cancelled('unavailable');
 
+    /**
+     * Which Stripe the fresh page belongs to is read off the booking's trips —
+     * the rows that carry is_test_data (lib/stripe-mode.ts). A standing order's
+     * trips all share the flag set at booking, so any one of them answers it.
+     * A test booking gets a TEST-mode page: the "add your card" link in a test
+     * parent's email can never open the live account. No trips found (or the
+     * columns are not there yet) resolves to live — today's behaviour.
+     */
+    const { data: trips } = await db
+      .from(TRIP_REQUESTS_TABLE)
+      .select('is_test_data')
+      .eq('standing_order_id', row.id as string)
+      .limit(400);
+    const mode = stripeModeForTrip({
+      is_test_data: (trips ?? []).some((t) => t.is_test_data === true),
+    });
+
     const card = await startCardSetup(db, {
       standingOrderId: row.id as string,
       studentId: row.student_id as string,
@@ -76,6 +94,7 @@ export async function GET(request: Request) {
       parentPhone: (student.parent_phone as string) ?? '',
       origin: url.origin,
       existingCustomerId: (billing?.stripe_customer_id as string | null) ?? null,
+      mode,
     });
     if (!card) return cancelled('unavailable');
 

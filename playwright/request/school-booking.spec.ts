@@ -23,6 +23,27 @@ function email(tag: string) {
   return `pw-sch-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@${TEST_DOMAIN}`;
 }
 
+/**
+ * The earliest start the API still accepts once the school year is under way: the
+ * next Mon–Fri date after today (America/New_York). A fixed date rots — this spec
+ * once sent '2026-08-24', which was the future when it was written and is a 400
+ * now that the route refuses a start date in the past.
+ */
+function nextSchoolDay(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const day = new Date(Date.UTC(part('year'), part('month') - 1, part('day'), 12));
+  do {
+    day.setUTCDate(day.getUTCDate() + 1);
+  } while (day.getUTCDay() === 0 || day.getUTCDay() === 6);
+  return day.toISOString().slice(0, 10);
+}
+
 /** A complete, valid payload. Individual specs break one thing at a time. */
 function payload(over: Record<string, unknown> = {}) {
   const ts = new Date().toISOString();
@@ -48,7 +69,7 @@ function payload(over: Record<string, unknown> = {}) {
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
     guardian: { accepted: true, ts },
-    starts_on: '2026-08-24',
+    starts_on: nextSchoolDay(),
     standard_household_confirmed: true,
     hp_token: '',
     elapsedMs: 9000,
@@ -316,6 +337,22 @@ test('bot guards reject without telling a script why', async ({ playwright }) =>
   const tooFast = await api.post('/api/school-booking', { data: payload({ elapsedMs: 500 }) });
   expect(tooFast.status()).toBe(200);
   expect((await tooFast.json()).id).toBeNull();
+  await api.dispose();
+});
+
+test('a start date in the past is refused before anything is stored', async ({ playwright }) => {
+  const api = await playwright.request.newContext();
+
+  // The wizard used to send the hardcoded first day of the school year for every
+  // enrollment, so once that day passed, every plan "started" in the past and its
+  // first ride could never happen. The wizard computes a real date now; this pins
+  // the server half — the refusal happens before the student insert, so no rows
+  // exist for a refused booking (which is why this test needs no database).
+  const res = await api.post('/api/school-booking', { data: payload({ starts_on: '2020-01-06' }) });
+  expect(res.status()).toBe(400);
+  const json = await res.json();
+  expect(json.ok).toBe(false);
+  expect(json.error).toMatch(/start date has already passed/i);
   await api.dispose();
 });
 

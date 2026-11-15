@@ -156,6 +156,18 @@ export default defineConfig({
         STRIPE_SECRET_KEY: 'sk_test_pw_stub_not_real',
         STRIPE_API_BASE: 'http://127.0.0.1:3944/v1',
         STRIPE_WEBHOOK_SECRET: 'whsec_pw_test_secret',
+        /**
+         * The test-mode pair (same fake values as the 3943 webhook rig). A Scholar TEST
+         * booking — every parent address in the card spec is one — now runs its card step
+         * in Stripe TEST mode, so this server needs a test key for the app to gate on and
+         * a test webhook secret for the specs to sign test events with. Both point at the
+         * same stub: the stub cannot tell keys apart, the app can, and that split is what
+         * the test-mode specs assert. Without the key here, the return page reads a
+         * cs_test_ session in test mode, finds no test key, and answers "finishing"
+         * where the spec expects "saved".
+         */
+        STRIPE_TEST_SECRET_KEY: 'sk_test_pw_stub_testmode_not_real',
+        STRIPE_TEST_WEBHOOK_SECRET: 'whsec_pw_testmode_secret',
         SCHOOL_BOOKING_RATE_LIMIT: '1000',
         SCHOOL_CARD_RATE_LIMIT: '1000',
         NTFY_TOPIC: 'pw-test-topic',

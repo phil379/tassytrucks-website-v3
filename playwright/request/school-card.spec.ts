@@ -72,6 +72,27 @@ function email(tag: string) {
   return `pw-card-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@${TEST_DOMAIN}`;
 }
 
+/**
+ * The earliest start the API still accepts once the school year is under way: the
+ * next Mon–Fri date after today (America/New_York). A fixed date rots — this spec
+ * once sent '2026-08-24', which was the future when it was written and is a 400
+ * now that the route refuses a start date in the past.
+ */
+function nextSchoolDay(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const day = new Date(Date.UTC(part('year'), part('month') - 1, part('day'), 12));
+  do {
+    day.setUTCDate(day.getUTCDate() + 1);
+  } while (day.getUTCDay() === 0 || day.getUTCDay() === 6);
+  return day.toISOString().slice(0, 10);
+}
+
 function payload(over: Record<string, unknown> = {}, parentOver: Record<string, unknown> = {}) {
   const ts = new Date().toISOString();
   return {
@@ -97,7 +118,7 @@ function payload(over: Record<string, unknown> = {}, parentOver: Record<string, 
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
     guardian: { accepted: true, ts },
-    starts_on: '2026-08-24',
+    starts_on: nextSchoolDay(),
     standard_household_confirmed: true,
     hp_token: '',
     elapsedMs: 9000,
@@ -265,6 +286,59 @@ test('the webhook ignores a setup session that is not ours and an unsigned reque
 
   const unsigned = await api.post('/api/stripe/webhook', { data: other, headers: { 'content-type': 'application/json' } });
   expect(unsigned.status(), 'no signature, no entry').toBe(400);
+  await api.dispose();
+});
+
+/* ── test mode: a test booking's card lives in test Stripe ─────────────────── */
+
+const TEST_MODE_SECRET = 'whsec_pw_testmode_secret';
+
+function signTest(rawBody: string, atSeconds = Math.floor(Date.now() / 1000)) {
+  const v1 = createHmac('sha256', TEST_MODE_SECRET).update(`${atSeconds}.${rawBody}`, 'utf8').digest('hex');
+  return `t=${atSeconds},v1=${v1}`;
+}
+
+test('test endpoint records a test booking\u2019s saved card', async ({ playwright }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  const api = await playwright.request.newContext({ baseURL: ORIGIN });
+  const json = await book(api);
+  const sessionId = sessionIdFrom(json.cardSetupUrl);
+  await fetch(`${STRIPE}/__complete/${sessionId}`, { method: 'POST' });
+
+  // The same completed setup as the live webhook test above, but signed with the TEST
+  // secret and marked livemode:false. Before the Scholar card fix the test endpoint
+  // acknowledged this and recorded nothing; the card now lands, read back in test mode.
+  const body = JSON.stringify({
+    type: 'checkout.session.completed',
+    livemode: false,
+    data: { object: { id: sessionId, mode: 'setup', payment_status: 'no_payment_required', metadata: { purpose: 'scholar_card_on_file' } } },
+  });
+  const res = await api.post('/api/stripe/webhook', { data: body, headers: { 'stripe-signature': signTest(body), 'content-type': 'application/json' } });
+  expect(res.status()).toBe(200);
+  expect((await res.json()).card).toBe('recorded');
+  expect((await orderRow(api, json.standingOrderId)).billing_status).toBe('card_saved');
+  await api.dispose();
+});
+
+test('test endpoint still leaves billing events and other setup sessions alone', async ({ playwright }) => {
+  test.skip(!dbConfigured, 'needs SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY');
+  const api = await playwright.request.newContext({ baseURL: ORIGIN });
+  const json = await book(api);
+
+  const billing = JSON.stringify({ type: 'invoice.payment_failed', livemode: false, data: { object: {} } });
+  const b = await api.post('/api/stripe/webhook', { data: billing, headers: { 'stripe-signature': signTest(billing), 'content-type': 'application/json' } });
+  expect(b.status()).toBe(200);
+  expect((await b.json()).ignored).toContain('test mode');
+  expect((await orderRow(api, json.standingOrderId)).billing_status, 'test mode never moves billing state').toBe('card_pending');
+
+  const other = JSON.stringify({
+    type: 'checkout.session.completed',
+    livemode: false,
+    data: { object: { id: 'cs_test_other', mode: 'setup', metadata: { purpose: 'something_else' } } },
+  });
+  const o = await api.post('/api/stripe/webhook', { data: other, headers: { 'stripe-signature': signTest(other), 'content-type': 'application/json' } });
+  expect(o.status()).toBe(200);
+  expect((await o.json()).ignored).toContain('test mode');
   await api.dispose();
 });
 

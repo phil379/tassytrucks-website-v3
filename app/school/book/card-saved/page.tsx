@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { looksLikeSessionId, recordCardFromSession } from '@/lib/school-billing';
+import { withStripeMode } from '@/lib/stripe';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
@@ -23,11 +24,18 @@ type Outcome = { state: 'saved'; label: string | null } | { state: 'finishing' }
  * immediately; whichever runs second is a harmless no-op. If our database cannot be
  * reached the card is still safe in Stripe and the webhook retries, so that case says
  * "finishing" rather than showing a failure the parent cannot act on.
+ *
+ * The session id names its own Stripe: a test booking's session starts cs_test_ and
+ * can only be read back with the test key (Stripe refuses the cross-read itself), so
+ * the prefix picks the mode and a test parent's return is read from the same account
+ * that issued the page. Live sessions (cs_live_) take the live path, as before.
  */
 async function resolve(sessionId: string | undefined): Promise<Outcome> {
   if (!looksLikeSessionId(sessionId)) return { state: 'unconfirmed' };
   try {
-    const result = await recordCardFromSession(supabaseAdmin(), sessionId);
+    const result = await withStripeMode(sessionId.startsWith('cs_test_') ? 'test' : 'live', () =>
+      recordCardFromSession(supabaseAdmin(), sessionId),
+    );
     if (result.ok) {
       const label = result.last4 ? `${result.brand ? capitalize(result.brand) : 'Card'} ending ${result.last4}` : null;
       return { state: 'saved', label };

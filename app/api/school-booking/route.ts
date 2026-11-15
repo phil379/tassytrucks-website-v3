@@ -13,7 +13,8 @@ import {
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
-import { parseLocalDateTime } from '@/lib/time';
+import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
+import { stripeModeForTrip } from '@/lib/stripe-mode';
 import { fireNotifications } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { classifyHousehold, householdRequestHref } from '@/lib/school-household';
@@ -126,6 +127,23 @@ export async function POST(request: Request) {
   const plan = planBySlug(data.plan);
   if (!plan) {
     return NextResponse.json({ ok: false, error: 'Unknown plan.' }, { status: 400 });
+  }
+
+  /**
+   * A start date in the past books a first ride on a day that has already gone.
+   * The wizard no longer produces one, but the API is the promise, so it is
+   * refused here too — no client, ours or anyone else's, can store one.
+   * "Today" is Charlotte's (the school calendar being booked), not the UTC day
+   * of whatever serverless region happens to run this.
+   */
+  if (data.starts_on < charlotteToday()) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'That start date has already passed, so the plan cannot start then. Please choose a later start date.',
+      },
+      { status: 400 },
+    );
   }
 
   const schedule = resolveSchedule(plan, data);
@@ -244,6 +262,9 @@ export async function POST(request: Request) {
   const returnAt = schedule.return_trip && schedule.return_time
     ? parseLocalDateTime(`${data.starts_on}T${schedule.return_time}:00`)!.toISOString()
     : null;
+  // Computed once: the trip row carries it, and the card step below takes its
+  // Stripe mode from it (lib/stripe-mode.ts) — the two must never disagree.
+  const isTestData = looksLikeTestIdentity(data.parent.email);
   const { data: trip, error: tripErr } = await db
     .from(TRIP_REQUESTS_TABLE)
     .insert({
@@ -255,7 +276,7 @@ export async function POST(request: Request) {
       contact_email: data.parent.email,
       // Same rule as /api/trip-request: a plus-tagged parent address is a test
       // booking and must not reach the dispatch board as a child's ride.
-      is_test_data: looksLikeTestIdentity(data.parent.email),
+      is_test_data: isTestData,
       pickup_address: schedule.pickup_address,
       dropoff_address: schedule.dropoff_address,
       requested_at: requestedAt,
@@ -353,6 +374,10 @@ export async function POST(request: Request) {
       parentEmail: data.parent.email,
       parentPhone: data.parent.phone,
       origin: new URL(request.url).origin,
+      // The card step belongs to the same Stripe as the booking: a test booking's
+      // card is saved in TEST mode (the 4242 card works, and no test parent ever
+      // writes a customer onto the live account). Real bookings are unchanged.
+      mode: stripeModeForTrip({ is_test_data: isTestData }),
     });
     cardSetupUrl = card?.url ?? null;
   }
@@ -370,6 +395,18 @@ export async function POST(request: Request) {
     },
     { status: 200 },
   );
+}
+
+/** Today as YYYY-MM-DD in the operating time zone (Charlotte). */
+function charlotteToday(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: OPERATING_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
 }
 
 type ResolvedSchedule = {

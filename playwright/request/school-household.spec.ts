@@ -40,6 +40,27 @@ const h = () => ({ apikey: SERVICE_KEY!, Authorization: `Bearer ${SERVICE_KEY!}`
 const TEST_DOMAIN = 'pw-household.invalid';
 const uniqueEmail = (tag: string) => `pw-hh-${tag}-${Date.now()}-${Math.floor(Math.random() * 1e4)}@${TEST_DOMAIN}`;
 
+/**
+ * The earliest start the booking API still accepts once the school year is under
+ * way: the next Mon–Fri date after today (America/New_York). A fixed date rots —
+ * this spec once sent '2026-08-24', which was the future when it was written and
+ * is a 400 now that the route refuses a start date in the past.
+ */
+function nextSchoolDay(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const day = new Date(Date.UTC(part('year'), part('month') - 1, part('day'), 12));
+  do {
+    day.setUTCDate(day.getUTCDate() + 1);
+  } while (day.getUTCDay() === 0 || day.getUTCDay() === 6);
+  return day.toISOString().slice(0, 10);
+}
+
 function request(over: Record<string, unknown> = {}) {
   return {
     guardian_name: 'Dana Reed',
@@ -375,7 +396,7 @@ function bookingPayload(over: Record<string, unknown> = {}) {
     schedule: { am: '6:45 AM', pm: '3:15 PM', days: [] },
     policies: Object.fromEntries(SCHOOL_POLICIES.map((p) => [p.key, { accepted: true, ts }])),
     guardian: { accepted: true, ts },
-    starts_on: '2026-08-24',
+    starts_on: nextSchoolDay(),
     standard_household_confirmed: true,
     hp_token: '',
     elapsedMs: 9000,

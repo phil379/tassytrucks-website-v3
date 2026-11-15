@@ -367,9 +367,38 @@ function loadWizardState(planKey: string): Record<string, unknown> | null {
   }
 }
 
-/** First ride defaults to the start of the school year. */
+/** The first day of the 2026–27 school year — the earliest start a plan can have. */
+const SCHOOL_YEAR_START = '2026-08-24';
+
+/**
+ * First ride defaults to the start of the school year while that is still ahead.
+ * Once the year is under way it defaults to the next school day (Mon–Fri) after
+ * today instead: a start date in the past books a first ride on a day that has
+ * already gone, and the booking API now refuses one outright.
+ *
+ * "Today" is Charlotte's, not the visitor's — the school calendar being booked
+ * against is Charlotte's wherever the parent happens to be.
+ */
 function nextSchoolStart(): string {
-  return '2026-08-24';
+  const today = charlotteToday();
+  if (today < SCHOOL_YEAR_START) return SCHOOL_YEAR_START;
+  const day = new Date(`${today}T12:00:00Z`);
+  do {
+    day.setUTCDate(day.getUTCDate() + 1);
+  } while (day.getUTCDay() === 0 || day.getUTCDay() === 6);
+  return day.toISOString().slice(0, 10);
+}
+
+/** Today as YYYY-MM-DD in America/New_York. */
+function charlotteToday(): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
 }
 
 function Field({

@@ -2,10 +2,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   createCardSetupSession,
   createStripeCustomer,
+  currentStripeMode,
   getCheckoutSession,
   getPaymentMethod,
   stripeConfigured,
+  withStripeMode,
 } from '@/lib/stripe';
+import { stripeTestModeReady, type StripeMode } from '@/lib/stripe-mode';
 import type { PlanKey } from '@/lib/school-plans';
 
 /**
@@ -74,6 +77,15 @@ export type CardSetup = { url: string; sessionId: string };
  * Returns null when Stripe is not configured or anything fails; the caller then
  * tells the parent the truth (their booking is saved, we will follow up about the
  * card) instead of pretending a card step happened.
+ *
+ * MODE. The caller decides which Stripe this card step belongs to, from the
+ * booking's is_test_data (lib/stripe-mode.ts) — the same rule as a trip's pay
+ * link. It is passed in, never guessed here, and it defaults to 'live' so every
+ * existing caller keeps today's behaviour. The gate and both Stripe calls run
+ * in that mode: a test booking's setup uses the test key and creates its
+ * customer on the TEST account. Before this parameter existed the step always
+ * ran live, so the Nov 14 test enrollment wrote a customer onto the live
+ * account and the test card could not be saved at all.
  */
 export async function startCardSetup(
   db: SupabaseClient,
@@ -86,33 +98,42 @@ export async function startCardSetup(
     parentPhone: string;
     origin: string;
     existingCustomerId?: string | null;
+    mode?: StripeMode;
   },
 ): Promise<CardSetup | null> {
-  if (!stripeConfigured()) return null;
+  const mode = input.mode ?? 'live';
+  // Gate on the mode's OWN key. A test step with no test key quietly does not
+  // happen; it must never fall back to the live key — that fallback is exactly
+  // the bug this parameter closes.
+  if (mode === 'test' ? !stripeTestModeReady() : !stripeConfigured()) return null;
   try {
     const customerId =
       input.existingCustomerId ||
       (
-        await createStripeCustomer({
-          email: input.parentEmail,
-          name: input.parentName,
-          phone: input.parentPhone,
-          metadata: {
-            standing_order_id: input.standingOrderId,
-            student_id: input.studentId,
-            plan: input.plan,
-          },
-        })
+        await withStripeMode(mode, () =>
+          createStripeCustomer({
+            email: input.parentEmail,
+            name: input.parentName,
+            phone: input.parentPhone,
+            metadata: {
+              standing_order_id: input.standingOrderId,
+              student_id: input.studentId,
+              plan: input.plan,
+            },
+          }),
+        )
       ).id;
 
-    const session = await createCardSetupSession({
-      customerId,
-      standingOrderId: input.standingOrderId,
-      studentId: input.studentId,
-      planKey: input.plan,
-      successUrl: `${input.origin}/school/book/card-saved?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${input.origin}/school/book/card-cancelled?o=${input.standingOrderId}`,
-    });
+    const session = await withStripeMode(mode, () =>
+      createCardSetupSession({
+        customerId,
+        standingOrderId: input.standingOrderId,
+        studentId: input.studentId,
+        planKey: input.plan,
+        successUrl: `${input.origin}/school/book/card-saved?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${input.origin}/school/book/card-cancelled?o=${input.standingOrderId}`,
+      }),
+    );
 
     const { error } = await db
       .from(STANDING_ORDERS_TABLE)
@@ -154,7 +175,12 @@ export async function recordCardFromSession(
   db: SupabaseClient,
   sessionId: string,
 ): Promise<RecordResult> {
-  if (!stripeConfigured()) return { ok: false, reason: 'stripe_not_configured', retry: false };
+  // The gate follows the AMBIENT mode: a caller reading back a test session wraps this in
+  // withStripeMode('test', …) (the return page and the webhook both do), and then it is the
+  // test key that must exist. Outside any mode context this is the live check, as before.
+  if (currentStripeMode() === 'test' ? !stripeTestModeReady() : !stripeConfigured()) {
+    return { ok: false, reason: 'stripe_not_configured', retry: false };
+  }
 
   let session;
   try {

@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { BRIDGE_HEADER, verifyBridgeSignature } from '@/lib/ops-bridge';
-import { refundTrip } from '@/lib/ops-refund';
+import { notifyRefundHeld, refundTrip } from '@/lib/ops-refund';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const bodySchema = z.object({
   tripId: z.string().uuid(),
+  // "held": the cancel held the refund (rider-initiated late cancel, 50%
+  // fee) — no money moves; the call only emails the rider the held
+  // variant of the cancellation email. Absent = refund, as before.
+  outcome: z.enum(['held']).optional(),
 });
 
 /**
@@ -22,6 +26,11 @@ const bodySchema = z.object({
  * rider that their booking was cancelled and their fare refunded. A trip that
  * was never paid, was never cancelled, or was already refunded is refused or
  * reported, never charged twice.
+ *
+ * With outcome: "held" the same call moves no money at all: the refund was
+ * held for the 50% late-cancel fee, and the endpoint only emails the rider
+ * the held variant (fee named, remainder promised by hand) — see
+ * notifyRefundHeld in lib/ops-refund.ts.
  */
 export async function POST(request: Request) {
   const secret = process.env.INTERNAL_NOTIFY_SECRET;
@@ -44,6 +53,18 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (parsed.outcome === 'held') {
+      const held = await notifyRefundHeld({ id: parsed.tripId });
+      if (!held.ok) {
+        const status = held.code === 'not_found' ? 404 : 422;
+        return NextResponse.json({ ok: false, error: held.code }, { status });
+      }
+      return NextResponse.json({
+        ok: true,
+        emailSent: held.emailSent,
+        alreadyNotified: held.alreadyNotified,
+      });
+    }
     const result = await refundTrip({ id: parsed.tripId });
     if (!result.ok) {
       const status = result.code === 'not_found' ? 404 : 422;

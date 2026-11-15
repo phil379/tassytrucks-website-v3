@@ -15,6 +15,13 @@ import { emailFooterHtml, emailFooterText } from '@/lib/business';
  * the rider is never left guessing whether they were charged for a ride that
  * is not happening.
  *
+ * HELD VARIANT (refundHeld on the trip below): when a rider cancels inside
+ * the free-cancel window, policy keeps a 50% fee and the automatic refund is
+ * HELD (the dispatcher refunds the rest by hand in Stripe). No money has
+ * moved when this variant is sent, so its copy must never say a refund
+ * already happened: it says the fee applies and the remainder WILL be
+ * refunded by hand. Sent by notifyRefundHeld in lib/ops-refund.ts.
+ *
  * Same design constraints as the confirmation email (lib/confirmation-email.ts):
  *   - Tables, not flexbox. Outlook renders neither grid nor flex.
  *   - Inline styles only. Gmail strips <style> blocks on most clients.
@@ -41,6 +48,15 @@ export type CancelledTrip = {
   refundCents: number;
   /** Stripe refund id (re_...), for the rider to quote if they call. */
   refundId?: string | null;
+  /**
+   * The refund was HELD (rider-initiated late cancel): no money has moved
+   * yet. refundCents is then the amount that WILL be refunded by hand —
+   * the fare minus the 50% late-cancellation fee — and fareCents is the
+   * fare the rider paid. The copy must never claim the money is back.
+   */
+  refundHeld?: boolean;
+  /** What the rider paid, in cents. Only read when refundHeld is true. */
+  fareCents?: number | null;
 };
 
 function fmtWhen(iso: string | null | undefined): string {
@@ -82,6 +98,9 @@ export function cancellationSubject(t: CancelledTrip, data: TripRequestInput): s
 
 export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): string {
   const refund = formatUsd(t.refundCents);
+  const held = t.refundHeld === true;
+  const fare = formatUsd(t.fareCents ?? t.refundCents);
+  const fee = formatUsd(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -89,7 +108,7 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
 <title>Your trip is cancelled</title></head>
 <body style="margin:0;padding:0;background:${PAPER};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Cancelled. ${esc(t.confirmationCode)} · ${esc(refund)} refunded.
+  Cancelled. ${esc(t.confirmationCode)} · ${held ? 'late-cancellation fee applies.' : `${esc(refund)} refunded.`}
 </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
        style="background:${PAPER};padding:24px 12px;">
@@ -114,8 +133,10 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
     </h1>
     <p style="margin:0;color:${MUTE};font-size:15px;line-height:1.55;">
       Your ${esc(serviceShortName(data.serviceLine))} trip for ${esc(fmtWhen(data.requestedAt))} has been
-      cancelled. You will not be charged for it — we have refunded the full fare to the card you
-      paid with. Keep this email — the confirmation number below is all we need to find you.
+      cancelled. ${held ? `Because the cancellation came inside 4 hours of pickup, our late-cancellation
+      policy applies: a 50% fee is kept from the fare, and the rest will be refunded to the card
+      you paid with by our team.` : `You will not be charged for it — we have refunded the full fare to the card you
+      paid with.`} Keep this email — the confirmation number below is all we need to find you.
     </p>
   </td></tr>
 
@@ -124,12 +145,16 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
            style="border:1px solid ${GOLD};border-radius:12px;background:rgba(200,162,83,0.07);">
       <tr><td style="padding:16px 20px;">
         <div style="color:${MUTE};font-size:12px;letter-spacing:0.4px;text-transform:uppercase;">
-          Refunded
+          ${held ? 'To be refunded' : 'Refunded'}
         </div>
         <div style="color:${INK};font-size:30px;font-weight:700;margin-top:2px;">${esc(refund)}</div>
         <p style="margin:6px 0 0;color:${MUTE};font-size:13px;line-height:1.5;">
-          Refunded in full to the card you paid with. It can take 5–10 business days to appear on
-          your statement, depending on your bank.
+          ${held ? `Your fare was ${esc(fare)}. After the 50% late-cancellation fee (${esc(fee)}), the
+          remaining ${esc(refund)} will be refunded to the card you paid with by our team — it is
+          not automatic, so please allow a few business days for us to process it, then 5–10
+          business days to appear on your statement. Questions? Call dispatch and quote your
+          confirmation number.` : `Refunded in full to the card you paid with. It can take 5–10 business days to appear on
+          your statement, depending on your bank.`}
           ${t.refundId ? `Refund reference: ${esc(t.refundId)}.` : ''}
         </p>
       </td></tr>
@@ -195,11 +220,21 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
 
 export function cancellationText(t: CancelledTrip, data: TripRequestInput): string {
   const refund = formatUsd(t.refundCents);
+  const held = t.refundHeld === true;
+  const fare = formatUsd(t.fareCents ?? t.refundCents);
+  const fee = formatUsd(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
+  const moneyLines = held
+    ? [
+        `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside 4 hours of pickup, our late-cancellation policy applies: a 50% fee (${fee}) is kept from your ${fare} fare, and the remaining ${refund} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
+      ]
+    : [
+        `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,
+        t.refundId ? `Refund reference: ${t.refundId}.` : ``,
+      ];
   const lines = [
     `Your Tassy ${serviceShortName(data.serviceLine)} trip is cancelled.`,
     ``,
-    `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,
-    t.refundId ? `Refund reference: ${t.refundId}.` : ``,
+    ...moneyLines,
     ``,
     `Confirmation: ${t.confirmationCode}`,
     t.tripNumber ? `Trip number: ${t.tripNumber}` : ``,

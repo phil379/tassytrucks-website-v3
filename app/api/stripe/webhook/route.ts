@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { getPaymentMethodLabel, verifyWebhookSignature, withStripeMode } from '@/lib/stripe';
 import { paymentMayMarkPaid, type StripeMode } from '@/lib/stripe-mode';
+import { logWebhookReceipt, logWebhookReceiptForResponse } from '@/lib/webhook-log';
 import { ensureReceiptToken, receiptUrlFor } from '@/lib/receipt-token';
 import { pingTassyOpsEvent } from '@/lib/tassyops-notify';
 import {
@@ -74,13 +75,17 @@ export async function POST(request: Request) {
       ? 'test'
       : null;
   if (!mode) {
+    // A failed signature is still a receipt: it is how a misconfigured endpoint secret (the
+    // stale endpoints Stripe showed erroring at 100% on Nov 15) appears in our own log.
+    await logWebhookReceipt({ kind: 'unknown', status: 'failed', errorMessage: 'Bad signature' });
     return NextResponse.json({ ok: false, error: 'Bad signature' }, { status: 400 });
   }
 
-  let event: { type?: string; livemode?: boolean; data?: { object?: CheckoutSession } };
+  let event: { id?: string; type?: string; livemode?: boolean; data?: { object?: CheckoutSession } };
   try {
     event = JSON.parse(raw);
   } catch {
+    await logWebhookReceipt({ kind: 'unknown', status: 'failed', errorMessage: 'Bad JSON' });
     return NextResponse.json({ ok: false, error: 'Bad JSON' }, { status: 400 });
   }
 
@@ -89,6 +94,12 @@ export async function POST(request: Request) {
     // the two secrets were swapped in the dashboard; refuse it loudly instead of guessing.
     if (event.livemode !== false) {
       console.error('[stripe] a LIVE event was signed with the TEST webhook secret; refused');
+      await logWebhookReceipt({
+        kind: event.type ?? 'unknown',
+        status: 'failed',
+        errorMessage: 'Live event on the test endpoint',
+        metadata: { mode: 'test', event_id: event.id ?? null, livemode: event.livemode ?? null },
+      });
       return NextResponse.json({ ok: false, error: 'Live event on the test endpoint' }, { status: 400 });
     }
     // Test mode covers paying a test trip — and, since the Scholar card fix, recording a TEST
@@ -100,11 +111,28 @@ export async function POST(request: Request) {
     const s = event.data?.object ?? {};
     const scholarCardSetup = s.mode === 'setup' && s.metadata?.purpose === CARD_SETUP_PURPOSE;
     if (event.type !== 'checkout.session.completed' || (s.mode === 'setup' && !scholarCardSetup)) {
-      return NextResponse.json({ ok: true, ignored: `test mode: ${event.type ?? 'unknown'}` });
+      const res = NextResponse.json({ ok: true, ignored: `test mode: ${event.type ?? 'unknown'}` });
+      await logWebhookReceiptForResponse({ event, mode, response: res });
+      return res;
     }
   }
   // Every Stripe lookup below (the card label for the receipt) uses the key that matches.
-  return withStripeMode(mode, () => handleEvent(event, mode));
+  let response: NextResponse;
+  try {
+    response = await withStripeMode(mode, () => handleEvent(event, mode));
+  } catch (e) {
+    // The handler threw: today that propagates and Next answers 500. Log the receipt, then
+    // rethrow, so the response Stripe sees is exactly what it would have been.
+    await logWebhookReceipt({
+      kind: event.type ?? 'unknown',
+      status: 'failed',
+      errorMessage: e instanceof Error ? e.message : 'Handler threw',
+      metadata: { mode, event_id: event.id ?? null, livemode: event.livemode ?? null },
+    });
+    throw e;
+  }
+  await logWebhookReceiptForResponse({ event, mode, response });
+  return response;
 }
 
 async function handleEvent(

@@ -13,6 +13,16 @@ import { OPERATING_TIME_ZONE } from '@/lib/time';
  * public.ride_tracking_tokens, bound to one trip. Nothing in the URL is a name, a phone number or a
  * trip number.
  *
+ * RLINK (Phil, 2026-11-15): the hash-only rule above made a minted link unrecoverable — dispatch
+ * could never see it, copy it, or give it to a rider who lost the text, and because minting was
+ * gated on SMS consent, a rider who never opted into texts got no link at all. Two changes, both
+ * in this file: (1) minting no longer depends on consent — the link is minted at every assignment
+ * and the recipient list only decides who gets TEXTED it (ops still applies every SMS rule);
+ * (2) at mint time the full URL is also recorded in public.ride_link_urls (RLINK_01), a table with
+ * RLS on and no policies, readable only by service-role server functions, so TassyOps dispatch —
+ * behind its staff gate — can view, copy and replace the link. ride_tracking_tokens itself stays
+ * hash-only; the raw URL lives only in that staff-only table and in messages to the rider.
+ *
  * EXPIRY: the link dies 2 hours after the trip ends (completed_at, or the dropped_off / completed
  * event when completed_at was never stamped). Until the trip ends the link stays valid, but never
  * past a hard cap stored on the row: the scheduled pickup + 24 hours (and at least 2 hours from the
@@ -411,6 +421,18 @@ export interface RideLinkStore {
   /** True when a not-revoked link was already issued for this trip and audience (one text per ride). */
   hasIssued(tripId: string, audience: RideAudience): Promise<boolean>;
   findTokenByHash(tokenHash: string): Promise<RideTokenRecord | null>;
+  /**
+   * RLINK: remember the raw URL of a just-minted link in public.ride_link_urls, where TassyOps
+   * dispatch (service role, staff gate) can recover it. Optional: a store without it still mints —
+   * the link simply stays unrecoverable, the pre-RLINK behaviour. mintRideLink treats a failure
+   * here as non-fatal for the same reason.
+   */
+  recordLinkUrl?(row: { tokenId: string; tripId: string; audience: RideAudience; url: string; expiresAt: string }): Promise<void>;
+  /**
+   * RLINK: revoke every live link for one trip + audience (the staff "replace" action). Optional:
+   * without it, a replace request falls back to the one-link rule and answers 'already_sent'.
+   */
+  revokeIssued?(tripId: string, audience: RideAudience): Promise<void>;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -423,7 +445,6 @@ export type MintResult =
   | { kind: 'disabled' }
   | { kind: 'not_found' }
   | { kind: 'not_active' }
-  | { kind: 'no_recipients' }
   | { kind: 'already_sent' }
   | { kind: 'minted'; url: string; recipients: RideRecipient[]; expiresAt: string; audience: RideAudience };
 
@@ -432,12 +453,21 @@ export function isAudience(value: unknown): value is RideAudience {
 }
 
 /**
- * Mint the link for one AUDIENCE of a trip (Phil, 2026-11-12):
+ * Mint the link for one AUDIENCE of a trip (Phil, 2026-11-12; RLINK changes Phil, 2026-11-15):
  *   'rider'   the booker, once the trip is assigned or active; ops may text it at any hour.
  *   'family'  the confirmed family numbers, only while the ride is active (on the way, arrived,
  *             in progress); 'not_active' otherwise.
  * ONE link per audience per ride: a second call returns 'already_sent' and mints nothing, so ops
- * never texts the same people twice. With no consented recipient in the audience, nothing is minted.
+ * never texts the same people twice.
+ *
+ * RLINK: consent no longer decides WHETHER the link exists. The link is minted at every
+ * assignment; `recipients` (possibly empty) only tells ops who may be TEXTED it, and ops applies
+ * every SMS rule itself, exactly as before. A rider who never opted into texts gets a link that
+ * dispatch can see, copy and email — they simply receive no text.
+ *
+ * `replace` is the staff recovery action from the TassyOps trip page: the audience's live link is
+ * revoked and a fresh one minted, so a rider holding the old link sees the neutral page. The trip
+ * status rules above still apply — a finished or cancelled trip gets no link, replace or not.
  * Throws only on a database failure; the route turns that into a 503.
  */
 export async function mintRideLink(opts: {
@@ -447,6 +477,7 @@ export async function mintRideLink(opts: {
   audience?: RideAudience;
   now?: Date;
   token?: string;
+  replace?: boolean;
 }): Promise<MintResult> {
   if (!opts.enabled) return { kind: 'disabled' };
   const audience: RideAudience = opts.audience ?? 'rider';
@@ -460,13 +491,28 @@ export async function mintRideLink(opts: {
   if (audience === 'family' && !isActiveRide(status)) return { kind: 'not_active' };
 
   const recipients = rideRecipients(trip).filter((r) => r.role === audience);
-  if (recipients.length === 0) return { kind: 'no_recipients' };
-  if (await opts.store.hasIssued(trip.id, audience)) return { kind: 'already_sent' };
+  if (opts.replace && opts.store.revokeIssued) {
+    await opts.store.revokeIssued(trip.id, audience);
+  } else if (await opts.store.hasIssued(trip.id, audience)) {
+    return { kind: 'already_sent' };
+  }
 
   const token = opts.token ?? generateRideToken();
   const expiresAt = hardCapExpiry(trip, now).toISOString();
-  await opts.store.insertToken({ tripId: trip.id, tokenHash: hashRideToken(token), expiresAt, audience });
-  return { kind: 'minted', url: rideUrlFor(token), recipients, expiresAt, audience };
+  const { id } = await opts.store.insertToken({ tripId: trip.id, tokenHash: hashRideToken(token), expiresAt, audience });
+  const url = rideUrlFor(token);
+  // RLINK: record the raw URL where dispatch can recover it (public.ride_link_urls, RLINK_01).
+  // Best-effort on purpose: the link itself is minted and valid either way — a missing URL row
+  // (above all before RLINK_01 is applied) only means dispatch cannot copy this one, never that
+  // the rider's link breaks.
+  if (opts.store.recordLinkUrl) {
+    try {
+      await opts.store.recordLinkUrl({ tokenId: id, tripId: trip.id, audience, url, expiresAt });
+    } catch (e) {
+      console.error('[ride-link] link URL not recorded:', (e as Error).message);
+    }
+  }
+  return { kind: 'minted', url, recipients, expiresAt, audience };
 }
 
 export type RidePageResult = { kind: 'neutral' } | { kind: 'ride'; view: RideView };

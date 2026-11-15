@@ -50,6 +50,17 @@ import {
  *     NOT applied here: the cancel flow does not record who asked for it or
  *     apply a time-based fee, and the policy is still a proposal. That is an
  *     open question for Phil (see the PR description).
+ *
+ * THE HELD PATH (notifyRefundHeld, below): the ops cancel flow now DOES
+ * record who asked (PR #163), and when the rider asked inside the free-
+ * cancel window it HOLDS this refund — the dispatcher refunds the rest by
+ * hand in Stripe. But the rider's only cancellation email lived inside
+ * refundTrip, so a held cancel emailed the rider nothing at all (verified
+ * live Nov 15, 2026, trip T-20261115-0001: money held correctly, silence
+ * for the rider). notifyRefundHeld is the no-money companion: same signed
+ * bridge (the route passes outcome: "held"), same email template in its
+ * held variant, and it never touches Stripe and never marks the trip
+ * refunded — the trip stays "paid" until a human refunds the rest.
  */
 
 export const REFUND_ISSUED_ACTION = 'stripe.refund_issued';
@@ -131,6 +142,30 @@ function paidAmountCents(row: Record<string, unknown>): number {
   if (typeof agreed === 'number' && agreed > 0) return agreed;
   if (typeof quoted === 'number' && quoted > 0) return quoted;
   return 0;
+}
+
+/**
+ * The shape the cancellation email template reads. Built from the stored
+ * row rather than a form, so what the customer is sent is what the
+ * database holds. Shared by the refund email and the held-refund email.
+ */
+function emailTripShape(row: any, contactEmail: string) {
+  return {
+    serviceLine: row.service_line,
+    contactFirstName:
+      (row as { contact_first_name?: string | null }).contact_first_name ??
+      (String((row as { contact_name?: string | null }).contact_name ?? '').split(' ')[0] ?? ''),
+    contactLastName: (row as { contact_last_name?: string | null }).contact_last_name ?? '',
+    contactPhone: row.contact_phone,
+    contactEmail,
+    pickupAddress: row.pickup_address,
+    dropoffAddress: row.dropoff_address,
+    requestedAt: row.requested_at,
+    returnTrip: Boolean(row.return_trip),
+    returnAt: row.return_at,
+    passengers: (row as { passengers?: number | null }).passengers ?? 1,
+    mobility: row.mobility,
+  } as Parameters<typeof cancellationHtml>[1];
 }
 
 export async function refundTrip(args: { id: string }): Promise<RefundResult> {
@@ -225,24 +260,7 @@ export async function refundTrip(args: { id: string }): Promise<RefundResult> {
       refundCents: refund.amount,
       refundId: refund.id,
     };
-    // The shape the email template reads. Built from the stored row rather
-    // than a form, so what the customer is sent is what the database holds.
-    const trip = {
-      serviceLine: row.service_line,
-      contactFirstName:
-        (row as { contact_first_name?: string | null }).contact_first_name ??
-        (String((row as { contact_name?: string | null }).contact_name ?? '').split(' ')[0] ?? ''),
-      contactLastName: (row as { contact_last_name?: string | null }).contact_last_name ?? '',
-      contactPhone: row.contact_phone,
-      contactEmail,
-      pickupAddress: row.pickup_address,
-      dropoffAddress: row.dropoff_address,
-      requestedAt: row.requested_at,
-      returnTrip: Boolean(row.return_trip),
-      returnAt: row.return_at,
-      passengers: (row as { passengers?: number | null }).passengers ?? 1,
-      mobility: row.mobility,
-    } as Parameters<typeof cancellationHtml>[1];
+    const trip = emailTripShape(row, contactEmail);
     const subject = `${mode === 'test' ? '[TEST] ' : ''}${cancellationSubject(cancelled, trip)}`;
     try {
       await sendRichEmail({
@@ -267,4 +285,150 @@ export async function refundTrip(args: { id: string }): Promise<RefundResult> {
     emailSent,
     alreadyRefunded: false,
   };
+}
+
+export const REFUND_HELD_ACTION = 'cancel.refund_held_emailed';
+
+export type HeldNotifyResult =
+  | {
+      ok: true;
+      /** The held-refund email reached the rider (or had already gone out). */
+      emailSent: boolean;
+      /** The email was already sent by an earlier call; nothing was re-sent. */
+      alreadyNotified: boolean;
+    }
+  | { ok: false; code: RefundFailure | 'already_refunded' };
+
+/** Has the held-refund email already gone out for this trip? */
+async function heldNoticeRecorded(db: Db, tripId: string): Promise<boolean> {
+  const { data, error } = await db
+    .from(AUDIT_LOG_TABLE)
+    .select('id')
+    .eq('entity_type', 'trip_request')
+    .eq('entity_id', tripId)
+    .eq('action', REFUND_HELD_ACTION)
+    .limit(1);
+  if (error) {
+    console.error('[ops] could not check the held-refund record:', error.message);
+    return false;
+  }
+  return (data?.length ?? 0) > 0;
+}
+
+/**
+ * What this trip was actually charged: the payment record the webhook
+ * left (stripe.payment_recorded carries the charged amount), falling
+ * back to the agreed/quoted fare on the row.
+ */
+async function chargedFareCents(db: Db, tripId: string, row: Record<string, unknown>): Promise<number> {
+  const { data, error } = await db
+    .from(AUDIT_LOG_TABLE)
+    .select('notes')
+    .eq('entity_type', 'trip_request')
+    .eq('entity_id', tripId)
+    .eq('action', PAYMENT_RECORDED_ACTION)
+    .order('created_at', { ascending: true })
+    .limit(1);
+  if (!error) {
+    const parsed = parsePaymentNote((data?.[0] as { notes?: string | null } | undefined)?.notes);
+    if (parsed?.amountCents && parsed.amountCents > 0) return parsed.amountCents;
+  }
+  return paidAmountCents(row);
+}
+
+/**
+ * Email the rider about a HELD refund. The companion to refundTrip for
+ * the one cancel outcome that moves no money: rider-initiated, inside
+ * the free-cancel window, policy keeps a 50% fee and the dispatcher
+ * refunds the rest by hand in Stripe (PR #163). Ops calls this through
+ * the same bridge (outcome: "held") right after recording the cancel.
+ *
+ * It never touches Stripe and never changes the trip: the row stays
+ * cancelled + paid until a human refunds the remainder. The email is
+ * the template's held variant — the fee is named, the remainder is
+ * promised by hand, no refund is claimed and no reference is quoted.
+ * A successful send is recorded in the audit log (REFUND_HELD_ACTION)
+ * and on the trip timeline, and a repeat call answers alreadyNotified
+ * instead of emailing the rider twice.
+ */
+export async function notifyRefundHeld(args: { id: string }): Promise<HeldNotifyResult> {
+  const db = supabaseAdmin();
+  const { data: row, error: readError } = await db
+    .from(TRIP_REQUESTS_TABLE)
+    .select('*')
+    .eq('id', args.id)
+    .maybeSingle();
+  if (readError) throw new Error(readError.message);
+  if (!row) return { ok: false, code: 'not_found' };
+
+  // Same fences as the refund: only a cancelled trip is ever emailed
+  // about its money, and never one whose money already moved.
+  if (row.status !== 'cancelled') return { ok: false, code: 'not_cancelled' };
+  if (row.payment_status === 'refunded') return { ok: false, code: 'already_refunded' };
+  if (row.payment_status !== 'paid') return { ok: false, code: 'not_paid' };
+
+  // One held email per trip: the cancel is recorded once, but a retried
+  // bridge call must not email the rider twice.
+  if (await heldNoticeRecorded(db, args.id)) {
+    return { ok: true, emailSent: true, alreadyNotified: true };
+  }
+
+  const fareCents = await chargedFareCents(db, args.id, row as Record<string, unknown>);
+  const feeCents = Math.round(fareCents / 2);
+  const remainderCents = fareCents - feeCents;
+
+  // The [TEST] prefix follows the same mode rule as the refund email;
+  // no Stripe call is made here, the mode only picks the prefix.
+  const mode = stripeModeForTrip(row as { is_test_data?: unknown });
+
+  let emailSent = false;
+  const contactEmail = (row as { contact_email?: string | null }).contact_email ?? null;
+  if (contactEmail) {
+    const cancelled: CancelledTrip = {
+      confirmationCode: (row as { confirmation_code?: string | null }).confirmation_code ?? '',
+      tripNumber: (row as { trip_number?: string | null }).trip_number ?? null,
+      refundCents: remainderCents,
+      refundId: null,
+      refundHeld: true,
+      fareCents,
+    };
+    const trip = emailTripShape(row, contactEmail);
+    const subject = `${mode === 'test' ? '[TEST] ' : ''}${cancellationSubject(cancelled, trip)}`;
+    try {
+      await sendRichEmail({
+        to: contactEmail,
+        subject,
+        html: cancellationHtml(cancelled, trip),
+        text: cancellationText(cancelled, trip),
+      });
+      emailSent = true;
+    } catch (e) {
+      console.error('[ops] held-refund email failed:', e);
+    }
+  } else {
+    console.warn('[ops] held-refund email skipped: no contact email on trip', args.id);
+  }
+
+  if (emailSent) {
+    // The record that makes a repeat call answer alreadyNotified, and
+    // the timeline line the refund path writes for its own email — a
+    // held cancel must be just as visible on the trip.
+    const { error: auditError } = await db.from(AUDIT_LOG_TABLE).insert({
+      action: REFUND_HELD_ACTION,
+      entity_type: 'trip_request',
+      entity_id: args.id,
+      notes: `fare=${fareCents} fee=${feeCents} remainder=${remainderCents}`,
+    });
+    if (auditError) console.error('[ops] could not record the held-refund email:', auditError.message);
+
+    const { error: eventError } = await db.from('trip_events').insert({
+      trip_id: args.id,
+      event: 'note',
+      actor: 'system:refund-held',
+      notes: `Cancellation email sent: refund held — 50% late-cancellation fee applies; $${(remainderCents / 100).toFixed(2)} to be refunded by hand in Stripe.`,
+    });
+    if (eventError) console.error('[ops] could not write the held-refund timeline row:', eventError.message);
+  }
+
+  return { ok: true, emailSent, alreadyNotified: false };
 }

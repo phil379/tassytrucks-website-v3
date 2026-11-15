@@ -313,6 +313,55 @@ export async function getPaymentMethodLabel(checkoutSessionId: string): Promise<
   }
 }
 
+export type StripeRefund = {
+  id: string;
+  amount: number;
+  status: string;
+  payment_intent: string | null;
+};
+
+/**
+ * Refund a charge, in full unless amountCents is given.
+ *
+ * Used when a paid trip is cancelled: the rider gets their money back, not a
+ * credit and not a promise. Runs inside withStripeMode, so a test trip is
+ * refunded with the test key and a real trip with the live key — the same rule
+ * as every other call in this file. The idempotency key is the trip id, so a
+ * retried cancel refunds once, not twice: Stripe returns the original refund
+ * instead of creating a second one.
+ *
+ * The reason is 'requested_by_customer': the booking was cancelled and the
+ * rider is owed the fare back. (Stripe's other reasons are 'duplicate' and
+ * 'fraudulent'; neither describes a cancellation.)
+ */
+export async function createRefund(input: {
+  paymentIntentId: string;
+  amountCents?: number;
+  idempotencyKey: string;
+}): Promise<StripeRefund> {
+  const res = await post<{
+    id: string;
+    amount: number;
+    status: string;
+    payment_intent?: string | { id?: string } | null;
+  }>(
+    '/refunds',
+    {
+      payment_intent: input.paymentIntentId,
+      amount: input.amountCents,
+      reason: 'requested_by_customer',
+    },
+    { 'Idempotency-Key': input.idempotencyKey },
+  );
+  const pi = res.payment_intent;
+  return {
+    id: res.id,
+    amount: res.amount,
+    status: res.status,
+    payment_intent: typeof pi === 'string' ? pi : (pi?.id ?? null),
+  };
+}
+
 /**
  * The branded pay page: a fresh Stripe Checkout Session that carries the Tassy logo.
  *

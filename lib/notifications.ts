@@ -12,6 +12,7 @@ import { BUSINESS_MAILING_ADDRESS, emailFooterText, emailIdentityText } from './
 import { isSuppressed } from './email-suppression';
 import { unsubscribeUrl } from './unsubscribe-token';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
+import { logEmailSend } from './email-log';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -219,20 +220,40 @@ async function pushToZapier(ref: string, message: PushMessage): Promise<'sent' |
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function sendResendEmail(payload: { to: string; subject: string; text: string; kind?: EmailKind }): Promise<void> {
-  // Marketing / outreach is blocked until a mailing address is set (lib/marketing-guard.ts).
-  assertEmailAllowed(payload.kind ?? 'transactional');
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error('RESEND_API_KEY is not set');
+  // One notification_log row per attempt (lib/email-log.ts) — sent, or failed
+  // with the error. Logging never throws; a failure is rethrown untouched so
+  // callers see exactly the behavior they see today.
+  try {
+    // Marketing / outreach is blocked until a mailing address is set (lib/marketing-guard.ts).
+    assertEmailAllowed(payload.kind ?? 'transactional');
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: FROM_ADDRESS, to: [payload.to], subject: payload.subject, text: payload.text }),
-  });
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: FROM_ADDRESS, to: [payload.to], subject: payload.subject, text: payload.text }),
+    });
 
-  if (!res.ok) {
-    throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+    if (!res.ok) {
+      throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+    }
+  } catch (e) {
+    await logEmailSend({
+      kind: payload.kind ?? 'website_email',
+      status: 'failed',
+      errorMessage: e instanceof Error ? e.message : String(e),
+      to: payload.to,
+      subject: payload.subject,
+    });
+    throw e;
   }
+  await logEmailSend({
+    kind: payload.kind ?? 'website_email',
+    status: 'sent',
+    to: payload.to,
+    subject: payload.subject,
+  });
 }
 
 /**
@@ -254,25 +275,45 @@ export async function sendRichEmail(payload: {
   text: string;
   kind?: EmailKind;
 }): Promise<void> {
-  assertEmailAllowed(payload.kind ?? 'transactional');
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error('RESEND_API_KEY is not set');
+  // One notification_log row per attempt (lib/email-log.ts) — sent, or failed
+  // with the error. Logging never throws; a failure is rethrown untouched so
+  // callers see exactly the behavior they see today.
+  try {
+    assertEmailAllowed(payload.kind ?? 'transactional');
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) throw new Error('RESEND_API_KEY is not set');
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: [payload.to],
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: FROM_ADDRESS,
+        to: [payload.to],
+        subject: payload.subject,
+        html: payload.html,
+        text: payload.text,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+    }
+  } catch (e) {
+    await logEmailSend({
+      kind: payload.kind ?? 'website_email',
+      status: 'failed',
+      errorMessage: e instanceof Error ? e.message : String(e),
+      to: payload.to,
       subject: payload.subject,
-      html: payload.html,
-      text: payload.text,
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+    });
+    throw e;
   }
+  await logEmailSend({
+    kind: payload.kind ?? 'website_email',
+    status: 'sent',
+    to: payload.to,
+    subject: payload.subject,
+  });
 }
 
 /** Full detail to the operator's own mailbox, plain text. */
@@ -916,40 +957,62 @@ export async function sendMarketingEmail(
     unsubscribeUrl?: (email: string) => string;
   } = {},
 ): Promise<void> {
-  const makeUrl = deps.unsubscribeUrl ?? ((e: string) => unsubscribeUrl(e));
-  let url: string | null = null;
+  // One notification_log row per attempt (lib/email-log.ts), kind
+  // 'marketing' — this helper's guard kind is hard-coded. Logging never
+  // throws; a failure is rethrown untouched. Tests that inject deps hit
+  // the log call too: with Supabase unconfigured it degrades to a
+  // console.error and cannot change the send outcome.
   try {
-    url = makeUrl(payload.to);
-  } catch {
-    url = null; // no UNSUBSCRIBE_SECRET: assertEmailAllowed below refuses
-  }
-  assertEmailAllowed('marketing', { mailingAddress: deps.mailingAddress, unsubscribeUrl: url });
+    const makeUrl = deps.unsubscribeUrl ?? ((e: string) => unsubscribeUrl(e));
+    let url: string | null = null;
+    try {
+      url = makeUrl(payload.to);
+    } catch {
+      url = null; // no UNSUBSCRIBE_SECRET: assertEmailAllowed below refuses
+    }
+    assertEmailAllowed('marketing', { mailingAddress: deps.mailingAddress, unsubscribeUrl: url });
 
-  const suppressed = await (deps.isSuppressed ?? isSuppressed)(payload.to);
-  if (suppressed) throw new EmailBlockedError('this address has unsubscribed');
+    const suppressed = await (deps.isSuppressed ?? isSuppressed)(payload.to);
+    if (suppressed) throw new EmailBlockedError('this address has unsubscribed');
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) throw new Error('RESEND_API_KEY is not set');
-  const address = (deps.mailingAddress ?? BUSINESS_MAILING_ADDRESS).trim();
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) throw new Error('RESEND_API_KEY is not set');
+    const address = (deps.mailingAddress ?? BUSINESS_MAILING_ADDRESS).trim();
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: [payload.to],
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: FROM_ADDRESS,
+        to: [payload.to],
+        subject: payload.subject,
+        text: [
+          payload.text,
+          '',
+          '—',
+          `${emailIdentityText()} · ${address}`,
+          `Unsubscribe: ${url}`,
+        ].join('\n'),
+        headers: { 'List-Unsubscribe': `<${url}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
+      }),
+    });
+    if (!res.ok) throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+  } catch (e) {
+    await logEmailSend({
+      kind: 'marketing',
+      status: 'failed',
+      errorMessage: e instanceof Error ? e.message : String(e),
+      to: payload.to,
       subject: payload.subject,
-      text: [
-        payload.text,
-        '',
-        '—',
-        `${emailIdentityText()} · ${address}`,
-        `Unsubscribe: ${url}`,
-      ].join('\n'),
-      headers: { 'List-Unsubscribe': `<${url}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
-    }),
+    });
+    throw e;
+  }
+  await logEmailSend({
+    kind: 'marketing',
+    status: 'sent',
+    to: payload.to,
+    subject: payload.subject,
   });
-  if (!res.ok) throw new Error(`Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
 }
 
 /** Until the do-not-email table exists, an unsubscribe is handled by hand: tell the operator. Throws on failure. */

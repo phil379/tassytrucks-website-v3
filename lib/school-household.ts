@@ -92,6 +92,22 @@ export const HOUSEHOLD_DIRECTIONS = [
   { key: 'round_trip', label: 'Morning and afternoon' },
 ] as const;
 
+/**
+ * The plans a family can say they are interested in. The key is what is
+ * stored in scholar_household_requests.plan_interest (the schema enum
+ * below); the label is what the parent reads. Asking is optional — a
+ * family can arrive undecided, and a person reviews the request either
+ * way. The plan a family names here promises nothing: it only tells the
+ * reviewer which plan to prepare first.
+ */
+export const PLAN_INTERESTS = [
+  { key: 'full-year', label: 'Full Year' },
+  { key: 'weekly', label: 'Weekly per-ride' },
+  { key: 'after-school', label: 'After-school' },
+] as const;
+
+export type PlanInterest = (typeof PLAN_INTERESTS)[number]['key'];
+
 export const MAX_HOUSEHOLD_CHILDREN = 8;
 
 const childRow = z.object({

@@ -44,17 +44,22 @@ import {
  *   • Idempotent twice over: a trip already marked "refunded" returns the
  *     recorded refund instead of refunding again, and Stripe gets an
  *     idempotency key of `refund:<tripId>`, so a retried cancel refunds once.
- *   • Full refund, every time. The policy (lib/refund-policy.ts, PROPOSED)
- *     says "Tassy cancels or has no driver = full refund", and a dispatcher
- *     cancel is Tassy cancelling. The rider-initiated late-cancel 50% fee is
- *     NOT applied here: the cancel flow does not record who asked for it or
- *     apply a time-based fee, and the policy is still a proposal. That is an
- *     open question for Phil (see the PR description).
+ *   • Full refund at cancel time, every time. The policy
+ *     (lib/refund-policy.ts, PROPOSED) says "Tassy cancels or has no driver
+ *     = full refund", and a dispatcher cancel is Tassy cancelling. The
+ *     rider-initiated late-cancel 50% fee is NOT applied here: at cancel
+ *     time the refund is either issued in full or HELD (below). The one
+ *     partial refund in the system is a held payment being decided later:
+ *     the ops held-payments queue (Block B1) passes `amountCents` — the
+ *     remainder after the fee the held email already named — and this
+ *     function refunds exactly that. The idempotency key does not vary
+ *     with the amount, so a trip can only ever be refunded once.
  *
  * THE HELD PATH (notifyRefundHeld, below): the ops cancel flow now DOES
  * record who asked (PR #163), and when the rider asked inside the free-
- * cancel window it HOLDS this refund — the dispatcher refunds the rest by
- * hand in Stripe. But the rider's only cancellation email lived inside
+ * cancel window it HOLDS this refund — a human decides it afterwards,
+ * from the ops held-payments queue (Block B1) or by hand in Stripe. But
+ * the rider's only cancellation email lived inside
  * refundTrip, so a held cancel emailed the rider nothing at all (verified
  * live Nov 15, 2026, trip T-20261115-0001: money held correctly, silence
  * for the rider). notifyRefundHeld is the no-money companion: same signed
@@ -168,7 +173,7 @@ function emailTripShape(row: any, contactEmail: string) {
   } as Parameters<typeof cancellationHtml>[1];
 }
 
-export async function refundTrip(args: { id: string }): Promise<RefundResult> {
+export async function refundTrip(args: { id: string; amountCents?: number }): Promise<RefundResult> {
   const db = supabaseAdmin();
   const { data: row, error: readError } = await db
     .from(TRIP_REQUESTS_TABLE)
@@ -211,7 +216,7 @@ export async function refundTrip(args: { id: string }): Promise<RefundResult> {
   let refund: Awaited<ReturnType<typeof createRefund>>;
   try {
     refund = await withStripeMode(mode, () =>
-      createRefund({ paymentIntentId, idempotencyKey: `refund:${args.id}` }),
+      createRefund({ paymentIntentId, amountCents: args.amountCents, idempotencyKey: `refund:${args.id}` }),
     );
   } catch (e) {
     console.error('[ops] refund failed (trip stays cancelled, still paid):', e);
@@ -339,9 +344,10 @@ async function chargedFareCents(db: Db, tripId: string, row: Record<string, unkn
 /**
  * Email the rider about a HELD refund. The companion to refundTrip for
  * the one cancel outcome that moves no money: rider-initiated, inside
- * the free-cancel window, policy keeps a 50% fee and the dispatcher
- * refunds the rest by hand in Stripe (PR #163). Ops calls this through
- * the same bridge (outcome: "held") right after recording the cancel.
+ * the free-cancel window, policy keeps a 50% fee and a human refunds the
+ * rest afterwards (PR #163; the ops held-payments queue, Block B1, is
+ * where that decision now happens). Ops calls this through the same
+ * bridge (outcome: "held") right after recording the cancel.
  *
  * It never touches Stripe and never changes the trip: the row stays
  * cancelled + paid until a human refunds the remainder. The email is

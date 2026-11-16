@@ -76,8 +76,8 @@ const PLANS = [
   },
   {
     name: 'Facility Account',
-    save: '5–10% off',
-    body: 'Clinics and surgery centers book on account and get one invoice a week. 5% from 10 trips a month, 10% from 25.',
+    save: 'On account',
+    body: 'Clinics and surgery centers book on account — no card taken — and get one weekly invoice (Net 7).',
   },
 ];
 

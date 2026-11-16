@@ -668,11 +668,6 @@ export const WINNIE_PLANS = [
   { legs: 4, discount: 0.1, label: '4 rides a month' },
   { legs: 8, discount: 0.15, label: '8 rides a month' },
 ] as const;
-/** Facility account — tiered so the discount follows the volume, not the promise. */
-export const FACILITY_TIERS = [
-  { minTripsPerMonth: 10, discount: 0.05 },
-  { minTripsPerMonth: 25, discount: 0.1 },
-] as const;
 
 /**
  * ── PUBLISHED RATE TABLE HELPERS ─────────────────────────────────────────────

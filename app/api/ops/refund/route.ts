@@ -12,6 +12,12 @@ const bodySchema = z.object({
   // fee) — no money moves; the call only emails the rider the held
   // variant of the cancellation email. Absent = refund, as before.
   outcome: z.enum(['held']).optional(),
+  // Block B1: a PARTIAL refund of exactly this many cents, sent only by
+  // the TassyOps held-payments queue when a human decides a held refund
+  // at the 50% fee (the amount is the remainder after the fee — the split
+  // the held email already promised the rider). Absent = refund in full,
+  // exactly as before. The cancel-time call never sends it.
+  amountCents: z.number().int().positive().optional(),
 });
 
 /**
@@ -26,6 +32,12 @@ const bodySchema = z.object({
  * rider that their booking was cancelled and their fare refunded. A trip that
  * was never paid, was never cancelled, or was already refunded is refused or
  * reported, never charged twice.
+ *
+ * The one exception to "in full": with amountCents set (the held-payments
+ * queue deciding a held refund, Block B1) the refund is exactly that amount
+ * — the remainder after the 50% late-cancel fee. Everything else about the
+ * call is identical, including the idempotency key, so a held trip can only
+ * ever be refunded once, at whichever amount was decided first.
  *
  * With outcome: "held" the same call moves no money at all: the refund was
  * held for the 50% late-cancel fee, and the endpoint only emails the rider
@@ -65,7 +77,7 @@ export async function POST(request: Request) {
         alreadyNotified: held.alreadyNotified,
       });
     }
-    const result = await refundTrip({ id: parsed.tripId });
+    const result = await refundTrip({ id: parsed.tripId, amountCents: parsed.amountCents });
     if (!result.ok) {
       const status = result.code === 'not_found' ? 404 : 422;
       return NextResponse.json({ ok: false, error: result.code }, { status });

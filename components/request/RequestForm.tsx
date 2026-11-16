@@ -354,16 +354,41 @@ export default function RequestForm({
    *
    * Null is the normal starting state and a normal ending state: no Maps key,
    * an address typed rather than picked, Google slow, quota gone. The quote
-   * engine falls back to a stretched straight line and labels it "about". The
-   * lookup never gates the price — the panel shows the fallback number first
-   * and tightens to the measured one a moment later.
+   * engine falls back to a stretched straight line and labels it "about".
+   *
+   * ONE DISTANCE ON SCREEN (Block D1, 2026-11-16). The fallback figure and
+   * Google's figure are two different numbers for the same route — on the
+   * Winnie test route the panel read "about 8.6 miles" from the straight line
+   * and "7.8 miles driving" once the lookup landed, at the same $79 price.
+   * A customer who catches both concludes one of them is a lie, so the panel
+   * now waits for the lookup for THESE two addresses to settle before it
+   * prints any distance at all (see distancePending below). What it then
+   * prints — the measured drive, or the "about" figure when the lookup
+   * settled without an answer — is the one value the price on screen was
+   * computed from, and it never changes under the reader. The engine is
+   * untouched: same bands, same factors, same prices, here and on the server.
    */
   const [roadMiles, setRoadMiles] = useState<number | null>(null);
+  /** The address pair the current roadMiles answer (or non-answer) belongs to. */
+  const [roadMilesFor, setRoadMilesFor] = useState<string | null>(null);
 
   const pickupLat = pickupPlace?.lat ?? null;
   const pickupLng = pickupPlace?.lng ?? null;
   const dropoffLat = dropoffPlace?.lat ?? null;
   const dropoffLng = dropoffPlace?.lng ?? null;
+
+  /**
+   * The pair a distance answer belongs to, at the same five-decimal precision
+   * as the server's cache key (lib/road-distance.ts), so re-picking the same
+   * place from the dropdown reads as the same pair.
+   */
+  const distancePairKey =
+    pickupLat !== null && pickupLng !== null && dropoffLat !== null && dropoffLng !== null
+      ? `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}|${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`
+      : null;
+
+  /** True while the lookup for the CURRENT pair has not settled either way. */
+  const distancePending = distancePairKey !== null && roadMilesFor !== distancePairKey;
 
   useEffect(() => {
     if (
@@ -375,9 +400,14 @@ export default function RequestForm({
       // One end just changed or was cleared. Drop the old number immediately:
       // a measured distance for the PREVIOUS address is worse than none.
       setRoadMiles(null);
+      setRoadMilesFor(null);
       return;
     }
 
+    // The pair this run of the effect is answering for — the same string as
+    // distancePairKey, recomputed here where the four coords are narrowed
+    // non-null.
+    const pairKey = `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}|${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`;
     let cancelled = false;
     const controller = new AbortController();
     // Short debounce. Picking from the dropdown can fire pickup and dropoff in
@@ -396,9 +426,13 @@ export default function RequestForm({
         .then((data: { miles?: number | null } | null) => {
           if (cancelled) return;
           setRoadMiles(typeof data?.miles === 'number' ? data.miles : null);
+          setRoadMilesFor(pairKey);
         })
         .catch(() => {
-          if (!cancelled) setRoadMiles(null);
+          if (!cancelled) {
+            setRoadMiles(null);
+            setRoadMilesFor(pairKey);
+          }
         });
     }, 250);
 
@@ -491,6 +525,14 @@ export default function RequestForm({
       const flat = quoteFromHotelPrice(hotelPrice.chargedCents, returnTrip);
       return flat;
     }
+    // ONE DISTANCE ON SCREEN (Block D1). While the measured drive for the
+    // current pair is still being fetched, show no price panel at all: the
+    // fallback would print a straight-line mileage now and swap in Google's
+    // a moment later — two distances for one route. The hotel flat price
+    // above prints no mileage, so it is never held up by this. Quote-only
+    // lines never price off distance, so a lookup they do not use must not
+    // hold them up either.
+    if (distancePending && !isQuoteOnly(service, mobility)) return null;
     return estimateTrip({
       serviceLine: service,
       roadMiles,
@@ -516,6 +558,7 @@ export default function RequestForm({
     estimatesEnabled,
     hotelPrice,
     hotelPending,
+    distancePending,
     roadMiles,
     details.escort,
     details.flat_round_trip,
@@ -1606,6 +1649,11 @@ export default function RequestForm({
               )}
               <p className="ink-soft text-sm">{quoted.message}</p>
             </>
+          ) : distancePending ? (
+            /* No distance until the distance has settled — see distancePending. */
+            <p className="ink-soft text-sm" data-testid="distance-pending">
+              Working out your price…
+            </p>
           ) : (
             <p className="ink-soft text-sm">
               {/* Never a guess — but a picked suggestion or a ZIP is enough to

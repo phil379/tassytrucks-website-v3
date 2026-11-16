@@ -92,7 +92,7 @@ export default function RecoverPage() {
       ]}
       partnerCta={{
         title: 'Surgery centers, dental practices and med spas',
-        body: `Add a private transportation option to your discharge workflow. We book on account, invoice ${FACILITY_INVOICING}, and your patient is collected from the desk by a named driver at a time you set. Preferred rates from 10 trips a month.`,
+        body: `Add a private transportation option to your discharge workflow. We book on account, invoice ${FACILITY_INVOICING} — no card taken — and your patient is collected from the desk by a named driver at a time you set.`,
         href: 'mailto:phil@tassytrucks.com?subject=Facility%20account%20—%20Tassy%20Recovery',
         label: 'Ask for the facility packet',
       }}

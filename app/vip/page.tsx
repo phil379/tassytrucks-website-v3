@@ -68,7 +68,7 @@ export default function VipPage() {
       ]}
       partnerCta={{
         title: 'Hotels, clubs and corporate partners',
-        body: `Put a reliable car behind your guests and clients. We book on account and invoice ${FACILITY_INVOICING}, with preferred rates from 10 trips a month.`,
+        body: `Put a reliable car behind your guests and clients. We book on account and invoice ${FACILITY_INVOICING} — no card taken.`,
         href: 'mailto:phil@tassytrucks.com?subject=Corporate%20account%20—%20Tassy%20Concierge',
         label: 'Open an account',
       }}

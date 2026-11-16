@@ -8,7 +8,9 @@ import {
   HOUSEHOLD_DIRECTIONS,
   MAX_HOUSEHOLD_CHILDREN,
   NONSTANDARD_REASONS,
+  PLAN_INTERESTS,
   type NonstandardReason,
+  type PlanInterest,
 } from '@/lib/school-household';
 
 const field =
@@ -33,7 +35,7 @@ export default function HouseholdRequestForm({
   planSlug,
 }: {
   initialReasons: NonstandardReason[];
-  planSlug: 'full-year' | 'weekly' | 'after-school' | null;
+  planSlug: PlanInterest | null;
 }) {
   const [startedAt] = useState(() => Date.now());
   const [guardian, setGuardian] = useState('');
@@ -54,6 +56,10 @@ export default function HouseholdRequestForm({
   const [fridaySchedule, setFridaySchedule] = useState('');
   const [extraNotes, setExtraNotes] = useState('');
   const [reasons, setReasons] = useState<NonstandardReason[]>(initialReasons);
+  // Pre-answered when the family arrived from a plan page (the ?plan= link);
+  // they can change it or set it back to "Not sure yet". '' submits as null,
+  // exactly like arriving with no plan in mind did before the question existed.
+  const [planInterest, setPlanInterest] = useState<PlanInterest | ''>(planSlug ?? '');
   const [consent, setConsent] = useState(false);
   const [hp, setHp] = useState('');
 
@@ -103,7 +109,7 @@ export default function HouseholdRequestForm({
           friday_schedule: fridayDiffers ? fridaySchedule : null,
           extra_notes: extraNotes || null,
           reasons,
-          plan_interest: planSlug,
+          plan_interest: planInterest === '' ? null : planInterest,
           consent_contact: consent ? true : false,
           hp_token: hp,
           elapsedMs: Date.now() - startedAt,
@@ -249,6 +255,28 @@ export default function HouseholdRequestForm({
           </label>
           <p className="mb-1 text-xs text-[color:var(--ink-mute)]">Please do not include medical details, diagnoses or school records.</p>
           <textarea id="hh-extra" rows={3} className={field} value={extraNotes} onChange={(e) => setExtraNotes(e.target.value)} />
+        </div>
+      </fieldset>
+
+      <fieldset className="space-y-4">
+        <legend className="serif mb-1 text-lg font-semibold">The plan you have in mind</legend>
+        <div>
+          <label className={label} htmlFor="hh-plan">Which plan are you interested in?</label>
+          <select
+            id="hh-plan"
+            className={field}
+            value={planInterest}
+            onChange={(e) => setPlanInterest(e.target.value as PlanInterest | '')}
+          >
+            <option value="">Not sure yet</option>
+            {PLAN_INTERESTS.map((p) => (
+              <option key={p.key} value={p.key}>{p.label}</option>
+            ))}
+          </select>
+          <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">
+            Optional. It helps us prepare the right plan first. You can change your mind.
+          </p>
+          {fe('plan_interest')}
         </div>
       </fieldset>
 

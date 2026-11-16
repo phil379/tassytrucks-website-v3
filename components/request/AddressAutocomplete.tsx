@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { useGooglePlaces } from '@/lib/google-maps';
-import { pickTypedMatch, splitUnit } from '@/lib/address-match';
+import { pickTypedMatch, shouldShowPickHint, splitUnit } from '@/lib/address-match';
 
 /**
  * Address field with Google Places suggestions.
@@ -127,6 +127,12 @@ export default function AddressAutocomplete({
   const [activeIndex, setActiveIndex] = useState(-1);
   /** Typed, left the field, and nothing was picked or matched: show the "tap your address" line. */
   const [needsPick, setNeedsPick] = useState(false);
+  /**
+   * The visitor has typed in this field at least once. A prefilled address
+   * (a facility's own, a hotel link) is not "typed text": the pick hint is
+   * an instruction for someone mid-typing, not a label for a filled form.
+   */
+  const [typed, setTyped] = useState(false);
   // What the blur handler reads 150ms later, after any tap on a suggestion has landed.
   const textRef = useRef(text);
   textRef.current = text;
@@ -284,6 +290,7 @@ export default function AddressAutocomplete({
 
   function onTextChange(next: string) {
     setText(next);
+    setTyped(true);
     setNeedsPick(false);
     // Any edit invalidates a previously picked place. See rule 2 above.
     if (resolved) setResolved(null);
@@ -499,10 +506,20 @@ export default function AddressAutocomplete({
 
       {/*
         Something is typed and no address is picked. Plain words, visible, and announced. Shown
-        while typing as well as after leaving the field (Muse item 25): it used to wait for a
-        failed match on blur and vanish again on focus, so "Charlotte" alone never showed it.
+        while typing as well as after leaving the field (Muse item 25): the rule lives in
+        lib/address-match.ts (shouldShowPickHint) and deliberately ignores how many
+        suggestions came back — a vague "Charlotte" and a fragment Google cannot
+        answer both left typed text with no instruction under the old count-based rule.
       */}
-      {!listOpen && !resolved && (needsPick || (text.trim() !== '' && suggestions.length > 0)) && (
+      {shouldShowPickHint({
+        listOpen,
+        hasResolved: Boolean(resolved),
+        suggestionsReady,
+        needsPick,
+        typed,
+        text,
+        minQueryLength: MIN_QUERY_LENGTH,
+      }) && (
         <p className="mt-1.5 text-xs" role="status" data-testid={`${name}-pick-hint`}>
           {TAP_HINT}
         </p>

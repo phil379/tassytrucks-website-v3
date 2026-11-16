@@ -71,3 +71,35 @@ export function pickTypedMatch(typed: string, candidates: MatchCandidate[]): num
   const inState = bare.filter((b) => b.nc);
   return inState.length === 1 ? inState[0]!.i : -1;
 }
+
+/**
+ * Whether the "tap your address in the list" line belongs under an address
+ * field (Muse item 25, completed 2026-11-16). Pure, for the same reason as
+ * the match rule above.
+ *
+ * The line used to depend on how many suggestions happened to come back: it
+ * showed after a failed blur match, or while at least one suggestion was
+ * still loaded. That left typed, unpicked text with no instruction exactly
+ * when the rider needed it most — a vague "Charlotte" whose loaded list had
+ * been replaced by the blur lookup, or a fragment Google answers with no
+ * suggestions at all. The form then sits unpriced and reads as broken.
+ *
+ * The rule now asks only what matters: suggestions are working, the visitor
+ * typed a query long enough to search (or left the field unmatched), and
+ * nothing is picked. How many suggestions came back is not the question.
+ * While the list itself is open, the same instruction rides on top of it
+ * instead (TAP_HINT_OPEN in the component), so this returns false then.
+ */
+export function shouldShowPickHint(input: {
+  listOpen: boolean;
+  hasResolved: boolean;
+  suggestionsReady: boolean;
+  needsPick: boolean;
+  typed: boolean;
+  text: string;
+  minQueryLength: number;
+}): boolean {
+  if (input.listOpen || input.hasResolved || !input.suggestionsReady) return false;
+  if (input.needsPick) return true;
+  return input.typed && input.text.trim().length >= input.minQueryLength;
+}

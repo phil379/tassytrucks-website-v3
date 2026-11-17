@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import PagePhoto from '@/components/seo/PagePhoto';
+import WinnieMascot from '@/components/seo/WinnieMascot';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -76,6 +77,42 @@ export default function PetTransportPage() {
                 nobody owns the outcome. With Winnie Ride, the company that takes
                 your booking is the company that drives your pet. Direct
                 relationship, direct accountability.
+              </p>
+            </>
+          ),
+        },
+        {
+          h2: 'Meet Winnie',
+          body: (
+            <>
+              <figure className="text-center">
+                <WinnieMascot
+                  alt="Winnie, the rescue French bulldog Winnie Ride is named for, in her holiday sweater and reindeer antlers"
+                  className="mx-auto w-44 sm:w-52"
+                />
+                <figcaption className="mt-2 text-sm ink-soft">
+                  Winnie — the dog behind the name.
+                </figcaption>
+              </figure>
+              <p>
+                Winnie is a rescue French bulldog, and she is the reason this
+                service has a name.
+              </p>
+              <p>
+                We adopted her during the moving years. The Army took our family
+                from place to place, and every new duty station meant starting
+                over. Then someone in our family fell into a depression that
+                made even ordinary days heavy. Winnie did what dogs somehow know
+                how to do — she stayed close. She was a reason to get up, get
+                outside, and keep going on the days when that was not easy. She
+                helped carry our family through some of the toughest times we
+                have known, as a family and one person at a time.
+              </p>
+              <p>
+                So when we built a pet transport service, there was never a
+                question about what to call it. This is her legacy. Every pet
+                who rides with us is somebody&rsquo;s Winnie — the one who shows
+                up for them every day. We drive them like it.
               </p>
             </>
           ),

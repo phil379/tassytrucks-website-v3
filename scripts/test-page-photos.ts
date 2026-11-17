@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import PagePhoto from '../components/seo/PagePhoto';
-import WinnieMascot from '../components/seo/WinnieMascot';
+import WinniePortrait from '../components/seo/WinniePortrait';
 
 let n = 0;
 function t(name: string, fn: () => void) {
@@ -89,22 +89,23 @@ t('the page does not render a raw <img> of its own (every image goes through the
   assert.equal((PAGE.match(/<img\b/g) ?? []).length, 0);
 });
 
-t('WinnieMascot renders an <img> with alt text, the real size, and lazy loading', () => {
-  const html = renderToStaticMarkup(createElement(WinnieMascot, { alt: 'Winnie the rescue French bulldog' }));
+t('WinniePortrait renders an <img> with alt text, the real size, and lazy loading', () => {
+  const html = renderToStaticMarkup(createElement(WinniePortrait, { alt: 'Winnie the rescue French bulldog' }));
   assert.deepEqual(imgProblems(html), []);
   assert.match(html, /\bloading="lazy"/);
   assert.match(html, /\bdecoding="async"/);
-  assert.match(html, /width="207"/);
-  assert.match(html, /height="224"/);
+  assert.match(html, /width="800"/);
+  assert.match(html, /height="1000"/);
+  assert.match(html, /pet-transport-french-bulldog-800\.jpg/);
 });
 
-t('WinnieMascot refuses a missing alt instead of rendering it', () => {
-  assert.throws(() => renderToStaticMarkup(createElement(WinnieMascot, { alt: '' })), /alt text/);
-  assert.throws(() => renderToStaticMarkup(createElement(WinnieMascot, { alt: '   ' })), /alt text/);
+t('WinniePortrait refuses a missing alt instead of rendering it', () => {
+  assert.throws(() => renderToStaticMarkup(createElement(WinniePortrait, { alt: '' })), /alt text/);
+  assert.throws(() => renderToStaticMarkup(createElement(WinniePortrait, { alt: '   ' })), /alt text/);
 });
 
 t('the pet-transport page presents Winnie once, in the Meet Winnie section', () => {
-  assert.equal((PAGE.match(/<WinnieMascot\b/g) ?? []).length, 1);
+  assert.equal((PAGE.match(/<WinniePortrait\b/g) ?? []).length, 1);
   assert.ok(PAGE.includes("h2: 'Meet Winnie'"));
   assert.ok(PAGE.includes('rescue French bulldog'));
 });

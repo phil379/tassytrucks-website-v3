@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
 import PagePhoto from '@/components/seo/PagePhoto';
-import WinnieMascot from '@/components/seo/WinnieMascot';
+import WinniePortrait from '@/components/seo/WinniePortrait';
 import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
@@ -86,9 +86,9 @@ export default function PetTransportPage() {
           body: (
             <>
               <figure className="text-center">
-                <WinnieMascot
-                  alt="Winnie, the rescue French bulldog Winnie Ride is named for, in her holiday sweater and reindeer antlers"
-                  className="mx-auto w-44 sm:w-52"
+                <WinniePortrait
+                  alt="Winnie, the rescue French bulldog Winnie Ride is named for, resting on a cream pet bed"
+                  className="mx-auto w-64 sm:w-80 h-auto rounded-card border border-line"
                 />
                 <figcaption className="mt-2 text-sm ink-soft">
                   Winnie — the dog behind the name.

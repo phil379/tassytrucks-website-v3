@@ -315,8 +315,8 @@ export default function HouseholdRequestForm({
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <Link href="/school/book" className="inline-flex min-h-[44px] items-center rounded-full px-4 text-sm text-[color:var(--ink-soft)] hover:text-[color:var(--ink)]">
-          All plans
+        <Link href="/school" className="inline-flex min-h-[44px] items-center rounded-full px-4 text-sm text-[color:var(--ink-soft)] hover:text-[color:var(--ink)]">
+          Back to Tassy Scholar
         </Link>
         <button type="submit" disabled={busy} className="btn-primary min-h-[44px] disabled:opacity-40">
           {busy ? 'Sending…' : 'Send request'}

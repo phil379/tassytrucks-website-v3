@@ -48,7 +48,12 @@ export const request = {
   winnie: to('winnie'),
   renew: to('concierge'),
   recover: to('recovery'),
-  school: to('scholar'),
+  /**
+   * Tassy Scholar is NOT a booking link while the service is parked ahead of
+   * its later launch (Phil, 2026-11-17): every Scholar CTA lands on the
+   * Coming Soon page and its join list, never on the request form.
+   */
+  school: '/school',
 };
 
 /**
@@ -85,10 +90,14 @@ export const WINNIE_REQUEST_URL = seoRequest('winnie', { source: 'web' });
  *
  * These previously deep-linked into the SaaS subscription setup wizard
  * (`/book/school/<plan>/setup`), which is part of the booking flow that has
- * never worked — so a parent trying to pay hit a dead end. They now land on the
- * request form with the plan they picked carried through as a query param,
- * which the form stamps onto `trip_requests.source`. Dispatch sees which plan
- * they chose and quotes it.
+ * never worked — so a parent trying to pay hit a dead end. They then landed
+ * on the request form with the plan they picked carried through as a query
+ * param, which the form stamps onto `trip_requests.source`.
+ *
+ * While Scholar is parked ahead of its later launch (Phil, 2026-11-17) a
+ * plan link goes to the Coming Soon page like every other Scholar CTA. The
+ * plan a parent had in mind is not lost: the join-list form asks its own
+ * plan-interest question and stores the answer on the lead.
  */
 export const scholarPlan = (plan: 'full-year' | 'weekly' | 'after-school') =>
-  to('scholar', { plan });
+  '/school';

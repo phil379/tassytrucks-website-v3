@@ -8,7 +8,6 @@ import {
 } from '@/lib/quote';
 import RateTable, { pairRows, returnRows, type Row } from '@/components/pricing/RateTable';
 import { WAV_PARTNER_LINE, wavBookAndPayNote } from '@/lib/wav';
-import { SCHOOL_PLANS } from '@/lib/school-plans';
 import { HOUSEHOLD_PROMPT_BODY, HOUSEHOLD_PROMPT_TITLE, householdRequestHref } from '@/lib/school-household';
 import { TREATMENT_DAY_DRIVER } from '@/lib/copy';
 
@@ -148,32 +147,24 @@ export default function PricingPage() {
               />
               <div className="card-tile">
                 <h3 className="serif text-xl font-semibold">Tassy Scholar</h3>
-                {/* This card carried a THIRD set of Scholar prices — $45 a leg, $20 a
-                    sibling, a $55 route minimum, $660 a month — none of which matched the
-                    plans a parent is actually charged in the booking wizard. Those per-leg
-                    numbers are the institutional route model (and $45 a leg is what
-                    EverDriven paid Phil as a subcontractor, i.e. district money). They are
-                    a different product with a different payer, so they no longer masquerade
-                    as the family price. Family plans are now read from SCHOOL_PLANS, the
-                    same source the wizard charges from. */}
+                {/* Scholar is COMING SOON (Phil, 2026-11-17): it does not launch
+                    with the four money lines, so this card shows no prices. It
+                    used to read family plan prices from SCHOOL_PLANS, the same
+                    source the booking wizard charged from; those prices stay in
+                    lib/school-plans.ts, parked with the wizard, and return to
+                    this card when Scholar launches. */}
                 <p className="ink-soft mt-2 text-sm leading-relaxed">
-                  Sold <strong className="text-cream-text">by the plan and billed monthly</strong>,
-                  never per ride — one child, one car, on a recurring schedule reviewed and
-                  confirmed before service begins.
+                  <strong className="text-cream-text">Coming soon.</strong> When it opens, Scholar
+                  will be sold <strong className="text-cream-text">by the plan and billed monthly</strong>,
+                  never per ride — one child, one car, morning and afternoon, on a recurring
+                  schedule reviewed and confirmed before service begins. It is not enrolling
+                  yet, so there are no Scholar prices to show.
                 </p>
-                <ul className="mt-3 space-y-1.5 text-sm">
-                  {SCHOOL_PLANS.map((plan) => (
-                    <li key={plan.key} className="flex items-baseline justify-between gap-3">
-                      <span className="ink-soft">{plan.name}</span>
-                      <strong className="text-cream-text text-right">{plan.price}</strong>
-                    </li>
-                  ))}
-                </ul>
                 <p className="ink-soft mt-3 text-xs leading-relaxed" data-testid="household-prompt">
                   <strong className="text-cream-text">{HOUSEHOLD_PROMPT_TITLE}</strong>{' '}
                   {HOUSEHOLD_PROMPT_BODY}{' '}
                   <Link href={householdRequestHref([], null)} className="underline">
-                    Tell us about your family
+                    Join the Scholar list
                   </Link>
                   .
                 </p>
@@ -183,7 +174,7 @@ export default function PricingPage() {
                   quoted on account.
                 </p>
                 <Link href={request.school} className="btn-gold mt-5 inline-flex items-center gap-2">
-                  See plans and pricing <ArrowRight size={16} aria-hidden="true" />
+                  Join the Scholar list <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </div>

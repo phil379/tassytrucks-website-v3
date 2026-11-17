@@ -56,13 +56,14 @@ const nextConfig = {
       /**
        * Tassy Scholar moved onto the site 2026-09-29. The marketing pages have
        * been linking out with ?plan=full-year for a while, and `full-year` is a
-       * real slug, so those links must keep resolving — now to the wizard that
-       * actually understands the vocabulary.
+       * real slug, so those links must keep resolving.
        *
-       * Only when `plan` is present. A bare /request?service=scholar stays on
-       * the request form: `scholar` is still a requestable line, which is what
-       * audit-saas-links check 5 asserts, and a parent who wants one ride
-       * should get the one-ride form.
+       * They used to land on the per-plan setup wizard. Scholar enrollment is
+       * closed while the service is prepared for its later launch (Phil,
+       * 2026-11-17), so plan links now land on the Coming Soon page and its
+       * join list, where the form's own plan-interest question captures which
+       * plan the parent had in mind. A bare /request?service=scholar is
+       * redirected by the request page itself.
        */
       {
         source: '/request',
@@ -70,7 +71,7 @@ const nextConfig = {
           { type: 'query', key: 'service', value: 'scholar' },
           { type: 'query', key: 'plan', value: '(?<planSlug>[a-z-]+)' },
         ],
-        destination: '/school/book/:planSlug',
+        destination: '/school',
         permanent: false,
       },
     ];

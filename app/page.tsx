@@ -96,9 +96,9 @@ const verticals: Vertical[] = [
     blurb: 'Moving students who need more than a bus since 2022 — special needs, McKinney-Vento, foster youth and at-risk routes. We aim to provide consistent driver assignments whenever operationally possible, and your recurring schedule is reviewed and confirmed before service begins.',
     bullets: [
       'Four years of student transport · background-checked drivers',
-      'Full year, chosen days, or after-school — from $850/month',
+      'Full year, chosen days, or after-school — coming soon',
     ],
-    cta: 'See plans and pricing',
+    cta: 'Join the list',
     bookHref: request.school,
     image: { src: '/brand/scholar-mascot.webp', alt: 'A graduation cap over an open book', width: 960, height: 637 },
   },

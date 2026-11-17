@@ -1,21 +1,27 @@
 import type { Metadata } from 'next';
 import HouseholdRequestForm from '@/components/school/HouseholdRequestForm';
-import {
-  HOUSEHOLD_PROMPT_BODY,
-  HOUSEHOLD_PROMPT_TITLE,
-  reasonsFromQuery,
-} from '@/lib/school-household';
+import { reasonsFromQuery } from '@/lib/school-household';
 import { planBySlug } from '@/lib/school-plans';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Custom transportation request · Tassy Scholar' },
-  description: 'Tell us about your family’s school schedule and we’ll prepare a personalized transportation plan.',
+  title: { absolute: 'Join the Scholar list · Tassy Scholar' },
+  description:
+    'Tassy Scholar is coming soon. Join the list — tell us about your family and the plan you are interested in, and we will contact you when it opens.',
   // A family mid-request. Nothing here belongs in an index.
   robots: { index: false, follow: false },
 };
 
+/**
+ * The Scholar JOIN LIST (Phil, 2026-11-17).
+ *
+ * This page was the Custom Household Request. While Scholar is parked ahead
+ * of its later launch, the same form and the same plumbing
+ * (scholar_household_requests, pending_review) serve as the join list: the
+ * demand gauge for the launch. The framing changed; the submission did not —
+ * the payload, the schema and the stored row are exactly what they were.
+ */
 export default function HouseholdRequestPage({
   searchParams,
 }: {
@@ -28,13 +34,16 @@ export default function HouseholdRequestPage({
   return (
     <div className="mx-auto max-w-2xl px-5 py-16 sm:py-24">
       <p className="text-center text-[11px] uppercase tracking-[0.16em] text-[color:var(--ink-mute)]">
-        Tassy Scholar
+        Tassy Scholar · Coming soon
       </p>
       <h1 className="serif mt-3 text-center text-3xl font-semibold sm:text-4xl">
-        Custom transportation request
+        Join the Scholar list
       </h1>
       <p className="mt-3 text-center text-sm text-[color:var(--ink-soft)]">
-        {HOUSEHOLD_PROMPT_TITLE} {HOUSEHOLD_PROMPT_BODY}
+        Tassy Scholar is not enrolling yet. This list is how parents register their interest:
+        tell us about your family and the plan you have in mind, and we will contact you when
+        Scholar opens. Joining the list is not a booking — it does not charge you, reserve a
+        seat, or promise a start date.
       </p>
 
       <div className="mt-10">

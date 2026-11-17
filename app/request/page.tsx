@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
 import RequestForm from '@/components/request/RequestForm';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { textToBookActive } from '@/lib/text-to-book';
@@ -76,6 +77,17 @@ export default async function RequestPage({
   // With the mode off this page behaves exactly as before: no database write, no time prefill.
   const textLinks = textToBookActive();
   if (textLinks) await markTextLinkOpened(searchParams.ttb);
+
+  // Tassy Scholar is not enrolling while the service is prepared for its
+  // later launch (Phil, 2026-11-17): a deliberate ?service=scholar — typed,
+  // bookmarked or followed from an old link — lands on the Coming Soon page
+  // and its join list rather than opening a booking form for a service that
+  // has not launched. (The ?plan= variant never reaches here: next.config
+  // redirects it first.) Every other line renders exactly as before.
+  if (serviceWasHonoured(searchParams.service) && coerceServiceLine(searchParams.service) === 'scholar') {
+    redirect('/school');
+  }
+
   const initialService = coerceServiceLine(searchParams.service);
 
   // Necessarily public — Google's JS API runs in the browser. What protects it

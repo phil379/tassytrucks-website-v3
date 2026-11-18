@@ -391,12 +391,14 @@ export default function FacilityWizard({
                     <span className="block font-medium">{m.label}</span>
                     <span className="mt-1 block text-sm text-[color:var(--ink-soft)]">{m.blurb}</span>
 
-                    {/* Phil's copy, verbatim. Says the quiet part out loud so nobody
-                        finishes onboarding expecting to book on account today. */}
+                    {/* Says the quiet part out loud so nobody finishes onboarding
+                        expecting to book on account today. The approver is the company,
+                        not a named person (test-day fix, Nov 18, 2026: a tester asked why
+                        an individual was named; Phil approved dropping the name). */}
                     {m.value === 'invoice_weekly' && (
                       <span className="mt-2 block text-sm text-[color:var(--ink-mute)]">
-                        Weekly invoicing is a credit account, so we open it by hand. Phil reviews
-                        and approves — usually the same business day.
+                        Weekly invoicing is a credit account, so we open it by hand. We review
+                        and approve — usually the same business day.
                       </span>
                     )}
                   </span>

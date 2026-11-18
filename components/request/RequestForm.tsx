@@ -27,6 +27,7 @@ import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/Ad
 import DateTimeField from '@/components/request/DateTimeField';
 import { SCHOOL_PLANS, planBySlug } from '@/lib/school-plans';
 import TripDetailsFields from '@/components/request/TripDetailsFields';
+import ServiceSidePanel from '@/components/request/ServiceSidePanel';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
 import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly, surchargesFor } from '@/lib/quote';
@@ -154,6 +155,7 @@ export default function RequestForm({
   facility,
   hotelPrefill,
   rideTrackingEnabled = false,
+  withServicePanel = false,
 }: {
   initialService: ServiceLine;
   /**
@@ -182,6 +184,15 @@ export default function RequestForm({
    * `?when=` link pre-fill the pickup time. Off (the default) ignores it.
    */
   textLinkPrefill?: boolean;
+  /**
+   * Set on the public /request page only: the form renders beside a panel
+   * showing the selected line's picture, name and starting price, and the
+   * panel follows every service change (picker, decided line, or the
+   * panel's own thumbnails — all of which run through changeService, so a
+   * switch still resets mobility and details exactly as it does today).
+   * The airport and facility forms leave this off and render as before.
+   */
+  withServicePanel?: boolean;
 }) {
   const [smsChecked, setSmsChecked] = useState(false);
   /** The family-number fields: feature on, a retail booking, and the text box ticked. */
@@ -1017,7 +1028,7 @@ export default function RequestForm({
     );
   }
 
-  return (
+  const formBody = (
     <form onSubmit={onSubmit} onInput={clearCorrected} onChange={clearCorrected} noValidate className="space-y-6">
       {/*
         Honeypot — hidden from everyone, including screen readers.
@@ -1693,6 +1704,27 @@ export default function RequestForm({
         <a href={REFUNDS_PATH} className="inline-flex min-h-[44px] items-center underline">Cancellations &amp; refunds</a>
       </p>
     </form>
+  );
+
+  if (!withServicePanel) return formBody;
+
+  /*
+    Panel mode (/request only): the form card and the service panel sit side
+    by side on desktop, panel stacked first on a phone. The panel is a
+    SIBLING of the <form>, never inside it, so its switch buttons can never
+    submit anything; they call changeService, the form's own switch path.
+  */
+  return (
+    <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_370px] lg:items-start lg:gap-8">
+      <div className="order-1 mb-6 lg:order-2 lg:mb-0 lg:sticky lg:top-24">
+        <ServiceSidePanel
+          service={service}
+          options={serviceOptions.map((o) => o.value)}
+          onSelect={changeService}
+        />
+      </div>
+      <div className="card-tile order-2 p-6 sm:p-8 lg:order-1">{formBody}</div>
+    </div>
   );
 }
 

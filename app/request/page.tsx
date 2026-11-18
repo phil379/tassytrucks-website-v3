@@ -103,15 +103,17 @@ export default async function RequestPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(requestPageLd) }}
       />
       <section className="container-x py-12 sm:py-16">
-        <div className="max-w-2xl mx-auto">
-          <p className="eyebrow">Tassy Transportation</p>
-          <h1 className="h-display serif mt-2">{COPY.headline}</h1>
-          <p className="ink-soft mt-4 text-lg">
-            Tell us where and when. You will see an estimate as soon as both addresses are in, and a
-            dispatcher reviews every request personally and confirms the final price before anything is booked.
-          </p>
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Tassy Transportation</p>
+            <h1 className="h-display serif mt-2">{COPY.headline}</h1>
+            <p className="ink-soft mt-4 text-lg">
+              Tell us where and when. You will see an estimate as soon as both addresses are in, and a
+              dispatcher reviews every request personally and confirms the final price before anything is booked.
+            </p>
+          </div>
 
-          <div className="card-tile mt-8 p-6 sm:p-8">
+          <div className="mt-8">
             <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
               <RequestForm
                 initialService={initialService}
@@ -126,6 +128,7 @@ export default async function RequestPage({
                 servicePreselected={serviceWasHonoured(searchParams.service)}
                 googleMapsApiKey={googleMapsApiKey}
                 rideTrackingEnabled={rideTrackingEnabled()}
+                withServicePanel
               />
             </Suspense>
           </div>

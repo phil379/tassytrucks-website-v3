@@ -12,9 +12,10 @@ import { serviceLabel, serviceShortName, type ServiceLine } from '@/lib/trip-req
  * for anything.
  *
  * Copy is the homepage's own (app/page.tsx verticals), reused rather than
- * rewritten, so the panel and the homepage never tell two stories. Winnie's
- * picture is her real photograph, as on the pet-transport page — the drawn
- * mascot stays a logo-style mark, never her portrait.
+ * rewritten, so the panel and the homepage never tell two stories. Every
+ * line's picture is its designed mascot — including Winnie's. Her real
+ * photograph is reserved for one place only: introducing her on the Winnie
+ * Ride page itself (Phil, 2026-11-17).
  *
  * Rendered only by RequestForm's panel mode (the public /request page).
  * The airport and facility forms do not pass the flag and never see this.
@@ -54,12 +55,12 @@ const PANEL: Partial<Record<ServiceLine, PanelInfo>> = {
       'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
     priceLine: 'From $59 one way, $106 there and back',
     image: {
-      src: '/photos/pet-transport-french-bulldog-800.jpg',
-      alt: 'Winnie, a French bulldog, resting on a cream pet bed',
-      width: 800,
-      height: 1000,
+      src: '/brand/winnie-mascot.webp',
+      alt: 'Winnie, the Tassy French bulldog, in reindeer antlers',
+      width: 960,
+      height: 1036,
     },
-    thumb: '/photos/pet-transport-french-bulldog-480.jpg',
+    thumb: '/brand/winnie-mascot.webp',
   },
   scholar: {
     blurb:

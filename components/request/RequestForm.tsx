@@ -1184,7 +1184,7 @@ export default function RequestForm({
           required
         />
         <p id="requestedAt-help" className="ink-soft text-xs mt-1.5">
-          Type the date as month, day, year, or tap the calendar, then choose a time. Earliest pickup is 4 hours from now.
+          Type the date as month, day, year, or tap the calendar, then choose a time. Earliest pickup is 4 hours from now. All times are Charlotte (Eastern) time.
         </p>
         <FieldError name="requestedAt" />
       </div>
@@ -1210,8 +1210,11 @@ export default function RequestForm({
               name="returnAt"
               minDateTime={minDateTime}
               hasError={Boolean(errors.returnAt)}
-              describedBy={errors.returnAt ? 'returnAt-error' : undefined}
+              describedBy={errors.returnAt ? 'returnAt-error returnAt-help' : 'returnAt-help'}
             />
+            <p id="returnAt-help" className="ink-soft text-xs mt-1.5">
+              All times are Charlotte (Eastern) time.
+            </p>
             <FieldError name="returnAt" />
           </div>
         )}

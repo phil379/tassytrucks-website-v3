@@ -206,7 +206,7 @@ export default function PricingPage() {
               colBSub="20 min wait included"
               rows={WINNIE}
               href={request.winnie}
-              cta="Request a pet ride"
+              cta="Join the Winnie list"
             />
           </div>
         </div>

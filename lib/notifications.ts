@@ -730,6 +730,77 @@ export async function notifyOperatorHouseholdRequest(input: {
 }
 
 /**
+ * A pet owner joined the Winnie Ride waitlist. Tell the operator.
+ *
+ * Never throws. NOTE the difference from the household request above: there
+ * is no database row behind this alert yet (no winnie_waitlist table — see
+ * the STORAGE GAP banner in lib/winnie-waitlist.ts), so this notification
+ * IS the lead's record until that table lands. The email therefore carries
+ * the whole lead, and the route awaits this call before answering.
+ *
+ * PII RULE: the push carries the pet type and the reference only. The email
+ * goes to OPERATOR_EMAIL (a mailbox we control) and carries the detail.
+ *
+ * There is deliberately NO message to the pet owner from here. The
+ * confirmation on screen is the acknowledgement; contact when the service
+ * opens is a person's job, and sending one automatically would promise a
+ * response nobody has agreed to.
+ */
+export async function notifyOperatorWinnieWaitlist(input: {
+  id: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+  petName: string;
+  petType: string;
+  petBasics: string;
+  services: string[];
+  extraNotes: string | null;
+  isTestData: boolean;
+}): Promise<void> {
+  const ref = shortRef(input.id);
+  const message: PushMessage = {
+    title: 'NEW WINNIE WAITLIST - join list, no rides yet',
+    body: `${input.petType} - ref ${ref}`,
+    priority: 'high',
+    tags: ['dog'],
+  };
+
+  const lines = [
+    'A pet owner joined the Winnie Ride waitlist. Winnie Ride is NOT open yet.',
+    'Nothing was booked, charged or promised: no ride, no price confirmation, no start date.',
+    'This email is currently the lead’s only record — there is no waitlist table yet.',
+    '',
+    `Owner:     ${input.ownerName}`,
+    `Email:     ${input.email}`,
+    `Mobile:    ${input.phone}`,
+    `Pet:       ${input.petName} (${input.petType}) — ${input.petBasics}`,
+    `Needs:     ${input.services.length ? input.services.join(', ') : 'not specified'}`,
+    ...(input.extraNotes ? [`Notes:     ${input.extraNotes}`] : []),
+    ...(input.isTestData ? ['TEST DATA: the email matches the test-identity pattern.'] : []),
+    `Reference: ${ref}`,
+    '',
+    `Review:    ${opsUrl()}`,
+  ].join('\n');
+
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    sendResendEmail({
+      to: process.env.OPERATOR_EMAIL ?? '',
+      subject: `Winnie waitlist: ${input.petType} — ${input.services.length ? input.services.join(', ') : 'pet transport'}`,
+      text: lines,
+    }),
+  ]);
+
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('[winnie-waitlist] alert leg failed for', ref, r.reason);
+    }
+  }
+}
+
+/**
  * The money arrived. Tell the operator.
  *
  * Deliberately UNLIKE notifyOperatorUrgent: this NEVER throws. Its caller is

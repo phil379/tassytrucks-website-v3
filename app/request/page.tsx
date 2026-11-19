@@ -88,6 +88,16 @@ export default async function RequestPage({
     redirect('/school');
   }
 
+  // Winnie Ride is not taking bookings until a real Winnie driver exists
+  // (Phil, 2026-11-18 — the phased launch): a deliberate ?service=winnie
+  // lands on the Winnie page and its join list, exactly as Scholar does
+  // above, rather than opening a booking form for a service that has not
+  // opened. The legacy ?service=pet alias resolves to winnie in
+  // coerceServiceLine and follows it here.
+  if (serviceWasHonoured(searchParams.service) && coerceServiceLine(searchParams.service) === 'winnie') {
+    redirect('/winnie');
+  }
+
   const initialService = coerceServiceLine(searchParams.service);
 
   // Necessarily public — Google's JS API runs in the browser. What protects it

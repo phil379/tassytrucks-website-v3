@@ -695,6 +695,8 @@ export default function RequestForm({
     'careIntake.hipaa': 'Privacy acknowledgement',
     'careIntake.transportConsent': 'Transport consent',
     'careIntake.signerName': 'Name to sign',
+    'careIntake.accompaniedByAdult': 'Adult riding along',
+    'careIntake.accompanyingAdultName': 'Adult riding along',
   };
   function summaryLabel(name: string): string {
     if (name.startsWith('details.')) {
@@ -837,6 +839,8 @@ export default function RequestForm({
               hipaa: care.hipaa,
               transportConsent: care.transportConsent,
               signerName: care.signerName,
+              accompaniedByAdult: care.accompaniedByAdult,
+              accompanyingAdultName: care.accompanyingAdultName || null,
             }
           : null,
       source,

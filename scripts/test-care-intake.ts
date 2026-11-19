@@ -1,7 +1,7 @@
 // Unit tests for lib/care-intake.ts. Run: bun run scripts/test-care-intake.ts
 import assert from 'node:assert/strict';
 import {
-  buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, checkAdult, isMedicalPayer, isPayerEnabled,
+  buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, checkAdult, isAccompaniedMinor, isMedicalPayer, isPayerEnabled,
   patientIsMinor,
   CARE_CONSENT_VERSION, CARE_PAYMENT_OPTIONS,
 } from '../lib/care-intake';
@@ -108,6 +108,15 @@ t('patientIsMinor: the 18th birthday is not a minor; invalid dates are not minor
   for (const bad of [undefined, '', 'nope', '2030-01-01', '1950-02-31']) {
     assert.equal(patientIsMinor(bad as string, TODAY), false, String(bad));
   }
+});
+t('isAccompaniedMinor: only a minor with a named adult riding along', () => {
+  const kid = { dob: '2021-06-15', accompaniedByAdult: true, accompanyingAdultName: 'Marianne Wambo' };
+  assert.equal(isAccompaniedMinor(kid, TODAY), true);
+  assert.equal(isAccompaniedMinor({ ...kid, accompaniedByAdult: false }, TODAY), false);
+  assert.equal(isAccompaniedMinor({ ...kid, accompanyingAdultName: '' }, TODAY), false);
+  assert.equal(isAccompaniedMinor({ ...kid, accompanyingAdultName: 'M' }, TODAY), false);
+  assert.equal(isAccompaniedMinor({ ...kid, dob: '1950-03-02' }, TODAY), false); // adult patient, same boxes ticked
+  assert.equal(isAccompaniedMinor({ dob: '', accompaniedByAdult: true, accompanyingAdultName: 'Marianne Wambo' }, TODAY), false);
 });
 t('consent text names the signer and version', () => {
   const txt = buildCareConsentText('Maria Santos');

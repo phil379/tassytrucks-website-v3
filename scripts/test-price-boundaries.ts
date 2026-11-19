@@ -16,7 +16,7 @@ const A = { lat: 35.2271, lng: -80.8431 };
 const B = { lat: 35.3, lng: -80.7 };
 const AT = '2026-10-21T10:00'; // a Wednesday morning: no surcharge
 
-type Opts = { mobility?: string; returnTrip?: boolean; requestedAt?: string; treatmentDay?: boolean; escort?: boolean; passengers?: number };
+type Opts = { mobility?: string; returnTrip?: boolean; requestedAt?: string; treatmentDay?: boolean; escort?: boolean; passengers?: number; accompaniedMinor?: boolean };
 function est(line: ServiceLine, roadMiles: number, o: Opts = {}) {
   return estimateTrip({ serviceLine: line, pickup: A, dropoff: B, roadMiles, requestedAt: AT, ...o });
 }
@@ -195,6 +195,20 @@ t('extra passengers are charged per head on Care and Winnie, free on Recovery an
   assert.equal(cents('concierge', 2, { passengers: 6 }), 8900);
   // Not doubled on a return trip.
   assert.equal(cents('care', 2, { passengers: 2, returnTrip: true }), 9800 + 1000);
+});
+
+t('the adult required to ride with a minor Care patient is not an extra passenger (Phil, 2026-11-19)', () => {
+  // The dry-run scenario: child + mother on the ≤7 mi band — $59, not $59 + $10.
+  assert.equal(cents('care', 5, { passengers: 2, accompaniedMinor: true }), 5900);
+  // A third person is a real extra again: child + two adults pays for one.
+  assert.equal(cents('care', 5, { passengers: 3, accompaniedMinor: true }), 5900 + 1000);
+  // An adult patient with a companion is unchanged.
+  assert.equal(cents('care', 5, { passengers: 2 }), 5900 + 1000);
+  // The required adult is free once, like every extra is charged once: a
+  // return trip doubles the legs, never the people.
+  assert.equal(cents('care', 5, { passengers: 2, accompaniedMinor: true, returnTrip: true }), 11800);
+  // The flag is a Care rule: it never discounts another line.
+  assert.equal(cents('winnie', 2, { passengers: 2, accompaniedMinor: true }), 5900 + 1500);
 });
 
 t('Escort is $45 once, on Recovery only', () => {

@@ -22,7 +22,7 @@ import { coerceLatLng, roadDistance } from '@/lib/road-distance';
 import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { createHash } from 'node:crypto';
 import {
-  buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isPayerEnabled,
+  buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isAccompaniedMinor, isPayerEnabled,
 } from '@/lib/care-intake';
 import { buildSmsConsent } from '@/lib/sms-consent';
 import { buildFamilyPhones, rideTrackingEnabled, type FamilyPhoneValues } from '@/lib/ride-link';
@@ -239,6 +239,11 @@ export async function POST(request: Request) {
   // browser only says which boxes were ticked - and the signing IP / agent /
   // time are stamped by the server, so the record proves what was shown.
   let careIntake: ReturnType<typeof buildCareIntakeRecord> | null = null;
+  // Set from the VALIDATED intake below: a minor patient riding with the
+  // required named adult. The quote further down reads it, so the stored
+  // price never charges that adult as an extra passenger — the same
+  // predicate the form's live estimate used (lib/care-intake.ts).
+  let accompaniedMinor = false;
   if (data.careIntake !== undefined && data.careIntake !== null) {
     if (data.serviceLine !== 'care' || wantsFacilityBooking) {
       return NextResponse.json(
@@ -263,6 +268,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    accompaniedMinor = isAccompaniedMinor(intake.data);
     careIntake = buildCareIntakeRecord(intake.data, {
       textHash: 'sha256:' + createHash('sha256').update(buildCareConsentText(intake.data.signerName ?? '')).digest('hex'),
       signedAt: new Date().toISOString(),
@@ -477,6 +483,9 @@ export async function POST(request: Request) {
     dropoffAddress: data.dropoffAddress,
     requestedAt: data.requestedAt,
     passengers: data.passengers,
+    // From the validated care intake above: the adult required to ride
+    // with a minor patient is not an extra passenger.
+    accompaniedMinor,
     returnTrip: data.returnTrip,
     // Wheelchair moves Tassy Care onto the WAV card. The form has always
     // collected this; until now the price ignored it.

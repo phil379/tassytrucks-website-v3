@@ -129,7 +129,7 @@ export function buildPriceTable(): PriceTableData {
       label: 'Extra passenger — Tassy Care',
       cents: CARE.perExtra,
       amount: `+${dollars(CARE.perExtra)}`,
-      note: 'Each passenger beyond the first. On Recovery and Concierge, companions ride at no charge.',
+      note: 'Each passenger beyond the first. The adult required to ride with a minor patient is not charged as an extra passenger. On Recovery and Concierge, companions ride at no charge.',
     },
     {
       label: 'Extra pet — Winnie Ride',

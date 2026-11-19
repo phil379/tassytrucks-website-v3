@@ -80,7 +80,7 @@ const verticals: Vertical[] = [
     image: { src: '/brand/winnie-mascot.webp', alt: 'Winnie, the Tassy French bulldog, in reindeer antlers', width: 960, height: 1036 },
     blurb: 'Your pet gets there. You don’t have to leave work. Vet, groomer, daycare or boarding — we take them on their own and hand them over by name.',
     bullets: ['From $59 one way, $106 there and back', 'Carrier or harness included'],
-    cta: 'Request a Winnie Ride',
+    cta: 'Join the list',
     bookHref: request.winnie,
   },
   {

@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: 'Pet Boarding Pickup & Drop-Off in Charlotte NC',
@@ -12,7 +11,10 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/pet-boarding-transport', images: ['/og-image/pet-boarding-transport'] },
 };
 
-const CTA_HREF = seoRequest('winnie', { source: 'seo-boarding' });
+// Winnie Ride is join-list only until its first driver is in place (Phil,
+// 2026-11-18 — phased launch): the CTA goes to the list on /winnie,
+// not to the booking form.
+const CTA_HREF = '/winnie#join-list';
 
 const linkCls = 'underline decoration-[#7C9A5C] underline-offset-2';
 
@@ -28,7 +30,7 @@ export default function PetBoardingTransportPage() {
       h1="Pet Boarding Pickup & Drop-Off in Charlotte — Kennel Runs Scheduled Around Your Flights"
       heroSubtitle="We take your dog or cat to the boarding facility before you fly and bring them home when you land — no favors to ask, no second car to coordinate."
       quickAnswer="Winnie Ride by Tassy Transportation is a pet boarding pickup service covering Charlotte and Mecklenburg County. We handle home-to-kennel drop-offs, boarding-to-home returns, and daily daycare runs, scheduled around your travel. Current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking. Call (704) 941-8508 — a dispatcher usually confirms your driver and your price within 2 hours during business hours."
-      ctaText="Schedule boarding transport"
+      ctaText="Join the Winnie list"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       sections={[

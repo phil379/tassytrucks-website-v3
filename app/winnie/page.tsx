@@ -4,8 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import ServicePage from '@/components/ServicePage';
 import PawIcon from '@/components/seo/PawIcon';
 
-import { request } from '@/lib/request-links';
-import { WINNIE_LEAD_WORD } from '@/lib/copy';
+import WinnieWaitlistForm from '@/components/winnie/WinnieWaitlistForm';
 import { winnieRoundTrip, winnieRoundTripRange } from '@/lib/price-table';
 
 const charlotteServices = [
@@ -19,22 +18,37 @@ const charlotteServices = [
 ];
 
 export const metadata: Metadata = {
-  title: 'Winnie Ride — Charlotte pet transport | From $59',
-  description: `Dedicated Charlotte pet transport to the vet, groomer, daycare or boarding — you do not have to go. Flat rates from $59 one way, ${winnieRoundTrip(0)} there and back. (704) 941-8508.`,
+  title: { absolute: 'Winnie Ride — coming soon' },
+  description:
+    'Winnie Ride, dedicated Charlotte pet transport to the vet, groomer, daycare or boarding, is coming soon. Join the list and we will contact you when it opens.',
   alternates: { canonical: '/winnie' },
   openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
 };
+
+/**
+ * Winnie Ride — COMING SOON / JOIN LIST (Phil, 2026-11-18).
+ *
+ * The phased launch opens Care, Recovery and Concierge first; Winnie does
+ * not take bookings until a real Winnie driver exists. This page keeps
+ * selling what the service will be — the tiers and published rates stay,
+ * framed as what rides will cost when the service opens — and every
+ * booking CTA became a join-list CTA. The form collects a lead
+ * (lib/winnie-waitlist.ts); it does not book, charge or promise a start
+ * date. Same flip Scholar got on 2026-11-17 (PR #111). The marketing
+ * content — highlights, tiers, the Charlotte cluster below — is unchanged
+ * apart from the CTAs and the coming-soon framing.
+ */
 
 export default function WinniePage() {
   return (
     <>
     <ServicePage
-      eyebrow="Winnie Ride · Pet transport"
+      eyebrow="Winnie Ride · Coming soon"
       title="Your pet gets there. You don't have to leave work."
       tagline="Vet, groomer, daycare, boarding — and you don't travel with them."
-      description={`Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, ${winnieRoundTrip(0)} there and back with the wait included. Book with at least ${WINNIE_LEAD_WORD} hours' notice for routine rides.`}
-      bookHref={request.winnie}
-      bookLabel="Request a pet ride"
+      description={`Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, ${winnieRoundTrip(0)} there and back with the wait included. Winnie Ride is not open yet — we open it when its first driver is in place, and the list below is how you hear first.`}
+      bookHref="#join-list"
+      bookLabel="Join the Winnie list"
       serviceName="Winnie Ride — Pet Transportation"
       trustChips={['SDVOSB certified', 'Licensed & insured']}
       path="/winnie"
@@ -63,14 +77,14 @@ export default function WinniePage() {
           price: '$59',
           cadence: `one way · ${winnieRoundTrip(0)} there and back`,
           features: ['Carrier or harness included', 'Seat protection', '20 min wait on a round trip', 'Second pet $15', 'Weekends +$20'],
-          cta: { label: 'Request this', href: request.winnie },
+          cta: { label: 'Join the list', href: '#join-list' },
         },
         {
           name: '6 to 15 miles',
           price: '$79–89',
           cadence: `one way · ${winnieRoundTripRange(1, 2)} there and back`,
           features: ['Everything above', 'Across Mecklenburg County', 'Handover by name at the clinic', 'Text when they are collected', 'Second pet $15', 'Weekends +$20'],
-          cta: { label: 'Request this', href: request.winnie },
+          cta: { label: 'Join the list', href: '#join-list' },
           highlight: true,
         },
         {
@@ -78,7 +92,7 @@ export default function WinniePage() {
           price: '$99–109',
           cadence: `one way · ${winnieRoundTripRange(3, 4)} there and back`,
           features: ['Everything above', 'Longer runs and out-of-county vets', 'Over 25 miles, call us', 'Monthly plans 10–15% off', 'Second pet $15', 'Weekends +$20'],
-          cta: { label: 'Request this', href: request.winnie },
+          cta: { label: 'Join the list', href: '#join-list' },
         },
       ]}
       partnerCta={{
@@ -88,6 +102,29 @@ export default function WinniePage() {
         label: 'Start a partner account',
       }}
     />
+
+    {/* JOIN LIST — the waitlist form, framed as registering interest */}
+    <section id="join-list" className="bg-surface border-t border-line">
+      <div className="container-x py-16">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex items-center justify-center gap-2.5">
+            <PawIcon size={22} />
+            <div className="eyebrow">Join the list</div>
+          </div>
+          <h2 className="h-section mt-3 text-center">Be first in line when Winnie Ride opens.</h2>
+          <p className="mt-3 text-center text-sm ink-mute leading-relaxed">
+            Tell us about your pet and the rides you will need, and we will contact you when
+            Winnie Ride opens. Joining the list is not a booking: it does not charge you,
+            reserve a ride, or promise a start date — it is how we learn how many pets are
+            waiting, and how we reach you first. The rates above are what rides will cost
+            when the service opens.
+          </p>
+          <div className="mt-10">
+            <WinnieWaitlistForm />
+          </div>
+        </div>
+      </div>
+    </section>
 
     {/* Charlotte Winnie cluster hub — sage accent, additive (MEGA_SEO_002 Phase 3) */}
     <section className="bg-surface border-t border-line">

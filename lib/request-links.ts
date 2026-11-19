@@ -45,7 +45,13 @@ export const request = {
   ride: REQUEST_BASE,
   nemt: to('care'),
   vip: to('concierge'),
-  winnie: to('winnie'),
+  /**
+   * Winnie Ride is NOT a booking link while the service waits for its first
+   * driver (Phil, 2026-11-18 — the phased launch): every Winnie CTA lands
+   * on the Winnie page and its join list, never on the request form. Same
+   * treatment Scholar got on 2026-11-17.
+   */
+  winnie: '/winnie',
   renew: to('concierge'),
   recover: to('recovery'),
   /**

@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Check, Minus } from 'lucide-react';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoRequest } from '@/lib/request-links';
 import { SERVICE_AREA, WINNIE_LEAD_HOURS } from '@/lib/copy';
 
 export const metadata: Metadata = {
@@ -14,7 +13,10 @@ export const metadata: Metadata = {
   openGraph: { url: '/compare/winnie-vs-uber-pet-vs-lyft-pet', images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
 };
 
-const CTA_HREF = seoRequest('winnie', { source: 'seo-compare-pet' });
+// Winnie Ride is join-list only until its first driver is in place (Phil,
+// 2026-11-18 — phased launch): the CTA goes to the list on /winnie,
+// not to the booking form.
+const CTA_HREF = '/winnie#join-list';
 
 const yes = <Check size={18} className="inline" style={{ color: '#7C9A5C' }} aria-label="Yes" />;
 const no = <Minus size={18} className="inline opacity-40" aria-label="No" />;
@@ -108,7 +110,7 @@ export default function WinnieComparePage() {
       h1="Winnie Ride vs Uber Pet vs Lyft Pet — Charlotte Pet Transport Compared"
       heroSubtitle="The honest version: when a rideshare pet option is fine, and when your pet needs a service built for pets."
       quickAnswer="Uber Pet and Lyft Pets let you bring your pet along on your own ride for an added fee — good for quick trips with a calm, well-socialized dog when you're in the car too. Winnie Ride is a dedicated Charlotte pet transport service that moves your pet when you can't be there, with current rabies vaccination required (plus DAPP for dogs, FVRCP for cats). The pet's owner confirms rabies status when booking."
-      ctaText="Request a pet ride"
+      ctaText="Join the Winnie list"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       publishedDate="June 11, 2026"

@@ -13,6 +13,7 @@ import {
   cancellationText,
   type CancelledTrip,
 } from '@/lib/cancellation-email';
+import { CANCELLATION } from '@/lib/refund-policy';
 
 /**
  * Refund a cancelled trip. The one place a paid booking gets its money back.
@@ -47,7 +48,7 @@ import {
  *   • Full refund at cancel time, every time. The policy
  *     (lib/refund-policy.ts, PROPOSED) says "Tassy cancels or has no driver
  *     = full refund", and a dispatcher cancel is Tassy cancelling. The
- *     rider-initiated late-cancel 50% fee is NOT applied here: at cancel
+ *     rider-initiated late-cancel fee is NOT applied here: at cancel
  *     time the refund is either issued in full or HELD (below). The one
  *     partial refund in the system is a held payment being decided later:
  *     the ops held-payments queue (Block B1) passes `amountCents` — the
@@ -344,8 +345,9 @@ async function chargedFareCents(db: Db, tripId: string, row: Record<string, unkn
 /**
  * Email the rider about a HELD refund. The companion to refundTrip for
  * the one cancel outcome that moves no money: rider-initiated, inside
- * the free-cancel window, policy keeps a 50% fee and a human refunds the
- * rest afterwards (PR #163; the ops held-payments queue, Block B1, is
+ * the free-cancel window, policy keeps the late-cancellation fee and a
+ * human refunds the rest afterwards (PR #163; the ops held-payments
+ * queue, Block B1, is
  * where that decision now happens). Ops calls this through the same
  * bridge (outcome: "held") right after recording the cancel.
  *
@@ -380,7 +382,11 @@ export async function notifyRefundHeld(args: { id: string }): Promise<HeldNotify
   }
 
   const fareCents = await chargedFareCents(db, args.id, row as Record<string, unknown>);
-  const feeCents = Math.round(fareCents / 2);
+  // The fee is the policy's late-cancel percentage of the fare, read from
+  // lib/refund-policy.ts — never a typed split. It was half the fare until
+  // Phil's 2026-11-19 decision made it 100%, so the remainder is now $0
+  // and the held email tells the rider no refund is due.
+  const feeCents = Math.round((fareCents * CANCELLATION.trip.lateCancelFeePercent) / 100);
   const remainderCents = fareCents - feeCents;
 
   // The [TEST] prefix follows the same mode rule as the refund email;
@@ -431,7 +437,7 @@ export async function notifyRefundHeld(args: { id: string }): Promise<HeldNotify
       trip_id: args.id,
       event: 'note',
       actor: 'system:refund-held',
-      notes: `Cancellation email sent: refund held — 50% late-cancellation fee applies; $${(remainderCents / 100).toFixed(2)} to be refunded by hand in Stripe.`,
+      notes: `Cancellation email sent: refund held — ${CANCELLATION.trip.lateCancelFeePercent}% late-cancellation fee applies; $${(remainderCents / 100).toFixed(2)} to be refunded by hand in Stripe.`,
     });
     if (eventError) console.error('[ops] could not write the held-refund timeline row:', eventError.message);
   }

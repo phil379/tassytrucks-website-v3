@@ -33,6 +33,15 @@ assert.equal(CANCELLATION.treatmentDay.freeUntilHoursBefore, 2);
 assert.equal('treatmentDayFreeUntilHoursBefore' in PHIL_PROPOSED, false);
 ok('Treatment Day window is 2 hours too (Phil, decided 2026-11-18)');
 
+// Phil DECIDED the late-cancel fee on 2026-11-19: 100% of the price,
+// Uber-style, superseding the 50% set on 2026-11-18 — trips and Treatment
+// Day alike. The window stayed 2 hours; only the fee moved. The held
+// cancellation email and the ops held split read this number, so a drift
+// here would silently re-promise riders a cheaper fee.
+assert.equal(CANCELLATION.trip.lateCancelFeePercent, 100);
+assert.equal(CANCELLATION.treatmentDay.lateCancelFeePercent, 100);
+ok('late cancellation inside the window costs the full price (Phil, decided 2026-11-19)');
+
 // The numbers are not retyped on the page, the form or the email.
 const page = read('app/refunds/page.tsx');
 assert.ok(!/\b(50|100)%/.test(page), 'percentages must come from lib/refund-policy.ts');

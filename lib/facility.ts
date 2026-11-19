@@ -30,6 +30,7 @@ export const FACILITY_KINDS = [
   { value: 'dental',         label: 'Dental practice',          defaultLine: 'recovery', passenger: 'patient' },
   { value: 'clinic',         label: 'Clinic or physician group', defaultLine: 'care',    passenger: 'patient' },
   { value: 'veterinary',     label: 'Veterinary practice',      defaultLine: 'winnie',   passenger: 'pet' },
+  { value: 'pet_services',   label: 'Pet daycare, boarding or grooming', defaultLine: 'winnie', passenger: 'pet' },
   { value: 'rehab',          label: 'Rehab or skilled nursing', defaultLine: 'care',     passenger: 'resident' },
   { value: 'senior_living',  label: 'Senior living',            defaultLine: 'care',     passenger: 'resident' },
   { value: 'other',          label: 'Something else',           defaultLine: 'care',     passenger: 'passenger' },

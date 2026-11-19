@@ -85,10 +85,10 @@ export default async function FacilityWelcomePage({
             Tassy Transportation
           </p>
           <h1 className="serif mt-3 text-center text-3xl font-semibold sm:text-4xl">
-            {facility.name} is set up
+            {facility.name} — your setup is complete
           </h1>
           <p className="mt-4 text-center text-[color:var(--ink-soft)]">
-            Weekly invoicing is a credit account, so we open it by hand. We usually do that the same
+            Weekly invoicing is a credit account, so a person on our team opens it. We usually do that the same
             business day, and we will email you the moment your account is open. That email&rsquo;s link
             signs you into your console — where you book rides and read your messages. Until it
             arrives, there is nothing more to do here.

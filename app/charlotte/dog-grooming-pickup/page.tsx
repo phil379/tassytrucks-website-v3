@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import PawIcon from '@/components/seo/PawIcon';
-import { seoRequest } from '@/lib/request-links';
 
 export const metadata: Metadata = {
   title: { absolute: 'Dog Grooming Pickup Service in Charlotte NC | Winnie Ride' },
@@ -12,7 +11,10 @@ export const metadata: Metadata = {
   openGraph: { url: '/charlotte/dog-grooming-pickup', images: ['/og-image/dog-grooming-pickup'] },
 };
 
-const CTA_HREF = seoRequest('winnie', { source: 'seo-grooming' });
+// Winnie Ride is join-list only until its first driver is in place (Phil,
+// 2026-11-18 — phased launch): the CTA goes to the list on /winnie,
+// not to the booking form.
+const CTA_HREF = '/winnie#join-list';
 
 const linkCls = 'underline decoration-winnie-sage underline-offset-2';
 
@@ -28,7 +30,7 @@ export default function DogGroomingPickupPage() {
       h1="Dog Grooming Pickup Service in Charlotte — Your Dog Makes the Appointment, Even When You Can’t"
       heroSubtitle="Round-trip or one-way rides between your door and your groomer’s — same-day when vehicles are available, or on a recurring schedule that matches your standing appointment."
       quickAnswer="Winnie Ride is a dog grooming pickup service covering Charlotte and Mecklenburg County. We drive your dog to the groomer and back — round-trip or one-way, same-day when a vehicle is available, or on a recurring weekly or biweekly schedule. Current rabies vaccination required (plus DAPP for dogs). The pet's owner confirms rabies status when booking."
-      ctaText="Schedule a grooming ride"
+      ctaText="Join the Winnie list"
       ctaHref={CTA_HREF}
       schemaServiceType="Pet Transportation"
       sections={[

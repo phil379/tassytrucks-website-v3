@@ -14,6 +14,7 @@ import {
   type ActionResult,
 } from '@/app/facility/welcome/actions';
 import AddressAutocomplete from '@/components/request/AddressAutocomplete';
+import PriceTable from '@/components/pricing/PriceTable';
 
 /**
  * The four screens behind the magic link.
@@ -407,6 +408,15 @@ export default function FacilityWizard({
             ))}
           </fieldset>
 
+          {/* The terms that belong next to the billing choice (2026-11-18).
+              The cancellation window is Phil's Nov 18 decision — 2 hours,
+              the same number the website policy file (lib/refund-policy.ts)
+              and TassyOps enforce. */}
+          <div className="space-y-1.5 text-sm text-[color:var(--ink-soft)]">
+            <p>Free cancellation until 2 hours before pickup, then 50%.</p>
+            <p>Approved accounts are invoiced weekly on 7-day terms.</p>
+          </div>
+
           {billingMode === 'invoice_weekly' && (
             <>
               {/* Removes the dead window without touching the credit decision. */}
@@ -453,6 +463,24 @@ export default function FacilityWizard({
               )}
             </>
           )}
+
+          {/* Plan billing, display only — the same posture as the booking
+              form's payment options (lib/care-intake.ts): listed, marked
+              coming soon, never selectable, never promised. */}
+          <p className="rounded-lg border border-[color:var(--line)] p-4 text-sm text-[color:var(--ink-mute)]">
+            Medicaid, private insurance and VA billing are coming soon — they can&rsquo;t be
+            chosen yet. Today, every ride is paid by your facility&rsquo;s account or the
+            passenger&rsquo;s card.
+          </p>
+
+          {/* The rates themselves, on the step where a facility commits to
+              how it pays (Marianne's feedback, 2026-11-18: she finished
+              signup without seeing a single price). Every figure derives
+              from lib/quote.ts via lib/price-table.ts. */}
+          <PriceTable variant="full" />
+          <p className="text-sm text-[color:var(--ink-soft)]">
+            Your rates are the published rates above.
+          </p>
 
           <button type="submit" disabled={busy} className="btn-primary w-full justify-center disabled:opacity-60">
             {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : 'Finish setup'}

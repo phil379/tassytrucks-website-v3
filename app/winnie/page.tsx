@@ -6,6 +6,7 @@ import PawIcon from '@/components/seo/PawIcon';
 
 import { request } from '@/lib/request-links';
 import { WINNIE_LEAD_WORD } from '@/lib/copy';
+import { winnieRoundTrip, winnieRoundTripRange } from '@/lib/price-table';
 
 const charlotteServices = [
   { href: '/charlotte/pet-transport', label: 'Pet transport in Charlotte', blurb: 'The full picture — how it works, what it costs, and what your pet needs to ride.' },
@@ -19,8 +20,7 @@ const charlotteServices = [
 
 export const metadata: Metadata = {
   title: 'Winnie Ride — Charlotte pet transport | From $59',
-  description:
-    'Dedicated Charlotte pet transport to the vet, groomer, daycare or boarding — you do not have to go. Flat rates from $59 one way, $106 there and back. (704) 941-8508.',
+  description: `Dedicated Charlotte pet transport to the vet, groomer, daycare or boarding — you do not have to go. Flat rates from $59 one way, ${winnieRoundTrip(0)} there and back. (704) 941-8508.`,
   alternates: { canonical: '/winnie' },
   openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
 };
@@ -32,7 +32,7 @@ export default function WinniePage() {
       eyebrow="Winnie Ride · Pet transport"
       title="Your pet gets there. You don't have to leave work."
       tagline="Vet, groomer, daycare, boarding — and you don't travel with them."
-      description={`Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, $106 there and back with the wait included. Book with at least ${WINNIE_LEAD_WORD} hours' notice for routine rides.`}
+      description={`Dedicated pet transportation, with the owner not in the car. We collect your animal from you or from your home, hand them over to the clinic by name, and bring them back. This is the trip you cannot take: the vet appointment on a workday, the standing groomer, the boarding drop-off before a 6am flight. Flat rates from $59 one way, ${winnieRoundTrip(0)} there and back with the wait included. Book with at least ${WINNIE_LEAD_WORD} hours' notice for routine rides.`}
       bookHref={request.winnie}
       bookLabel="Request a pet ride"
       serviceName="Winnie Ride — Pet Transportation"
@@ -46,7 +46,7 @@ export default function WinniePage() {
         },
         {
           title: 'A flat price, both ways',
-          body: '$59 for anything inside 5 miles one way. $106 there and back, with 20 minutes of wait built in so a quick nail trim does not need two separate trips.',
+          body: `$59 for anything inside 5 miles one way. ${winnieRoundTrip(0)} there and back, with 20 minutes of wait built in so a quick nail trim does not need two separate trips.`,
         },
         {
           title: 'Carrier, harness and a calm cabin',
@@ -61,14 +61,14 @@ export default function WinniePage() {
         {
           name: 'Up to 5 miles',
           price: '$59',
-          cadence: 'one way · $106 there and back',
+          cadence: `one way · ${winnieRoundTrip(0)} there and back`,
           features: ['Carrier or harness included', 'Seat protection', '20 min wait on a round trip', 'Second pet $15', 'Weekends +$20'],
           cta: { label: 'Request this', href: request.winnie },
         },
         {
           name: '6 to 15 miles',
           price: '$79–89',
-          cadence: 'one way · $142–160 there and back',
+          cadence: `one way · ${winnieRoundTripRange(1, 2)} there and back`,
           features: ['Everything above', 'Across Mecklenburg County', 'Handover by name at the clinic', 'Text when they are collected', 'Second pet $15', 'Weekends +$20'],
           cta: { label: 'Request this', href: request.winnie },
           highlight: true,
@@ -76,7 +76,7 @@ export default function WinniePage() {
         {
           name: '16 to 25 miles',
           price: '$99–109',
-          cadence: 'one way · $178–196 there and back',
+          cadence: `one way · ${winnieRoundTripRange(3, 4)} there and back`,
           features: ['Everything above', 'Longer runs and out-of-county vets', 'Over 25 miles, call us', 'Monthly plans 10–15% off', 'Second pet $15', 'Weekends +$20'],
           cta: { label: 'Request this', href: request.winnie },
         },

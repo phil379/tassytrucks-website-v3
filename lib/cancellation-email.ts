@@ -1,7 +1,7 @@
 import { serviceShortName, fullName, mobilityLabel, type TripRequestInput } from '@/lib/trip-request';
 import { formatUsd } from '@/lib/quote';
 import { OPERATING_TIME_ZONE } from '@/lib/time';
-import { REFUNDS_URL } from '@/lib/refund-policy';
+import { CANCELLATION, REFUNDS_URL } from '@/lib/refund-policy';
 import { emailFooterHtml, emailFooterText } from '@/lib/business';
 
 /**
@@ -153,7 +153,7 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
     </h1>
     <p style="margin:0;color:${MUTE};font-size:15px;line-height:1.55;">
       Your ${esc(serviceShortName(data.serviceLine))} trip for ${esc(fmtWhen(data.requestedAt))} has been
-      cancelled. ${held ? `Because the cancellation came inside 4 hours of pickup, our late-cancellation
+      cancelled. ${held ? `Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation
       policy applies: a 50% fee is kept from the fare, and the rest will be refunded to the card
       you paid with by our team.` : `You will not be charged for it — we have refunded the full fare to the card you
       paid with.`} Keep this email — the confirmation number below is all we need to find you.
@@ -249,7 +249,7 @@ export function cancellationText(t: CancelledTrip, data: TripRequestInput): stri
   const feeExact = fmtUsdExact(Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents));
   const moneyLines = held
     ? [
-        `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside 4 hours of pickup, our late-cancellation policy applies: a 50% fee (${feeExact}) is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
+        `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation policy applies: a 50% fee (${feeExact}) is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
       ]
     : [
         `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,

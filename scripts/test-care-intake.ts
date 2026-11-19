@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import {
   buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, checkAdult, isMedicalPayer, isPayerEnabled,
+  patientIsMinor,
   CARE_CONSENT_VERSION, CARE_PAYMENT_OPTIONS,
 } from '../lib/care-intake';
 
@@ -77,6 +78,36 @@ t('plan record: carries version, server hash, DOB; broker only for medicaid; no 
   assert.equal(rec.medicaid_broker, null);
   const json = JSON.stringify(rec);
   for (const banned of ['diagnos', 'procedure', 'condition', 'medication']) assert.equal(json.includes(banned), false, banned);
+});
+t('minor: accompanied by a named adult books; the record tells the truth', () => {
+  const v = { ...card, dob: '2022-06-01', accompaniedByAdult: true, accompanyingAdultName: 'Marianne Wambo' };
+  assert.equal(careIntakeSchema.safeParse(v).success, true);
+  const rec = buildCareIntakeRecord(careIntakeSchema.parse(v), SIGNED);
+  assert.equal(rec.age_verified_18_plus, false);
+  assert.equal(rec.patient_minor, true);
+  assert.equal(rec.accompanied_by_adult, true);
+  assert.equal(rec.accompanying_adult_name, 'Marianne Wambo');
+  assert.equal(JSON.stringify(rec).includes('2022'), false); // card ride: the DOB itself is never stored
+});
+t('minor: no adult confirmed is refused on dob, with the way through', () => {
+  const r = careIntakeSchema.safeParse({ ...card, dob: '2022-06-01' });
+  assert.equal(r.success, false);
+  assert.deepEqual(r.error!.issues[0].path, ['dob']);
+  assert.match(r.error!.issues[0].message, /responsible adult/);
+  assert.match(r.error!.issues[0].message, /704\) 941-8508/);
+});
+t('minor: adult confirmed but not named is refused on the name field', () => {
+  const r = careIntakeSchema.safeParse({ ...card, dob: '2022-06-01', accompaniedByAdult: true, accompanyingAdultName: 'M' });
+  assert.equal(r.success, false);
+  assert.deepEqual(r.error!.issues[0].path, ['accompanyingAdultName']);
+});
+t('patientIsMinor: the 18th birthday is not a minor; invalid dates are not minors', () => {
+  assert.equal(patientIsMinor('2008-10-16', TODAY), false);
+  assert.equal(patientIsMinor('2008-10-17', TODAY), true);
+  assert.equal(patientIsMinor('1950-03-02', TODAY), false);
+  for (const bad of [undefined, '', 'nope', '2030-01-01', '1950-02-31']) {
+    assert.equal(patientIsMinor(bad as string, TODAY), false, String(bad));
+  }
 });
 t('consent text names the signer and version', () => {
   const txt = buildCareConsentText('Maria Santos');

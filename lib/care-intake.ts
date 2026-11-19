@@ -6,8 +6,8 @@ import { z } from 'zod';
  * TODAY (Phil, 2026-10-16): every ride is paid by card through Stripe. Medicaid,
  * insurance and VA billing do not exist yet, so those payment choices are listed
  * but disabled ("coming soon"), and the server refuses them. The one thing every
- * Care ride does ask is the patient's date of birth, for the 18+ rule; only the
- * fact "18 or older" is stored, never the date itself.
+ * Care ride does ask is the patient's date of birth, for the age rule below;
+ * for an adult only the fact "18 or older" is stored, never the date itself.
  *
  * LATER: when Medicaid / insurance / VA billing is set up, flip that option's
  * `enabled` flag below. The fuller intake (plan details, HIPAA + transport
@@ -78,12 +78,19 @@ export function isMedicalPayer(payer: string | null | undefined): payer is CareP
 export type AgeCheck = { ok: true } | { ok: false; message: string };
 
 /**
- * 18+ hard block (Phil, 2026-06-19: "under any conditions an underage should be
- * able to book a ride, never"). Pediatric transport is booked by phone so a
- * coordinator can verify guardian authorization.
+ * THE AGE RULE (Phil, 2026-06-19, clarified 2026-11-18): a patient under 18
+ * never rides unaccompanied — "under any conditions an underage should be
+ * able to book a ride, never" meant alone. With a parent or responsible
+ * adult riding along, the adult is in charge of the child and the ride
+ * books normally; the adult is named at booking (see the schema). An
+ * unaccompanied minor is booked by phone so a coordinator can verify
+ * guardian authorization.
  *
- * `today` is injectable for tests. Dates are compared as calendar dates in
- * UTC, so a birthday is the birthday regardless of the server's zone.
+ * checkAdult keeps the strict reading (any minor fails) because the stored
+ * record distinguishes the two age facts; the schema admits a minor only
+ * through the accompaniment path. `today` is injectable for tests. Dates
+ * are compared as calendar dates in UTC, so a birthday is the birthday
+ * regardless of the server's zone.
  */
 export function checkAdult(dob: string | null | undefined, today = new Date()): AgeCheck {
   if (!dob) return { ok: false, message: 'Patient date of birth is required.' };
@@ -110,6 +117,24 @@ export function checkAdult(dob: string | null | undefined, today = new Date()): 
   return { ok: true };
 }
 
+export const CARE_UNACCOMPANIED_MINOR_MESSAGE =
+  `A patient under 18 must ride with a parent or responsible adult. Confirm the adult below, or call ${CARE_PEDIATRIC_PHONE} to book through our coordinator.`;
+
+/** True only when the DOB is a real, past date and the patient is under 18. */
+export function patientIsMinor(dob: string | null | undefined, today = new Date()): boolean {
+  if (!dob) return false;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return false;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  const born = new Date(Date.UTC(y, mo - 1, d));
+  if (born.getUTCFullYear() !== y || born.getUTCMonth() !== mo - 1 || born.getUTCDate() !== d) return false;
+  const ty = today.getUTCFullYear(), tm = today.getUTCMonth(), td = today.getUTCDate();
+  if (Date.UTC(y, mo - 1, d) > Date.UTC(ty, tm, td)) return false;
+  let age = ty - y;
+  if (tm < mo - 1 || (tm === mo - 1 && td < d)) age -= 1;
+  return age >= 0 && age < 18;
+}
+
 const text = (max: number) => z.string().trim().max(max);
 
 /** What the browser sends. Everything else (text, hash, ip, ua, time) is server-made. */
@@ -123,10 +148,23 @@ export const careIntakeSchema = z
     hipaa: z.boolean().optional(),
     transportConsent: z.boolean().optional(),
     signerName: text(160).optional().nullable(),
+    accompaniedByAdult: z.boolean().optional(),
+    accompanyingAdultName: text(160).optional().nullable(),
   })
   .superRefine((v, ctx) => {
     const age = checkAdult(v.dob);
-    if (!age.ok) ctx.addIssue({ code: 'custom', path: ['dob'], message: age.message });
+    if (!age.ok) {
+      if (patientIsMinor(v.dob)) {
+        // A minor rides only with a named responsible adult in charge.
+        if (v.accompaniedByAdult !== true) {
+          ctx.addIssue({ code: 'custom', path: ['dob'], message: CARE_UNACCOMPANIED_MINOR_MESSAGE });
+        } else if (!v.accompanyingAdultName || v.accompanyingAdultName.trim().length < 2) {
+          ctx.addIssue({ code: 'custom', path: ['accompanyingAdultName'], message: 'Name the adult riding with the patient' });
+        }
+      } else {
+        ctx.addIssue({ code: 'custom', path: ['dob'], message: age.message });
+      }
+    }
     // Card needs nothing more. A plan payer needs the full intake.
     if (v.payer === 'self') return;
     if (v.payer === 'medicaid' && !v.medicaidBroker) {
@@ -146,13 +184,18 @@ export type CareIntakeInput = z.infer<typeof careIntakeSchema>;
 /**
  * The record stored in trip_requests.care_intake.
  *
- * Card rides store only that the patient was confirmed 18+, not the date of
- * birth: there is nothing to bill, so there is nothing to keep it for. A plan
- * payer (when one is enabled) stores the full intake.
+ * Card rides store only the age fact, not the date of birth: for an adult,
+ * that the patient was confirmed 18+; for a minor, that the patient is a
+ * minor riding with a named responsible adult. There is nothing to bill,
+ * so there is nothing to keep the date for. A plan payer (when one is
+ * enabled) stores the full intake.
  */
 export interface CareIntakeRecord {
   payer: CarePaymentValue;
-  age_verified_18_plus: true;
+  age_verified_18_plus: boolean;
+  patient_minor?: true;
+  accompanied_by_adult?: true;
+  accompanying_adult_name?: string;
   verified_at: string;
   dob?: string;
   medicaid_broker?: string | null;
@@ -174,12 +217,20 @@ export function buildCareIntakeRecord(
   v: CareIntakeInput,
   signed: { textHash: string; signedAt: string; ip: string | null; ua: string | null },
 ): CareIntakeRecord {
+  const ageFact = patientIsMinor(v.dob)
+    ? {
+        age_verified_18_plus: false,
+        patient_minor: true as const,
+        accompanied_by_adult: true as const,
+        accompanying_adult_name: v.accompanyingAdultName!.trim(),
+      }
+    : { age_verified_18_plus: true };
   if (v.payer === 'self') {
-    return { payer: 'self', age_verified_18_plus: true, verified_at: signed.signedAt };
+    return { payer: 'self', ...ageFact, verified_at: signed.signedAt };
   }
   return {
     payer: v.payer,
-    age_verified_18_plus: true,
+    ...ageFact,
     verified_at: signed.signedAt,
     dob: v.dob,
     medicaid_broker: v.payer === 'medicaid' ? v.medicaidBroker || null : null,

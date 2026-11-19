@@ -485,7 +485,8 @@ export default function FacilityWizard({
 
           {billingMode === 'invoice_weekly' && !bridge ? (
             <p className="text-sm text-[color:var(--ink-soft)]">
-              We&rsquo;ll email you the moment your account is open.
+              We&rsquo;ll email you the moment your account is open. That email&rsquo;s link signs you
+              into your console — where you book rides and read your messages.
             </p>
           ) : (
             <p className="text-sm text-[color:var(--ink-soft)]">

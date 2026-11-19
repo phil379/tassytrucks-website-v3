@@ -89,7 +89,9 @@ export default async function FacilityWelcomePage({
           </h1>
           <p className="mt-4 text-center text-[color:var(--ink-soft)]">
             Weekly invoicing is a credit account, so we open it by hand. We usually do that the same
-            business day, and we will email you the moment your account is open.
+            business day, and we will email you the moment your account is open. That email&rsquo;s link
+            signs you into your console — where you book rides and read your messages. Until it
+            arrives, there is nothing more to do here.
           </p>
           <p className="mt-4 text-center text-[color:var(--ink-soft)]">
             Need a ride before then? Call dispatch on{' '}

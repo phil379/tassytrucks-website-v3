@@ -118,7 +118,7 @@ export function checkAdult(dob: string | null | undefined, today = new Date()): 
 }
 
 export const CARE_UNACCOMPANIED_MINOR_MESSAGE =
-  `A patient under 18 must ride with a parent or responsible adult. Confirm the adult below, or call ${CARE_PEDIATRIC_PHONE} to book through our coordinator.`;
+  `A patient under 18 must ride with a parent or responsible adult. Tick the box below — "An adult will ride along" — and add their name, or call ${CARE_PEDIATRIC_PHONE} to book through our coordinator.`;
 
 /** True only when the DOB is a real, past date and the patient is under 18. */
 export function patientIsMinor(dob: string | null | undefined, today = new Date()): boolean {

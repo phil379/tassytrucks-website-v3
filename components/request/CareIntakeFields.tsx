@@ -163,7 +163,20 @@ export default function CareIntakeFields({
               maxLength={160}
               autoComplete="off"
               value={values.accompanyingAdultName}
-              onChange={(e) => onChange({ accompanyingAdultName: e.target.value })}
+              onChange={(e) => {
+                // Typing the adult's name IS the confirmation, so tick the
+                // box for them. A live tester (Nov 19, 2026) typed her name,
+                // missed the small box above it, was refused at submit, and
+                // worked around the block by entering her own date of birth
+                // instead of her daughter's — the booking then carried no
+                // minor facts at all. Clearing the name unticks: no name,
+                // no confirmed adult.
+                const name = e.target.value;
+                onChange({
+                  accompanyingAdultName: name,
+                  accompaniedByAdult: name.trim().length > 0,
+                });
+              }}
               aria-invalid={err('accompanyingAdultName') ? true : undefined}
               aria-describedby={err('accompanyingAdultName') ? 'careIntake-accompanyingAdultName-error' : undefined}
             />

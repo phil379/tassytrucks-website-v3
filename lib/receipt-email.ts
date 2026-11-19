@@ -1,5 +1,6 @@
 import { serviceShortName } from '@/lib/trip-request';
 import { emailFooterHtml, emailFooterText } from '@/lib/business';
+import { CANCELLATION } from '@/lib/refund-policy';
 
 /**
  * The paid-trip RECEIPT.
@@ -153,7 +154,7 @@ ${rule(14)}
   <tr><td style="padding:12px 0 0;font-size:17px;font-weight:700;color:${INK};border-top:2px solid ${INK};">Total paid</td><td style="padding:12px 0 0;font-size:17px;font-weight:700;color:${INK};text-align:right;border-top:2px solid ${INK};">${esc(total)}</td></tr>
  </table></td></tr></table></td></tr>
 <tr><td style="padding:18px 32px 6px;font-size:14px;line-height:1.55;color:${INK};">
- <p style="margin:0 0 10px;">Need to change or cancel? Call us. No fee if you let us know at least 4 hours ahead.</p>
+ <p style="margin:0 0 10px;">Need to change or cancel? Call us. No fee if you let us know at least ${CANCELLATION.trip.freeUntilHoursBefore} hours ahead.</p>
  <p style="margin:0;">Card only. We never ask for payment details over the phone.</p>
 </td></tr>
 ${rule(12)}
@@ -212,7 +213,7 @@ export function receiptText(r: ReceiptData): string {
     `Destination: ${r.dropoffAddress ?? '—'}`,
     r.confirmationCode ? `Confirmation: ${r.confirmationCode}` : ``,
     ``,
-    `Need to change or cancel? Call (704) 941-8508. No fee if you let us know at least 4 hours ahead.`,
+    `Need to change or cancel? Call (704) 941-8508. No fee if you let us know at least ${CANCELLATION.trip.freeUntilHoursBefore} hours ahead.`,
     `Card only. We never ask for payment details over the phone.`,
     ``,
     `Tassy Transportation · Charlotte, NC · Operated by Tassy Trucks LLC`,

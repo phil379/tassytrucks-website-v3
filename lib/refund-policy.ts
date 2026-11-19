@@ -7,6 +7,8 @@ import { CONCIERGE } from '@/lib/quote';
  * STATUS: PROPOSED. These are drafts for Phil's approval and for counsel's review.
  * Nothing here is legal advice. Merging the PR that contains this file is Phil's
  * approval; change a number here and every page that quotes it changes with it.
+ * One number is no longer a draft: the trip cancellation window was DECIDED by
+ * Phil on 2026-11-18 (see below).
  *
  * ── Where the numbers come from ────────────────────────────────────────────────
  * Phil (2026-10-24) proposed: Care / Concierge / Recovery / Winnie free to cancel
@@ -14,13 +16,18 @@ import { CONCIERGE } from '@/lib/quote';
  * free until 24 hours before. Late cancel = 50% of the trip (50% of the fare for
  * Treatment Day); no-show = 100%. Tassy cancels or has no driver = full refund.
  *
- * CONFLICT WITH THE CODE, so the code's number is kept (Phil's instruction):
- *   lib/confirmation-email.ts has told every customer with a confirmed trip, in
- *   writing, "No fee if you let us know at least 4 hours ahead." That is the number
- *   already promised, so it is used for Care, Concierge, Recovery, Winnie AND
- *   Treatment Day (24 hours would be stricter than what customers were told).
- *   Phil's 2-hour and 24-hour figures are kept below as PHIL_PROPOSED so he can
- *   decide to change the email and these numbers together.
+ * From Oct 24 the code kept 4 hours for trips and Treatment Day, because
+ *   lib/confirmation-email.ts had already told every customer with a confirmed
+ *   trip, in writing, "No fee if you let us know at least 4 hours ahead" — the
+ *   number already promised won over the number proposed.
+ * DECIDED 2026-11-18 (Phil, on market grounds — "four hours, that's a lot"):
+ *   the trip window is now 2 hours, for riders and facilities, everywhere.
+ *   The confirmation email derives its sentence from this file, so bookings
+ *   confirmed from this change on promise 2 hours. Bookings confirmed before
+ *   it were promised 4 hours in writing — honour the promise those customers
+ *   hold. Treatment Day was not part of the Nov 18 decision: it stays at
+ *   4 hours, and Phil's 24-hour figure for it stays in PHIL_PROPOSED until
+ *   he rules on it.
  *   lib/school-billing.ts (Phil, 2026-10-17): a Scholar monthly plan stops at the end
  *   of the paid month, with no prorated refund, and refunds are decided one at a
  *   time. That is used for Scholar's monthly plan; Phil's 24-hour / one-ride rule
@@ -45,16 +52,19 @@ import { CONCIERGE } from '@/lib/quote';
 export const CONCIERGE_PRICED_MAX_MILES: number = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
-export const REFUND_POLICY_UPDATED = 'October 24, 2026';
+export const REFUND_POLICY_UPDATED = 'November 18, 2026';
 
 export const CANCELLATION = {
-  /** Care, Concierge, Recovery and Winnie Ride. */
+  /** Care, Concierge, Recovery and Winnie Ride. Window DECIDED 2026-11-18. */
   trip: {
-    freeUntilHoursBefore: 4,
+    freeUntilHoursBefore: 2,
     lateCancelFeePercent: 50,
     noShowFeePercent: 100,
   },
-  /** Treatment Day round trips. The fee is a share of the flat round-trip fare. */
+  /**
+   * Treatment Day round trips. The fee is a share of the flat round-trip fare.
+   * Still 4 hours: the 2026-11-18 decision covered the trip window only.
+   */
   treatmentDay: {
     freeUntilHoursBefore: 4,
     lateCancelFeePercent: 50,
@@ -95,9 +105,12 @@ export function conciergeNoShowFeeText(): string {
   return `$${(CANCELLATION.conciergeNoShow.flatFeeCents / 100).toFixed(0)}`;
 }
 
-/** What Phil proposed on 2026-10-24, kept so a change is a one-line decision. */
+/**
+ * What Phil proposed on 2026-10-24 that is still only a proposal. The trip
+ * figure (2 hours) was adopted on 2026-11-18 and now lives in
+ * CANCELLATION.trip; the Treatment Day figure stays here until he rules.
+ */
 export const PHIL_PROPOSED = {
-  tripFreeUntilHoursBefore: 2,
   treatmentDayFreeUntilHoursBefore: 24,
 } as const;
 

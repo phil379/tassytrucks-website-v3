@@ -18,12 +18,19 @@ for (const k of ['trip', 'treatmentDay'] as const) {
 assert.equal(CANCELLATION.tassyCancelsRefundPercent, 100);
 ok('refund numbers are sane and a Tassy cancellation is a full refund');
 
-// The booking email already promised "at least 4 hours ahead" (scripts/test-receipt.ts asserts it).
-// The code's number is kept; Phil's proposed 2 hours is recorded, not used.
-assert.equal(CANCELLATION.trip.freeUntilHoursBefore, 4);
-assert.equal(PHIL_PROPOSED.tripFreeUntilHoursBefore, 2);
-assert.ok(freeCancellationSentence().startsWith('No fee if you let us know at least 4 hours ahead'));
-ok('free-cancellation sentence matches what the confirmation email already says');
+// Phil DECIDED the trip window on 2026-11-18: 2 hours, the figure he proposed
+// on 2026-10-24. The confirmation email derives its sentence from this file,
+// so the promise and the policy move together (scripts/test-receipt.ts asserts
+// the receipt's copy of the sentence).
+assert.equal(CANCELLATION.trip.freeUntilHoursBefore, 2);
+assert.ok(freeCancellationSentence().startsWith('No fee if you let us know at least 2 hours ahead'));
+ok('trip free-cancellation window is 2 hours (Phil, decided 2026-11-18)');
+
+// Treatment Day was not part of the Nov 18 decision: it stays at 4 hours, and
+// Phil's 24-hour figure for it stays a recorded proposal, not the live number.
+assert.equal(CANCELLATION.treatmentDay.freeUntilHoursBefore, 4);
+assert.equal(PHIL_PROPOSED.treatmentDayFreeUntilHoursBefore, 24);
+ok('Treatment Day window unchanged; the 24-hour figure is still only proposed');
 
 // The numbers are not retyped on the page, the form or the email.
 const page = read('app/refunds/page.tsx');

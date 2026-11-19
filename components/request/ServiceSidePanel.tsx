@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { serviceLabel, serviceShortName, type ServiceLine } from '@/lib/trip-request';
+import { careFrom } from '@/lib/price-table';
 
 /**
  * The service panel beside the request form (Phil, 2026-11-17).
@@ -32,7 +33,9 @@ const PANEL: Partial<Record<ServiceLine, PanelInfo>> = {
   care: {
     blurb:
       'Dialysis, infusion, physical therapy, the specialist across town. Booked ahead, door to door, and you know the price before you book.',
-    priceLine: 'Flat rates from $59, one way',
+    // Derived, not typed: this panel once said $59 while the engine's Care
+    // floor — and /pricing, the homepage and /nemt — said $49 (audit, 2026-11-18).
+    priceLine: `Flat rates from ${careFrom()}, one way`,
     image: { src: '/brand/care-mascot.webp', alt: 'A heart with a steady heartbeat line', width: 960, height: 593 },
     thumb: '/brand/care-mascot.webp',
   },

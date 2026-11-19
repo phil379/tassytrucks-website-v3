@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import LandingPageShell from '@/components/seo/LandingPageShell';
 import { partnerSignup } from '@/lib/partner-links';
 import { SERVICE_AREA } from '@/lib/copy';
+import { PricingTeaser } from '@/components/pricing/PriceTable';
 
 export const metadata: Metadata = {
   title: 'Facility Transport Partnerships in Charlotte NC',
@@ -183,6 +184,23 @@ export default function PartnersPage() {
                 At any step, if it isn&rsquo;t working, you walk away. We would
                 rather lose a contract in week one than keep a partner who
                 doesn&rsquo;t trust the service.
+              </p>
+            </>
+          ),
+        },
+        {
+          h2: 'Rates, before you sign anything',
+          body: (
+            <>
+              {/* Added 2026-11-18: a facility tester completed signup without
+                  ever seeing a price. The rates are published; the flow just
+                  never showed them. Every figure in the teaser and the table
+                  derives from lib/quote.ts via lib/price-table.ts. */}
+              <PricingTeaser />
+              <p className="mt-4">
+                Serving {SERVICE_AREA}. If your facility is outside that area,
+                call us before you set up an account — we would rather tell you
+                plainly than take bookings we cannot serve.
               </p>
             </>
           ),

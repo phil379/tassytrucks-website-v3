@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import FacilitySignupForm from '@/components/partners/FacilitySignupForm';
 import { coerceFacilityKind, coerceProspectId } from '@/lib/facility';
+import { SERVICE_AREA } from '@/lib/copy';
+import { PricingTeaser } from '@/components/pricing/PriceTable';
 
 export const metadata: Metadata = {
   title: { absolute: 'Partner with Tassy Transportation — Facility Accounts' },
@@ -37,6 +39,15 @@ export default function FacilitySignupPage({
       <p className="mt-4 text-center text-base text-[color:var(--muted)]">
         We Transport With Care. Get started in 60 seconds — no credit card.
       </p>
+
+      {/* Rates and service area up front (2026-11-18): a facility tester
+          finished this flow without seeing either. Figures derive from
+          lib/quote.ts via lib/price-table.ts; the area is the house
+          constant, not retyped words. */}
+      <div className="mx-auto mt-8 max-w-lg text-center text-base">
+        <PricingTeaser />
+        <p className="mt-4 text-sm text-[color:var(--muted)]">Serving {SERVICE_AREA}.</p>
+      </div>
 
       <div className="mt-10">
         <FacilitySignupForm source={source} rep={rep} kind={kind} prospect={coerceProspectId(searchParams?.src)} />

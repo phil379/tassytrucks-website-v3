@@ -92,7 +92,7 @@ async function main() {
       'FROM', 'Charlotte, NC', '(704) 941-8508', 'book@tassytrucks.com', 'BILLED TO', 'Marcus Johnson',
       'marcus.johnson@example.com', 'Paid with Visa •••• 4242', 'Oct 16, 2026', 'Pickup time',
       'Mon, Oct 19, 2026 · 10:00 a.m.', 'TT-MAJGAV', 'DESCRIPTION', 'AMOUNT', '$49.00', 'Total paid',
-      'No fee if you let us know at least 4 hours ahead', 'We never ask for payment details over the phone',
+      'No fee if you let us know at least 2 hours ahead', 'We never ask for payment details over the phone',
       'Operated by Tassy Trucks LLC', 'Disabled Veteran-Owned', 'SBE / DBE / MBE Certified',
       'Keep this receipt for your records.',
     ]) {

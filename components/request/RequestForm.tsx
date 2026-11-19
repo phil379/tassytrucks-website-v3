@@ -42,7 +42,7 @@ import {
   priceLabel,
 } from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
-import { careIntakeSchema } from '@/lib/care-intake';
+import { careIntakeSchema, isAccompaniedMinor } from '@/lib/care-intake';
 import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
@@ -562,6 +562,11 @@ export default function RequestForm({
       dropoffAddress: dropoffText,
       requestedAt: whenValue || (whenDate ? `${whenDate}T12:00` : ''),
       passengers,
+      // Care only: the adult required to ride with a minor patient is not
+      // an extra passenger. Derived from the same intake the submit sends,
+      // with the same predicate the server applies (lib/care-intake.ts), so
+      // the estimate on screen is the price that gets stored.
+      accompaniedMinor: isAccompaniedMinor(care),
       returnTrip,
       mobility,
     });
@@ -581,6 +586,7 @@ export default function RequestForm({
     whenValue,
     whenDate,
     passengers,
+    care,
     returnTrip,
     mobility,
   ]);

@@ -29,6 +29,16 @@ import { CONCIERGE } from '@/lib/quote';
  *   evening Phil extended it — "Make Treatment Day 2 hours too" — so
  *   Treatment Day is 2 hours as well, and his Oct 24 24-hour figure for it
  *   is superseded.
+ * DECIDED 2026-11-19 (Phil): the late-cancel fee is now 100% of the trip
+ *   price — Uber-style — replacing the 50% that stood from Oct 24 through
+ *   the Nov 18 decision. Phil was offered a 3-tier alternative (50% until
+ *   the driver is on the way, 100% after) and chose the flat 100% for
+ *   everything inside the window. The window itself does not change: free
+ *   until 2 hours before pickup. Same scope as the window — trips and
+ *   Treatment Day, riders and facilities. Scholar keeps its own terms.
+ *   Bookings confirmed while 50% was the published figure were promised
+ *   50% in writing — honour the promise those customers hold, the same
+ *   grandfathering rule as the Nov 18 window change.
  *   lib/school-billing.ts (Phil, 2026-10-17): a Scholar monthly plan stops at the end
  *   of the paid month, with no prorated refund, and refunds are decided one at a
  *   time. That is used for Scholar's monthly plan; Phil's 24-hour / one-ride rule
@@ -53,23 +63,27 @@ import { CONCIERGE } from '@/lib/quote';
 export const CONCIERGE_PRICED_MAX_MILES: number = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
-export const REFUND_POLICY_UPDATED = 'November 18, 2026';
+export const REFUND_POLICY_UPDATED = 'November 19, 2026';
 
 export const CANCELLATION = {
-  /** Care, Concierge, Recovery and Winnie Ride. Window DECIDED 2026-11-18. */
+  /**
+   * Care, Concierge, Recovery and Winnie Ride. Window DECIDED 2026-11-18;
+   * late-cancel fee 100% DECIDED 2026-11-19 (was 50%).
+   */
   trip: {
     freeUntilHoursBefore: 2,
-    lateCancelFeePercent: 50,
+    lateCancelFeePercent: 100,
     noShowFeePercent: 100,
   },
   /**
    * Treatment Day round trips. The fee is a share of the flat round-trip fare.
    * Window DECIDED 2026-11-18 (Phil extended the trip decision to Treatment
-   * Day the same evening): 2 hours, same as trips.
+   * Day the same evening): 2 hours, same as trips. Late-cancel fee 100%
+   * DECIDED 2026-11-19, same as trips (was 50%).
    */
   treatmentDay: {
     freeUntilHoursBefore: 2,
-    lateCancelFeePercent: 50,
+    lateCancelFeePercent: 100,
     noShowFeePercent: 100,
   },
   /** Scholar plans billed per ride (Weekly Pattern, After-School Activities). */

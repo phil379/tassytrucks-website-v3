@@ -15,6 +15,7 @@ import {
 } from '@/app/facility/welcome/actions';
 import AddressAutocomplete from '@/components/request/AddressAutocomplete';
 import PriceTable from '@/components/pricing/PriceTable';
+import { CANCELLATION } from '@/lib/refund-policy';
 
 /**
  * The four screens behind the magic link.
@@ -416,9 +417,11 @@ export default function FacilityWizard({
           {/* The terms that belong next to the billing choice (2026-11-18).
               The cancellation window is Phil's Nov 18 decision — 2 hours,
               the same number the website policy file (lib/refund-policy.ts)
-              and TassyOps enforce. */}
+              and TassyOps enforce. The fee beside it is Phil's Nov 19
+              decision — 100% — and both numbers are read from that policy
+              file here so this line can never drift from it. */}
           <div className="space-y-1.5 text-sm text-[color:var(--ink-soft)]">
-            <p>Free cancellation until 2 hours before pickup, then 50%.</p>
+            <p>Free cancellation until {CANCELLATION.trip.freeUntilHoursBefore} hours before pickup, then {CANCELLATION.trip.lateCancelFeePercent}% of the trip price.</p>
             <p>Approved accounts are invoiced weekly on 7-day terms.</p>
           </div>
 

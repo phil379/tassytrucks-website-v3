@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { BRIDGE_HEADER, verifyBridgeSignature } from '@/lib/ops-bridge';
-import { notifyRefundHeld, refundTrip } from '@/lib/ops-refund';
+import { notifyFeeKept, notifyRefundHeld, refundTrip } from '@/lib/ops-refund';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -10,9 +10,11 @@ const bodySchema = z.object({
   tripId: z.string().uuid(),
   // "held": the cancel held the refund (rider-initiated late cancel,
   // late-cancellation fee) — no money moves; the call only emails the
-  // rider the held variant of the cancellation email. Absent = refund,
-  // as before.
-  outcome: z.enum(['held']).optional(),
+  // rider the held variant of the cancellation email. "fee_kept": the
+  // cancel kept the FULL fare as the fee (Phil, 2026-11-19) — no money
+  // moves either; the call only emails the rider the full-fee variant
+  // (no refund is due). Absent = refund, as before.
+  outcome: z.enum(['held', 'fee_kept']).optional(),
   // Block B1: a PARTIAL refund of exactly this many cents, sent only by
   // the TassyOps held-payments queue when a human decides a held refund
   // at the late-cancel fee (the amount is the remainder after the fee —
@@ -44,6 +46,13 @@ const bodySchema = z.object({
  * held for the late-cancel fee, and the endpoint only emails the rider
  * the held variant (fee named, remainder promised by hand) — see
  * notifyRefundHeld in lib/ops-refund.ts.
+ *
+ * With outcome: "fee_kept" the call also moves no money: the fare itself
+ * was kept as the late-cancel fee (Phil, 2026-11-19), and the endpoint
+ * only emails the rider the full-fee variant (the full fare is kept, no
+ * refund is due) — see notifyFeeKept in lib/ops-refund.ts. It is a
+ * separate mode from "held" on purpose: nothing about a fee-kept trip
+ * may be recorded as a hold.
  */
 export async function POST(request: Request) {
   const secret = process.env.INTERNAL_NOTIFY_SECRET;
@@ -76,6 +85,18 @@ export async function POST(request: Request) {
         ok: true,
         emailSent: held.emailSent,
         alreadyNotified: held.alreadyNotified,
+      });
+    }
+    if (parsed.outcome === 'fee_kept') {
+      const kept = await notifyFeeKept({ id: parsed.tripId });
+      if (!kept.ok) {
+        const status = kept.code === 'not_found' ? 404 : 422;
+        return NextResponse.json({ ok: false, error: kept.code }, { status });
+      }
+      return NextResponse.json({
+        ok: true,
+        emailSent: kept.emailSent,
+        alreadyNotified: kept.alreadyNotified,
       });
     }
     const result = await refundTrip({ id: parsed.tripId, amountCents: parsed.amountCents });

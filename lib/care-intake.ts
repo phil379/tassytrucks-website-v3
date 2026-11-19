@@ -135,6 +135,31 @@ export function patientIsMinor(dob: string | null | undefined, today = new Date(
   return age >= 0 && age < 18;
 }
 
+/**
+ * The one case the age rule admits a minor: a minor patient riding with a
+ * named responsible adult. That adult's seat is a safety requirement Tassy
+ * imposes, not an extra the family chose, so the quote engine does not
+ * count them as an extra passenger (Phil, 2026-11-19 — a live dry run of a
+ * mother booking for her 4-year-old quoted $69 instead of $59 because the
+ * required mother was charged as the +$10 extra passenger). Both the form's
+ * live estimate and the server price derive the flag from this one
+ * predicate, so the two can never disagree.
+ */
+export function isAccompaniedMinor(
+  v: {
+    dob?: string | null;
+    accompaniedByAdult?: boolean | null;
+    accompanyingAdultName?: string | null;
+  },
+  today = new Date(),
+): boolean {
+  return (
+    patientIsMinor(v.dob, today) &&
+    v.accompaniedByAdult === true &&
+    (v.accompanyingAdultName?.trim().length ?? 0) >= 2
+  );
+}
+
 const text = (max: number) => z.string().trim().max(max);
 
 /** What the browser sends. Everything else (text, hash, ip, ua, time) is server-made. */

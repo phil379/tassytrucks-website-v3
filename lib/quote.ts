@@ -830,6 +830,14 @@ export type QuoteInput = {
   dropoffAddress?: string | null;
   requestedAt?: string | null;
   passengers?: number | null;
+  /**
+   * Tassy Care only: the patient is a minor riding with the required named
+   * adult (lib/care-intake.ts `isAccompaniedMinor`, derived from the care
+   * intake by both the form and the server). That adult is a safety
+   * requirement, not a chosen extra, so they are not counted toward
+   * perExtra (Phil, 2026-11-19). Ignored on every other line.
+   */
+  accompaniedMinor?: boolean | null;
   returnTrip?: boolean | null;
   /** Switches Tassy Care to a WAV quote when it is `wheelchair`. */
   mobility?: string | null;
@@ -938,7 +946,11 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
 
   const surcharges = surchargesFor(input.requestedAt, input.serviceLine);
   const surchargeTotal = surcharges.reduce((sum, s) => sum + s.cents, 0);
-  const extras = Math.max(0, (input.passengers ?? 1) - 1) * card.perExtra;
+  // The adult required to ride with a minor Care patient is not an extra
+  // passenger (see QuoteInput.accompaniedMinor). Everyone past them still
+  // is: child + mother + grandmother is one extra, not two.
+  const requiredAdult = input.serviceLine === 'care' && input.accompaniedMinor ? 1 : 0;
+  const extras = Math.max(0, (input.passengers ?? 1) - 1 - requiredAdult) * card.perExtra;
 
   // Charged ONCE, like a surcharge and unlike a fare. The driver walks them out
   // of the building one time; a return leg does not double it.

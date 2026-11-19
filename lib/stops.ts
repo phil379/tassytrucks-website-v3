@@ -105,6 +105,52 @@ export function stopFeeLine(leg: StopLeg, feeCents: number): string {
   return `${label} (${STOP_INCLUDED_WAIT_MINUTES} min waiting included) — ${usd(feeCents)}`;
 }
 
+/** One leg's stop, as the notification emails name it. */
+export type TripStopSummary = {
+  leg: 'outbound' | 'return';
+  /** "Stop on the way" / "Stop on the way back" — the legs never merge. */
+  label: string;
+  /** "<address> ($10 stop fee, 15 minutes of waiting included)". */
+  value: string;
+};
+
+/**
+ * The stops on a trip, one summary per leg that has one — empty when the
+ * trip has no stop, so a no-stop email renders exactly as it did before
+ * stops existed. The fee and the included wait derive from the constants
+ * above, never hand-typed, so an email cannot quote different stop terms
+ * than the form and the /refunds page. Reads the same address fields the
+ * form input and the stored row carry (stopAddress / returnStopAddress).
+ */
+export function tripStopSummaries(data: {
+  stopAddress?: string | null;
+  returnStopAddress?: string | null;
+}): TripStopSummary[] {
+  const summaries: TripStopSummary[] = [];
+  const stop = data.stopAddress?.trim();
+  if (stop) {
+    summaries.push({
+      leg: 'outbound',
+      label: 'Stop on the way',
+      value: `${stop} (${stopFeeText()} stop fee, ${STOP_INCLUDED_WAIT_MINUTES} minutes of waiting included)`,
+    });
+  }
+  const back = data.returnStopAddress?.trim();
+  if (back) {
+    summaries.push({
+      leg: 'return',
+      label: 'Stop on the way back',
+      value: `${back} (${stopFeeText()} stop fee, ${STOP_INCLUDED_WAIT_MINUTES} minutes of waiting included)`,
+    });
+  }
+  return summaries;
+}
+
+/** "Stop on the way: <address> ($10 stop fee, 15 minutes of waiting included)". */
+export function stopSummaryLine(summary: TripStopSummary): string {
+  return `${summary.label}: ${summary.value}`;
+}
+
 /**
  * Address comparison for the "the stop is one of the trip's own ends" rule:
  * case, spacing and trailing punctuation do not make two addresses different.

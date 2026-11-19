@@ -13,6 +13,7 @@ import { isSuppressed } from './email-suppression';
 import { unsubscribeUrl } from './unsubscribe-token';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
 import { logEmailSend } from './email-log';
+import { stopSummaryLine, tripStopSummaries } from './stops';
 
 /**
  * Alerts fire after a request is stored. Each leg is independent and each
@@ -337,6 +338,14 @@ async function notifyOperatorEmail(
   const to = process.env.OPERATOR_EMAIL;
   if (!to) throw new Error('OPERATOR_EMAIL is not set');
 
+  // Booking-time stops (lib/stops.ts): one summary per leg that has one.
+  // The dispatcher's email must name a stop the rider booked — until now it
+  // only showed on the ops board, so a stop existed that the alert never
+  // mentioned. Empty for a no-stop trip, which leaves this email unchanged.
+  const stops = tripStopSummaries(data);
+  const outboundStop = stops.find((s) => s.leg === 'outbound');
+  const returnStop = stops.find((s) => s.leg === 'return');
+
   const when = new Date(data.requestedAt);
   const datePart = Number.isNaN(when.getTime())
     ? data.requestedAt
@@ -368,9 +377,11 @@ async function notifyOperatorEmail(
     `Preferred contact: ${data.preferredContact}`,
     '',
     `Pickup:            ${data.pickupAddress}`,
+    ...(outboundStop ? [`Stop on the way:   ${outboundStop.value}`] : []),
     `Destination:       ${data.dropoffAddress}`,
     `Requested:         ${formatWhen(data.requestedAt)}`,
     `Return trip:       ${data.returnTrip ? `yes — ${formatWhen(data.returnAt ?? '')}` : 'no'}`,
+    ...(returnStop ? [`Stop on the way back: ${returnStop.value}`] : []),
     `Passengers:        ${data.passengers ?? 1}`,
     `Mobility:          ${mobilityLabel(data.mobility)}`,
     '',
@@ -420,15 +431,22 @@ export function buildRequesterText(args: {
   price?: QuotedPrice | null;
   priceUnavailable?: boolean;
   reference: string;
+  /** Booking-time stops (lib/stops.ts); a line is named only for a leg that has one. */
+  stopAddress?: string | null;
+  returnStopAddress?: string | null;
   at?: Date;
 }): string {
   const { firstName, price, priceUnavailable } = args;
+  const stopLines = tripStopSummaries(args).map(stopSummaryLine);
   return [
     `Hi ${firstName},`,
     '',
     `We have your ${serviceShortName(args.serviceLine)} request for ${formatWhen(args.requestedAt)}.`,
     'A dispatcher is reviewing it now.',
     '',
+    // The stops the rider booked, named back to them — one line per leg.
+    // Absent entirely on a no-stop request, so that email is unchanged.
+    ...(stopLines.length ? [...stopLines, ''] : []),
     ...(price
       ? priceKind(price) === 'range'
         ? // A range is never "your price". One sentence, the same words as the confirmation screen.
@@ -483,6 +501,8 @@ async function notifyRequester(
     price,
     priceUnavailable,
     reference: tripNumber ?? shortRef(id),
+    stopAddress: data.stopAddress,
+    returnStopAddress: data.returnStopAddress,
   });
 
   await sendResendEmail({

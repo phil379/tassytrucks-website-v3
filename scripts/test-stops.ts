@@ -8,9 +8,13 @@ import {
   STOP_WAIT_BLOCK_MINUTES,
   stopAvailable,
   stopFeeLine,
+  stopSummaryLine,
+  tripStopSummaries,
 } from '../lib/stops';
 import { estimateTrip, haversineMiles } from '../lib/quote';
-import { tripRequestSchema } from '../lib/trip-request';
+import { tripRequestSchema, type TripRequestInput } from '../lib/trip-request';
+import { buildRequesterText } from '../lib/notifications';
+import { confirmationHtml, confirmationText } from '../lib/confirmation-email';
 
 let n = 0;
 function t(name: string, fn: () => void) {
@@ -360,6 +364,110 @@ t('/refunds stop copy derives from lib/stops — no hand-typed stop numbers', ()
   assert.ok(src.includes('stopFeeText()'), 'the fee comes from the constants');
   assert.ok(src.includes('STOP_INCLUDED_WAIT_MINUTES'), 'the included wait comes from the constants');
   assert.ok(!/costs\s+\$10\s+per stop/.test(src), 'no hand-typed stop fee on the page');
+});
+
+// ── The notification emails name the stop (Phil's residual, 2026-11-19) ────
+// The operator alert, the booking-received auto-reply and the confirmation
+// email all summarize the trip; each names a stop ONLY on the leg that has
+// one, and a no-stop email is byte-identical to before stops existed.
+const OUT_STOP = '3425 Park Rd, Charlotte, NC 28209';
+const BACK_STOP = '901 Providence Rd, Charlotte, NC 28207';
+const OUT_LINE = `Stop on the way: ${OUT_STOP} ($10 stop fee, 15 minutes of waiting included)`;
+const BACK_LINE = `Stop on the way back: ${BACK_STOP} ($10 stop fee, 15 minutes of waiting included)`;
+
+t('email stop summaries: one per leg that has one, legs never merge', () => {
+  assert.deepEqual(tripStopSummaries({}).map(stopSummaryLine), []);
+  assert.deepEqual(tripStopSummaries({ stopAddress: null, returnStopAddress: null }).map(stopSummaryLine), []);
+  assert.deepEqual(tripStopSummaries({ stopAddress: '   ' }).map(stopSummaryLine), []);
+  assert.deepEqual(tripStopSummaries({ stopAddress: OUT_STOP }).map(stopSummaryLine), [OUT_LINE]);
+  assert.deepEqual(tripStopSummaries({ returnStopAddress: BACK_STOP }).map(stopSummaryLine), [BACK_LINE]);
+  assert.deepEqual(
+    tripStopSummaries({ stopAddress: OUT_STOP, returnStopAddress: BACK_STOP }).map(stopSummaryLine),
+    [OUT_LINE, BACK_LINE],
+  );
+});
+
+const reply = (over: Partial<Parameters<typeof buildRequesterText>[0]> = {}) =>
+  buildRequesterText({
+    firstName: 'Pat',
+    serviceLine: 'care',
+    requestedAt: '2026-11-20T15:00:00.000Z',
+    reference: 'T-20261120-0007',
+    at: new Date('2026-11-19T15:00:00.000Z'),
+    ...over,
+  });
+
+t('booking-received auto-reply names the stop on the leg that has one', () => {
+  const outOnly = reply({ stopAddress: OUT_STOP });
+  assert.ok(outOnly.includes(OUT_LINE));
+  assert.ok(!outOnly.includes('Stop on the way back'));
+  const backOnly = reply({ returnStopAddress: BACK_STOP });
+  assert.ok(backOnly.includes(BACK_LINE));
+  assert.ok(!backOnly.includes('Stop on the way: '));
+  const both = reply({ stopAddress: OUT_STOP, returnStopAddress: BACK_STOP });
+  assert.ok(both.includes(OUT_LINE) && both.includes(BACK_LINE));
+});
+
+t('booking-received auto-reply with no stop is byte-identical to before', () => {
+  assert.equal(reply(), reply({ stopAddress: null, returnStopAddress: null }));
+  assert.ok(!reply().includes('Stop on the way'));
+});
+
+const emailTrip = (over: Record<string, unknown> = {}) =>
+  ({
+    serviceLine: 'care',
+    contactFirstName: 'Pat',
+    contactLastName: 'Probe',
+    contactPhone: '7045550100',
+    contactEmail: 'pat@example.com',
+    pickupAddress: '100 N Tryon St, Charlotte, NC 28202',
+    dropoffAddress: '1000 Blythe Blvd, Charlotte, NC 28203',
+    requestedAt: '2026-11-20T15:00:00.000Z',
+    returnTrip: true,
+    returnAt: '2026-11-20T18:00:00.000Z',
+    passengers: 1,
+    mobility: 'ambulatory',
+    preferredContact: 'phone',
+    smsConsent: false,
+    ...over,
+  }) as unknown as TripRequestInput;
+const confirmedTrip = { confirmationCode: 'TT-TEST1', agreedCents: 15800 };
+
+t('confirmation email (text + html) names the stop on the leg that has one', () => {
+  const outText = confirmationText(confirmedTrip, emailTrip({ stopAddress: OUT_STOP }));
+  assert.ok(outText.includes(OUT_LINE));
+  assert.ok(!outText.includes('Stop on the way back'));
+  const backText = confirmationText(confirmedTrip, emailTrip({ returnStopAddress: BACK_STOP }));
+  assert.ok(backText.includes(BACK_LINE));
+  assert.ok(!backText.includes('Stop on the way: '));
+  const bothText = confirmationText(confirmedTrip, emailTrip({ stopAddress: OUT_STOP, returnStopAddress: BACK_STOP }));
+  assert.ok(bothText.includes(OUT_LINE) && bothText.includes(BACK_LINE));
+
+  const outHtml = confirmationHtml(confirmedTrip, emailTrip({ stopAddress: OUT_STOP }));
+  assert.ok(outHtml.includes('Stop on the way') && outHtml.includes(OUT_STOP));
+  assert.ok(outHtml.includes('$10 stop fee, 15 minutes of waiting included'));
+  assert.ok(!outHtml.includes('Stop on the way back'));
+  const bothHtml = confirmationHtml(
+    confirmedTrip,
+    emailTrip({ stopAddress: OUT_STOP, returnStopAddress: BACK_STOP }),
+  );
+  assert.ok(bothHtml.includes('Stop on the way back') && bothHtml.includes(BACK_STOP));
+});
+
+t('confirmation email with no stop carries no stop line', () => {
+  const text = confirmationText(confirmedTrip, emailTrip());
+  assert.ok(!text.includes('Stop on the way'));
+  assert.equal(text, confirmationText(confirmedTrip, emailTrip({ stopAddress: null, returnStopAddress: null })));
+  const html = confirmationHtml(confirmedTrip, emailTrip());
+  assert.ok(!html.includes('Stop on the way'));
+});
+
+t('the operator alert and the ops confirm path carry the stops into the emails', () => {
+  const notif = readFileSync(new URL('../lib/notifications.ts', import.meta.url), 'utf8');
+  assert.ok(notif.includes('tripStopSummaries(data)'), 'operator alert derives its stop lines from lib/stops');
+  const confirm = readFileSync(new URL('../lib/ops-confirm.ts', import.meta.url), 'utf8');
+  assert.ok(confirm.includes('stopAddress: row.stop_address'), 'ops confirm threads the stored outbound stop');
+  assert.ok(confirm.includes('returnStopAddress: row.return_stop_address'), 'ops confirm threads the stored return stop');
 });
 
 console.log(`\n${n} stop tests passed`);

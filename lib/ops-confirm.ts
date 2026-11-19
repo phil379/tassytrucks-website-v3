@@ -142,6 +142,10 @@ export async function confirmTrip(args: {
     contactEmail: row.contact_email,
     pickupAddress: row.pickup_address,
     dropoffAddress: row.dropoff_address,
+    // Booking-time stops, from the stored per-leg columns, so the
+    // confirmation email names them (lib/stops.ts tripStopSummaries).
+    stopAddress: row.stop_address ?? null,
+    returnStopAddress: row.return_stop_address ?? null,
     requestedAt: row.requested_at,
     returnTrip: Boolean(row.return_trip),
     returnAt: row.return_at,

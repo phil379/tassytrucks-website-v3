@@ -3,6 +3,7 @@ import { formatUsd } from '@/lib/quote';
 import { OPERATING_TIME_ZONE } from '@/lib/time';
 import { freeCancellationSentence, REFUNDS_URL } from '@/lib/refund-policy';
 import { emailFooterHtml, emailFooterText } from '@/lib/business';
+import { tripStopSummaries } from '@/lib/stops';
 
 /**
  * The booking confirmation.
@@ -83,6 +84,11 @@ export function confirmationSubject(t: ConfirmedTrip, data: TripRequestInput): s
 }
 
 export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): string {
+  // Booking-time stops (lib/stops.ts): named in the trip table, one row per
+  // leg that has one. No rows at all on a no-stop trip.
+  const stops = tripStopSummaries(data);
+  const outboundStop = stops.find((s) => s.leg === 'outbound');
+  const returnStop = stops.find((s) => s.leg === 'return');
   const price = formatUsd(t.agreedCents);
   const saved =
     t.discountCents && t.discountCents > 0
@@ -170,9 +176,9 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       ${t.tripNumber ? row('Trip number', t.tripNumber) : ''}
       ${row('Pickup time', fmtWhen(data.requestedAt))}
-      ${row('Pickup', data.pickupAddress)}
+      ${row('Pickup', data.pickupAddress)}${outboundStop ? `\n      ${row(outboundStop.label, outboundStop.value)}` : ''}
       ${row('Destination', data.dropoffAddress)}
-      ${data.returnTrip ? row('Return pickup', fmtWhen(data.returnAt)) : ''}
+      ${data.returnTrip ? row('Return pickup', fmtWhen(data.returnAt)) : ''}${returnStop ? `\n      ${row(returnStop.label, returnStop.value)}` : ''}
       ${row('Service', serviceShortName(data.serviceLine))}
       ${row('Passengers', String(data.passengers ?? 1))}
       ${data.mobility ? row('Mobility', mobilityLabel(data.mobility)) : ''}
@@ -241,6 +247,10 @@ export function confirmationHtml(t: ConfirmedTrip, data: TripRequestInput): stri
 
 /** Plain-text alternative. Hospital mail systems strip HTML; the time must survive. */
 export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): string {
+  // Same stop rows as the HTML, in plain text (lib/stops.ts).
+  const stops = tripStopSummaries(data);
+  const outboundStop = stops.find((s) => s.leg === 'outbound');
+  const returnStop = stops.find((s) => s.leg === 'return');
   const lines = [
     `YOU'RE BOOKED, ${data.contactFirstName.toUpperCase()}.`,
     '',
@@ -262,9 +272,11 @@ export function confirmationText(t: ConfirmedTrip, data: TripRequestInput): stri
     'YOUR TRIP',
     `  Pickup time    ${fmtWhen(data.requestedAt)}`,
     `  Pickup         ${data.pickupAddress}`,
+    ...(outboundStop ? [`  Stop on the way: ${outboundStop.value}`] : []),
     `  Destination    ${data.dropoffAddress}`,
   );
   if (data.returnTrip) lines.push(`  Return pickup  ${fmtWhen(data.returnAt)}`);
+  if (returnStop) lines.push(`  Stop on the way back: ${returnStop.value}`);
   lines.push(
     `  Service        ${serviceShortName(data.serviceLine)}`,
     `  Passengers     ${data.passengers ?? 1}`,

@@ -256,6 +256,11 @@ export function quoteFromHotelPrice(chargedCents: number, roundTrip: boolean): Q
     measuredFrom: null,
     distanceMeasured: true,
     escortCents: 0,
+    // A hotel price is flat and server-decided; a booking with a stop is
+    // priced on the normal card instead (the form and the API both drop the
+    // hotel price when a stop is present), so a hotel quote never carries one.
+    stopFeeCents: 0,
+    returnStopFeeCents: 0,
     flatLabel: 'Flat hotel price',
   };
 }

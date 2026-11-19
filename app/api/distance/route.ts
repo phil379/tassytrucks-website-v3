@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
-import { coerceLatLng, roadDistance } from '@/lib/road-distance';
+import { coerceLatLng, roadDistance, roadDistanceVia } from '@/lib/road-distance';
 
 /**
  * POST /api/distance — driving miles between two picked places.
@@ -11,9 +11,17 @@ import { coerceLatLng, roadDistance } from '@/lib/road-distance';
  * a leak. It also lets one warm instance serve a cached answer to the next
  * visitor asking the same question, which the browser cannot do.
  *
- * WHAT THIS ROUTE MUST NEVER DO: take an address. It takes two coordinate
- * pairs the visitor has already picked, returns a number of miles, and stores
- * nothing. No address, no name, no request id, and no logging of either point.
+ * WHAT THIS ROUTE MUST NEVER DO: take an address. It takes coordinate pairs
+ * the visitor has already picked, returns a number of miles, and stores
+ * nothing. No address, no name, no request id, and no logging of any point.
+ *
+ * STOPS (2026-11-19): an optional `stop` point prices the outbound route
+ * through it (pickup -> stop -> dropoff), and `returnMiles` prices the way
+ * back whenever a stop is on the trip: through an optional `returnStop`
+ * point (dropoff -> stop -> pickup), or the direct dropoff -> pickup drive
+ * when only the way there has a stop (the return does not retrace the
+ * detour). With no stop anywhere there is no returnMiles — the quote
+ * engine mirrors the outbound miles for the way back, as it always has.
  */
 
 const LOOKUPS_PER_IP_PER_HOUR = Number(process.env.DISTANCE_RATE_LIMIT) || 120;
@@ -43,11 +51,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ miles: null, reason: 'bad-points' }, { status: 400 });
   }
 
-  const result = await roadDistance(from, to);
+  const stop = coerceLatLng(raw?.stop);
+  const result = stop ? await roadDistanceVia(from, stop, to) : await roadDistance(from, to);
   if (!result) return NextResponse.json({ miles: null, reason: 'unavailable' });
+
+  const returnStop = coerceLatLng(raw?.returnStop);
+  const returnResult = returnStop
+    ? await roadDistanceVia(to, returnStop, from)
+    : stop
+      ? await roadDistance(to, from)
+      : null;
 
   return NextResponse.json({
     miles: Math.round(result.miles * 100) / 100,
     seconds: result.seconds,
+    returnMiles: returnResult ? Math.round(returnResult.miles * 100) / 100 : null,
+    returnSeconds: returnResult ? returnResult.seconds : null,
   });
 }

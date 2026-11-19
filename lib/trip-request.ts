@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
+import { addressesMatch, coordinatesMatch, stopAvailable } from '@/lib/stops';
 import { parseLocalDateTimeMs, toLocalDateTimeInput } from '@/lib/time';
 
 /**
@@ -235,6 +236,23 @@ const tripRequestObject = z
     dropoffLat: optionalCoordinate(-90, 90),
     dropoffLng: optionalCoordinate(-180, 180),
 
+    // Booking-time stops (lib/stops.ts; Phil, 2026-11-19): one optional stop
+    // per leg. The outbound stop sits between pickup and destination; the
+    // return stop sits between destination and pickup on the way back of a
+    // round trip. Same shape as the two ends — the address text plus what
+    // the picker resolved — and the same standard: the route enforces that a
+    // stop can actually be placed (picked point or a ZIP we serve), and the
+    // cross-field rules below keep a stop from being one of the trip's own
+    // ends or riding on a line that does not take stops.
+    stopAddress: trimmed(500).optional().nullable(),
+    stopPlaceId: trimmed(300).optional().nullable(),
+    stopLat: optionalCoordinate(-90, 90),
+    stopLng: optionalCoordinate(-180, 180),
+    returnStopAddress: trimmed(500).optional().nullable(),
+    returnStopPlaceId: trimmed(300).optional().nullable(),
+    returnStopLat: optionalCoordinate(-90, 90),
+    returnStopLng: optionalCoordinate(-180, 180),
+
     /**
      * Whether the customer actually SAW a price range before submitting.
      *
@@ -406,6 +424,88 @@ const tripRequestObject = z
             ? 'Choose how your pet travels'
             : 'Choose a mobility option for this service',
         });
+      }
+    }
+
+    // Stops (lib/stops.ts). The form only offers them where they belong, but
+    // the API is the authority: a stop rides only on a line that takes stops,
+    // a return stop needs a return trip, and a stop that IS one of the trip's
+    // own ends is not a stop — it is a mistake the rider should hear about
+    // here, not a detour the driver discovers later.
+    const stopText = (v: string | null | undefined) => (typeof v === 'string' ? v.trim() : '');
+    const samePlace = (
+      address: string,
+      placeId: string | null | undefined,
+      lat: number | undefined,
+      lng: number | undefined,
+      otherAddress: string,
+      otherPlaceId: string | null | undefined,
+      otherLat: number | undefined,
+      otherLng: number | undefined,
+    ) =>
+      addressesMatch(address, otherAddress) ||
+      (Boolean(placeId) && placeId === otherPlaceId) ||
+      coordinatesMatch({ lat, lng }, { lat: otherLat, lng: otherLng });
+    const checkStop = (
+      address: string,
+      placeId: string | null | undefined,
+      lat: number | undefined,
+      lng: number | undefined,
+      path: 'stopAddress' | 'returnStopAddress',
+      leg: 'there' | 'back',
+    ) => {
+      if (!stopAvailable(data.serviceLine)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [path],
+          message: 'Stops cannot be added to this service online — call (704) 941-8508 and we will arrange it',
+        });
+        return;
+      }
+      if (
+        samePlace(address, placeId, lat, lng, data.pickupAddress, data.pickupPlaceId, data.pickupLat, data.pickupLng)
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [path],
+          message:
+            leg === 'back'
+              ? 'Your stop on the way back is the same as your pickup address — your ride home ends there. Remove the stop, or pick the place you want to stop at on the way back.'
+              : 'Your stop is the same as your pickup address. Remove the stop, or pick the place you want to stop at on the way.',
+        });
+      }
+      if (
+        samePlace(address, placeId, lat, lng, data.dropoffAddress, data.dropoffPlaceId, data.dropoffLat, data.dropoffLng)
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [path],
+          message:
+            leg === 'back'
+              ? 'Your stop on the way back is the same as your destination — the ride back starts there. Remove the stop, or pick the place you want to stop at on the way back.'
+              : 'Your stop is the same as your destination. Remove the stop, or pick the place you want to stop at on the way.',
+        });
+      }
+    };
+    if (stopText(data.stopAddress)) {
+      checkStop(data.stopAddress!, data.stopPlaceId, data.stopLat, data.stopLng, 'stopAddress', 'there');
+    }
+    if (stopText(data.returnStopAddress)) {
+      if (!data.returnTrip) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['returnStopAddress'],
+          message: 'A stop on the way back needs a round trip — tick "I need a return trip" or remove the stop',
+        });
+      } else {
+        checkStop(
+          data.returnStopAddress!,
+          data.returnStopPlaceId,
+          data.returnStopLat,
+          data.returnStopLng,
+          'returnStopAddress',
+          'back',
+        );
       }
     }
   });

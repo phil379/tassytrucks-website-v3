@@ -64,7 +64,9 @@ await t('the slug cannot change the price: the quote takes coordinates only, wha
 
 await t('the slug never reaches pricing in the booking route or the pricing modules', () => {
   const route = readFileSync('app/api/trip-request/route.ts', 'utf8');
-  const hotelCall = route.slice(route.indexOf('const hotel = await hotelQuoteServer('), route.indexOf('});', route.indexOf('const hotel = await hotelQuoteServer(')));
+  // Since booking-time stops (2026-11-19) the call sits behind a ternary
+  // (a trip with a stop is never a hotel price), so anchor on the call itself.
+  const hotelCall = route.slice(route.indexOf('await hotelQuoteServer('), route.indexOf('});', route.indexOf('await hotelQuoteServer(')));
   assert.ok(hotelCall.length > 0 && !/sourceHotelSlug|hotel_slug|source_hotel/.test(hotelCall), 'hotelQuoteServer gets no slug');
   const estimateCall = route.slice(route.indexOf('estimateTrip('), route.indexOf('});', route.indexOf('estimateTrip(')));
   assert.ok(!/sourceHotelSlug|source_hotel/.test(estimateCall), 'estimateTrip gets no slug');

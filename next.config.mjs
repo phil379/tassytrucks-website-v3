@@ -17,6 +17,22 @@ const nextConfig = {
    */
   async headers() {
     return [
+      /**
+       * Baseline security headers on every response (added 2026-11-18, Phil's
+       * hardening pass). Deliberately the non-breaking set: no Content-Security-
+       * Policy (the site loads Stripe and map assets a strict CSP would need
+       * careful allow-listing for — that is a separate, tested change), and
+       * HSTS is already sent by Vercel's edge. X-Frame-Options is SAMEORIGIN,
+       * not DENY, so the site can still frame its own pages if it ever needs to.
+       */
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
       {
         source: '/:path*',
         has: [{ type: 'host', value: '(.*)\\.vercel\\.app' }],

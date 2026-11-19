@@ -25,9 +25,10 @@ import { CONCIERGE } from '@/lib/quote';
  *   The confirmation email derives its sentence from this file, so bookings
  *   confirmed from this change on promise 2 hours. Bookings confirmed before
  *   it were promised 4 hours in writing — honour the promise those customers
- *   hold. Treatment Day was not part of the Nov 18 decision: it stays at
- *   4 hours, and Phil's 24-hour figure for it stays in PHIL_PROPOSED until
- *   he rules on it.
+ *   hold. Treatment Day was not in the first Nov 18 decision; later the same
+ *   evening Phil extended it — "Make Treatment Day 2 hours too" — so
+ *   Treatment Day is 2 hours as well, and his Oct 24 24-hour figure for it
+ *   is superseded.
  *   lib/school-billing.ts (Phil, 2026-10-17): a Scholar monthly plan stops at the end
  *   of the paid month, with no prorated refund, and refunds are decided one at a
  *   time. That is used for Scholar's monthly plan; Phil's 24-hour / one-ride rule
@@ -63,10 +64,11 @@ export const CANCELLATION = {
   },
   /**
    * Treatment Day round trips. The fee is a share of the flat round-trip fare.
-   * Still 4 hours: the 2026-11-18 decision covered the trip window only.
+   * Window DECIDED 2026-11-18 (Phil extended the trip decision to Treatment
+   * Day the same evening): 2 hours, same as trips.
    */
   treatmentDay: {
-    freeUntilHoursBefore: 4,
+    freeUntilHoursBefore: 2,
     lateCancelFeePercent: 50,
     noShowFeePercent: 100,
   },
@@ -106,13 +108,13 @@ export function conciergeNoShowFeeText(): string {
 }
 
 /**
- * What Phil proposed on 2026-10-24 that is still only a proposal. The trip
- * figure (2 hours) was adopted on 2026-11-18 and now lives in
- * CANCELLATION.trip; the Treatment Day figure stays here until he rules.
+ * What Phil proposed on 2026-10-24 that is still only a proposal. Nothing is
+ * outstanding: the trip figure (2 hours) was adopted on 2026-11-18 and lives
+ * in CANCELLATION.trip, and the Treatment Day figure (24 hours) was
+ * superseded the same evening when Phil set Treatment Day to 2 hours too.
+ * Kept as an (empty) export so existing imports keep working.
  */
-export const PHIL_PROPOSED = {
-  treatmentDayFreeUntilHoursBefore: 24,
-} as const;
+export const PHIL_PROPOSED = {} as const;
 
 export const REFUNDS_PATH = '/refunds';
 export const REFUNDS_URL = 'https://www.tassytrucks.com/refunds';

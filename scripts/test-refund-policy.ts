@@ -26,11 +26,12 @@ assert.equal(CANCELLATION.trip.freeUntilHoursBefore, 2);
 assert.ok(freeCancellationSentence().startsWith('No fee if you let us know at least 2 hours ahead'));
 ok('trip free-cancellation window is 2 hours (Phil, decided 2026-11-18)');
 
-// Treatment Day was not part of the Nov 18 decision: it stays at 4 hours, and
-// Phil's 24-hour figure for it stays a recorded proposal, not the live number.
-assert.equal(CANCELLATION.treatmentDay.freeUntilHoursBefore, 4);
-assert.equal(PHIL_PROPOSED.treatmentDayFreeUntilHoursBefore, 24);
-ok('Treatment Day window unchanged; the 24-hour figure is still only proposed');
+// Treatment Day: Phil extended the Nov 18 decision to it the same evening
+// ("Make Treatment Day 2 hours too"), superseding his Oct 24 24-hour figure —
+// nothing is left in PHIL_PROPOSED.
+assert.equal(CANCELLATION.treatmentDay.freeUntilHoursBefore, 2);
+assert.equal('treatmentDayFreeUntilHoursBefore' in PHIL_PROPOSED, false);
+ok('Treatment Day window is 2 hours too (Phil, decided 2026-11-18)');
 
 // The numbers are not retyped on the page, the form or the email.
 const page = read('app/refunds/page.tsx');

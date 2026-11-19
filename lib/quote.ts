@@ -1,4 +1,5 @@
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
+import { STOP_FEE_CENTS, stopAvailable } from '@/lib/stops';
 import { isPetLine, type ServiceLine } from '@/lib/trip-request';
 import { OPERATING_TIME_ZONE, parseLocalDateTime } from '@/lib/time';
 import { WAV_PARTNER_LINE } from '@/lib/wav';
@@ -740,6 +741,15 @@ export type Quote = {
     /** $45 when a Tassy Escort was asked for, 0 otherwise. Already in the total. */
   escortCents: number;
   /**
+   * The stop fee for the OUTBOUND leg's stop (lib/stops.ts), 0 when that leg
+   * has no stop. Already in the total, and kept as its own component — the
+   * panel prints it as its own line and the stored record keeps it separate,
+   * never blended into the band price.
+   */
+  stopFeeCents: number;
+  /** The stop fee for the RETURN leg's stop, 0 when it has none. Already in the total. */
+  returnStopFeeCents: number;
+  /**
    * The rung the measured distance landed in: over `bandOverMiles`, up to `bandUpToMiles`.
    * Null when the distance is a range across rungs. A rung's ceiling is exact (12.0 miles is
    * the 12-mile price, 12.2 is the next rung), and the panel says so when a trip is just over
@@ -756,7 +766,7 @@ export type Quote = {
 
 export type QuoteOnly = {
   kind: 'quote-only';
-  reason: 'beyond-bands' | 'quoted-line' | 'wheelchair';
+  reason: 'beyond-bands' | 'quoted-line' | 'wheelchair' | 'unlocated';
   miles: number | null;
   message: string;
 };
@@ -855,6 +865,30 @@ export type QuoteInput = {
    */
   roadMiles?: number | null;
   /**
+   * A stop on the OUTBOUND leg (pickup -> stop -> destination), priced by
+   * lib/stops.ts: the leg's band is chosen on the route THROUGH the stop and
+   * the flat stop fee is added once for the leg. `stop` is the picked place,
+   * `stopAddress` its raw text (ZIP fallback, like the two ends). When
+   * roadMiles is supplied it must already be the through-stop route miles —
+   * the form and the server both measure it that way (lib/road-distance.ts
+   * roadDistanceVia).
+   */
+  stop?: { lat?: number | null; lng?: number | null } | null;
+  stopAddress?: string | null;
+  /**
+   * A stop on the RETURN leg of a round trip (destination -> stop -> pickup).
+   * Trips are asymmetric (Phil, 2026-11-19): the ride there is usually
+   * direct, the pharmacy stop belongs on the way home. Ignored when the trip
+   * is not a round trip. `returnRoadMiles` is the measured return route:
+   * through the return stop when it has one, or the direct way back when
+   * only the outbound leg has a stop (the return does not retrace the
+   * detour). Without any stop the return leg mirrors the outbound miles
+   * exactly, as it always has.
+   */
+  returnStop?: { lat?: number | null; lng?: number | null } | null;
+  returnStopAddress?: string | null;
+  returnRoadMiles?: number | null;
+  /**
    * Tassy Escort — the driver goes inside and walks them out. Recovery only;
    * silently ignored on every other line so a stale query string cannot add
    * $45 to a pet ride.
@@ -905,6 +939,32 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
       : cardFor(input.serviceLine, input.mobility);
   if (!card) return null;
 
+  // Recovery is already a round trip, so ticking the box must not double it. A wheelchair
+  // Recovery is forced to one (see roundTripForced), whatever the box says; the form and the
+  // server both come through here, so the price on screen is the price that is stored.
+  const returnTrip = Boolean(input.returnTrip) || roundTripForced(input.serviceLine, input.mobility);
+
+  // ── Stops (lib/stops.ts; Phil, 2026-11-19). Each leg prices on its own
+  // route: the band for that leg's driving miles THROUGH its stop, plus the
+  // flat stop fee for each leg that has one. A stop address that cannot be
+  // placed at all (no picked point, no ZIP we serve) is a conversation, not
+  // a silently direct price — the same honesty as an unplaceable pickup.
+  const stopsOn = stopAvailable(input.serviceLine);
+  const outStopGiven = stopsOn && Boolean(input.stopAddress?.trim());
+  const outStop = outStopGiven ? resolvePoint(input.stop, input.stopAddress) : null;
+  const retStopGiven = stopsOn && returnTrip && Boolean(input.returnStopAddress?.trim());
+  const retStop = retStopGiven ? resolvePoint(input.returnStop, input.returnStopAddress) : null;
+  if ((outStopGiven && !outStop) || (retStopGiven && !retStop)) {
+    return {
+      kind: 'quote-only',
+      reason: 'unlocated',
+      miles: null,
+      message: `We could not place that stop on the map. Send the request and a dispatcher will price the trip with your stop included. ${CONFIRMATION_PROMISE}`,
+    };
+  }
+  const stopFeeCents = outStop ? STOP_FEE_CENTS : 0;
+  const returnStopFeeCents = retStop ? STOP_FEE_CENTS : 0;
+
   // A measured road distance ends the guessing. Both ends of the range become
   // the same number, so the panel prints one price instead of a spread, and the
   // mileage on screen is the mileage the customer's own phone will show.
@@ -912,37 +972,72 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     typeof input.roadMiles === 'number' && Number.isFinite(input.roadMiles) && input.roadMiles > 0
       ? input.roadMiles
       : null;
+  const measuredReturn =
+    typeof input.returnRoadMiles === 'number' &&
+    Number.isFinite(input.returnRoadMiles) &&
+    input.returnRoadMiles > 0
+      ? input.returnRoadMiles
+      : null;
 
-  const straight = haversineMiles(from.point, to.point);
-  if (measured === null && !Number.isFinite(straight)) return null;
+  /** One leg's distance range: measured wins outright; else the straight line through the leg's stop, stretched by the road factors. */
+  const legMiles = (
+    a: LatLng,
+    b: LatLng,
+    via: LatLng | null,
+    legMeasured: number | null,
+  ): { low: number; mid: number; high: number } | null => {
+    if (legMeasured !== null) return { low: legMeasured, mid: legMeasured, high: legMeasured };
+    const straight = via ? haversineMiles(a, via) + haversineMiles(via, b) : haversineMiles(a, b);
+    if (!Number.isFinite(straight)) return null;
+    return { low: straight * ROAD_FACTOR_LOW, mid: straight * ROAD_FACTOR_MID, high: straight * ROAD_FACTOR_HIGH };
+  };
 
-  const milesLow = measured ?? straight * ROAD_FACTOR_LOW;
-  const milesMid = measured ?? straight * ROAD_FACTOR_MID;
-  const milesHigh = measured ?? straight * ROAD_FACTOR_HIGH;
+  const out = legMiles(from.point, to.point, outStop?.point ?? null, measured);
+  if (!out) return null;
+  // The return leg's distance, in order: its own measured route when the
+  // caller measured one (through its stop, or direct when only the way
+  // there has a stop); the straight line through its stop; the straight
+  // DIRECT line back when the way there detoured but the way back does not
+  // (the return does not retrace the outbound stop); and only when neither
+  // leg has a stop, the outbound leg itself — the way back mirrors the way
+  // there, exactly as it always has.
+  const ret = !returnTrip
+    ? null
+    : retStop
+      ? legMiles(to.point, from.point, retStop.point, measuredReturn)
+      : measuredReturn !== null
+        ? legMiles(to.point, from.point, null, measuredReturn)
+        : outStop
+          ? legMiles(to.point, from.point, null, null)
+          : out;
+  if (retStop && !ret) return null;
 
   // Past the last rung. Do NOT extrapolate: the reason the card ends is that
   // beyond it the trip stops being a lookup and starts being a conversation
   // about tolls, driver hours and whether the vehicle comes back empty.
   //
-  // THE MIDDLE ESTIMATE DECIDES THIS, not the pessimistic one. Uptown to
-  // Concord is 25.5 real road miles — comfortably inside the 30-mile rung —
-  // but 19.4 straight-line times the p90 factor is 30.1, and judging it on
-  // that number turns a priceable trip into "call us". Refusing to quote is
+  // THE MIDDLE ESTIMATE OF EACH LEG DECIDES THIS, not the pessimistic one.
+  // Uptown to Concord is 25.5 real road miles — comfortably inside the 30-mile
+  // rung — but 19.4 straight-line times the p90 factor is 30.1, and judging it
+  // on that number turns a priceable trip into "call us". Refusing to quote is
   // the most expensive mistake this function can make; a range that clips at
   // the top rung is the cheap one.
-  const midBand = bandFor(card, milesMid);
-  if (!midBand) {
+  const midBand = bandFor(card, out.mid);
+  const retMidBand = ret ? bandFor(card, ret.mid) : null;
+  if (!midBand || (ret !== null && !retMidBand)) {
     return {
       kind: 'quote-only',
       reason: 'beyond-bands',
-      miles: Math.round(milesMid * 10) / 10,
+      miles: Math.round(out.mid * 10) / 10,
       message: `That is a longer trip than our published ${card.label} rates cover. Send the request and a dispatcher will quote it. ${CONFIRMATION_PROMISE}`,
     };
   }
 
   // Clamped to the card, having already established the trip belongs on it.
-  const lowBand = bandFor(card, milesLow) ?? card.bands[0]!;
-  const highBand = bandFor(card, milesHigh) ?? card.bands[card.bands.length - 1]!;
+  const lowBand = bandFor(card, out.low) ?? card.bands[0]!;
+  const highBand = bandFor(card, out.high) ?? card.bands[card.bands.length - 1]!;
+  const retLowBand = ret ? (bandFor(card, ret.low) ?? card.bands[0]!) : null;
+  const retHighBand = ret ? (bandFor(card, ret.high) ?? card.bands[card.bands.length - 1]!) : null;
 
   const surcharges = surchargesFor(input.requestedAt, input.serviceLine);
   const surchargeTotal = surcharges.reduce((sum, s) => sum + s.cents, 0);
@@ -957,23 +1052,36 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const escortCents =
     input.escort && escortAvailable(input.serviceLine) ? ESCORT_CENTS : 0;
 
-  // Recovery is already a round trip, so ticking the box must not double it. A wheelchair
-  // Recovery is forced to one (see roundTripForced), whatever the box says; the form and the
-  // server both come through here, so the price on screen is the price that is stored.
-  const returnTrip = Boolean(input.returnTrip) || roundTripForced(input.serviceLine, input.mobility);
   const bothLegs = card.returnFactor === 1 || returnTrip;
-  const factor = returnTrip ? card.returnFactor : 1;
 
-  const price = (band: Band) => {
-    // Multiply the LEG, then add what is charged once. Surcharges and extra
-    // passengers do not double on a return trip — the driver is dispatched
-    // once, at one hour of the day, carrying one extra passenger.
-    const legs = Math.round(band.cents * factor);
+  const price = (band: Band, retBand: Band | null) => {
+    // Price each leg on its own band, then add what is charged once.
+    // Surcharges, extra passengers, the escort and the stop fees do not
+    // double on a return trip — the driver is dispatched once, at one hour
+    // of the day, and a stop is one stop.
+    let legs: number;
+    if (!returnTrip || retBand === null) {
+      legs = band.cents;
+    } else if (card.returnFactor === 1) {
+      // The band IS the round trip (Recovery, Treatment Day): it prices the
+      // longer of the two legs' routes.
+      legs = Math.max(band.cents, retBand.cents);
+    } else if (card.returnFactor === 2) {
+      legs = band.cents + retBand.cents;
+    } else {
+      // The 1.8x cards (Winnie, Care WAV): the full band out and the
+      // remaining 0.8 back. On equal legs that is exactly
+      // Math.round(band x 1.8) — the outbound band is a whole number of
+      // cents, so a booking with no stops prices byte-identically to before.
+      legs = band.cents + Math.round(retBand.cents * (card.returnFactor - 1));
+    }
     return (
       roundTo(Math.max(legs, returnTrip ? card.returnFloor : 0), 100) +
       surchargeTotal +
       extras +
-      escortCents
+      escortCents +
+      stopFeeCents +
+      returnStopFeeCents
     );
   };
 
@@ -982,19 +1090,25 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
   const waitIncludedMin =
     card === WINNIE && returnTrip ? 20 : card.waitIncludedMin;
 
-  const exact = from.exact && to.exact;
+  const exact =
+    from.exact && to.exact && (outStop === null || outStop.exact) && (retStop === null || retStop.exact);
   const fromPlace = zipPlace(from.zip);
   const toPlace = zipPlace(to.zip);
 
   return {
     kind: 'estimate',
-    lowCents: price(lowBand),
-    highCents: price(highBand),
-    // The MIDDLE estimate, not the low one. Printing the optimistic figure is
-    // what made the site read 10.6 miles for an 11.1-mile drive.
-    miles: Math.round(milesMid * 10) / 10,
+    lowCents: price(lowBand, retLowBand),
+    highCents: price(highBand, retHighBand),
+    // The MIDDLE estimate of the outbound leg, not the low one. Printing the
+    // optimistic figure is what made the site read 10.6 miles for an
+    // 11.1-mile drive.
+    miles: Math.round(out.mid * 10) / 10,
     surcharges,
-    entryBand: lowBand === card.bands[0] && highBand === card.bands[0],
+    entryBand:
+      lowBand === card.bands[0] &&
+      highBand === card.bands[0] &&
+      (retLowBand === null || retLowBand === card.bands[0]) &&
+      (retHighBand === null || retHighBand === card.bands[0]),
     waitIncludedMin,
     cardLabel: card.label,
     roundTrip: bothLegs,
@@ -1002,8 +1116,13 @@ export function estimateTrip(input: QuoteInput): QuoteResult | null {
     measuredFrom: exact || !fromPlace || !toPlace ? null : `${fromPlace} to ${toPlace}`,
         distanceMeasured: measured !== null,
     escortCents,
-    bandOverMiles: lowBand === highBand ? (card.bands[card.bands.indexOf(lowBand) - 1]?.upToMiles ?? 0) : null,
-    bandUpToMiles: lowBand === highBand ? lowBand.upToMiles : null,
+    stopFeeCents,
+    returnStopFeeCents,
+    bandOverMiles:
+      lowBand === highBand && retLowBand === retHighBand
+        ? (card.bands[card.bands.indexOf(lowBand) - 1]?.upToMiles ?? 0)
+        : null,
+    bandUpToMiles: lowBand === highBand && retLowBand === retHighBand ? lowBand.upToMiles : null,
   };
 }
 

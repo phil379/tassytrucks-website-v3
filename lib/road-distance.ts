@@ -183,3 +183,25 @@ function siteReferer(): string {
 export function __resetRoadDistanceCache() {
   cache.clear();
 }
+
+/**
+ * Driving distance for a route THROUGH a stop: A -> stop -> B.
+ *
+ * roadDistance prices one leg; a stop makes two. Each leg goes through
+ * roadDistance itself, so each is cached on its own coordinates — a route
+ * sharing a leg with another route reuses it — and a failed leg fails the
+ * whole route (null), never a silently direct distance.
+ */
+export async function roadDistanceVia(
+  from: LatLng,
+  via: LatLng,
+  to: LatLng,
+): Promise<RoadDistance | null> {
+  const [first, second] = await Promise.all([roadDistance(from, via), roadDistance(via, to)]);
+  if (!first || !second) return null;
+  return {
+    miles: first.miles + second.miles,
+    seconds:
+      first.seconds !== null && second.seconds !== null ? first.seconds + second.seconds : null,
+  };
+}

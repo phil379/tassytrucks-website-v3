@@ -18,7 +18,8 @@ import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications, type FacilityAlertContext } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { containsNul, MAX_REQUEST_BODY_CHARS } from '@/lib/request-guards';
-import { coerceLatLng, roadDistance } from '@/lib/road-distance';
+import { coerceLatLng, roadDistance, roadDistanceVia } from '@/lib/road-distance';
+import { STOP_FEE_CENTS } from '@/lib/stops';
 import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { createHash } from 'node:crypto';
 import {
@@ -454,15 +455,61 @@ export async function POST(request: Request) {
   // The visitor's browser string is deliberately NOT stored on the ride row: nothing needs it to
   // deliver a ride (privacy audit 2026-10-24). A signed care consent still records it above, as evidence.
 
+  // ── Stops (lib/stops.ts). The schema has already ruled on the line, the
+  // leg and the "same as one of the ends" cases. What remains is the
+  // standard the two ends are held to: a stop must be placeable — a picked
+  // point, or a typed address with a ZIP we serve — or the route through it
+  // can be neither priced nor driven. Refused here with a field error,
+  // never silently dropped and never silently priced as a direct trip.
+  const stopPoint = coerceLatLng({ lat: data.stopLat, lng: data.stopLng });
+  const returnStopPoint = coerceLatLng({ lat: data.returnStopLat, lng: data.returnStopLng });
+  const hasStop = Boolean(data.stopAddress?.trim());
+  const hasReturnStop = Boolean(data.returnStopAddress?.trim());
+  const stopFieldErrors: Record<string, string> = {};
+  if (hasStop && !resolvePoint(stopPoint, data.stopAddress)) {
+    stopFieldErrors.stopAddress =
+      'Pick your stop from the list as you type, or add its ZIP code so we can find it';
+  }
+  if (hasReturnStop && !resolvePoint(returnStopPoint, data.returnStopAddress)) {
+    stopFieldErrors.returnStopAddress =
+      'Pick your stop on the way back from the list as you type, or add its ZIP code so we can find it';
+  }
+  if (Object.keys(stopFieldErrors).length > 0) {
+    return NextResponse.json(
+      { ok: false, error: 'Please check the form.', fieldErrors: stopFieldErrors },
+      { status: 400 },
+    );
+  }
+
   // The SAME measured distance the visitor was shown, fetched again here rather
   // than trusted from the body - a price the browser can edit is not a price.
   // Cached in lib/road-distance.ts, so in practice this is the browser's own
   // lookup served back with no second call to Google. Null is fine: the engine
   // falls back to the straight-line estimate exactly as the form did.
+  // With a stop, the measured route goes THROUGH it — each leg separately,
+  // so the return leg's stop prices the way back, not the way there.
   const pickupPoint = coerceLatLng({ lat: data.pickupLat, lng: data.pickupLng });
   const dropoffPoint = coerceLatLng({ lat: data.dropoffLat, lng: data.dropoffLng });
   const measured =
-    pickupPoint && dropoffPoint ? await roadDistance(pickupPoint, dropoffPoint) : null;
+    pickupPoint && dropoffPoint
+      ? stopPoint
+        ? await roadDistanceVia(pickupPoint, stopPoint, dropoffPoint)
+        : // A stop typed with a ZIP but never picked: there is no point to
+          // measure through, so the direct measured miles must NOT win — the
+          // engine falls back to centroid routing through the stop, exactly
+          // as the form's estimate did.
+          hasStop
+          ? null
+          : await roadDistance(pickupPoint, dropoffPoint)
+      : null;
+  const measuredReturn =
+    pickupPoint && dropoffPoint && returnStopPoint
+      ? await roadDistanceVia(dropoffPoint, returnStopPoint, pickupPoint)
+      : // Only the way there has a stop: the way back is the direct drive,
+        // measured as itself — it does not retrace the outbound detour.
+        pickupPoint && dropoffPoint && stopPoint
+        ? await roadDistance(dropoffPoint, pickupPoint)
+        : null;
 
   // Recomputed here from the coordinates that arrived, never taken from the
   // request body. Null whenever the addresses were typed instead of picked -
@@ -470,6 +517,13 @@ export async function POST(request: Request) {
   const quoted = estimateTrip({
     serviceLine: data.serviceLine,
     roadMiles: measured?.miles ?? null,
+    // The stops, leg by leg: picked points plus the typed text for the ZIP
+    // fallback, and the measured return route when the way back has a stop.
+    stop: stopPoint,
+    stopAddress: data.stopAddress,
+    returnStop: returnStopPoint,
+    returnStopAddress: data.returnStopAddress,
+    returnRoadMiles: measuredReturn?.miles ?? null,
     // Read from the VALIDATED details, so the stored estimate matches the one
     // on screen. The engine ignores it off Recovery.
     escort: tripDetails?.escort === 'yes',
@@ -495,13 +549,19 @@ export async function POST(request: Request) {
   // HOTEL ZONE PRICE. Decided here, from the coordinates, never from a `?hotel=` link or from the
   // price the browser says it saw. Null for every trip that is not a listed hotel <-> CLT ride, and
   // then nothing below changes. A hotel price is flat: no surcharge of any kind (lib/hotel-price.ts).
-  const hotel = await hotelQuoteServer({
-    serviceLine: data.serviceLine,
-    mobility: data.mobility,
-    pickup: pickupPoint,
-    dropoff: dropoffPoint,
-    returnTrip: data.returnTrip,
-  });
+  // A booking with a stop is never a hotel price: the flat rate prices the direct hotel <-> CLT
+  // run, so a stop takes the trip onto the normal card, priced through the stop — the same price
+  // the form showed when the stop was added.
+  const hotel =
+    hasStop || hasReturnStop
+      ? null
+      : await hotelQuoteServer({
+          serviceLine: data.serviceLine,
+          mobility: data.mobility,
+          pickup: pickupPoint,
+          dropoff: dropoffPoint,
+          returnTrip: data.returnTrip,
+        });
   // A client that SENT a hotel price must have been shown the same one. Anything else (another
   // amount, or a hotel price for a trip that is not a hotel trip) is refused with nothing stored.
   if (hotelPriceMismatch(data.hotelQuotedCents, hotel)) {
@@ -628,6 +688,31 @@ export async function POST(request: Request) {
               hotel_slug: hotel.slug,
               hotel_zone: hotel.zone,
               hotel_intro: hotel.introApplied,
+            }
+          : {}),
+        // Booking-time stops (STOP_01 migration), leg by leg, only when the
+        // booking has them — every other insert is unchanged and keeps
+        // working before the migration is applied. The fee columns record
+        // what the stored estimate charged per leg (estimate_low/high_cents
+        // already include them, so ops confirms the stored total and never
+        // recomputes); on a quote-only trip the fee recorded is the flat fee
+        // that will apply when dispatch prices it.
+        ...(hasStop
+          ? {
+              stop_address: data.stopAddress!.trim(),
+              stop_place_id: data.stopPlaceId || null,
+              stop_lat: data.stopLat ?? null,
+              stop_lng: data.stopLng ?? null,
+              stop_fee_cents: estimate?.stopFeeCents || STOP_FEE_CENTS,
+            }
+          : {}),
+        ...(hasReturnStop
+          ? {
+              return_stop_address: data.returnStopAddress!.trim(),
+              return_stop_place_id: data.returnStopPlaceId || null,
+              return_stop_lat: data.returnStopLat ?? null,
+              return_stop_lng: data.returnStopLng ?? null,
+              return_stop_fee_cents: estimate?.returnStopFeeCents || STOP_FEE_CENTS,
             }
           : {}),
         // Empty for every retail booking, so this spread changes nothing there.

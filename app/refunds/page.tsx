@@ -2,6 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import LegalPage from '@/components/legal/LegalPage';
 import { CANCELLATION, REFUND_POLICY_UPDATED, conciergeNoShowFeeText } from '@/lib/refund-policy';
+import {
+  STOP_INCLUDED_WAIT_MINUTES,
+  STOP_WAIT_BLOCK_MINUTES,
+  stopFeeText,
+  stopWaitBlockText,
+} from '@/lib/stops';
 import { BUSINESS, businessIdentityLine } from '@/lib/business';
 
 export const metadata: Metadata = {
@@ -168,11 +174,25 @@ export default function RefundsPage() {
           id: 'other-charges',
           heading: 'Waiting time, tolls and other charges',
           children: (
-            <p>
-              Waiting time beyond what is included, and tolls, are quoted to you before they are
-              charged. See <Link href="/pricing" className="underline">Pricing</Link> for what is
-              included and what can change a price.
-            </p>
+            <>
+              <p>
+                Waiting time beyond what is included, and tolls, are quoted to you before they are
+                charged. See <Link href="/pricing" className="underline">Pricing</Link> for what is
+                included and what can change a price.
+              </p>
+              {/* Every number in this paragraph derives from lib/stops.ts, the
+                  same constants the booking form and the quote engine use —
+                  nothing here is typed by hand, so it cannot drift. */}
+              <p>
+                A stop you add when you book — at your pharmacy on the way home, for example — costs{' '}
+                {stopFeeText()} per stop, and the trip is priced on the whole route through the
+                stop, shown before you book. The stop fee includes {STOP_INCLUDED_WAIT_MINUTES}{' '}
+                minutes of waiting at the stop. If the stop takes longer, waiting beyond that is{' '}
+                {stopWaitBlockText()} for each additional {STOP_WAIT_BLOCK_MINUTES} minutes,
+                billed after the ride — your ride always completes, and you are never left at a
+                stop because a waiting window ran out.
+              </p>
+            </>
           ),
         },
         {

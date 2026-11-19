@@ -44,6 +44,15 @@ import {
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema, isAccompaniedMinor } from '@/lib/care-intake';
 import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
+import {
+  STOP_TERMS_LINE,
+  stopAvailable,
+  stopButtonLabel,
+  stopFeeLine,
+  stopHeading,
+  stopIntro,
+  type StopLeg,
+} from '@/lib/stops';
 
 const labelCls = 'block text-sm font-medium mb-1.5';
 
@@ -261,6 +270,19 @@ export default function RequestForm({
   /** Tassy Care medical billing. Only sent when a payer is chosen on a Care ride. */
   const [care, setCare] = useState<CareIntakeValues>(EMPTY_CARE_INTAKE);
 
+  // Booking-time stops (lib/stops.ts): one optional stop per leg, each with
+  // the same lifted state as the two ends — the picked place plus the raw
+  // text — so the estimate, the distance lookup and the submit all read the
+  // same thing. `Open` is whether the rider expanded that leg's control.
+  const [stopOpen, setStopOpen] = useState(false);
+  const [stopPlace, setStopPlace] = useState<ResolvedPlace | null>(null);
+  const [stopText, setStopText] = useState('');
+  const [stopSuggest, setStopSuggest] = useState(false);
+  const [returnStopOpen, setReturnStopOpen] = useState(false);
+  const [returnStopPlace, setReturnStopPlace] = useState<ResolvedPlace | null>(null);
+  const [returnStopText, setReturnStopText] = useState('');
+  const [returnStopSuggest, setReturnStopSuggest] = useState(false);
+
   function changeService(next: ServiceLine) {
     setService(next);
     // Carry the answer over when it still exists in the new list (`other` does),
@@ -271,6 +293,17 @@ export default function RequestForm({
     // by meaning — carrying a pet's name into a Scholar request would put a
     // dog's name where a child's belongs.
     setDetails({});
+    // A stop cannot ride on a line that does not take stops (Scholar): clear
+    // both legs rather than carry a pharmacy into a school route. Between
+    // lines that do take stops the addresses are the rider's own and stay.
+    if (!stopAvailable(next)) {
+      setStopOpen(false);
+      setStopPlace(null);
+      setStopText('');
+      setReturnStopOpen(false);
+      setReturnStopPlace(null);
+      setReturnStopText('');
+    }
     setErrors((current) => {
       const kept: Record<string, string> = {};
       for (const [key, message] of Object.entries(current)) {
@@ -293,6 +326,15 @@ export default function RequestForm({
   /** True once Google's suggestions are loaded for that field. Only then must an address be picked. */
   const [pickupSuggest, setPickupSuggest] = useState(false);
   const [dropoffSuggest, setDropoffSuggest] = useState(false);
+  /** Stops ride only on the lines lib/stops.ts allows, and only count once the rider has typed one. */
+  const stopsSupported = stopAvailable(service);
+  const stopActive = stopsSupported && stopOpen && stopText.trim().length > 0;
+  const returnStopActive =
+    stopsSupported && returnTrip && returnStopOpen && returnStopText.trim().length > 0;
+  const stopLat = stopPlace?.lat ?? null;
+  const stopLng = stopPlace?.lng ?? null;
+  const returnStopLat = returnStopPlace?.lat ?? null;
+  const returnStopLng = returnStopPlace?.lng ?? null;
   // `?when=YYYY-MM-DDTHH:mm` pre-fills the time (a text-to-book link), ONLY when the server passed
   // textLinkPrefill (TEXT_TO_BOOK_MODE on). Off: ignored, the form opens as before.
   const [whenValue, setWhenValue] = useState(() => prefillWhen(searchParams.get('when'), textLinkPrefill));
@@ -380,7 +422,9 @@ export default function RequestForm({
    * untouched: same bands, same factors, same prices, here and on the server.
    */
   const [roadMiles, setRoadMiles] = useState<number | null>(null);
-  /** The address pair the current roadMiles answer (or non-answer) belongs to. */
+  /** Measured miles for the RETURN leg, only ever set when the way back has a stop of its own. */
+  const [returnRoadMiles, setReturnRoadMiles] = useState<number | null>(null);
+  /** The route the current distance answers (or non-answers) belong to. */
   const [roadMilesFor, setRoadMilesFor] = useState<string | null>(null);
 
   const pickupLat = pickupPlace?.lat ?? null;
@@ -389,16 +433,27 @@ export default function RequestForm({
   const dropoffLng = dropoffPlace?.lng ?? null;
 
   /**
-   * The pair a distance answer belongs to, at the same five-decimal precision
+   * The route a distance answer belongs to, at the same five-decimal precision
    * as the server's cache key (lib/road-distance.ts), so re-picking the same
-   * place from the dropdown reads as the same pair.
+   * place from the dropdown reads as the same route. A leg's stop is part of
+   * the route: '-' when the leg has none, 'typed' when the rider typed a stop
+   * but has not picked it (no measured route exists for it yet — the lookup
+   * settles with no answer and the engine prices the detour from ZIP codes,
+   * exactly as the server does).
    */
+  const routeSegment = (lat: number | null, lng: number | null, active: boolean) =>
+    !active ? '-' : lat !== null && lng !== null ? `${lat.toFixed(5)},${lng.toFixed(5)}` : 'typed';
   const distancePairKey =
     pickupLat !== null && pickupLng !== null && dropoffLat !== null && dropoffLng !== null
-      ? `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}|${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`
+      ? [
+          `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}`,
+          routeSegment(stopLat, stopLng, stopActive),
+          `${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`,
+          routeSegment(returnStopLat, returnStopLng, returnStopActive),
+        ].join('|')
       : null;
 
-  /** True while the lookup for the CURRENT pair has not settled either way. */
+  /** True while the lookup for the CURRENT route has not settled either way. */
   const distancePending = distancePairKey !== null && roadMilesFor !== distancePairKey;
 
   useEffect(() => {
@@ -408,21 +463,39 @@ export default function RequestForm({
       dropoffLat === null ||
       dropoffLng === null
     ) {
-      // One end just changed or was cleared. Drop the old number immediately:
+      // One end just changed or was cleared. Drop the old numbers immediately:
       // a measured distance for the PREVIOUS address is worse than none.
       setRoadMiles(null);
+      setReturnRoadMiles(null);
       setRoadMilesFor(null);
       return;
     }
 
-    // The pair this run of the effect is answering for — the same string as
+    // The route this run of the effect is answering for — the same string as
     // distancePairKey, recomputed here where the four coords are narrowed
     // non-null.
-    const pairKey = `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}|${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`;
+    const pairKey = [
+      `${pickupLat.toFixed(5)},${pickupLng.toFixed(5)}`,
+      routeSegment(stopLat, stopLng, stopActive),
+      `${dropoffLat.toFixed(5)},${dropoffLng.toFixed(5)}`,
+      routeSegment(returnStopLat, returnStopLng, returnStopActive),
+    ].join('|');
+
+    // A stop that was typed but not picked has no point to measure through.
+    // Settle with no measured miles: the engine prices the detour from ZIP
+    // centroids, the server does the same, and the panel labels the price a
+    // ZIP estimate — never a measured direct route wearing a stop fee.
+    if ((stopActive && stopPlace === null) || (returnStopActive && returnStopPlace === null)) {
+      setRoadMiles(null);
+      setReturnRoadMiles(null);
+      setRoadMilesFor(pairKey);
+      return;
+    }
+
     let cancelled = false;
     const controller = new AbortController();
     // Short debounce. Picking from the dropdown can fire pickup and dropoff in
-    // quick succession, and one billed call per pair is the point.
+    // quick succession, and one billed call per route is the point.
     const timer = setTimeout(() => {
       fetch('/api/distance', {
         method: 'POST',
@@ -430,18 +503,24 @@ export default function RequestForm({
         body: JSON.stringify({
           pickup: { lat: pickupLat, lng: pickupLng },
           dropoff: { lat: dropoffLat, lng: dropoffLng },
+          ...(stopActive && stopPlace ? { stop: { lat: stopLat, lng: stopLng } } : {}),
+          ...(returnStopActive && returnStopPlace
+            ? { returnStop: { lat: returnStopLat, lng: returnStopLng } }
+            : {}),
         }),
         signal: controller.signal,
       })
         .then((response) => (response.ok ? response.json() : null))
-        .then((data: { miles?: number | null } | null) => {
+        .then((data: { miles?: number | null; returnMiles?: number | null } | null) => {
           if (cancelled) return;
           setRoadMiles(typeof data?.miles === 'number' ? data.miles : null);
+          setReturnRoadMiles(typeof data?.returnMiles === 'number' ? data.returnMiles : null);
           setRoadMilesFor(pairKey);
         })
         .catch(() => {
           if (!cancelled) {
             setRoadMiles(null);
+            setReturnRoadMiles(null);
             setRoadMilesFor(pairKey);
           }
         });
@@ -452,7 +531,20 @@ export default function RequestForm({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [pickupLat, pickupLng, dropoffLat, dropoffLng]);
+  }, [
+    pickupLat,
+    pickupLng,
+    dropoffLat,
+    dropoffLng,
+    stopLat,
+    stopLng,
+    returnStopLat,
+    returnStopLng,
+    stopActive,
+    returnStopActive,
+    stopPlace,
+    returnStopPlace,
+  ]);
 
   /**
    * A hotel zone price, asked of the server (/api/hotel-price) from the two picked places. No hotel
@@ -531,8 +623,11 @@ export default function RequestForm({
 
   const quoted = useMemo(() => {
     if (!estimatesEnabled) return null;
-    if (hotelPending) return null;
-    if (hotelPrice) {
+    // A stop takes the trip off the flat hotel price onto the normal card,
+    // priced through the stop (the server does the same) — so while a stop
+    // is on the trip, the hotel answer is not even consulted.
+    if (hotelPending && !stopActive && !returnStopActive) return null;
+    if (hotelPrice && !stopActive && !returnStopActive) {
       const flat = quoteFromHotelPrice(hotelPrice.chargedCents, returnTrip);
       return flat;
     }
@@ -547,6 +642,14 @@ export default function RequestForm({
     return estimateTrip({
       serviceLine: service,
       roadMiles,
+      // The stops, leg by leg (lib/stops.ts). The picked place plus the raw
+      // text for the ZIP fallback — the same pairing the two ends use — and
+      // the measured return route when the way back has a stop.
+      stop: stopPlace,
+      stopAddress: stopActive ? stopText : null,
+      returnStop: returnStopPlace,
+      returnStopAddress: returnStopActive ? returnStopText : null,
+      returnRoadMiles,
       // The one detail answer that moves the price. The engine ignores it on
       // every line but Recovery, so switching service cannot carry $45 across.
       escort: details.escort === 'yes',
@@ -576,6 +679,13 @@ export default function RequestForm({
     hotelPending,
     distancePending,
     roadMiles,
+    returnRoadMiles,
+    stopPlace,
+    stopText,
+    stopActive,
+    returnStopPlace,
+    returnStopText,
+    returnStopActive,
     details.escort,
     details.flat_round_trip,
     service,
@@ -634,9 +744,17 @@ export default function RequestForm({
         next = { ...next };
         delete next.dropoffAddress;
       }
+      if (stopPlace?.placeId && current.stopAddress === PICK_ADDRESS_MESSAGE) {
+        next = { ...next };
+        delete next.stopAddress;
+      }
+      if (returnStopPlace?.placeId && current.returnStopAddress === PICK_ADDRESS_MESSAGE) {
+        next = { ...next };
+        delete next.returnStopAddress;
+      }
       return next;
     });
-  }, [pickupPlace, dropoffPlace]);
+  }, [pickupPlace, dropoffPlace, stopPlace, returnStopPlace]);
 
     /** What a weekend or an early/late pickup adds on THIS service, asked of the price engine. */
   const undatedNote = (() => {
@@ -678,6 +796,8 @@ export default function RequestForm({
     serviceLine: 'Service',
     pickupAddress: 'Pickup address',
     dropoffAddress: 'Destination',
+    stopAddress: 'Stop address',
+    returnStopAddress: 'Stop on the way back',
     requestedAt: 'Date & time',
     returnAt: 'Return time',
     passengers: 'Passengers',
@@ -749,6 +869,70 @@ export default function RequestForm({
     );
   }
 
+  /**
+   * One leg's stop control (lib/stops.ts) — a plain render helper, not a
+   * component, so the address picker inside it never remounts. Phil's
+   * inviting line sits up front where every rider sees it, with the "Add a
+   * stop" button beside it; opening it reveals the same address picker the
+   * two ends use, the wait terms in small print, and a way back out. The
+   * outbound control sits under the destination; the return leg's control
+   * lives in the return-trip block, on the leg it belongs to.
+   */
+  function renderStopBlock(leg: StopLeg) {
+    if (!stopsSupported) return null;
+    const isReturn = leg === 'return';
+    const name = isReturn ? 'returnStopAddress' : 'stopAddress';
+    const open = isReturn ? returnStopOpen : stopOpen;
+    const setOpen = isReturn ? setReturnStopOpen : setStopOpen;
+    const setPlace = isReturn ? setReturnStopPlace : setStopPlace;
+    const setText = isReturn ? setReturnStopText : setStopText;
+    const setSuggest = isReturn ? setReturnStopSuggest : setStopSuggest;
+    const removeStop = () => {
+      setOpen(false);
+      setPlace(null);
+      setText('');
+    };
+    return (
+      <div className="rounded-xl border border-line p-4" data-testid={isReturn ? 'return-stop-block' : 'stop-block'}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="serif text-base font-semibold">{stopHeading(leg)}</h3>
+            <p className="ink-soft mt-1 text-sm">{stopIntro(service, leg)}</p>
+          </div>
+          {open ? (
+            <button type="button" onClick={removeStop} className="shrink-0 text-sm underline">
+              Remove stop
+            </button>
+          ) : (
+            <button type="button" onClick={() => setOpen(true)} className="btn-call shrink-0">
+              {stopButtonLabel(leg)}
+            </button>
+          )}
+        </div>
+        {open && (
+          <div className="mt-3">
+            <AddressAutocomplete
+              name={name}
+              label={
+                isReturn ? 'Stop on the way back' : leg === 'outbound' ? 'Stop on the way there' : 'Stop address'
+              }
+              apiKey={googleMapsApiKey}
+              autoComplete="street-address"
+              hasError={Boolean(errors[name])}
+              describedBy={errors[name] ? `${name}-error` : undefined}
+              onResolve={setPlace}
+              onText={setText}
+              onSuggestionsReady={setSuggest}
+              debug={debugMaps}
+            />
+            <FieldError name={name} />
+            <p className="ink-soft mt-1.5 text-xs">{STOP_TERMS_LINE}</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
     /**
    * A flagged field clears the moment it is corrected, not at the next submit (Muse F17: a
    * valid phone number kept its red message, so the customer could not tell the fix had worked).
@@ -769,7 +953,7 @@ export default function RequestForm({
       let next = current;
       for (const key of keys) {
         // Address errors clear when the address is picked (see the effect above), not on typing.
-        if (key === 'pickupAddress' || key === 'dropoffAddress') continue;
+        if (key === 'pickupAddress' || key === 'dropoffAddress' || key === 'stopAddress' || key === 'returnStopAddress') continue;
         if (key && next[key]) {
           if (next === current) next = { ...current };
           delete next[key];
@@ -809,6 +993,18 @@ export default function RequestForm({
       dropoffPlaceId: String(fd.get('dropoffAddressPlaceId') ?? '') || null,
       dropoffLat: String(fd.get('dropoffAddressLat') ?? '') || null,
       dropoffLng: String(fd.get('dropoffAddressLng') ?? '') || null,
+      // The stops, leg by leg. Sent only when that leg's stop is on the trip;
+      // the hidden place fields ride along exactly like the two ends'.
+      stopAddress: stopActive ? stopText : null,
+      stopPlaceId: stopActive ? String(fd.get('stopAddressPlaceId') ?? '') || null : null,
+      stopLat: stopActive ? String(fd.get('stopAddressLat') ?? '') || null : null,
+      stopLng: stopActive ? String(fd.get('stopAddressLng') ?? '') || null : null,
+      returnStopAddress: returnStopActive ? returnStopText : null,
+      returnStopPlaceId: returnStopActive
+        ? String(fd.get('returnStopAddressPlaceId') ?? '') || null
+        : null,
+      returnStopLat: returnStopActive ? String(fd.get('returnStopAddressLat') ?? '') || null : null,
+      returnStopLng: returnStopActive ? String(fd.get('returnStopAddressLng') ?? '') || null : null,
       // Only the FLAG. The server recomputes the amounts from the coordinates
       // it received — a price the browser could edit is not defensible.
       estimateShown: Boolean(estimate),
@@ -895,6 +1091,15 @@ export default function RequestForm({
       }
       if (dropoffSuggest && payload.dropoffAddress.trim() && !addressOk(dropoffPlace, payload.dropoffAddress, false)) {
         pickErrors.dropoffAddress = PICK_ADDRESS_MESSAGE;
+      }
+      // A stop is held to the same standard as the two ends: typed is not
+      // priced. Only its own field's suggestions decide — a stop is optional,
+      // so an empty one is never an error.
+      if (stopActive && stopSuggest && !stopPlace?.placeId) {
+        pickErrors.stopAddress = PICK_ADDRESS_MESSAGE;
+      }
+      if (returnStopActive && returnStopSuggest && !returnStopPlace?.placeId) {
+        pickErrors.returnStopAddress = PICK_ADDRESS_MESSAGE;
       }
     }
 
@@ -1177,6 +1382,10 @@ export default function RequestForm({
         <UnitField name="dropoffUnit" />
       </div>
 
+      {/* The outbound stop, on the leg it belongs to: under the destination,
+          before the date. On a round trip it is the way-there stop. */}
+      {renderStopBlock(returnTrip ? 'outbound' : 'single')}
+
       <div>
         <label className={labelCls} htmlFor="requestedAt" id="requestedAt-label">
           Date &amp; time <span aria-hidden="true">*</span>
@@ -1226,6 +1435,9 @@ export default function RequestForm({
               All times are Charlotte (Eastern) time.
             </p>
             <FieldError name="returnAt" />
+            {/* The return leg's stop lives here, with the return leg — the
+                pharmacy stop on the way home, not merged into the way there. */}
+            <div className="mt-4">{renderStopBlock('return')}</div>
           </div>
         )}
       </div>
@@ -1599,6 +1811,19 @@ export default function RequestForm({
                   ? ` · includes ${estimate.surcharges.map((x) => `${x.label.toLowerCase()} +${formatUsd(x.cents)}`).join(' and ')}`
                   : ''}
               </p>
+              {/* Each leg's stop fee as its own line. The fee is a separate
+                  price component (lib/stops.ts), never blended into the band
+                  price above — the rider sees exactly what the stop costs. */}
+              {estimate.stopFeeCents > 0 && (
+                <p className="ink-soft mt-1.5 text-xs" data-testid="stop-fee-line">
+                  {stopFeeLine(estimate.roundTrip ? 'outbound' : 'single', estimate.stopFeeCents)}
+                </p>
+              )}
+              {estimate.returnStopFeeCents > 0 && (
+                <p className="ink-soft mt-1.5 text-xs" data-testid="return-stop-fee-line">
+                  {stopFeeLine('return', estimate.returnStopFeeCents)}
+                </p>
+              )}
                             {/* Just over a rung's ceiling: say which rung, so 12.2 miles at the 13-17 price
                   does not look like an error (Muse F16). */}
               {estimate.distanceMeasured &&

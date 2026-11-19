@@ -129,7 +129,11 @@ t('what marks a hotel booking as test data: only name+tag@tassytrucks.com, case-
 
 t('the form never shows the normal ladder for a Concierge trip while the hotel answer is pending', () => {
   const form = readFileSync('components/request/RequestForm.tsx', 'utf8');
-  assert.ok(/if \(hotelPending\) return null;[\s\S]*if \(hotelPrice\) \{/.test(form), 'pending returns no quote before the engine runs');
+  // Since booking-time stops (2026-11-19) the hotel answer is consulted only
+  // when no stop is on the trip — a stop prices on the normal card instead.
+  // The pin follows the gate's new shape; the rule it guards is unchanged:
+  // pending returns no quote before the engine runs.
+  assert.ok(/if \(hotelPending && !stopActive && !returnStopActive\) return null;[\s\S]*if \(hotelPrice && !stopActive && !returnStopActive\) \{/.test(form), 'pending returns no quote before the engine runs');
   assert.ok(/hotelPrefill\?\.price/.test(form), 'the form opens on the server price');
   const page = readFileSync('app/airport/page.tsx', 'utf8');
   assert.ok(/price: shown \?/.test(page), 'the /airport page hands its server price to the form');

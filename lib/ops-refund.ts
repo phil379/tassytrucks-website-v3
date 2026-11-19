@@ -67,6 +67,17 @@ import { CANCELLATION } from '@/lib/refund-policy';
  * bridge (the route passes outcome: "held"), same email template in its
  * held variant, and it never touches Stripe and never marks the trip
  * refunded — the trip stays "paid" until a human refunds the rest.
+ *
+ * THE FEE-KEPT PATH (notifyFeeKept, below): since Phil's 2026-11-19
+ * decision the late-cancel fee is the FULL fare, so a rider cancel inside
+ * the window keeps the fare outright — no refund, no remainder, nothing
+ * for the held-payments queue to decide. Ops records the kept fare
+ * (recordFeeKept) and calls this companion through the same bridge
+ * (outcome: "fee_kept") so the rider still gets the cancellation email:
+ * the same template's held variant with a $0 remainder, which since
+ * PR #126 reads "the full fare is kept as the fee, so no refund is due."
+ * It never touches Stripe and never marks the trip refunded — the trip
+ * stays "paid" because the fare was earned, not held.
  */
 
 export const REFUND_ISSUED_ACTION = 'stripe.refund_issued';
@@ -295,6 +306,8 @@ export async function refundTrip(args: { id: string; amountCents?: number }): Pr
 
 export const REFUND_HELD_ACTION = 'cancel.refund_held_emailed';
 
+export const REFUND_FEE_KEPT_ACTION = 'cancel.fee_kept_emailed';
+
 export type HeldNotifyResult =
   | {
       ok: true;
@@ -305,14 +318,18 @@ export type HeldNotifyResult =
     }
   | { ok: false; code: RefundFailure | 'already_refunded' };
 
-/** Has the held-refund email already gone out for this trip? */
-async function heldNoticeRecorded(db: Db, tripId: string): Promise<boolean> {
+/** Has the held-refund email (or its fee-kept sibling) already gone out for this trip? */
+async function heldNoticeRecorded(
+  db: Db,
+  tripId: string,
+  action: string = REFUND_HELD_ACTION,
+): Promise<boolean> {
   const { data, error } = await db
     .from(AUDIT_LOG_TABLE)
     .select('id')
     .eq('entity_type', 'trip_request')
     .eq('entity_id', tripId)
-    .eq('action', REFUND_HELD_ACTION)
+    .eq('action', action)
     .limit(1);
   if (error) {
     console.error('[ops] could not check the held-refund record:', error.message);
@@ -440,6 +457,115 @@ export async function notifyRefundHeld(args: { id: string }): Promise<HeldNotify
       notes: `Cancellation email sent: refund held — ${CANCELLATION.trip.lateCancelFeePercent}% late-cancellation fee applies; $${(remainderCents / 100).toFixed(2)} to be refunded by hand in Stripe.`,
     });
     if (eventError) console.error('[ops] could not write the held-refund timeline row:', eventError.message);
+  }
+
+  return { ok: true, emailSent, alreadyNotified: false };
+}
+
+/**
+ * Email the rider about a KEPT fare. The second no-money companion, for
+ * Phil's 2026-11-19 rule: a rider cancel inside the free-cancel window
+ * keeps the FULL fare as the late-cancellation fee (ops cancel-outcome
+ * "full_fee"), so there is no refund and no remainder — and nothing for
+ * the held-payments queue, which is why this is a separate mode from
+ * "held" and not a reuse of it. Ops calls it through the same bridge
+ * (outcome: "fee_kept") from recordFeeKept, right after recording the
+ * cancel.
+ *
+ * The email is the template's held variant with a $0 remainder: since
+ * PR #126 the copy derives from the numbers, and at a $0 remainder it
+ * says the full fare is kept as the fee and no refund is due — it never
+ * promises money by hand, because none will move. The fee here is the
+ * full fare BY THE CALLER'S DECISION (ops has already decided the fare
+ * is kept), not a percentage read from policy: this function documents
+ * that decision, so its wording can never drift into a held-style
+ * remainder promise. Like notifyRefundHeld it never touches Stripe and
+ * never changes the trip — the row stays cancelled + paid, because the
+ * fare was earned. A successful send is recorded in the audit log
+ * (REFUND_FEE_KEPT_ACTION) and on the trip timeline, and a repeat call
+ * answers alreadyNotified instead of emailing the rider twice.
+ */
+export async function notifyFeeKept(args: { id: string }): Promise<HeldNotifyResult> {
+  const db = supabaseAdmin();
+  const { data: row, error: readError } = await db
+    .from(TRIP_REQUESTS_TABLE)
+    .select('*')
+    .eq('id', args.id)
+    .maybeSingle();
+  if (readError) throw new Error(readError.message);
+  if (!row) return { ok: false, code: 'not_found' };
+
+  // Same fences as the refund and the held email: only a cancelled trip
+  // is ever emailed about its money, and never one whose money moved.
+  if (row.status !== 'cancelled') return { ok: false, code: 'not_cancelled' };
+  if (row.payment_status === 'refunded') return { ok: false, code: 'already_refunded' };
+  if (row.payment_status !== 'paid') return { ok: false, code: 'not_paid' };
+
+  // One fee-kept email per trip: the cancel is recorded once, but a
+  // retried bridge call must not email the rider twice.
+  if (await heldNoticeRecorded(db, args.id, REFUND_FEE_KEPT_ACTION)) {
+    return { ok: true, emailSent: true, alreadyNotified: true };
+  }
+
+  const fareCents = await chargedFareCents(db, args.id, row as Record<string, unknown>);
+  // The fee is the whole fare and the remainder is $0 — the decision ops
+  // made when it kept the fare. (Contrast notifyRefundHeld, which splits
+  // the fare by the policy percentage because a human still owes the
+  // remainder there.)
+  const feeCents = fareCents;
+  const remainderCents = 0;
+
+  // The [TEST] prefix follows the same mode rule as the refund email;
+  // no Stripe call is made here, the mode only picks the prefix.
+  const mode = stripeModeForTrip(row as { is_test_data?: unknown });
+
+  let emailSent = false;
+  const contactEmail = (row as { contact_email?: string | null }).contact_email ?? null;
+  if (contactEmail) {
+    const cancelled: CancelledTrip = {
+      confirmationCode: (row as { confirmation_code?: string | null }).confirmation_code ?? '',
+      tripNumber: (row as { trip_number?: string | null }).trip_number ?? null,
+      refundCents: remainderCents,
+      refundId: null,
+      refundHeld: true,
+      fareCents,
+    };
+    const trip = emailTripShape(row, contactEmail);
+    const subject = `${mode === 'test' ? '[TEST] ' : ''}${cancellationSubject(cancelled, trip)}`;
+    try {
+      await sendRichEmail({
+        to: contactEmail,
+        subject,
+        html: cancellationHtml(cancelled, trip),
+        text: cancellationText(cancelled, trip),
+      });
+      emailSent = true;
+    } catch (e) {
+      console.error('[ops] fee-kept email failed:', e);
+    }
+  } else {
+    console.warn('[ops] fee-kept email skipped: no contact email on trip', args.id);
+  }
+
+  if (emailSent) {
+    // The record that makes a repeat call answer alreadyNotified, and
+    // the timeline line the refund path writes for its own email — a
+    // fee-kept cancel must be just as visible on the trip.
+    const { error: auditError } = await db.from(AUDIT_LOG_TABLE).insert({
+      action: REFUND_FEE_KEPT_ACTION,
+      entity_type: 'trip_request',
+      entity_id: args.id,
+      notes: `fare=${fareCents} fee=${feeCents} remainder=${remainderCents}`,
+    });
+    if (auditError) console.error('[ops] could not record the fee-kept email:', auditError.message);
+
+    const { error: eventError } = await db.from('trip_events').insert({
+      trip_id: args.id,
+      event: 'note',
+      actor: 'system:fee-kept',
+      notes: `Cancellation email sent: the full fare of $${(fareCents / 100).toFixed(2)} was kept as the late-cancellation fee — no refund is due.`,
+    });
+    if (eventError) console.error('[ops] could not write the fee-kept timeline row:', eventError.message);
   }
 
   return { ok: true, emailSent, alreadyNotified: false };

@@ -397,7 +397,7 @@ test('weekly + bridge stores patient_card, stays pending, and can book', async (
   await page.getByText('I need to book before then — use passenger-pays in the meantime').click();
   await page.locator('#billingEmail').fill(`ap-${Date.now()}@${TEST_DOMAIN}`);
   await page.getByRole('button', { name: 'Finish setup' }).click();
-  await expect(page.getByRole('heading', { name: /is set up/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /your setup is complete/i })).toBeVisible();
 
   const row = await facilityRow(api, facilityId);
   // patient_card is what lets canBook() through while the credit decision waits.
@@ -427,7 +427,7 @@ test('weekly without the bridge stays pending and cannot book yet', async ({ pag
   // the server action, and this spec's expected values are also the seeded
   // values — so without this wait it passes whether or not the write ever
   // happened. Screen 4 renders on success, so it is the completion signal.
-  await expect(page.getByRole('heading', { name: /is set up/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /your setup is complete/i })).toBeVisible();
 
   const row = await facilityRow(api, facilityId);
   expect(row.billing_mode).toBe('invoice_weekly');
@@ -453,7 +453,7 @@ test('passenger-pays needs no credit decision and opens immediately', async ({ p
   await page.getByRole('button', { name: 'Finish setup' }).click();
   // Same race as above, and here it actually bit: the row still read
   // invoice_weekly because it was read before the action had written.
-  await expect(page.getByRole('heading', { name: /is set up/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /your setup is complete/i })).toBeVisible();
 
   const row = await facilityRow(api, facilityId);
   expect(row.billing_mode).toBe('patient_card');

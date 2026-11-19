@@ -26,6 +26,11 @@ import PriceTable from '@/components/pricing/PriceTable';
  * teammate approver role, not credit. So weekly stays pending AND the facility
  * can still book today on passenger-pays. Do not soften either string.
  *
+ * Nov 19, 2026: two friend testers stumbled on the phrase "we open it by
+ * hand", and with Phil's approval it now reads "a person on our team opens
+ * it" — the meaning above is unchanged (still a human credit decision,
+ * still pending until opened), only the words are plainer.
+ *
  * NO CLINICAL DATA. No diagnosis, procedure, condition, medication, date of
  * birth, insurance id or medical record number is collected on any screen here,
  * and none should be added. The booking form's MRN guard
@@ -398,7 +403,7 @@ export default function FacilityWizard({
                         an individual was named; Phil approved dropping the name). */}
                     {m.value === 'invoice_weekly' && (
                       <span className="mt-2 block text-sm text-[color:var(--ink-mute)]">
-                        Weekly invoicing is a credit account, so we open it by hand. We review
+                        Weekly invoicing is a credit account, so a person on our team opens it. We review
                         and approve — usually the same business day.
                       </span>
                     )}
@@ -429,14 +434,20 @@ export default function FacilityWizard({
                 />
                 <span className="text-sm">I need to book before then — use passenger-pays in the meantime</span>
               </label>
+              <p className="ml-8 text-sm text-[color:var(--ink-mute)]">
+                While your account is being reviewed, your patients can still ride — they pay by secure link.
+              </p>
 
               <div className="grid gap-6 sm:grid-cols-2">
                 <div>
                   <label className={label} htmlFor="billingEmail">
-                    Where do invoices go? <span aria-hidden="true">*</span>
+                    Invoice email <span aria-hidden="true">*</span>
                     <span className="sr-only">(required)</span>
                   </label>
                   <input id="billingEmail" name="billingEmail" type="email" className={field} />
+                  <p className="mt-1.5 text-xs text-[color:var(--ink-mute)]">
+                    We send your weekly invoice to this address.
+                  </p>
                   {errors.billingEmail && <p className={err}>{errors.billingEmail}</p>}
                 </div>
                 <div>
@@ -492,7 +503,7 @@ export default function FacilityWizard({
       {step === 3 && (
         <div className="space-y-5 text-center" role="status" aria-live="polite">
           <Check className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />
-          <h2 className="serif text-2xl font-semibold">{facilityName} is set up</h2>
+          <h2 className="serif text-2xl font-semibold">{facilityName} — your setup is complete</h2>
 
           <div className="rounded-lg border border-[color:var(--line)] p-4 text-left">
             <p className="text-xs uppercase tracking-[0.14em] text-[color:var(--ink-mute)]">

@@ -49,6 +49,29 @@ export default function FacilitySignupForm({
   // success screen has to say the same, or the signer opens the welcome page
   // expecting a new account. (Muse lifecycle test, 2026-11-13.)
   const [alreadyExists, setAlreadyExists] = useState(false);
+  // "Resend the link" on the Check-your-inbox screen. The endpoint answers
+  // the same generic success whether or not a signup is waiting for the
+  // address, so this state can only ever say the conditional sentence below.
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+
+  async function onResend() {
+    if (resending || resent) return;
+    setResending(true);
+    try {
+      await fetch('/api/facility-signup/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: sentTo }),
+      });
+    } catch {
+      // The confirmation copy is conditional on purpose ("If a signup is
+      // waiting…") — it makes no promise a failed request could break.
+    } finally {
+      setResending(false);
+      setResent(true);
+    }
+  }
 
   /** When the form was rendered. The difference at submit is the bot signal. */
   const renderedAtRef = useRef<number>(Date.now());
@@ -172,6 +195,20 @@ export default function FacilitySignupForm({
           Nothing arrived? Check spam, or call dispatch on{' '}
           <a className="underline" href="tel:+17049418508">(704) 941-8508</a>.
         </p>
+        {resent ? (
+          <p className="mt-4 text-sm text-[color:var(--muted)]" role="status">
+            If a signup is waiting for that address, we&rsquo;ve sent a fresh link.
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={onResend}
+            disabled={resending}
+            className="btn-ghost mt-4 min-h-[44px] disabled:opacity-60"
+          >
+            {resending ? 'Sending…' : 'Resend the link'}
+          </button>
+        )}
       </div>
     );
   }
@@ -208,6 +245,7 @@ export default function FacilitySignupForm({
         placeholder="you@facility.org"
         autoComplete="email"
         error={fieldErrors.workEmail}
+        help="Use the email where you want your sign-in link and account messages."
       />
 
       {formError ? (
@@ -247,14 +285,18 @@ function Field({
   id,
   label,
   error,
+  help,
   type = 'text',
   ...rest
 }: {
   id: string;
   label: string;
   error?: string;
+  help?: string;
   type?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const describedBy =
+    [error ? `${id}-error` : null, help ? `${id}-help` : null].filter(Boolean).join(' ') || undefined;
   return (
     <div className="mt-5 first:mt-0">
       <label htmlFor={id} className="block text-sm font-medium">
@@ -265,10 +307,15 @@ function Field({
         name={id}
         type={type}
         aria-invalid={error ? 'true' : undefined}
-        aria-describedby={error ? `${id}-error` : undefined}
+        aria-describedby={describedBy}
         className="mt-2 w-full rounded-lg border border-[color:var(--line)] bg-transparent px-4 py-3 text-base outline-none focus:border-[color:var(--gold)]"
         {...rest}
       />
+      {help ? (
+        <p id={`${id}-help`} className="mt-1.5 text-xs text-[color:var(--muted)]">
+          {help}
+        </p>
+      ) : null}
       {error ? (
         <p id={`${id}-error`} className="mt-2 text-sm text-[color:var(--danger,#E06A6A)]">
           {error}

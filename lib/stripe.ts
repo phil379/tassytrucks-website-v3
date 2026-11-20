@@ -19,9 +19,15 @@ import { stripeTestKey, TEST_PAYMENT_LABEL, TEST_PAYMENT_NOTE, type StripeMode }
  * Payment Link does not expire, survives being forwarded to the daughter who
  * is actually paying, and can be resent from the ops queue unchanged.
  *
- * WHY NOT AT REQUEST TIME. The /request page says the figure is an estimate
- * and a dispatcher confirms the price. Charging before that contradicts it in
- * writing, and every correction becomes a refund.
+ * WHEN THE LINK IS MADE (changed 2026-11-20, Phil). Firm-price rider
+ * bookings — Care, Recovery, Concierge, and Winnie when it opens — are
+ * confirmed at booking time and the rider pays the price on screen when
+ * they book (lib/pay-at-booking.ts). The review-first bookings keep the
+ * older rhythm: wheelchair partner-network rides and trips past the last
+ * price band have no firm price at form time, so a dispatcher confirms
+ * first and the link is made then. Either way the link is minted by the
+ * one confirm path (lib/ops-confirm.ts), at the moment the price it
+ * charges becomes the agreed price — never before, never twice.
  * ─────────────────────────────────────────────────────────────────────────
  *
  * The secret key is read from the environment and never logged, never returned
@@ -473,6 +479,24 @@ export async function paymentLinkUrl(linkId: string): Promise<string | null> {
     return link.active === false ? null : (link.url ?? null);
   } catch {
     return null;
+  }
+}
+
+export type PaymentLinkState = 'active' | 'inactive' | 'unknown';
+
+/**
+ * Whether Stripe still honours a Payment Link, in three values on purpose:
+ * 'inactive' is a FACT Stripe stated (the link was deactivated) and is the
+ * only state /pay may heal by minting a replacement; 'unknown' is a failed
+ * lookup, which proves nothing — a network blip must never become a second
+ * live link for a trip somebody could pay twice.
+ */
+export async function paymentLinkState(linkId: string): Promise<PaymentLinkState> {
+  try {
+    const link = await get<{ active?: boolean }>(`/payment_links/${encodeURIComponent(linkId)}`);
+    return link.active === false ? 'inactive' : 'active';
+  } catch {
+    return 'unknown';
   }
 }
 

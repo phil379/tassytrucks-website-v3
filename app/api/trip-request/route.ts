@@ -21,6 +21,8 @@ import { containsNul, MAX_REQUEST_BODY_CHARS } from '@/lib/request-guards';
 import { coerceLatLng, roadDistance, roadDistanceVia } from '@/lib/road-distance';
 import { STOP_FEE_CENTS } from '@/lib/stops';
 import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
+import { payAtBookingEligible } from '@/lib/pay-at-booking';
+import { confirmTrip } from '@/lib/ops-confirm';
 import { createHash } from 'node:crypto';
 import {
   buildCareConsentText, buildCareIntakeRecord, careIntakeSchema, CARE_PLAN_NOT_AVAILABLE, isAccompaniedMinor, isPayerEnabled,
@@ -605,6 +607,21 @@ export async function POST(request: Request) {
         dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
       });
 
+  // PAY AT BOOKING (lib/pay-at-booking.ts, Phil 2026-11-20). A firm-price retail
+  // booking on Care / Recovery / Concierge (and Winnie, when it opens) is confirmed
+  // at booking and the rider pays the price on screen. Decided here, from the same
+  // server-computed estimate the row will store — never from the body — and acted
+  // on after the insert below. Wheelchair rides, ranges, ZIP estimates, unpriced
+  // and facility bookings stay on the dispatcher flow, untouched.
+  const payAtBooking = payAtBookingEligible({
+    serviceLine: data.serviceLine,
+    mobility: data.mobility,
+    facility: wantsFacilityBooking,
+    price: estimate
+      ? { exact: price?.exact ?? false, lowCents: estimate.lowCents, highCents: estimate.highCents }
+      : null,
+  });
+
   // What dispatch reads: the picked address, then the door. The estimate above was
   // computed from the address alone, so a unit can never break the match.
   const pickupStored = withUnit(data.pickupAddress, data.pickupUnit);
@@ -753,10 +770,43 @@ export async function POST(request: Request) {
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  }, tripNumber, facilityAlert, price, priceUnavailable);
+  }, tripNumber, facilityAlert, price, priceUnavailable, payAtBooking);
+
+  // Confirm the pay-at-booking trips NOW, through the one confirm path a
+  // dispatcher uses (lib/ops-confirm.ts): confirmation code, Stripe Payment
+  // Link at the stored firm price, confirmation email with the pay button,
+  // row stamped confirmed, rider text pinged. The rider's next screen is the
+  // pay step (payNow below). A failure here NEVER loses the booking: the row
+  // stays a plain request, dispatch confirms it the way they always have, and
+  // the rider sees the ordinary "Request received" screen — the auto-reply
+  // they just got promised the pay link "follows with your confirmation",
+  // which stays true on that path too.
+  let payNow: { url: string; amountCents: number } | null = null;
+  if (payAtBooking) {
+    try {
+      const confirmed = await confirmTrip({
+        id,
+        agreedCents: estimate!.lowCents,
+        onAccount: false,
+        refuseClosed: true,
+        refuseIfAlreadyConfirmed: true,
+      });
+      if (confirmed.ok && confirmed.payUrl) {
+        payNow = { url: confirmed.payUrl, amountCents: confirmed.amountCents };
+      } else if (!confirmed.ok) {
+        console.error('[trip-request] pay-at-booking confirm did not complete:', confirmed.code, 'trip', id);
+      } else {
+        // Confirmed but no pay link (Stripe not configured on this deployment):
+        // the trip is confirmed and dispatch can send the link from the queue.
+        console.error('[trip-request] pay-at-booking trip confirmed without a pay link:', id);
+      }
+    } catch (e) {
+      console.error('[trip-request] pay-at-booking confirm failed (booking kept as a request):', e);
+    }
+  }
 
   return NextResponse.json(
-    { ok: true, id, tripNumber, notifications, price, priceUnavailable },
+    { ok: true, id, tripNumber, notifications, price, priceUnavailable, payNow },
     { status: 200 },
   );
 }

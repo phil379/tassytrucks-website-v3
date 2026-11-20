@@ -177,8 +177,23 @@ export const COPY = {
     'Please do not include medical details, diagnoses, or procedure names.',
   confirmation:
     `${CONFIRMATION_PROMISE} You see the price before anything is booked or charged, and if anything about the trip changes, you hear the new price from us first.`,
+  /**
+   * The same place on the form, for a pay-at-booking line (lib/pay-at-booking.ts, Phil
+   * 2026-11-20): the price is firm before the rider books, so the promise is that they
+   * see it before they pay — not that a dispatcher confirms it first.
+   */
+  confirmationPayAtBooking:
+    `${CONFIRMATION_PROMISE} You see the price before you pay, and you pay it when you book. If anything about the trip changes, you hear the new price from us first.`,
     /** One sentence on every booking form, so no rider wonders when or how they pay (Muse F20). */
   howYouPay: 'We confirm your price first, then send a secure link to pay. No card is taken on this form.',
+  /**
+   * The pay-at-booking twin of howYouPay (Phil, 2026-11-20): on Care, Recovery, Concierge
+   * and Winnie the price on screen is the price, and the rider pays it when they book.
+   * The card still goes to Stripe's page, never to this form — that half of the sentence
+   * does not change.
+   */
+  howYouPayAtBooking:
+    'Your price is shown before you book, and you pay it when you book, on a secure payment page. No card is taken on this form.',
   howYouPayScholar:
     'We confirm your price first, then send a secure link to pay. Scholar is billed monthly. No card is taken on this form.',
   waitTime:

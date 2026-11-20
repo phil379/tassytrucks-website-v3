@@ -118,8 +118,8 @@ export default async function RequestPage({
             <p className="eyebrow">Tassy Transportation</p>
             <h1 className="h-display serif mt-2">{COPY.headline}</h1>
             <p className="ink-soft mt-4 text-lg">
-              Tell us where and when. You will see an estimate as soon as both addresses are in, and a
-              dispatcher reviews every request personally and confirms the final price before anything is booked.
+              Tell us where and when. You will see your price as soon as both addresses are in, and on
+              most rides you pay it when you book. A dispatcher reviews every request personally.
             </p>
           </div>
 

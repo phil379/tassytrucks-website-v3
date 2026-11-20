@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { brandLogoUrl, isValidReceiptToken, payPageUrlFor, receiptUrlFor } from '@/lib/receipt-token';
-import { findPaymentAttempt } from '@/lib/payment-attempts';
-import { createBrandedCheckout, paymentLinkUrl, stripeConfigured, withStripeMode } from '@/lib/stripe';
+import { closePaymentAttempt, findPaymentAttempt, recordPaymentAttempt } from '@/lib/payment-attempts';
+import { createBrandedCheckout, createTripPaymentLink, paymentLinkState, paymentLinkUrl, stripeConfigured, withStripeMode } from '@/lib/stripe';
 import { stripeModeForTrip } from '@/lib/stripe-mode';
 import { serviceShortName } from '@/lib/trip-request';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
@@ -15,6 +15,15 @@ import { payBlockFor, payBlockMessage, type PayBlock } from '@/lib/pay-guard';
  * it, so the link never expires and the page shows the Tassy logo (see createBrandedCheckout). The
  * token is the same private 24-character token as the receipt. A bad or unknown token is a plain 404.
  * If a branded checkout cannot be made, the customer is sent to the trip's ordinary Payment Link.
+ *
+ * HOW LONG THIS ADDRESS LIVES (2026-11-20). There is no clock on this address: nothing here
+ * refuses by time, the token does not expire, and a trip that is still unpaid can be paid from
+ * it before, on, or after the pickup day (a completed-but-unpaid trip included). The only
+ * expiring artefact in the chain is the Checkout Session minted per click (24 hours, Stripe's
+ * cap) — a session URL saved or forwarded instead of this address dies with it, which is the
+ * dead link a rider hit on 2026-11-20. The stored Payment Link itself does not expire either;
+ * if Stripe ever reports it deactivated, the fallback below mints a fresh one for the same
+ * trip and amount rather than showing the rider a dead page.
  */
 
 export const runtime = 'nodejs';
@@ -97,14 +106,68 @@ export async function GET(req: Request, { params }: { params: { token: string } 
   // A test booking pays in Stripe test mode (lib/stripe-mode.ts). The Payment Link was made in the
   // same mode at confirmation, so the fallback has to look it up there too.
   const mode = stripeModeForTrip(row as { is_test_data?: unknown });
-  const fallback = async () => {
-    const url = linkId ? await withStripeMode(mode, () => paymentLinkUrl(linkId)) : null;
-    return url ? go(url) : new NextResponse('This payment link is not available. Please call (704) 941-8508.', { status: 410, headers: NO_STORE });
-  };
 
   // The amount is what the Payment Link recorded, so the webhook's amount check agrees with it.
   const attempt = linkId ? await findPaymentAttempt(db, linkId) : null;
   const amountCents = attempt?.status === 'active' ? attempt.amount_cents : (row.agreed_cents as number | null);
+
+  /**
+   * Mint a replacement Payment Link for this trip, same amount, same metadata.
+   *
+   * Only ever called when Stripe has said the stored link is INACTIVE — a link
+   * that cannot be paid — so the trip never has two live links at once (the
+   * double-payment trap confirmTrip's comment warns about; the webhook's
+   * double-payment guard stands behind this too). The dead link's attempt is
+   * superseded and the new one recorded, so the webhook's amount check reads
+   * the link that can actually be paid, and the row points at the new link
+   * from now on. Best effort throughout: any failure returns null and the
+   * caller shows the call-us page, exactly as before.
+   */
+  const healPaymentLink = async (): Promise<string | null> => {
+    if (!amountCents || !row.confirmation_code) return null;
+    try {
+      const link = await withStripeMode(mode, () =>
+        createTripPaymentLink({
+          amountCents,
+          serviceName: serviceShortName(row.service_line as string),
+          confirmationCode: row.confirmation_code as string,
+          tripRequestId: row.id as string,
+          serviceLine: row.service_line as string,
+          receiptUrl: receiptUrlFor(token),
+        }),
+      );
+      if (attempt) {
+        await closePaymentAttempt(db, attempt.id, 'superseded', 'Stored payment link inactive; replaced from /pay.');
+      }
+      await recordPaymentAttempt(db, { tripId: row.id as string, linkId: link.id, amountCents });
+      await db
+        .from(TRIP_REQUESTS_TABLE)
+        .update({ stripe_payment_link_id: link.id })
+        .eq('id', row.id as string);
+      return link.url;
+    } catch (e) {
+      console.error('[pay] could not mint a replacement payment link:', e);
+      return null;
+    }
+  };
+
+  const fallback = async () => {
+    if (linkId) {
+      const url = await withStripeMode(mode, () => paymentLinkUrl(linkId));
+      if (url) return go(url);
+      // No URL: either the lookup failed (proves nothing — show the call-us
+      // page) or Stripe has deactivated the stored link. Only the second is
+      // healed, by minting a fresh link, so this address keeps working for as
+      // long as the trip is unpaid instead of dying with the old link.
+      const state = await withStripeMode(mode, () => paymentLinkState(linkId));
+      if (state === 'inactive') {
+        const healed = await healPaymentLink();
+        if (healed) return go(healed);
+      }
+    }
+    return new NextResponse('This payment link is not available. Please call (704) 941-8508.', { status: 410, headers: NO_STORE });
+  };
+
   if (!amountCents || !row.confirmation_code) return fallback();
   if (attempt && attempt.status !== 'active') return fallback();
 

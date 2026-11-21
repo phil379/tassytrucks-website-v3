@@ -75,9 +75,12 @@ export function stopButtonLabel(leg: StopLeg): string {
 }
 
 /**
- * Phil's inviting line, in his framing, per line and leg. The passenger
- * lines carry his hospital/pharmacy framing; Winnie carries the same shape
- * for the vet and the pet store.
+ * Phil's inviting line, in his framing, per line and leg. Three voices:
+ * the passenger lines (Care, Recovery) carry his hospital/pharmacy framing;
+ * Concierge carries the pick-up-a-person framing — a stop on a Concierge
+ * trip is collecting a date, a client or a friend, not a pharmacy run
+ * (Phil, 2026-11-21); Winnie carries the same shape for the vet and the
+ * pet store.
  */
 export function stopIntro(serviceLine: string, leg: StopLeg): string {
   const pet = serviceLine === 'winnie' || serviceLine === 'pet';
@@ -85,6 +88,13 @@ export function stopIntro(serviceLine: string, leg: StopLeg): string {
     return leg === 'outbound'
       ? 'On the way there, you may want to stop at the pet store for food or supplies. Add a stop and we price the whole trip up front.'
       : 'After the vet, you may want to stop at the pet store for food or supplies before going home. Add a stop and we price the whole trip up front.';
+  }
+  if (serviceLine === 'concierge') {
+    if (leg === 'outbound')
+      return 'Picking someone up on the way there? Your driver can collect your date, a client or a friend — or make a quick stop for flowers. Add a stop and we price the whole trip up front.';
+    if (leg === 'return')
+      return 'Picking someone up on the way back? Your driver can collect your date, a client or a friend — or make a quick stop — before you head home. Add a stop and we price the whole trip up front.';
+    return 'Picking someone up on the way? Your driver can collect your date, a client or a friend — or make a quick stop. Add a stop and we price the whole trip up front.';
   }
   return leg === 'outbound'
     ? 'On the way there, you may want to stop at your pharmacy or pick up what you need. Add a stop and we price the whole trip up front.'

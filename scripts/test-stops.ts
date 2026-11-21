@@ -8,6 +8,7 @@ import {
   STOP_WAIT_BLOCK_MINUTES,
   stopAvailable,
   stopFeeLine,
+  stopIntro,
   stopSummaryLine,
   tripStopSummaries,
 } from '../lib/stops';
@@ -59,6 +60,43 @@ t('the customer copy derives from the constants, so it cannot drift', () => {
   assert.equal(stopFeeLine('single', STOP_FEE_CENTS), 'Stop fee (15 min waiting included) — $10');
   assert.equal(stopFeeLine('outbound', STOP_FEE_CENTS), 'Stop fee on the way there (15 min waiting included) — $10');
   assert.equal(stopFeeLine('return', STOP_FEE_CENTS), 'Stop fee on the way back (15 min waiting included) — $10');
+});
+
+t('stop intro copy: three voices — passenger, concierge, winnie — per leg', () => {
+  // Passenger default (Care / Recovery): the hospital & pharmacy framing.
+  assert.equal(
+    stopIntro('care', 'outbound'),
+    'On the way there, you may want to stop at your pharmacy or pick up what you need. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(
+    stopIntro('care', 'return'),
+    'After the hospital or an appointment, you may want to stop at your pharmacy or pick up what you need before going home. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(stopIntro('care', 'single'), stopIntro('care', 'return'));
+  assert.equal(stopIntro('recovery', 'outbound'), stopIntro('care', 'outbound'));
+  // Concierge (Phil, 2026-11-21): picking up a person, not a pharmacy run.
+  assert.equal(
+    stopIntro('concierge', 'outbound'),
+    'Picking someone up on the way there? Your driver can collect your date, a client or a friend — or make a quick stop for flowers. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(
+    stopIntro('concierge', 'return'),
+    'Picking someone up on the way back? Your driver can collect your date, a client or a friend — or make a quick stop — before you head home. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(
+    stopIntro('concierge', 'single'),
+    'Picking someone up on the way? Your driver can collect your date, a client or a friend — or make a quick stop. Add a stop and we price the whole trip up front.',
+  );
+  // Winnie (incl. the pet alias): the vet & the pet store.
+  assert.equal(
+    stopIntro('winnie', 'outbound'),
+    'On the way there, you may want to stop at the pet store for food or supplies. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(
+    stopIntro('winnie', 'return'),
+    'After the vet, you may want to stop at the pet store for food or supplies before going home. Add a stop and we price the whole trip up front.',
+  );
+  assert.equal(stopIntro('pet', 'outbound'), stopIntro('winnie', 'outbound'));
 });
 
 // ── No-stop bookings price EXACTLY as before (byte-identical totals) ────────

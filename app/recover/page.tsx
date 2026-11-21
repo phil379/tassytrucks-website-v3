@@ -29,7 +29,7 @@ export default function RecoverPage() {
       eyebrow="Tassy Recovery · After a procedure"
       title="They won't discharge you without someone to take you home."
       tagline="We come inside and wait."
-      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Your Tassy driver comes to the discharge desk, waits while the paperwork catches up, and takes you home — with one pharmacy stop on the way. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $129."
+      description="Most surgery centers will not release a sedated patient to a taxi, a rideshare, or their own two feet. Your Tassy driver comes to the discharge desk, waits while the paperwork catches up, and takes you home — add a pharmacy stop on the way for $10. One price, agreed before we move, covering the trip there, the wait, and the trip home. From $129."
       bookHref={request.recover}
       bookLabel="Book your ride home"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
@@ -51,7 +51,7 @@ export default function RecoverPage() {
         },
         {
           title: 'One pharmacy stop on the way home',
-          body: 'You leave with a prescription and no way to fill it. We stop once on the route home and wait while you do. It is included, and nobody else offers it.',
+          body: 'You leave with a prescription and no way to fill it. Add the stop when you book — $10, with 15 minutes of waiting included — and we stop once on the route home and wait while you do. Nobody else offers it.',
         },
         {
           title: 'A vehicle you can actually get into',
@@ -71,7 +71,7 @@ export default function RecoverPage() {
           name: 'Up to 3 miles',
           price: '$129',
           cadence: 'there, the wait, and home',
-          features: ['Pickup at the discharge desk', '20 minutes of wait included', 'One pharmacy stop', 'Same driver both ways'],
+          features: ['Pickup at the discharge desk', '20 minutes of wait included', 'Add a pharmacy stop for $10', 'Same driver both ways'],
           cta: { label: 'Book this', href: request.recover },
         },
         {

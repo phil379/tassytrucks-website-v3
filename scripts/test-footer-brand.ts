@@ -13,5 +13,8 @@ assert.ok(/serif italic text-base sm:text-lg mt-1/.test(f), 'tagline scaled to m
 assert.ok(/<ul className="mt-3 space-y-2 text-sm whitespace-nowrap">/.test(f), 'contact lines stay on one line');
 assert.ok(!/break-words/.test(f), 'no forced mid-word breaks in the footer');
 assert.ok(/<div className="col-span-2 sm:col-span-1">\s*<div className="eyebrow opacity-60 text-current">Contact<\/div>/.test(f), 'phones: Contact spans the full width');
-for (const n of [3, 2]) assert.ok(f.includes(`lg:grid-cols-[minmax(0,2fr)_repeat(${n},minmax(0,1fr))_max-content]`), `large screens: Contact column sized to content (${n} link columns)`);
+// The Careers column renders in both gate states since 2026-11-21 (closed = the
+// interest-list link), so there are always 3 link columns and one grid track set.
+assert.ok(f.includes('lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_max-content]'), 'large screens: Contact column sized to content (3 link columns)');
+assert.ok(!f.includes('repeat(2,minmax(0,1fr))'), 'the two-link-column grid variant is gone with the hidden Careers column');
 console.log('ok - footer brand is larger and every contact line stays on one line');

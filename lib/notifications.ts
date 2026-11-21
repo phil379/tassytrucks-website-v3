@@ -855,6 +855,71 @@ export async function notifyOperatorWinnieWaitlist(input: {
 }
 
 /**
+ * A candidate joined the Careers interest list. Tell the operator.
+ *
+ * Applications are CLOSED (Phil, 2026-11-21 — the pro bono driver agreement
+ * and the insurance setup are not final yet), so /careers runs as an
+ * interest list and this email is the lead's only record: there is no
+ * careers-interest table yet (see the banner in lib/careers-interest.ts).
+ * When applications open, the list is worked from these emails.
+ *
+ * NEVER throws, same as notifyOperatorWinnieWaitlist: the route awaits this
+ * as the capture itself, and a dead leg must not lose the lead silently —
+ * each email attempt leaves a notification_log row (lib/email-log.ts).
+ *
+ * PII RULE applies — see the header. The push legs carry the role and the
+ * ref only; the candidate's details live in this email, to a mailbox we
+ * control.
+ */
+export async function notifyOperatorCareersInterest(input: {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  role: string;
+  isTestData: boolean;
+}): Promise<void> {
+  const ref = shortRef(input.id);
+  const message: PushMessage = {
+    title: 'NEW CAREERS INTEREST - applications not open yet',
+    body: `${input.role} - ref ${ref}`,
+    priority: 'high',
+    tags: ['briefcase'],
+  };
+
+  const lines = [
+    'A candidate joined the Careers interest list. Applications are NOT open yet.',
+    'Nothing was promised: no job, no interview, no start date. Joining the list only means we reach out when applications open.',
+    'This email is currently the lead’s only record — there is no careers-interest table yet.',
+    '',
+    `Name:      ${input.fullName}`,
+    `Email:     ${input.email}`,
+    `Phone:     ${input.phone ?? 'not given'}`,
+    `Role:      ${input.role}`,
+    ...(input.isTestData ? ['TEST DATA: the email matches the test-identity pattern.'] : []),
+    `Reference: ${ref}`,
+    '',
+    `Review:    ${opsUrl()}`,
+  ].join('\n');
+
+  const results = await Promise.allSettled([
+    pushToNtfy(message),
+    pushToZapier(ref, message),
+    sendResendEmail({
+      to: process.env.OPERATOR_EMAIL ?? '',
+      subject: `Careers interest: ${input.role}`,
+      text: lines,
+    }),
+  ]);
+
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('[careers-interest] alert leg failed for', ref, r.reason);
+    }
+  }
+}
+
+/**
  * The money arrived. Tell the operator.
  *
  * Deliberately UNLIKE notifyOperatorUrgent: this NEVER throws. Its caller is

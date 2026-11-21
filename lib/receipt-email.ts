@@ -1,6 +1,8 @@
-import { serviceShortName } from '@/lib/trip-request';
+import { serviceShortName, type ServiceLine } from '@/lib/trip-request';
 import { emailFooterHtml, emailFooterText } from '@/lib/business';
 import { CANCELLATION } from '@/lib/refund-policy';
+import { ESCORT_CENTS, escortAvailable, surchargesFor } from '@/lib/quote';
+import { STOP_FEE_CENTS, STOP_INCLUDED_WAIT_MINUTES } from '@/lib/stops';
 
 /**
  * The paid-trip RECEIPT.
@@ -41,6 +43,32 @@ export type ReceiptData = {
   paymentMethodLabel?: string | null;
   /** The private /r/<token> page. Omitted from the receipt when no token could be issued. */
   receiptUrl?: string | null;
+  /**
+   * The full journey, from the stored row (Phil, 2026-11-21: the receipt must
+   * state pickup, stop and drop-off, and cover BOTH legs of a round trip).
+   * A return trip starts at the outbound drop-off and ends back at the pickup.
+   */
+  returnTrip?: boolean | null;
+  returnAt?: string | null;
+  stopAddress?: string | null;
+  returnStopAddress?: string | null;
+  /** The per-leg stop fees the stored estimate charged (stop_fee_cents columns). */
+  stopFeeCents?: number | null;
+  returnStopFeeCents?: number | null;
+  /**
+   * The stored system estimate the price came from. The money breakdown is
+   * only itemised when the amount paid IS that estimate (see
+   * receiptPriceLines) — a dispatcher-set price is shown as one line, never
+   * reverse-engineered into components it may not contain.
+   */
+  estimateLowCents?: number | null;
+  estimateHighCents?: number | null;
+  /** Recovery escort, from the validated trip details (trip_details.escort). */
+  escort?: boolean | null;
+  discountLabel?: string | null;
+  discountCents?: number | null;
+  /** A listed-hotel flat price (a hotel_slug is stored): no band, no surcharges. */
+  hotelFlat?: boolean | null;
 };
 
 function esc(s: string | null | undefined): string {
@@ -81,6 +109,128 @@ export function fmtDate(iso: string | null | undefined): string {
   });
 }
 
+export type ReceiptJourneyStep = {
+  label: string;
+  address: string;
+  /** ISO instant for the steps that carry a time (pickup, return pickup). */
+  when?: string | null;
+};
+
+/**
+ * The whole journey in order, from the stored row: pickup -> (stop) ->
+ * drop-off, and for a round trip the way back: return pickup at the outbound
+ * drop-off -> (stop) -> final drop-off back at the pickup address. Empty when
+ * the row lacks either end — the receipt then keeps its plain Pickup /
+ * Destination lines rather than printing a half-built itinerary.
+ */
+export function receiptJourney(r: ReceiptData): ReceiptJourneyStep[] {
+  const pickup = r.pickupAddress?.trim();
+  const dropoff = r.dropoffAddress?.trim();
+  if (!pickup || !dropoff) return [];
+  const steps: ReceiptJourneyStep[] = [
+    { label: 'Pickup', address: pickup, when: r.requestedAt ?? null },
+  ];
+  const stop = r.stopAddress?.trim();
+  if (stop) steps.push({ label: 'Stop on the way', address: stop });
+  steps.push({ label: 'Drop-off', address: dropoff });
+  if (r.returnTrip) {
+    steps.push({ label: 'Return pickup', address: dropoff, when: r.returnAt ?? null });
+    const back = r.returnStopAddress?.trim();
+    if (back) steps.push({ label: 'Stop on the way back', address: back });
+    steps.push({ label: 'Final drop-off', address: pickup });
+  }
+  return steps;
+}
+
+/** True when the journey says more than the plain Pickup / Destination lines. */
+export function receiptHasJourneyDetail(r: ReceiptData): boolean {
+  return Boolean(r.returnTrip || r.stopAddress?.trim() || r.returnStopAddress?.trim());
+}
+
+export type ReceiptPriceLine = {
+  label: string;
+  note?: string | null;
+  cents: number;
+};
+
+/**
+ * The itemised charges, footing exactly to amountCents — or null, meaning
+ * "show the single ride line, as before".
+ *
+ * Honesty rules (Phil's transparency standard cuts both ways — an invented
+ * breakdown is worse than none):
+ *  - A hotel flat price is one line and says so; it has no band or surcharges.
+ *  - Itemisation only happens when the amount paid is the system's own stored
+ *    estimate (within estimate_low..estimate_high). A dispatcher-set agreed
+ *    price may bundle anything, so it stays one line.
+ *  - Stop fees come from the stored per-leg fee columns (the flat constant
+ *    when a pre-column row has the address but no fee recorded).
+ *  - Surcharges are re-derived with the quote engine's own surchargesFor()
+ *    from the stored pickup time and line — the same function that priced
+ *    the booking, so the labels and amounts cannot drift from the card.
+ *  - The escort is the stored trip-details flag priced at the card constant.
+ *  - The ride fare is what remains; if nothing positive remains, the
+ *    components do not describe this price and we fall back to one line.
+ *  - Extra passengers are NOT a line: the row stores a headcount, not the
+ *    charge, and an accompanied minor changes the arithmetic — any
+ *    extra-passenger charge stays inside the ride fare line.
+ */
+export function receiptPriceLines(r: ReceiptData): ReceiptPriceLine[] | null {
+  if (!(r.amountCents > 0)) return null;
+  const name = serviceShortName(r.serviceLine);
+  if (r.hotelFlat) {
+    return [
+      {
+        label: `${name} ride`,
+        note: 'Flat hotel price · same price at any hour, any day',
+        cents: r.amountCents,
+      },
+    ];
+  }
+  const low = r.estimateLowCents;
+  const high = r.estimateHighCents;
+  if (low == null || high == null || r.amountCents < low || r.amountCents > high) return null;
+
+  const components: ReceiptPriceLine[] = [];
+  for (const s of surchargesFor(r.requestedAt, r.serviceLine as ServiceLine)) {
+    components.push({ label: s.label, cents: s.cents });
+  }
+  if (r.stopAddress?.trim()) {
+    components.push({
+      label: `Stop fee on the way (${STOP_INCLUDED_WAIT_MINUTES} min waiting included)`,
+      cents: r.stopFeeCents ?? STOP_FEE_CENTS,
+    });
+  }
+  if (r.returnStopAddress?.trim()) {
+    components.push({
+      label: `Stop fee on the way back (${STOP_INCLUDED_WAIT_MINUTES} min waiting included)`,
+      cents: r.returnStopFeeCents ?? STOP_FEE_CENTS,
+    });
+  }
+  if (r.escort && escortAvailable(r.serviceLine)) {
+    components.push({ label: 'Tassy Escort', cents: ESCORT_CENTS });
+  }
+  const discount = r.discountCents ?? 0;
+  if (discount > 0) {
+    components.push({
+      label: r.discountLabel ? `Discount — ${r.discountLabel}` : 'Discount',
+      cents: -discount,
+    });
+  }
+  if (components.length === 0) return null;
+  const fare = r.amountCents - components.reduce((sum, c) => sum + c.cents, 0);
+  if (fare <= 0) return null;
+  return [
+    { label: `${name} ride`, note: 'Agreed price, not metered', cents: fare },
+    ...components,
+  ];
+}
+
+/** "-$5.00" for a negative line, money() otherwise. */
+function moneySigned(cents: number): string {
+  return cents < 0 ? `-${money(-cents)}` : money(cents);
+}
+
 function kv(label: string, value: string): string {
   return `<tr><td style="padding:5px 0;color:${MUTE};font-size:14px;width:38%;vertical-align:top;">${esc(label)}</td><td style="padding:5px 0;color:${INK};font-size:14px;text-align:right;vertical-align:top;">${value}</td></tr>`;
 }
@@ -102,6 +252,38 @@ export function receiptCardHtml(r: ReceiptData): string {
   const paidWith = r.paymentMethodLabel
     ? `<div>Paid with ${esc(r.paymentMethodLabel)}</div>`
     : '';
+
+  // The full journey (Phil, 2026-11-21): every point the rider is driven to,
+  // in order, both legs of a round trip. Only rendered when the trip has a
+  // stop or a return leg — a plain one-way receipt is unchanged.
+  const journey = receiptHasJourneyDetail(r) ? receiptJourney(r) : [];
+  const journeyHtml = journey.length
+    ? `${rule(14)}
+<tr><td style="padding:10px 32px 0;"><div style="font-size:11px;font-weight:700;letter-spacing:1.1px;margin-bottom:4px;">YOUR TRIP</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+ ${journey
+   .map(
+     (s) =>
+       kv(
+         s.label,
+         `${esc(s.address)}${s.when ? `<div style="color:${MUTE};font-size:12.5px;">${esc(fmtPickup(s.when))}</div>` : ''}`,
+       ),
+   )
+   .join('\n ')}
+</table></td></tr>`
+    : '';
+
+  // Itemised charges when the stored data honestly supports them (see
+  // receiptPriceLines); otherwise the single ride line, exactly as before.
+  const priceLines = receiptPriceLines(r);
+  const descRows = priceLines
+    ? priceLines
+        .map((l, i) =>
+          i === 0
+            ? `<tr><td style="padding:14px 0;border-bottom:1px solid ${LINE};"><div style="font-size:16px;font-weight:700;color:${INK};">${esc(l.label)}</div>${l.note ? `<div style="font-size:12px;color:${MUTE};margin-top:2px;">${esc(l.note)}</div>` : ''}</td><td style="padding:14px 0;border-bottom:1px solid ${LINE};text-align:right;font-size:16px;color:${INK};vertical-align:top;">${esc(moneySigned(l.cents))}</td></tr>`
+            : `<tr><td style="padding:10px 0;border-bottom:1px solid ${LINE};font-size:14px;color:${INK};">${esc(l.label)}</td><td style="padding:10px 0;border-bottom:1px solid ${LINE};text-align:right;font-size:14px;color:${INK};vertical-align:top;">${esc(moneySigned(l.cents))}</td></tr>`,
+        )
+        .join('\n ')
+    : `<tr><td style="padding:14px 0;border-bottom:1px solid ${LINE};"><div style="font-size:16px;font-weight:700;color:${INK};">${esc(name)} ride</div><div style="font-size:12px;color:${MUTE};margin-top:2px;">Agreed price, not metered</div></td><td style="padding:14px 0;border-bottom:1px solid ${LINE};text-align:right;font-size:16px;color:${INK};vertical-align:top;">${esc(total)}</td></tr>`;
 
   return `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:14px;background:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
@@ -143,10 +325,11 @@ ${rule(18)}
  ${kv('Destination', esc(r.dropoffAddress || '—'))}
  ${r.confirmationCode ? kv('Confirmation', esc(r.confirmationCode)) : ''}
 </table></td></tr>
+${journeyHtml}
 ${rule(14)}
 <tr><td style="padding:16px 32px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">
  <tr><td style="padding:0 0 8px;font-size:11px;font-weight:700;letter-spacing:1.1px;color:${INK};border-bottom:2px solid ${INK};">DESCRIPTION</td><td style="padding:0 0 8px;font-size:11px;font-weight:700;letter-spacing:1.1px;color:${INK};text-align:right;border-bottom:2px solid ${INK};">AMOUNT</td></tr>
- <tr><td style="padding:14px 0;border-bottom:1px solid ${LINE};"><div style="font-size:16px;font-weight:700;color:${INK};">${esc(name)} ride</div><div style="font-size:12px;color:${MUTE};margin-top:2px;">Agreed price, not metered</div></td><td style="padding:14px 0;border-bottom:1px solid ${LINE};text-align:right;font-size:16px;color:${INK};vertical-align:top;">${esc(total)}</td></tr>
+ ${descRows}
 </table></td></tr>
 <tr><td style="padding:6px 32px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="width:46%;"></td><td>
  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -199,6 +382,8 @@ ${link}
 
 export function receiptText(r: ReceiptData): string {
   const ref = r.tripNumber || r.confirmationCode || '—';
+  const journey = receiptHasJourneyDetail(r) ? receiptJourney(r) : [];
+  const priceLines = receiptPriceLines(r);
   return [
     `Tassy Transportation — Payment receipt`,
     ``,
@@ -212,6 +397,23 @@ export function receiptText(r: ReceiptData): string {
     `Pickup: ${r.pickupAddress ?? '—'}`,
     `Destination: ${r.dropoffAddress ?? '—'}`,
     r.confirmationCode ? `Confirmation: ${r.confirmationCode}` : ``,
+    ...(journey.length
+      ? [
+          ``,
+          `Your trip:`,
+          ...journey.map(
+            (s) => `${s.label}: ${s.address}${s.when ? ` — ${fmtPickup(s.when)}` : ''}`,
+          ),
+        ]
+      : []),
+    ...(priceLines
+      ? [
+          ``,
+          `Charges:`,
+          ...priceLines.map((l) => `${l.label}: ${moneySigned(l.cents)}`),
+          `Total paid: ${money(r.amountCents)}`,
+        ]
+      : []),
     ``,
     `Need to change or cancel? Call (704) 941-8508. No fee if you let us know at least ${CANCELLATION.trip.freeUntilHoursBefore} hours ahead.`,
     `Card only. We never ask for payment details over the phone.`,

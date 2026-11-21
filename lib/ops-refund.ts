@@ -55,6 +55,13 @@ import { CANCELLATION } from '@/lib/refund-policy';
  *     remainder after the fee the held email already named — and this
  *     function refunds exactly that. The idempotency key does not vary
  *     with the amount, so a trip can only ever be refunded once.
+ *   • Since 2026-11-21 there is a second partial refund: a Concierge
+ *     late cancel keeps only the $35 flat fee (Phil — the late cancel
+ *     costs the no-show amount), so ops passes the remainder as
+ *     `amountCents` at cancel time. When the amount refunded is less
+ *     than the fare charged, the cancellation email below states the
+ *     amount actually kept (feeKeptCents = charged fare − refund),
+ *     never a generic percent.
  *
  * THE HELD PATH (notifyRefundHeld, below): the ops cancel flow now DOES
  * record who asked (PR #163), and when the rider asked inside the free-
@@ -235,6 +242,15 @@ export async function refundTrip(args: { id: string; amountCents?: number }): Pr
     return { ok: false, code: 'refund_failed' };
   }
 
+  // A partial refund means a fee was kept (Phil, 2026-11-21: a Concierge
+  // late cancel keeps $35 and refunds the rest). The kept amount is the
+  // fare the rider actually paid minus what just went back — computed
+  // here, from the payment record, so the cancellation email states the
+  // amount actually kept rather than any policy percent.
+  const fareCents =
+    args.amountCents !== undefined ? await chargedFareCents(db, args.id, row as Record<string, unknown>) : 0;
+  const keptCents = fareCents > refund.amount ? fareCents - refund.amount : 0;
+
   // The money is back. Only now is the row stamped, so a failure above leaves
   // the trip exactly as it was (cancelled, paid) and the dispatcher can retry.
   // `refunded` is already a payment status the codebase knows: lib/confirm-plan.ts
@@ -261,7 +277,10 @@ export async function refundTrip(args: { id: string; amountCents?: number }): Pr
     trip_id: args.id,
     event: 'note',
     actor: 'system:refund',
-    notes: `Refund issued: $${(refund.amount / 100).toFixed(2)} (Stripe refund ${refund.id}) — booking cancelled.`,
+    notes:
+      keptCents > 0
+        ? `Refund issued: $${(refund.amount / 100).toFixed(2)} (Stripe refund ${refund.id}) — booking cancelled. Late-cancellation fee kept: $${(keptCents / 100).toFixed(2)}.`
+        : `Refund issued: $${(refund.amount / 100).toFixed(2)} (Stripe refund ${refund.id}) — booking cancelled.`,
   });
   if (eventError) console.error('[ops] could not write the refund timeline row:', eventError.message);
 
@@ -276,6 +295,8 @@ export async function refundTrip(args: { id: string; amountCents?: number }): Pr
       tripNumber: (row as { trip_number?: string | null }).trip_number ?? null,
       refundCents: refund.amount,
       refundId: refund.id,
+      // A partial refund: the email names the fee actually kept (above).
+      ...(keptCents > 0 ? { feeKeptCents: keptCents, fareCents } : {}),
     };
     const trip = emailTripShape(row, contactEmail);
     const subject = `${mode === 'test' ? '[TEST] ' : ''}${cancellationSubject(cancelled, trip)}`;

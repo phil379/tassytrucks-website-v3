@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import LegalPage from '@/components/legal/LegalPage';
-import { CANCELLATION, REFUND_POLICY_UPDATED, conciergeNoShowFeeText } from '@/lib/refund-policy';
+import { CANCELLATION, REFUND_POLICY_UPDATED, conciergeLateCancelFeeText, conciergeNoShowFeeText } from '@/lib/refund-policy';
 import {
   STOP_INCLUDED_WAIT_MINUTES,
   STOP_WAIT_BLOCK_MINUTES,
@@ -85,7 +85,10 @@ export default function RefundsPage() {
                         Tassy Concierge
                       </th>
                       <td className={cell}>Up to {T.trip.freeUntilHoursBefore} hours before pickup</td>
-                      <td className={cell}>{T.trip.lateCancelFeePercent}% of the trip price</td>
+                      <td className={cell} data-testid="concierge-late-cancel">
+                        {conciergeLateCancelFeeText()} flat. Trips over {T.conciergeLateCancel.longTripOverMiles} miles:{' '}
+                        {T.conciergeLateCancel.longTripFeePercent}% of the trip price
+                      </td>
                       <td className={cell} data-testid="concierge-no-show">
                         {conciergeNoShowFeeText()} flat. Trips over {T.conciergeNoShow.longTripOverMiles} miles:{' '}
                         {T.conciergeNoShow.longTripNoShowFeePercent}% of the trip price

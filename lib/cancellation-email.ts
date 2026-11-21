@@ -58,8 +58,19 @@ export type CancelledTrip = {
    * money is back.
    */
   refundHeld?: boolean;
-  /** What the rider paid, in cents. Only read when refundHeld is true. */
+  /** What the rider paid, in cents. Read by the held variant and the partial-fee variant. */
   fareCents?: number | null;
+  /**
+   * PARTIAL-FEE VARIANT (Phil, 2026-11-21): a fee was kept from the fare
+   * and the REST was refunded — today a Concierge late cancel, which
+   * keeps the $35 flat fee (100% on a long trip) instead of the full
+   * fare. refundCents is the remainder that was actually refunded and
+   * fareCents the fare paid; this field is the fee kept, stated in the
+   * email as an amount — never as a percent, because $35 is not a
+   * percent of anything. Set by refundTrip in lib/ops-refund.ts, which
+   * computes it as the charged fare minus the Stripe refund it issued.
+   */
+  feeKeptCents?: number | null;
 };
 
 function fmtWhen(iso: string | null | undefined): string {
@@ -129,6 +140,13 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
   // fare is kept, never promise a remainder that does not exist.
   const feePct = CANCELLATION.trip.lateCancelFeePercent;
   const nothingBack = t.refundCents <= 0;
+  // The percent phrase is only honest when the fee kept really is that
+  // percent of the fare. A flat fee (a Concierge $35, Phil 2026-11-21)
+  // is not, so the held copy then names the amount instead.
+  const feeIsPercent = Math.round(((t.fareCents ?? t.refundCents) * feePct) / 100) === Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents);
+  // Partial-fee variant: a fee was kept and the rest refunded (above).
+  const partialFee = !held && t.feeKeptCents != null && t.feeKeptCents > 0;
+  const feeKeptExact = fmtUsdExact(t.feeKeptCents ?? 0);
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -162,8 +180,11 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
     <p style="margin:0;color:${MUTE};font-size:15px;line-height:1.55;">
       Your ${esc(serviceShortName(data.serviceLine))} trip for ${esc(fmtWhen(data.requestedAt))} has been
       cancelled. ${held ? `Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation
-      policy applies: ${nothingBack ? 'the full fare is kept as the fee, so no refund is due.' : `a ${feePct}% fee is kept from the fare, and the rest will be refunded to the card
-      you paid with by our team.`}` : `You will not be charged for it — we have refunded the full fare to the card you
+      policy applies: ${nothingBack ? 'the full fare is kept as the fee, so no refund is due.' : feeIsPercent ? `a ${feePct}% fee is kept from the fare, and the rest will be refunded to the card
+      you paid with by our team.` : `a late-cancellation fee of ${esc(feeExact)} is kept from your ${esc(fareExact)} fare, and the rest will be refunded to the card
+      you paid with by our team.`}` : partialFee ? `Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation
+      fee of ${esc(feeKeptExact)} applies. We have refunded the rest of your fare to the card you
+      paid with.` : `You will not be charged for it — we have refunded the full fare to the card you
       paid with.`} Keep this email — the confirmation number below is all we need to find you.
     </p>
   </td></tr>
@@ -175,15 +196,21 @@ export function cancellationHtml(t: CancelledTrip, data: TripRequestInput): stri
         <div style="color:${MUTE};font-size:12px;letter-spacing:0.4px;text-transform:uppercase;">
           ${held ? (nothingBack ? 'Refund due' : 'To be refunded') : 'Refunded'}
         </div>
-        <div style="color:${INK};font-size:30px;font-weight:700;margin-top:2px;">${esc(held ? refundExact : refund)}</div>
+        <div style="color:${INK};font-size:30px;font-weight:700;margin-top:2px;">${esc(held || partialFee ? refundExact : refund)}</div>
         <p style="margin:6px 0 0;color:${MUTE};font-size:13px;line-height:1.5;">
           ${held ? (nothingBack ? `Your fare was ${esc(fareExact)}. The late-cancellation fee is the full fare
           (${esc(feeExact)}), so no refund is due. Questions? Call dispatch and quote your
-          confirmation number.` : `Your fare was ${esc(fareExact)}. After the ${feePct}% late-cancellation fee (${esc(feeExact)}), the
+          confirmation number.` : feeIsPercent ? `Your fare was ${esc(fareExact)}. After the ${feePct}% late-cancellation fee (${esc(feeExact)}), the
           remaining ${esc(refundExact)} will be refunded to the card you paid with by our team — it is
           not automatic, so please allow a few business days for us to process it, then 5–10
           business days to appear on your statement. Questions? Call dispatch and quote your
-          confirmation number.`) : `Refunded in full to the card you paid with. It can take 5–10 business days to appear on
+          confirmation number.` : `Your fare was ${esc(fareExact)}. After the late-cancellation fee of ${esc(feeExact)}, the
+          remaining ${esc(refundExact)} will be refunded to the card you paid with by our team — it is
+          not automatic, so please allow a few business days for us to process it, then 5–10
+          business days to appear on your statement. Questions? Call dispatch and quote your
+          confirmation number.`) : partialFee ? `Your fare was ${esc(fareExact)}. After the late-cancellation fee of ${esc(feeKeptExact)}, the
+          remaining ${esc(refundExact)} has been refunded to the card you paid with. It can take 5–10 business days to appear on
+          your statement, depending on your bank.` : `Refunded in full to the card you paid with. It can take 5–10 business days to appear on
           your statement, depending on your bank.`}
           ${t.refundId ? `Refund reference: ${esc(t.refundId)}.` : ''}
         </p>
@@ -261,16 +288,28 @@ export function cancellationText(t: CancelledTrip, data: TripRequestInput): stri
   // full fare is kept and no remainder is promised.
   const feePct = CANCELLATION.trip.lateCancelFeePercent;
   const nothingBack = t.refundCents <= 0;
+  // Same guard as the HTML variant: the percent phrase only when the fee
+  // kept really is that percent of the fare — a flat $35 fee is not.
+  const feeIsPercent = Math.round(((t.fareCents ?? t.refundCents) * feePct) / 100) === Math.max(0, (t.fareCents ?? t.refundCents) - t.refundCents);
+  const partialFee = !held && t.feeKeptCents != null && t.feeKeptCents > 0;
+  const feeKeptExact = fmtUsdExact(t.feeKeptCents ?? 0);
   const moneyLines = held
     ? [
         nothingBack
           ? `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation policy applies: the full fare (${fareExact}) is kept as the fee, so no refund is due.`
-          : `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation policy applies: a ${feePct}% fee (${feeExact}) is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
+          : feeIsPercent
+            ? `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation policy applies: a ${feePct}% fee (${feeExact}) is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`
+            : `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, our late-cancellation policy applies: a late-cancellation fee of ${feeExact} is kept from your ${fareExact} fare, and the remaining ${refundExact} will be refunded to the card you paid with by our team. It is not automatic — please allow a few business days for us to process it, then 5-10 business days to appear on your statement.`,
       ]
-    : [
-        `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,
-        t.refundId ? `Refund reference: ${t.refundId}.` : ``,
-      ];
+    : partialFee
+      ? [
+          `We have cancelled your trip for ${fmtWhen(data.requestedAt)}. Because the cancellation came inside ${CANCELLATION.trip.freeUntilHoursBefore} hours of pickup, a late-cancellation fee of ${feeKeptExact} was kept from your ${fareExact} fare, and the remaining ${refundExact} has been refunded to the card you paid with. It can take 5-10 business days to appear on your statement.`,
+          t.refundId ? `Refund reference: ${t.refundId}.` : ``,
+        ]
+      : [
+          `We have cancelled your trip for ${fmtWhen(data.requestedAt)} and refunded ${refund} in full to the card you paid with. It can take 5-10 business days to appear on your statement.`,
+          t.refundId ? `Refund reference: ${t.refundId}.` : ``,
+        ];
   const lines = [
     `Your Tassy ${serviceShortName(data.serviceLine)} trip is cancelled.`,
     ``,

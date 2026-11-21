@@ -142,7 +142,7 @@ export default function PricingPage() {
                 colB="There and back"
                 colBSub="20 min wait included"
                 rows={WAV}
-                href={request.nemt}
+                href={seoRequest('nemt', { mobility: 'wheelchair' })}
                 cta="Request a wheelchair ride"
               />
               <div className="card-tile">

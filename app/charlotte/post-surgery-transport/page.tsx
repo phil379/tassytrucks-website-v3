@@ -38,7 +38,7 @@ export default function PostSurgeryTransportPage() {
                 responsible adult to be released to.</strong> This is standard
                 practice after anesthesia or sedation, reflected in{' '}
                 <a
-                  href="https://www.asahq.org/madeforthismoment/preparing-for-surgery/recovery"
+                  href="https://madeforthismoment.asahq.org/preparing-for-surgery/recovery/"
                   className="underline decoration-[color:var(--gold)] underline-offset-2"
                   rel="noopener"
                   target="_blank"

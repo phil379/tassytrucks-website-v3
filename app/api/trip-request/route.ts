@@ -12,6 +12,7 @@ import { attributionSlug } from '@/lib/hotel-card';
 import { resolvePoint } from '@/lib/zip-centroids';
 import { withUnit } from '@/lib/address-unit';
 import { unpricedFor } from '@/lib/price-fallback';
+import { isOutOfAreaPickup, outOfAreaNote, serviceAreaMiles } from '@/lib/service-area';
 import { supabaseAdmin, TRIP_REQUESTS_TABLE } from '@/lib/supabase-admin';
 import { nextTripNumber } from '@/lib/trip-number';
 import { looksLikeTestIdentity } from '@/lib/test-data';
@@ -626,12 +627,35 @@ export async function POST(request: Request) {
         dropoff: !resolvePoint({ lat: data.dropoffLat, lng: data.dropoffLng }, data.dropoffAddress),
       });
 
+  // OUT-OF-AREA PICKUP (lib/service-area.ts, Phil 2026-11-20). The booking is still
+  // captured, but the customer is told it is not a confirmed booking and that we will
+  // call with a quote, and the row is marked for dispatch. Measured from the same
+  // resolved point the estimate used — a picked place, else the typed ZIP's centroid;
+  // no point at all keeps today's behaviour exactly. Facility bookings are not
+  // measured: their pickups are the facility's business, not the retail area's.
+  // A far DROPOFF from a Charlotte pickup is not this: it already landed as a
+  // beyond-bands quote request above, untouched.
+  // PAY-AT-BOOKING GUARD: this is computed here, BEFORE the pay-at-booking
+  // decision below, and passed into it — a flagged booking is never
+  // auto-confirmed or charged, however firm its price. It lands as a plain
+  // quote request, exactly as the service-area decision intends.
+  const pickupResolvedPoint = resolvePoint(pickupPoint, data.pickupAddress)?.point ?? null;
+  const outOfArea = !wantsFacilityBooking && isOutOfAreaPickup(pickupResolvedPoint);
+  const outOfAreaMiles = outOfArea ? serviceAreaMiles(pickupResolvedPoint) : null;
+
+  // One internal_notes value carrying every marker that applies, the unpriced note
+  // first so the [NEEDS PRICE] prefix check (lib/price-fallback.ts isNeedsPrice)
+  // keeps reading the rows it reads today.
+  const internalNotes =
+    [unpricedNote, outOfArea ? outOfAreaNote(outOfAreaMiles) : null].filter(Boolean).join(' ') ||
+    null;
+
   // PAY AT BOOKING (lib/pay-at-booking.ts, Phil 2026-11-20). A firm-price retail
   // booking on Care / Recovery / Concierge (and Winnie, when it opens) is confirmed
   // at booking and the rider pays the price on screen. Decided here, from the same
   // server-computed estimate the row will store — never from the body — and acted
-  // on after the insert below. Wheelchair rides, ranges, ZIP estimates, unpriced
-  // and facility bookings stay on the dispatcher flow, untouched.
+  // on after the insert below. Wheelchair rides, ranges, ZIP estimates, unpriced,
+  // out-of-area and facility bookings stay on the dispatcher flow, untouched.
   const payAtBooking = payAtBookingEligible({
     serviceLine: data.serviceLine,
     mobility: data.mobility,
@@ -639,6 +663,7 @@ export async function POST(request: Request) {
     price: estimate
       ? { exact: price?.exact ?? false, lowCents: estimate.lowCents, highCents: estimate.highCents }
       : null,
+    outOfArea,
   });
 
   // What dispatch reads: the picked address, then the door. The estimate above was
@@ -706,7 +731,7 @@ export async function POST(request: Request) {
         // ops queue while the public display is off is not a promise.
         estimate_shown: Boolean(estimate && data.estimateShown),
         // Marks a row that has no price so /ops shows it as one that needs a price.
-        ...(unpricedNote ? { internal_notes: unpricedNote } : {}),
+        ...(internalNotes ? { internal_notes: internalNotes } : {}),
         passengers: data.passengers ?? 1,
         mobility: data.mobility || null,
         vehicle_notes: data.vehicleNotes || null,
@@ -789,7 +814,7 @@ export async function POST(request: Request) {
       ? (parseLocalDateTime(data.returnAt)?.toISOString() ?? data.returnAt)
       : data.returnAt,
     tripDetails,
-  }, tripNumber, facilityAlert, price, priceUnavailable, payAtBooking);
+  }, tripNumber, facilityAlert, price, priceUnavailable, payAtBooking, outOfArea);
 
   // Confirm the pay-at-booking trips NOW, through the one confirm path a
   // dispatcher uses (lib/ops-confirm.ts): confirmation code, Stripe Payment
@@ -825,7 +850,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    { ok: true, id, tripNumber, notifications, price, priceUnavailable, payNow },
+    { ok: true, id, tripNumber, notifications, price, priceUnavailable, payNow, outOfArea },
     { status: 200 },
   );
 }

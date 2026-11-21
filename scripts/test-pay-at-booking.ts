@@ -113,6 +113,30 @@ t('wheelchair and scholar stay on the dispatcher flow even with a firm price', (
   );
 });
 
+t('an out-of-area pickup is never pay-at-booking, however firm its price', () => {
+  // The sequencing guard (PR #132 rebased onto PR #139): the route measures
+  // the pickup against the Charlotte ring (lib/service-area.ts) and passes
+  // the flag in. A Raleigh pickup on a firm-price Care booking must land as a
+  // plain quote request — never auto-confirmed, never charged.
+  for (const line of ['care', 'recovery', 'concierge', 'winnie']) {
+    assert.equal(
+      payAtBookingEligible({ serviceLine: line, mobility: 'ambulatory', facility: false, price: firm, outOfArea: true }),
+      false,
+      line,
+    );
+  }
+  // The same bookings inside the ring stay eligible: the flag, and only the
+  // flag, changes the answer.
+  assert.equal(
+    payAtBookingEligible({ serviceLine: 'care', mobility: 'ambulatory', facility: false, price: firm, outOfArea: false }),
+    true,
+  );
+  assert.equal(
+    payAtBookingEligible({ serviceLine: 'care', mobility: 'ambulatory', facility: false, price: firm }),
+    true,
+  );
+});
+
 /* ── The auto-reply's closing line ─────────────────────────────────────── */
 
 const mail = (payAtBooking: boolean) =>

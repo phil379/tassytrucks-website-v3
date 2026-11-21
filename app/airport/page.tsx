@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import RequestForm from '@/components/request/RequestForm';
+import { BOOKINGS_PAUSED_MESSAGE, bookingsPaused } from '@/lib/bookings-paused';
 import { rideTrackingEnabled } from '@/lib/ride-link';
 import { hotelBySlug, hotelQuote } from '@/lib/hotel-price';
 import { hotelQuoteServer } from '@/lib/hotel-price.server';
@@ -93,25 +94,31 @@ export default async function AirportPage({
           )}
 
           <div className="card-tile mt-6 p-6 sm:p-8">
-            <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
-              <RequestForm
-                initialService="concierge"
-                servicePreselected
-                textLinkPrefill={textLinks}
-                googleMapsApiKey={googleMapsApiKey}
-                rideTrackingEnabled={rideTrackingEnabled()}
-                hotelPrefill={
-                  pickup && dropoff
-                    ? {
-                        pickup,
-                        dropoff,
-                        // The server's price, so the form opens on it and never shows the normal ladder's.
-                        price: shown ? { slug: shown.slug, chargedCents: shown.chargedCents } : undefined,
-                      }
-                    : undefined
-                }
-              />
-            </Suspense>
+            {bookingsPaused() ? (
+              // The pause switch (lib/bookings-paused.ts): same notice as
+              // /request — this page embeds the same public booking form.
+              <p className="text-lg">{BOOKINGS_PAUSED_MESSAGE}</p>
+            ) : (
+              <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
+                <RequestForm
+                  initialService="concierge"
+                  servicePreselected
+                  textLinkPrefill={textLinks}
+                  googleMapsApiKey={googleMapsApiKey}
+                  rideTrackingEnabled={rideTrackingEnabled()}
+                  hotelPrefill={
+                    pickup && dropoff
+                      ? {
+                          pickup,
+                          dropoff,
+                          // The server's price, so the form opens on it and never shows the normal ladder's.
+                          price: shown ? { slug: shown.slug, chargedCents: shown.chargedCents } : undefined,
+                        }
+                      : undefined
+                  }
+                />
+              </Suspense>
+            )}
           </div>
 
           <p className="ink-soft text-sm mt-6 text-center">

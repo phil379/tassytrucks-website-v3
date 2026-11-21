@@ -3,7 +3,18 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CANCELLATION, REFUND_POLICY_STATUS, freeCancellationSentence, REFUNDS_URL, PHIL_PROPOSED } from '../lib/refund-policy';
+import {
+  CANCELLATION,
+  CONCIERGE_PRICED_MAX_MILES,
+  REFUND_POLICY_STATUS,
+  conciergeLateCancelFeeText,
+  conciergeNoShowFeeText,
+  freeCancellationSentence,
+  REFUNDS_URL,
+  PHIL_PROPOSED,
+} from '../lib/refund-policy';
+import { cancellationHtml, cancellationText, type CancelledTrip } from '../lib/cancellation-email';
+import type { TripRequestInput } from '../lib/trip-request';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p: string) => readFileSync(join(ROOT, p), 'utf8');
@@ -42,11 +53,65 @@ assert.equal(CANCELLATION.trip.lateCancelFeePercent, 100);
 assert.equal(CANCELLATION.treatmentDay.lateCancelFeePercent, 100);
 ok('late cancellation inside the window costs the full price (Phil, decided 2026-11-19)');
 
+// Phil DECIDED on 2026-11-21: a Concierge late cancel costs the NO-SHOW
+// amount — $35 flat, or 100% of the trip price on a long trip. The two fees
+// share one constant in the config, so they must be equal here and stay
+// equal; the long-trip boundary is the priced card's last band for both.
+assert.equal(CANCELLATION.conciergeLateCancel.flatFeeCents, 3500);
+assert.equal(CANCELLATION.conciergeLateCancel.flatFeeCents, CANCELLATION.conciergeNoShow.flatFeeCents);
+assert.equal(CANCELLATION.conciergeLateCancel.longTripOverMiles, CONCIERGE_PRICED_MAX_MILES);
+assert.equal(CANCELLATION.conciergeLateCancel.longTripOverMiles, CANCELLATION.conciergeNoShow.longTripOverMiles);
+assert.equal(CANCELLATION.conciergeLateCancel.longTripFeePercent, 100);
+assert.equal(conciergeLateCancelFeeText(), '$35');
+assert.equal(conciergeLateCancelFeeText(), conciergeNoShowFeeText());
+ok('Concierge late cancel costs the no-show amount: $35 flat, 100% over 30 miles (Phil, decided 2026-11-21)');
+
 // The numbers are not retyped on the page, the form or the email.
 const page = read('app/refunds/page.tsx');
 assert.ok(!/\b(50|100)%/.test(page), 'percentages must come from lib/refund-policy.ts');
 assert.ok(/CANCELLATION\./.test(page));
+assert.ok(page.includes('conciergeLateCancel'), '/refunds Concierge row reads conciergeLateCancel from the config');
+assert.ok(page.includes('data-testid="concierge-late-cancel"'), '/refunds marks the Concierge late-cancel cell');
 ok('/refunds reads its numbers from the config');
+
+// The rider's cancellation email for a charged Concierge late cancel states
+// the amount actually kept — $35 of a $119 fare, $84 refunded — and never
+// dresses the flat fee up as a percent (Phil, 2026-11-21). The amount comes
+// from refundTrip (lib/ops-refund.ts): the charged fare minus the Stripe
+// refund issued, passed in as feeKeptCents/fareCents.
+const conciergeTrip = {
+  serviceLine: 'concierge',
+  pickupAddress: '100 N Tryon St, Charlotte, NC 28202',
+  dropoffAddress: 'Charlotte Douglas Intl Airport, Charlotte, NC',
+  requestedAt: '2026-11-22T15:00:00Z',
+  contactFirstName: 'QA',
+  contactLastName: 'Probe',
+  contactPhone: '7045550100',
+  contactEmail: 'qa@example.com',
+} as TripRequestInput;
+const partialCancel: CancelledTrip = {
+  confirmationCode: 'TT-TEST35',
+  refundCents: 8400,
+  refundId: 're_test',
+  feeKeptCents: 3500,
+  fareCents: 11900,
+};
+const partialText = cancellationText(partialCancel, conciergeTrip);
+assert.ok(partialText.includes('a late-cancellation fee of $35 was kept from your $119 fare'));
+assert.ok(partialText.includes('the remaining $84 has been refunded'));
+assert.ok(!partialText.includes('100%'), 'a flat $35 fee must never be stated as a percent');
+const partialHtml = cancellationHtml(partialCancel, conciergeTrip);
+assert.ok(partialHtml.includes('late-cancellation fee of $35'));
+assert.ok(!partialHtml.includes('100% fee'), 'a flat $35 fee must never be stated as a percent');
+// The dormant held variant obeys the same rule when the fee it derives is
+// a flat amount rather than the policy percent of the fare.
+const heldFlatText = cancellationText(
+  { confirmationCode: 'TT-TEST35', refundCents: 8400, refundHeld: true, fareCents: 11900 },
+  conciergeTrip,
+);
+assert.ok(heldFlatText.includes('a late-cancellation fee of $35 is kept from your $119 fare'));
+assert.ok(!heldFlatText.includes('100% fee'), 'the held copy must not call a flat fee a percent either');
+ok('cancellation email states the $35 actually kept on a Concierge late cancel, never a percent');
 
 // Linked from the places that matter.
 assert.ok(read('components/request/RequestForm.tsx').includes('REFUNDS_PATH'), 'request form links the refund policy');

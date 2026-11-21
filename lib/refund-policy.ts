@@ -39,6 +39,14 @@ import { CONCIERGE } from '@/lib/quote';
  *   Bookings confirmed while 50% was the published figure were promised
  *   50% in writing — honour the promise those customers hold, the same
  *   grandfathering rule as the Nov 18 window change.
+ * DECIDED 2026-11-21 (Phil): a Concierge LATE CANCEL now costs the NO-SHOW
+ *   amount instead of the full fare — the same $35 flat, or 100% of the
+ *   trip price on a long trip (over 30 miles). CANCELLATION.conciergeLateCancel
+ *   carries it, and the $35 is one constant (CONCIERGE_FLAT_FEE_CENTS)
+ *   shared with the no-show entry so the two fees can never drift apart.
+ *   A paid Concierge late cancel therefore keeps only the fee and refunds
+ *   the rest. Every other line keeps the 2026-11-19 full-fare rule, and
+ *   free cancellation until 2 hours before pickup is unchanged for all.
  *   lib/school-billing.ts (Phil, 2026-10-17): a Scholar monthly plan stops at the end
  *   of the paid month, with no prorated refund, and refunds are decided one at a
  *   time. That is used for Scholar's monthly plan; Phil's 24-hour / one-ride rule
@@ -63,7 +71,15 @@ import { CONCIERGE } from '@/lib/quote';
 export const CONCIERGE_PRICED_MAX_MILES: number = CONCIERGE.bands[CONCIERGE.bands.length - 1]!.upToMiles;
 
 export const REFUND_POLICY_STATUS: 'PROPOSED' | 'APPROVED' = 'PROPOSED';
-export const REFUND_POLICY_UPDATED = 'November 19, 2026';
+export const REFUND_POLICY_UPDATED = 'November 21, 2026';
+
+/**
+ * The Concierge flat fee, in cents: $35. ONE number behind both the
+ * Concierge no-show fee and the Concierge late-cancel fee — since
+ * 2026-11-21 the late cancel costs the no-show amount (Phil), so both
+ * entries below read this constant and can never drift apart.
+ */
+const CONCIERGE_FLAT_FEE_CENTS = 3500;
 
 export const CANCELLATION = {
   /**
@@ -108,17 +124,35 @@ export const CANCELLATION = {
    * except long trips, which keep 100% of the trip price.
    */
   conciergeNoShow: {
-    flatFeeCents: 3500,
+    flatFeeCents: CONCIERGE_FLAT_FEE_CENTS,
     /** The last mileage the website prices for Concierge. Never typed: read from the card. */
     longTripOverMiles: CONCIERGE_PRICED_MAX_MILES,
     longTripNoShowFeePercent: 100,
     counselReview: true,
+  },
+  /**
+   * Tassy Concierge late cancel (Phil, DECIDED 2026-11-21): inside the
+   * free-cancel window a Concierge trip costs the NO-SHOW amount — the
+   * flat fee, or 100% of the trip price on a long trip (over the priced
+   * card's last band — the same boundary the no-show rule uses). Every
+   * other line keeps trip.lateCancelFeePercent.
+   */
+  conciergeLateCancel: {
+    flatFeeCents: CONCIERGE_FLAT_FEE_CENTS,
+    /** The last mileage the website prices for Concierge. Never typed: read from the card. */
+    longTripOverMiles: CONCIERGE_PRICED_MAX_MILES,
+    longTripFeePercent: 100,
   },
 } as const;
 
 /** "$35", from the config, so the page never types the amount. */
 export function conciergeNoShowFeeText(): string {
   return `$${(CANCELLATION.conciergeNoShow.flatFeeCents / 100).toFixed(0)}`;
+}
+
+/** "$35", from the config, so the page never types the amount. */
+export function conciergeLateCancelFeeText(): string {
+  return `$${(CANCELLATION.conciergeLateCancel.flatFeeCents / 100).toFixed(0)}`;
 }
 
 /**

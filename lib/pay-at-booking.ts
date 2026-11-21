@@ -18,7 +18,12 @@
  *     reviews them first (any line, Care WAV included — the WAV card is a
  *     firm published price, but the ride is still review-first by decision);
  *   - trips with no firm price at form time: a price range, a ZIP estimate,
- *     or a trip past the last band that a dispatcher quotes ("call us" work).
+ *     or a trip past the last band that a dispatcher quotes ("call us" work);
+ *   - out-of-area pickups (lib/service-area.ts): the pickup is beyond the
+ *     Charlotte ring, so the booking is a quote request — dispatch calls with
+ *     a quote. It is never confirmed or charged at booking, however firm the
+ *     price the form worked out for the trip itself, because that price never
+ *     included getting the car to the pickup.
  * Facility bookings are on account or passenger-pay through the facility
  * flow and never come through here; Scholar is plan-billed and untouched.
  *
@@ -46,19 +51,27 @@ export function payAtBookingLine(
 }
 
 /**
- * May THIS booking be confirmed and charged at booking time? All four must hold:
- * a pay-at-booking line, a retail booking (not a facility one), and a firm
- * price — one number, measured from picked addresses, that the rider was
- * actually shown as "Your price" (lib/price-fallback.ts: a range and a ZIP
- * estimate are estimates, not promises, and are never charged at booking).
+ * May THIS booking be confirmed and charged at booking time? All must hold:
+ * a pay-at-booking line, a retail booking (not a facility one), an in-area
+ * pickup, and a firm price — one number, measured from picked addresses, that
+ * the rider was actually shown as "Your price" (lib/price-fallback.ts: a range
+ * and a ZIP estimate are estimates, not promises, and are never charged at
+ * booking).
  */
 export function payAtBookingEligible(input: {
   serviceLine: string | null | undefined;
   mobility?: string | null;
   facility: boolean;
   price: { exact: boolean; lowCents: number; highCents: number } | null;
+  /**
+   * The pickup is outside the Charlotte service area (lib/service-area.ts):
+   * a quote-first booking by Phil's decision — dispatch calls with a quote.
+   * Never auto-confirmed or charged, however firm its price.
+   */
+  outOfArea?: boolean;
 }): boolean {
   if (input.facility) return false;
+  if (input.outOfArea) return false;
   if (!payAtBookingLine(input.serviceLine, input.mobility)) return false;
   const p = input.price;
   return Boolean(p && p.exact && p.lowCents === p.highCents && p.lowCents > 0);

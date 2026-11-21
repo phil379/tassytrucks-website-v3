@@ -48,6 +48,7 @@ const routes: Array<{ path: string; priority: number }> = [
   { path: '/privacy', priority: 0.3 },
   { path: '/terms', priority: 0.3 },
   { path: '/accessibility', priority: 0.3 },
+  { path: '/refunds', priority: 0.3 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

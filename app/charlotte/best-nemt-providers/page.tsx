@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'How to evaluate NEMT providers in Charlotte NC: licensing, insurance, driver training, reliability — and how Tassy Transportation measures up. (704) 941-8508.',
   alternates: { canonical: '/charlotte/best-nemt-providers' },
-  openGraph: { url: '/charlotte/best-nemt-providers', images: ['/og-image/best-nemt-providers'] },
+  openGraph: { type: 'website', url: '/charlotte/best-nemt-providers', images: ['/og-image/best-nemt-providers'] },
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-best' });

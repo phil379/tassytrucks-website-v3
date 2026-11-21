@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Set up a facility account for patient and pet transport across Charlotte. Weekly invoicing or the passenger pays. Get started in 60 seconds — (704) 941-8508.',
   alternates: { canonical: '/partners/signup' },
-  openGraph: { url: '/partners/signup' },
+  openGraph: { type: 'website', url: '/partners/signup' },
   robots: { index: false, follow: true },
 };
 

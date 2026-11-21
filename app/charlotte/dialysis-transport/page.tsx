@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Recurring dialysis rides in Charlotte NC — M-W-F or T-Th-Sa schedules, door-to-door, wheelchair accessible. Veteran-owned. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/dialysis-transport' },
-  openGraph: { url: '/charlotte/dialysis-transport', images: ['/og-image/dialysis-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/dialysis-transport', images: ['/og-image/dialysis-transport'] },
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-dialysis', recurring: '1' });

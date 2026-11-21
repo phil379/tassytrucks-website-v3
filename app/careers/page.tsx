@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Careers — Drive, Care and Sell with Tassy Transportation' },
   description: CAREERS_OPEN
     ? 'Open roles at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Apply in about five minutes.'
-    : 'Careers at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Applications are not open yet — join the interest list.',
+    : 'Careers at Tassy Transportation in Charlotte: drivers, ride companions, CNAs, sales reps. Veteran-owned, HIRE Vets Gold. Not open yet — join the interest list.',
   alternates: { canonical: '/careers' },
   // Not indexed while the page is closed (lib/careers-gate.ts).
   robots: { index: CAREERS_OPEN, follow: CAREERS_OPEN },

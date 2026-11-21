@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Pet transport in Charlotte NC to the vet, groomer, and boarding. Current rabies vaccination required. Veteran-owned. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/pet-transport' },
-  openGraph: { url: '/charlotte/pet-transport', images: ['/og-image/pet-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/pet-transport', images: ['/og-image/pet-transport'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,

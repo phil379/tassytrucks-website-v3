@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Airport runs, golf, dinner, events and client pickups in Charlotte. A reserved vehicle and a professional driver, booked for a time you chose. Flat rates from $89. No surge.',
   alternates: { canonical: '/vip' },
-  openGraph: { url: '/vip', images: ['/og-image/vip'] },
+  openGraph: { type: 'website', url: '/vip', images: ['/og-image/vip'] },
 };
 
 export default function VipPage() {

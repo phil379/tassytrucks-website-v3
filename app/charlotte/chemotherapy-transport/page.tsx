@@ -13,9 +13,9 @@ const TOP = dollars(TREATMENT_DAY.bands[TREATMENT_DAY.bands.length - 1].cents);
 
 export const metadata: Metadata = {
   title: 'Chemotherapy & Infusion Rides in Charlotte NC',
-  description: `Rides to and from chemotherapy, infusion and radiation in Charlotte NC. Flat round trip from ${FROM}, both legs included, set up once for the whole course. Veteran-owned. (704) 941-8508.`,
+  description: `Rides to chemotherapy, infusion and radiation in Charlotte NC. Flat round trip from ${FROM}, set up once for the whole course. Veteran-owned. (704) 941-8508.`,
   alternates: { canonical: '/charlotte/chemotherapy-transport' },
-  openGraph: { url: '/charlotte/chemotherapy-transport' },
+  openGraph: { type: 'website', url: '/charlotte/chemotherapy-transport' },
 };
 
 // flat=1 pre-selects the flat round trip (the Treatment Day card) on the Care form.

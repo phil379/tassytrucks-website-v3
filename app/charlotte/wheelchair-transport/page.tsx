@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description:
     'Wheelchair rides in Charlotte NC, run in ramp-equipped vehicles from our partner network. Door-through-door help, companions welcome. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/wheelchair-transport' },
-  openGraph: { url: '/charlotte/wheelchair-transport', images: ['/og-image/wheelchair-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/wheelchair-transport', images: ['/og-image/wheelchair-transport'] },
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-wc', mobility: 'wheelchair' });
@@ -166,7 +166,7 @@ export default function WheelchairTransportPage() {
             <h2 className="h-section max-w-2xl">What a wheelchair ride costs</h2>
             <p className="ink-soft mt-3 max-w-2xl leading-relaxed">
               Priced by distance, like every other Tassy line. You get the number before you
-              book and it does not move afterward &mdash; no meter, no surge, and no
+              book and it does not move afterwards &mdash; no meter, no surge, and no
               &ldquo;we&rsquo;ll quote you on the call&rdquo;.
             </p>
             <div className="mt-7 max-w-2xl">

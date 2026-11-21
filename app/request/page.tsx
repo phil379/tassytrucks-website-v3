@@ -13,9 +13,9 @@ import { COPY, coerceServiceLine,
 export const metadata: Metadata = {
   title: 'Request a ride in Charlotte NC',
   description:
-    'Request medical, recovery, wellness, pet, or student transport in Charlotte NC. A dispatcher confirms every request by phone or text and quotes pricing before the trip is confirmed.',
+    'Request medical, recovery, wellness, pet or student transport in Charlotte NC. A dispatcher confirms each request by phone or text and quotes pricing first.',
   alternates: { canonical: '/request' },
-  openGraph: { url: '/request' },
+  openGraph: { type: 'website', url: '/request' },
 };
 
 /**
@@ -32,7 +32,7 @@ const requestPageLd = {
   url: 'https://www.tassytrucks.com/request',
   name: 'Request a ride in Charlotte NC',
   description:
-    'Request medical, recovery, wellness, pet, or student transport in Charlotte NC. A dispatcher confirms every request by phone or text and quotes pricing before the trip is confirmed.',
+    'Request medical, recovery, wellness, pet or student transport in Charlotte NC. A dispatcher confirms each request by phone or text and quotes pricing first.',
   inLanguage: 'en-US',
   isPartOf: { '@id': 'https://www.tassytrucks.com/#business' },
   about: { '@id': 'https://www.tassytrucks.com/#business' },

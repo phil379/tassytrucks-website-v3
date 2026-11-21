@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Partner with Winnie Ride for pet transport to and from your Charlotte veterinary practice. Current rabies vaccination required. Book a 15-min intro call.',
   alternates: { canonical: '/partners/veterinary' },
-  openGraph: { url: '/partners/veterinary', images: ['/og-image/veterinary'] },
+  openGraph: { type: 'website', url: '/partners/veterinary', images: ['/og-image/veterinary'] },
 };
 
 const CTA_HREF = partnerSignup({ source: 'vet-partners', type: 'veterinary' });

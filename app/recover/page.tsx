@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Charlotte rides home after outpatient surgery, sedation, dental work or a hospital discharge. We meet you at the discharge desk, wait, and take you home. From $129, both directions.',
   alternates: { canonical: '/recover' },
-  openGraph: { url: '/recover', images: ['/og-image/recover'] },
+  openGraph: { type: 'website', url: '/recover', images: ['/og-image/recover'] },
 };
 
 /**

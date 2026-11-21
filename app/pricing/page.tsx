@@ -24,9 +24,9 @@ const WAIT_LINES = [
 export const metadata: Metadata = {
   title: 'Pricing — flat rates by distance in Charlotte',
   description:
-    'Charlotte medical, pet and premium transport priced by distance, not by meter. Tassy Care from $49, Recovery from $129, Concierge from $89, Winnie Ride from $59. No surge.',
+    'Charlotte medical, pet and premium transport priced by distance. Tassy Care from $49, Recovery from $129, Concierge from $89, Winnie Ride from $59. No surge.',
   alternates: { canonical: '/pricing' },
-  openGraph: { url: '/pricing', images: ['/og-image/pricing'] },
+  openGraph: { type: 'website', url: '/pricing', images: ['/og-image/pricing'] },
 };
 
 /**

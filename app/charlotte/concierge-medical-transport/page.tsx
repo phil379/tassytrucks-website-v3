@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Discreet, white-glove concierge medical transport in Charlotte NC for plastic surgery and aesthetic patients. Private rides — (704) 941-8508.',
   alternates: { canonical: '/charlotte/concierge-medical-transport' },
-  openGraph: { url: '/charlotte/concierge-medical-transport', images: ['/og-image/concierge-medical-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/concierge-medical-transport', images: ['/og-image/concierge-medical-transport'] },
 };
 
 const CTA_HREF = seoRequest('vip', { source: 'seo-concierge' });

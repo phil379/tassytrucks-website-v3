@@ -66,6 +66,13 @@ const localBusinessLd = {
   hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
   priceRange: '$$',
   image: 'https://www.tassytrucks.com/brand/og-image.png',
+  // The public profiles, so a reader can confirm this record and the social
+  // pages are the same business. URLs as supplied by Phil, 2026-11-21.
+  sameAs: [
+    'https://www.facebook.com/tassytrucks/',
+    'https://www.instagram.com/tassytrucksofficial/',
+    'https://www.linkedin.com/company/82484063',
+  ],
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Charlotte',

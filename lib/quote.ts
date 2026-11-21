@@ -251,6 +251,16 @@ export const RECOVERY: Card = {
  * rule). Never copy "sterile", "prevents infection" or "safe for the
  * immunocompromised" onto any surface: the insurer and counsel have not cleared
  * health-protection wording.
+ *
+ * NO WAIT CHARGE (Phil, 2026-11-20). /pricing and the chemotherapy page
+ * promise "no wait charges however long the day runs" — a Treatment Day can
+ * run two to eight hours, and the driver is released and re-dispatched, so
+ * there is no waiting driver to charge for. This card used to carry a
+ * $20/30-min wait overage that contradicted the published promise; Phil ruled
+ * the published page authoritative. `waitOverage` stays a field — every card
+ * carries it and /api/price-list publishes it — so ZERO, not absence, is how
+ * the promise is kept in the one price list, and no surface can quote or
+ * charge a Treatment Day wait fee from this card again.
  */
 export const TREATMENT_DAY: Card = {
   label: 'Tassy Care · Treatment Day',
@@ -263,7 +273,7 @@ export const TREATMENT_DAY: Card = {
     { upToMiles: 30, cents: 26900 },
   ],
   waitIncludedMin: 0,
-  waitOverage: 2000,
+  waitOverage: 0,
   perExtra: 0,
   returnFactor: 1,
   returnFloor: 0,

@@ -49,6 +49,14 @@ t('Recovery, Concierge, Winnie and Treatment Day cards', () => {
   assert.deepEqual([RECOVERY.returnFactor, CONCIERGE.returnFactor, TREATMENT_DAY.returnFactor], [1, 2, 1]);
   assert.deepEqual({ ...SURCHARGES }, { afterHours: 2500, weekend: 2000, holiday: 4500 });
 });
+t('Treatment Day carries no wait charge (Phil, 2026-11-20)', () => {
+  // /pricing and the chemotherapy page promise "no wait charges however long
+  // the day runs"; Phil ruled the published page authoritative over the card's
+  // old $20/30-min overage. The field stays — every card carries it and
+  // /api/price-list publishes it — so zero is the promise, and the bands above
+  // are unchanged.
+  assert.equal(TREATMENT_DAY.waitOverage, 0);
+});
 
 // ── Distance boundaries, every line.
 const LINES: [ServiceLine, Opts][] = [

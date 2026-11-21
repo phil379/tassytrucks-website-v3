@@ -102,7 +102,7 @@ export default function PostSurgeryTransportPage() {
                 post-surgery transport, we go further — what we call
                 door-through-door. Your driver meets you inside your home or
                 lobby, helps with the entryway and any steps, and walks you into
-                the facility to check-in. On the way home, the driver receives
+                the facility to check in. On the way home, the driver receives
                 you at discharge, helps you into the vehicle, and escorts you
                 back through your own front door before leaving. Not a honk from
                 the driveway. Through the door.

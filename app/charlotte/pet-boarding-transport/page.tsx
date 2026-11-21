@@ -102,10 +102,14 @@ export default function PetBoardingTransportPage() {
                 direct to the facility with no pooled stops. Winnie Ride is a
                 direct relationship with one Charlotte company, not a marketplace
                 listing — and rides for nervous travelers are covered on our{' '}
+                <Link href="/charlotte/calm-pet-transport" className={linkCls}>
+                  calm pet transport page
+                </Link>
+                , and pre-boarding checkups on our{' '}
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides page
-                </Link>{' '}
-                too, if your trip includes a pre-boarding checkup.
+                </Link>
+                .
               </p>
             </>
           ),

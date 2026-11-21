@@ -29,7 +29,7 @@ export default function RenewPage() {
           body: 'An IV drip, a facial, a routine appointment you walk out of feeling fine. That is Tassy Concierge — a reserved car and a professional driver, flat rate from $89 one way. Book the return separately for whenever you expect to be finished.',
         },
         {
-          title: 'If you should not be driving afterwards',
+          title: 'If you should not be driving afterward',
           body: 'Sedation, anything that leaves you groggy, or a clinic that asks you to arrange a ride home. That is Tassy Recovery — from $129 for the trip there, the wait, and the trip home, with one pharmacy stop on the way.',
         },
         {
@@ -53,7 +53,7 @@ export default function RenewPage() {
           name: 'Tassy Recovery',
           price: 'From $129',
           cadence: 'there, the wait, and home',
-          features: ['Driver waits 20 minutes', 'Add a pharmacy stop for $10 — 15 minutes of waiting included', 'Help to the car and to your door', 'Family text on the way home'],
+          features: ['Driver waits 20 minutes', 'Add a pharmacy stop for $10', 'Help to the car and to your door', 'Family text on the way home'],
           cta: { label: 'Book the round trip', href: requestRenew.recovery },
           highlight: true,
         },

@@ -44,10 +44,12 @@ export default function RefundsPage() {
           children: (
             <>
               <p>
-                You see an estimated price when you ask for a ride. Nothing is charged then. A
-                dispatcher reviews your request and confirms the price and your driver. After that
-                we send you one payment link for the confirmed amount. If anything about the trip
-                changes, you hear the new price from us before you pay.
+                You see your price when you ask for a ride. On most rides you pay it when you book,
+                on a secure payment page — nothing is charged before you see the price and agree to
+                it. On rides a dispatcher prices, such as wheelchair and longer trips, the dispatcher
+                confirms the price with you first and then sends one payment link for the confirmed
+                amount. If anything about the trip changes, you hear the new price from us before you
+                pay.
               </p>
             </>
           ),

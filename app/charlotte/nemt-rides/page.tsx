@@ -147,7 +147,7 @@ export default function NemtRidesPage() {
         },
         {
           q: 'Does Tassy Transportation accept Medicaid for NEMT rides?',
-          a: 'Not at this time. Tassy Care is private pay: we confirm your price first, then you pay by card through a secure link, or your facility is invoiced under a direct agreement. We are not a Medicaid or Medicare provider today. Call us and we will tell you the price before you commit.',
+          a: 'Not at this time. Tassy Care is private pay: on most rides you pay by card when you book, at the price you saw; on rides a dispatcher prices, we confirm your price first, then you pay by card through a secure link — or your facility is invoiced under a direct agreement. We are not a Medicaid or Medicare provider today. Call us and we will tell you the price before you commit.',
         },
         {
           q: 'Will the driver help me to the door?',

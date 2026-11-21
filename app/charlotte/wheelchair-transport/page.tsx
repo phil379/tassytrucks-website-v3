@@ -166,7 +166,7 @@ export default function WheelchairTransportPage() {
             <h2 className="h-section max-w-2xl">What a wheelchair ride costs</h2>
             <p className="ink-soft mt-3 max-w-2xl leading-relaxed">
               Priced by distance, like every other Tassy line. You get the number before you
-              book and it does not move afterwards &mdash; no meter, no surge, and no
+              book and it does not move afterward &mdash; no meter, no surge, and no
               &ldquo;we&rsquo;ll quote you on the call&rdquo;.
             </p>
             <div className="mt-7 max-w-2xl">

@@ -44,7 +44,7 @@ export default function VetAppointmentRidesPage() {
                 your job. When the only open slot is Tuesday at 3 p.m., you are
                 left choosing between burning a half day of PTO, pushing the
                 appointment another two weeks, or asking someone for a favor they
-                can&rsquo;t really spare. Meanwhile your dog still has the limp, or
+                can&rsquo;t really spare. Meanwhile, your dog still has the limp, or
                 your cat is still due for that recheck.
               </p>
               <p>

@@ -47,7 +47,7 @@ export default function NemtPage() {
           body: 'The Standing Ride Plan holds the same driver at the same time — dialysis Tuesday, Thursday and Saturday, therapy every Monday — at 15% off, with each ride billed after the ride. You never book again.',
         },
         {
-          title: 'Travelling in a wheelchair',
+          title: 'Traveling in a wheelchair',
           body: `${WAV_PARTNER_LINE} Priced by distance like every other line — from ${WAV_FROM} — so you know the number before you book.`,
         },
         {

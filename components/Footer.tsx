@@ -17,13 +17,7 @@ export default function Footer() {
       {/* Large screens: the brand gets the widest column, and Contact is sized to its longest line
           (partners@tassytrucks.com) so no address ever breaks (Phil, 2026-11-14). */}
       <div
-        className={`container-x py-16 grid grid-cols-2 gap-10 ${
-          // One link column fewer while Careers is hidden, so Contact always lands in the last,
-          // content-sized track. Both class strings are written out in full for Tailwind.
-          CAREERS_OPEN
-            ? 'lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_max-content]'
-            : 'lg:grid-cols-[minmax(0,2fr)_repeat(2,minmax(0,1fr))_max-content]'
-        }`}
+        className="container-x py-16 grid grid-cols-2 gap-10 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_max-content]"
       >
         {/* Brand. Phil, 2026-11-14: name and logo were too small. Logo 2x (80px; 64px on phones),
             name 30px (24px on phones), tagline scaled to match. */}
@@ -85,7 +79,10 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Careers -- hidden while lib/careers-gate.ts is OFF (Phil, 2026-11-13). */}
+        {/* Careers. While lib/careers-gate.ts is OFF the column no longer
+            disappears: /careers is a visible interest page (Phil, 2026-11-21),
+            so the closed branch links there instead — and to nothing on the
+            SaaS, whose application forms stay unreachable until hiring opens. */}
         {CAREERS_OPEN ? (
         <div>
           <div className="eyebrow opacity-60 text-current">Careers</div>
@@ -115,7 +112,21 @@ export default function Footer() {
             </li>
           </ul>
         </div>
-        ) : null}
+        ) : (
+        <div>
+          <div className="eyebrow opacity-60 text-current">Careers</div>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <Link
+                href="/careers"
+                className="inline-flex items-center gap-1 hover:text-[color:var(--gold-warm)]"
+              >
+                Join the interest list <ArrowRight size={13} />
+              </Link>
+            </li>
+          </ul>
+        </div>
+        )}
 
         {/* Partners */}
         <div>

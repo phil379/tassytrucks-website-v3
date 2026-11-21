@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight, Car, HeartHandshake, Stethoscope, Briefcase } from 'lucide-react';
-import { notFound } from 'next/navigation';
 import { apply, contact } from '@/lib/saas-links';
 import { CAREERS_OPEN } from '@/lib/careers-gate';
+import CareersInterestForm from '@/components/careers/CareersInterestForm';
+import {
+  CAREERS_INTEREST_BANNER_BODY,
+  CAREERS_INTEREST_BANNER_TITLE,
+} from '@/lib/careers-interest';
 
 /**
  * The careers hub. Shipped 2026-10-01 to retire a stopgap.
@@ -33,12 +37,21 @@ import { CAREERS_OPEN } from '@/lib/careers-gate';
  *
  * So this page's job is the reading, and the SaaS's job is the form. Revisit
  * only if the onboarding token flow ever moves into this repo.
+ *
+ * CLOSED STATE (Phil, 2026-11-21): while CAREERS_OPEN is off, this page no
+ * longer 404s. It renders CareersInterestPage below — the same intro and
+ * role cards with the reading left on, every Apply button and SaaS link
+ * removed, an honest banner about why applications are closed, and one
+ * interest form (POST /api/careers-interest; the operator email is the
+ * list of record). The open render below is untouched and returns the day
+ * the gate flips. See lib/careers-gate.ts and lib/careers-interest.ts.
  */
 
 export const metadata: Metadata = {
   title: { absolute: 'Careers — Drive, Care and Sell with Tassy Transportation' },
-  description:
-    'Open roles at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Apply in about five minutes.',
+  description: CAREERS_OPEN
+    ? 'Open roles at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Apply in about five minutes.'
+    : 'Careers at Tassy Transportation in Charlotte: drivers, ride companions, CNAs and sales reps. Veteran-owned, HIRE Vets Gold. Applications are not open yet — join the interest list.',
   alternates: { canonical: '/careers' },
   // Not indexed while the page is closed (lib/careers-gate.ts).
   robots: { index: CAREERS_OPEN, follow: CAREERS_OPEN },
@@ -84,8 +97,9 @@ const ROLES = [
 ] as const;
 
 export default function CareersPage() {
-  // Closed until the insurance and counsel gates clear. See lib/careers-gate.ts.
-  if (!CAREERS_OPEN) notFound();
+  // Closed until the driver agreement and insurance gates clear: render the
+  // interest-list state, not a 404. See lib/careers-gate.ts.
+  if (!CAREERS_OPEN) return <CareersInterestPage />;
   return (
     <section>
       <div className="container-x py-16 lg:py-24 max-w-4xl">
@@ -143,6 +157,105 @@ export default function CareersPage() {
           </ol>
           <p className="ink-mute mt-5 text-sm">
             Applied and heard nothing? That is on us, not you — call{' '}
+            <a className="underline" href={contact.phone}>
+              {contact.phoneDisplay}
+            </a>{' '}
+            or email{' '}
+            <a className="underline" href={contact.bookingEmail}>
+              book@tassytrucks.com
+            </a>
+            .
+          </p>
+        </div>
+
+        <p className="ink-mute mt-10 text-sm">
+          Running a clinic, practice or senior community instead?{' '}
+          <Link className="underline" href="/partners">
+            Partner with us
+          </Link>
+          .
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The closed state of /careers: the reading stays, the applying goes.
+ *
+ * Same intro and role cards as the open page, but no Apply buttons and no
+ * link anywhere reaches the SaaS application forms (lib/saas-links apply.*)
+ * — a candidate who finds a way to apply while hiring is not cleared is a
+ * promise the business cannot keep. In their place: the banner, and below
+ * the roles the one interest form. The contact line at the bottom points
+ * at the phone and the booking inbox, same as the open page's — a person
+ * with a question still reaches a person.
+ */
+function CareersInterestPage() {
+  return (
+    <section>
+      <div className="container-x py-16 lg:py-24 max-w-4xl">
+        <div className="eyebrow">Join us</div>
+        <h1 className="h-section mt-3">Careers at Tassy Transportation</h1>
+
+        <p className="mt-5 ink-soft leading-relaxed max-w-2xl">
+          We are a veteran-owned Charlotte transportation company and a 2023 HIRE Vets Medallion
+          Gold winner. We hire for reliability over experience, and we say the pay out loud before
+          you apply. Veterans and military spouses are especially welcome on the list.
+        </p>
+
+        <div className="mt-10 rounded-tile border border-line p-6" role="note">
+          <h2 className="serif text-xl font-semibold">{CAREERS_INTEREST_BANNER_TITLE}</h2>
+          <p className="ink-soft mt-3 text-sm leading-relaxed">{CAREERS_INTEREST_BANNER_BODY}</p>
+        </div>
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          {ROLES.map(({ icon: Icon, title, line, body, needs }) => (
+            <div key={title} className="card-tile flex flex-col p-6">
+              <Icon size={22} aria-hidden="true" style={{ color: 'var(--gold)' }} />
+              <h2 className="serif mt-4 text-2xl font-semibold">{title}</h2>
+              <div className="eyebrow mt-1 opacity-70">{line}</div>
+
+              <p className="ink-soft mt-4 flex-1 text-sm leading-relaxed">{body}</p>
+
+              <ul className="mt-5 space-y-1.5 text-sm ink-mute">
+                {needs.map((n) => (
+                  <li key={n}>· {n}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div id="interest-list" className="mt-14">
+          <h2 className="serif text-xl font-semibold">Join the interest list</h2>
+          <p className="ink-soft mt-3 max-w-2xl text-sm leading-relaxed">
+            Tell us who you are and which role fits, and we will reach out the moment
+            applications open — the list hears first, before the roles are posted anywhere else.
+          </p>
+          <div className="mt-6 max-w-2xl">
+            <CareersInterestForm />
+          </div>
+        </div>
+
+        <div className="mt-14 rounded-tile border border-line p-6">
+          <h2 className="serif text-xl font-semibold">What happens next</h2>
+          <ol className="ink-soft mt-4 space-y-2 text-sm leading-relaxed">
+            <li>
+              <strong>1.</strong> You join the list. That is the whole step — there is no
+              application to fill in today.
+            </li>
+            <li>
+              <strong>2.</strong> When the driver agreement and insurance setup are final and
+              applications open, we email everyone on the list for that role.
+            </li>
+            <li>
+              <strong>3.</strong> You apply then, through the normal application, and we pick
+              the conversation up from there.
+            </li>
+          </ol>
+          <p className="ink-mute mt-5 text-sm">
+            Questions in the meantime? Call{' '}
             <a className="underline" href={contact.phone}>
               {contact.phoneDisplay}
             </a>{' '}

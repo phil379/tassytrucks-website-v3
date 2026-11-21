@@ -28,10 +28,17 @@ import { OPERATING_TIME_ZONE } from '@/lib/time';
  * past a hard cap stored on the row: the scheduled pickup + 24 hours (and at least 2 hours from the
  * moment it was minted, so a link minted late still works for a while).
  *
- * WHAT THE PAGE MAY SHOW, and nothing else: the driver's FIRST name, the vehicle's color, make and
- * model (no plate), the status, the pickup STREET (no house number, city, state or ZIP) and the
- * scheduled pickup time. Never a phone number, a full name, a price or any pay figure. Everything
- * the page renders goes through buildRideView() below, which only copies those fields.
+ * WHAT THE PAGE MAY SHOW, and nothing else: the driver's FIRST name, the vehicle's color, make,
+ * model and plate number, the status, the pickup STREET (no house number, city, state or ZIP) and
+ * the scheduled pickup time. Never a phone number, a full name, a price or any pay figure.
+ * Everything the page renders goes through buildRideView() below, which only copies those fields.
+ *
+ * THE PLATE (Phil, 2026-11-21): the plate started out excluded on purpose — "no plate, ever" —
+ * even though the rider texts TassyOps sends carried it. Phil replaced that with ONE
+ * identification standard for every surface that names the driver to the rider: the driver's
+ * first name, the vehicle model and the plate number, so the rider can be sure the car at the
+ * curb is theirs. The plate is the ONLY field that standard adds here; every other exclusion in
+ * this file stands, and a vehicle record with no plate simply shows no plate segment.
  *
  * Everything in this file is pure or takes its data access as an argument, so the tests run with
  * no database and no network. The Supabase-backed store is lib/ride-link.server.ts.
@@ -218,11 +225,31 @@ function cleanVehicleText(raw: string | null | undefined): string | null {
   return v;
 }
 
-/** "Silver Toyota Sienna". No plate, ever: the plate is not even read from the database. */
-export function vehicleLabel(v: { color: string | null; make: string | null; model: string | null } | null): string | null {
+/**
+ * The plate as it may be shown: letters, digits, spaces and dashes only, and never a run of 7+
+ * digits — the same phone/VIN-in-the-wrong-box guard as cleanVehicleText. Anything else, and a
+ * record with no plate at all, shows no plate segment rather than a cleaned-up guess.
+ */
+function cleanPlate(raw: string | null | undefined): string | null {
+  const v = String(raw ?? '').replace(/\s+/g, ' ').trim().slice(0, 12);
+  if (!v || /[^A-Za-z0-9 -]/.test(v) || /\d{7,}/.test(v)) return null;
+  return v;
+}
+
+/**
+ * "Silver Toyota Sienna, plate ZM2821" — the same identification the rider texts carry (Phil,
+ * 2026-11-21: first name, vehicle model and plate wherever the driver is named to the rider).
+ * A vehicle record with no usable plate simply drops the plate segment.
+ */
+export function vehicleLabel(
+  v: { color: string | null; make: string | null; model: string | null; plate?: string | null } | null,
+): string | null {
   if (!v) return null;
   const parts = [cleanVehicleText(v.color), cleanVehicleText(v.make), cleanVehicleText(v.model)].filter(Boolean);
-  return parts.length ? parts.join(' ') : null;
+  const plate = cleanPlate(v.plate);
+  const base = parts.length ? parts.join(' ') : null;
+  if (!plate) return base;
+  return base ? `${base}, plate ${plate}` : `plate ${plate}`;
 }
 
 const HOUSE_NUMBER = /^\s*(?:\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?|\d+\s+\d\/\d)\s+/;
@@ -278,7 +305,7 @@ export type RideView = {
 export function buildRideView(input: {
   status: RideStatus;
   driverFirstName: string | null;
-  vehicle: { color: string | null; make: string | null; model: string | null } | null;
+  vehicle: { color: string | null; make: string | null; model: string | null; plate?: string | null } | null;
   pickupAddress: string | null;
   scheduledFor: string | null;
   requestedAt: string | null;
@@ -413,7 +440,7 @@ export type RideTokenRecord = { id: string; tripId: string; expiresAt: string; r
 export interface RideLinkStore {
   getTrip(tripId: string): Promise<RideTripRecord | null>;
   getDriverFirstName(driverId: string): Promise<string | null>;
-  getVehicle(vehicleId: string): Promise<{ color: string | null; make: string | null; model: string | null } | null>;
+  getVehicle(vehicleId: string): Promise<{ color: string | null; make: string | null; model: string | null; plate: string | null } | null>;
   getEvents(tripId: string): Promise<RideEvent[]>;
   /** Nothing stores a driver's position today, so the real store always answers null. */
   getDriverLocation(tripId: string): Promise<DriverLocation | null>;

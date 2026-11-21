@@ -6,7 +6,9 @@ import type { RideLinkStore, RideTripRecord } from '@/lib/ride-link';
  * SERVER ONLY. The Supabase-backed store for lib/ride-link.ts.
  *
  * Reads are deliberately narrow: drivers -> first_name only (never last_name or phone), vehicles ->
- * color, make, model only (never plate). The trip row is mapped to RideTripRecord immediately, so no
+ * color, make, model and plate only (the plate joined the page under Phil's 2026-11-21
+ * identification standard — first name, vehicle model, plate; nothing else about the vehicle is
+ * read). The trip row is mapped to RideTripRecord immediately, so no
  * price, pay or contact field travels any further than this function. Every failure throws, and the
  * callers turn a throw into the neutral page (the public page) or a 503 (the internal endpoint).
  */
@@ -56,11 +58,11 @@ export function supabaseRideStore(db: SupabaseClient): RideLinkStore {
     },
 
     async getVehicle(vehicleId) {
-      const { data, error } = await db.from('vehicles').select('color, make, model').eq('id', vehicleId).maybeSingle();
+      const { data, error } = await db.from('vehicles').select('color, make, model, plate').eq('id', vehicleId).maybeSingle();
       if (error) throw new Error(`vehicle lookup: ${error.message}`);
       if (!data) return null;
       const r = data as Row;
-      return { color: str(r.color), make: str(r.make), model: str(r.model) };
+      return { color: str(r.color), make: str(r.make), model: str(r.model), plate: str(r.plate) };
     },
 
     async getEvents(tripId) {

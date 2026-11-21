@@ -101,7 +101,7 @@ function memoryStore(opts: {
     },
     async getVehicle(id) {
       fail('getVehicle');
-      return id === VEHICLE_ID ? { color: 'Silver', make: 'Toyota', model: 'Sienna' } : null;
+      return id === VEHICLE_ID ? { color: 'Silver', make: 'Toyota', model: 'Sienna', plate: 'ABC1234' } : null;
     },
     async getEvents() {
       fail('getEvents');
@@ -265,7 +265,7 @@ await t('a revoked token, a cancelled or no-show trip and a database failure are
 
 /* ─────────────────────────────────────────────── no pay, no phone */
 
-await t('the page leaks no pay or phone data, no full name, no plate and no house number', async () => {
+await t('the page leaks no pay or phone data, no full name and no house number — and shows the plate on purpose', async () => {
   // A trip row stuffed with everything the page must never show. The store maps only safe fields,
   // but this proves the view drops them even if they arrived.
   const loud = trip({
@@ -279,6 +279,9 @@ await t('the page leaks no pay or phone data, no full name, no plate and no hous
 
   assert.ok(html.includes('Darnell'), 'first name is shown');
   assert.ok(html.includes('Silver Toyota Sienna'), 'vehicle color and type are shown');
+  // Phil, 2026-11-21: the plate is part of the identification standard (first name, model, plate),
+  // so it is shown on purpose — it is the one deliberate exception to this test's original no-plate pin.
+  assert.ok(html.includes('Silver Toyota Sienna, plate ABC1234'), 'vehicle model and plate are shown');
   assert.ok(html.includes('Tourmaline Rd'), 'the pickup street is shown');
   assert.ok(html.includes('On the way'));
 
@@ -298,8 +301,10 @@ await t('the page leaks no pay or phone data, no full name, no plate and no hous
   // The real store never even reads the forbidden columns.
   const server = readFileSync('lib/ride-link.server.ts', 'utf8');
   assert.ok(/from\('drivers'\)\.select\('first_name'\)/.test(server), 'drivers: first_name only');
-  assert.ok(/from\('vehicles'\)\.select\('color, make, model'\)/.test(server), 'vehicles: no plate');
-  assert.ok(!/last_name'|'phone'|plate'/.test(server.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')));
+  // Pin updated 2026-11-21: the vehicles read now includes plate (and only plate) beyond color,
+  // make and model, per Phil's identification standard. last_name and phone stay barred outright.
+  assert.ok(/from\('vehicles'\)\.select\('color, make, model, plate'\)/.test(server), 'vehicles: color, make, model, plate');
+  assert.ok(!/last_name'|'phone'/.test(server.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')));
 });
 
 await t('first name, vehicle and street are cleaned of anything that is not those things', () => {
@@ -309,6 +314,10 @@ await t('first name, vehicle and street are cleaned of anything that is not thos
   assert.equal(vehicleLabel({ color: 'Black', make: 'Ford', model: 'F-150' }), 'Black Ford F-150');
   assert.equal(vehicleLabel({ color: '7045550142', make: 'Honda', model: 'Odyssey' }), 'Honda Odyssey');
   assert.equal(vehicleLabel(null), null);
+  assert.equal(vehicleLabel({ color: 'Silver', make: 'Toyota', model: 'Sienna', plate: 'ZM2821' }), 'Silver Toyota Sienna, plate ZM2821');
+  assert.equal(vehicleLabel({ color: 'Silver', make: 'Toyota', model: 'Sienna', plate: null }), 'Silver Toyota Sienna', 'no plate on the record: no plate segment');
+  assert.equal(vehicleLabel({ color: 'Silver', make: 'Toyota', model: 'Sienna', plate: '7045550142' }), 'Silver Toyota Sienna', 'a phone number in the plate field is dropped');
+  assert.equal(vehicleLabel({ color: null, make: null, model: null, plate: 'ZM2821' }), 'plate ZM2821');
 
   assert.equal(pickupStreetOnly('1220 Tourmaline Rd, Apt 1910, Charlotte, NC 28202'), 'Tourmaline Rd');
   assert.equal(pickupStreetOnly('5501 Josh Birmingham Pkwy, Charlotte, NC 28208, USA'), 'Josh Birmingham Pkwy');

@@ -61,7 +61,7 @@ const verticals: Vertical[] = [
   {
     slug: '/recover', name: 'Tassy Recovery', Icon: Shield, anim: 'svc-anim--shield',
     blurb: 'Most surgery centers will not discharge you without a responsible adult. We meet you at the desk, wait, and take you home — with one pharmacy stop on the way.',
-    bullets: ['From $129 — there, the wait, and home', 'One pharmacy stop included'],
+    bullets: ['From $129 — there, the wait, and home', 'Add a pharmacy stop for $10 — 15 minutes of waiting included'],
     cta: 'Book your ride home',
     bookHref: request.recover,
     image: { src: '/brand/recovery-mascot.webp', alt: 'A heart with crossed bandages', width: 960, height: 706 },

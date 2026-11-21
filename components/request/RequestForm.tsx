@@ -46,6 +46,7 @@ import {
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema, isAccompaniedMinor } from '@/lib/care-intake';
 import { payAtBookingLine } from '@/lib/pay-at-booking';
+import { pricingPoint } from '@/lib/road-distance';
 import { OUT_OF_AREA_MESSAGE } from '@/lib/service-area';
 import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
 import {
@@ -529,8 +530,13 @@ export default function RequestForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pickup: { lat: pickupLat, lng: pickupLng },
-          dropoff: { lat: dropoffLat, lng: dropoffLng },
+          // Pricing points (lib/road-distance.ts pricingPoint): an airport
+          // end is measured as the canonical CLT terminal point, whichever
+          // pin was picked for the airport's address — the same snap the
+          // /api/distance route applies again server-side, so the estimate
+          // on screen is the price the server will store.
+          pickup: pricingPoint({ lat: pickupLat, lng: pickupLng }),
+          dropoff: pricingPoint({ lat: dropoffLat, lng: dropoffLng }),
           ...(stopActive && stopPlace ? { stop: { lat: stopLat, lng: stopLng } } : {}),
           ...(returnStopActive && returnStopPlace
             ? { returnStop: { lat: returnStopLat, lng: returnStopLng } }
@@ -667,6 +673,20 @@ export default function RequestForm({
     // lines never price off distance, so a lookup they do not use must not
     // hold them up either.
     if (distancePending && !isQuoteOnly(service, mobility)) return null;
+    // PRICING POINTS (lib/road-distance.ts pricingPoint, Phil 2026-11-21).
+    // The straight-line fallback inside estimateTrip must price an airport
+    // end to the canonical CLT terminal point, exactly as the server does —
+    // never to whichever pin was picked for the airport's address. With no
+    // picked point these are null and the picked place passes through
+    // untouched, so typed-address (ZIP) behaviour is unchanged. The hotel
+    // check above deliberately keeps the RAW picked places: it is
+    // radius-based already and decides a different price entirely.
+    const pickupPricingPoint = pricingPoint(
+      pickupLat !== null && pickupLng !== null ? { lat: pickupLat, lng: pickupLng } : null,
+    );
+    const dropoffPricingPoint = pricingPoint(
+      dropoffLat !== null && dropoffLng !== null ? { lat: dropoffLat, lng: dropoffLng } : null,
+    );
     return estimateTrip({
       serviceLine: service,
       roadMiles,
@@ -684,8 +704,8 @@ export default function RequestForm({
       // Treatment Day: its own flat round-trip card, Care only. The engine ignores
       // it everywhere else, so switching service cannot carry it across.
       treatmentDay: details.flat_round_trip === 'yes',
-      pickup: pickupPlace,
-      dropoff: dropoffPlace,
+      pickup: pickupPricingPoint ?? pickupPlace,
+      dropoff: dropoffPricingPoint ?? dropoffPlace,
       // The raw text matters even when a place was picked: with no Maps key
       // there is no place to pick, and the ZIP in what they typed is the only
       // thing that can produce a price. See lib/zip-centroids.ts.

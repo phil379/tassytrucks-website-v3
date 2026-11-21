@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
-import { coerceLatLng, roadDistance, roadDistanceVia } from '@/lib/road-distance';
+import { coerceLatLng, pricingPoint, roadDistance, roadDistanceVia } from '@/lib/road-distance';
 
 /**
  * POST /api/distance — driving miles between two picked places.
@@ -45,11 +45,19 @@ export async function POST(request: Request) {
   }
 
   const raw = body as Record<string, unknown>;
-  const from = coerceLatLng(raw?.pickup);
-  const to = coerceLatLng(raw?.dropoff);
-  if (!from || !to) {
+  const fromRaw = coerceLatLng(raw?.pickup);
+  const toRaw = coerceLatLng(raw?.dropoff);
+  if (!fromRaw || !toRaw) {
     return NextResponse.json({ miles: null, reason: 'bad-points' }, { status: 400 });
   }
+
+  // PRICING POINTS (lib/road-distance.ts pricingPoint, Phil 2026-11-21). An
+  // airport end measures as the canonical CLT terminal point, whichever pin
+  // the visitor picked for the airport's address — the price band must not
+  // depend on the pin. Stop and return-stop points are NOT snapped: a stop
+  // is priced on the route actually driven through it.
+  const from = pricingPoint(fromRaw);
+  const to = pricingPoint(toRaw);
 
   const stop = coerceLatLng(raw?.stop);
   const result = stop ? await roadDistanceVia(from, stop, to) : await roadDistance(from, to);

@@ -22,6 +22,9 @@
  * that fires once per completed address pair, cached, will not come close.
  */
 
+import { CLT_TERMINAL } from '@/lib/hotel-zones';
+import { haversineMiles } from '@/lib/quote';
+
 const ENDPOINT = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 const TIMEOUT_MS = 4_000;
 const CACHE_TTL_MS = 60 * 60 * 1000;
@@ -82,6 +85,58 @@ export function coerceLatLng(p: unknown): LatLng | null {
   const lng = typeof raw.lng === 'string' ? Number(raw.lng) : raw.lng;
   const candidate = { lat, lng };
   return isLatLng(candidate) ? candidate : null;
+}
+
+/**
+ * The pricing snap circle around the CLT terminal point, in metres.
+ *
+ * WHY NOT CLT_TERMINAL.radiusMeters (2,000)? That circle is the HOTEL match
+ * circle around the terminal centre (lib/hotel-price.ts atTerminal), and the
+ * map pin for the airport's own street address — 5501 Josh Birmingham Pkwy,
+ * on the airport's north edge — sits about 2,408 m from that centre, OUTSIDE
+ * it. A pricing snap drawn at 2,000 m would miss the very pin that caused
+ * the Nov 21 mispricing. The circle also cannot grow much: the nearest
+ * listed hotel, the Hampton Inn & Suites Charlotte-Airport, sits about
+ * 2,819 m from the terminal centre, and a hotel point must never snap (a
+ * snapped hotel end would price a hotel ride as a zero-length terminal run
+ * on the normal card whenever the flat hotel price does not apply). The
+ * Sheraton Charlotte Airport Hotel is about 3,695 m out. 2,600 m threads
+ * the measured gap: every observed airport pin (0 m, ~1,110 m, ~2,408 m)
+ * snaps; every listed hotel stays itself.
+ */
+export const AIRPORT_PRICING_SNAP_RADIUS_M = 2600;
+
+/**
+ * The point PRICING measures from/to, as opposed to the point the rider
+ * picked. (Phil, 2026-11-21.)
+ *
+ * WHY THIS EXISTS. "5501 Josh Birmingham Pkwy" resolves to several map pins
+ * over a mile apart — the terminal itself, points along the parkway on the
+ * airport's edge. Google honestly measures the drive to whichever pin was
+ * picked, so on 2026-11-21 the same Pruitt St -> CLT ride priced at 6.5
+ * measured miles ($119 Concierge) from the terminal pin and at 2.8 measured
+ * miles ($109) from a near-edge pin. The ride ends at the terminal either
+ * way; the price band must not depend on the pin.
+ *
+ * So: a point inside the airport snap circle IS the airport, and pricing
+ * measures it as the canonical terminal point (CLT_TERMINAL, the same point
+ * the hotel rules already use). Any other point passes through unchanged,
+ * and null / invalid input passes through unchanged — a typed address with
+ * no picked place keeps today's ZIP-centroid behaviour exactly.
+ *
+ * This is for DISTANCE MEASUREMENT ONLY. Callers keep the rider's actual
+ * pin for everything else: the stored pickup_lat/lng and dropoff_lat/lng,
+ * the address text, the hotel check (which is radius-based already and
+ * reads the raw points), and the service-area measurement.
+ */
+export function pricingPoint(point: LatLng): LatLng;
+export function pricingPoint(point: LatLng | null | undefined): LatLng | null | undefined;
+export function pricingPoint(point: LatLng | null | undefined): LatLng | null | undefined {
+  if (!isLatLng(point)) return point;
+  const metres = haversineMiles(point, CLT_TERMINAL) * METERS_PER_MILE;
+  return metres <= AIRPORT_PRICING_SNAP_RADIUS_M
+    ? { lat: CLT_TERMINAL.lat, lng: CLT_TERMINAL.lng }
+    : point;
 }
 
 /**

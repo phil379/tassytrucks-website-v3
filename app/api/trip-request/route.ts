@@ -19,7 +19,7 @@ import { looksLikeTestIdentity } from '@/lib/test-data';
 import { fireNotifications, type FacilityAlertContext } from '@/lib/notifications';
 import { clientIp, rateLimit } from '@/lib/rate-limit';
 import { containsNul, MAX_REQUEST_BODY_CHARS } from '@/lib/request-guards';
-import { coerceLatLng, roadDistance, roadDistanceVia } from '@/lib/road-distance';
+import { coerceLatLng, pricingPoint, roadDistance, roadDistanceVia } from '@/lib/road-distance';
 import { STOP_FEE_CENTS } from '@/lib/stops';
 import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { payAtBookingEligible } from '@/lib/pay-at-booking';
@@ -512,25 +512,35 @@ export async function POST(request: Request) {
   // so the return leg's stop prices the way back, not the way there.
   const pickupPoint = coerceLatLng({ lat: data.pickupLat, lng: data.pickupLng });
   const dropoffPoint = coerceLatLng({ lat: data.dropoffLat, lng: data.dropoffLng });
+  // PRICING POINTS (lib/road-distance.ts pricingPoint, Phil 2026-11-21). An
+  // airport end is measured — and fallback-priced — as the canonical CLT
+  // terminal point, whichever pin the rider picked for the airport's
+  // address: the ride ends at the terminal, so the band must not depend on
+  // the pin. These feed ONLY the distance measurement and the estimate
+  // below. The rider's actual pins stay in pickupPoint / dropoffPoint for
+  // everything else: the hotel check, the stored pickup_lat/lng and
+  // dropoff_lat/lng, and the service-area measurement further down.
+  const pickupPricingPoint = pricingPoint(pickupPoint);
+  const dropoffPricingPoint = pricingPoint(dropoffPoint);
   const measured =
-    pickupPoint && dropoffPoint
+    pickupPricingPoint && dropoffPricingPoint
       ? stopPoint
-        ? await roadDistanceVia(pickupPoint, stopPoint, dropoffPoint)
+        ? await roadDistanceVia(pickupPricingPoint, stopPoint, dropoffPricingPoint)
         : // A stop typed with a ZIP but never picked: there is no point to
           // measure through, so the direct measured miles must NOT win — the
           // engine falls back to centroid routing through the stop, exactly
           // as the form's estimate did.
           hasStop
           ? null
-          : await roadDistance(pickupPoint, dropoffPoint)
+          : await roadDistance(pickupPricingPoint, dropoffPricingPoint)
       : null;
   const measuredReturn =
-    pickupPoint && dropoffPoint && returnStopPoint
-      ? await roadDistanceVia(dropoffPoint, returnStopPoint, pickupPoint)
+    pickupPricingPoint && dropoffPricingPoint && returnStopPoint
+      ? await roadDistanceVia(dropoffPricingPoint, returnStopPoint, pickupPricingPoint)
       : // Only the way there has a stop: the way back is the direct drive,
         // measured as itself — it does not retrace the outbound detour.
-        pickupPoint && dropoffPoint && stopPoint
-        ? await roadDistance(dropoffPoint, pickupPoint)
+        pickupPricingPoint && dropoffPricingPoint && stopPoint
+        ? await roadDistance(dropoffPricingPoint, pickupPricingPoint)
         : null;
 
   // Recomputed here from the coordinates that arrived, never taken from the
@@ -551,8 +561,8 @@ export async function POST(request: Request) {
     escort: tripDetails?.escort === 'yes',
     // Same rule as the form: read from the VALIDATED details, Care ambulatory only.
     treatmentDay: tripDetails?.flat_round_trip === 'yes',
-    pickup: { lat: data.pickupLat, lng: data.pickupLng },
-    dropoff: { lat: data.dropoffLat, lng: data.dropoffLng },
+    pickup: pickupPricingPoint,
+    dropoff: dropoffPricingPoint,
     // The typed addresses are passed too, so a row with no picked place still
     // gets a ZIP-derived estimate rather than a blank in the ops queue.
     pickupAddress: data.pickupAddress,

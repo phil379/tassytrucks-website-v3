@@ -430,6 +430,13 @@ export function buildRequesterText(args: {
   requestedAt: string;
   price?: QuotedPrice | null;
   priceUnavailable?: boolean;
+  /**
+   * The booking was confirmed and charged at booking time (lib/pay-at-booking.ts):
+   * the closing promise below is the old dispatcher-first sentence, which would be
+   * false for this rider — they already have a price and a pay link on its way.
+   * Only ever set together with a firm price.
+   */
+  payAtBooking?: boolean;
   reference: string;
   /** Booking-time stops (lib/stops.ts); a line is named only for a leg that has one. */
   stopAddress?: string | null;
@@ -462,7 +469,9 @@ export function buildRequesterText(args: {
         ? [PRICE_PENDING_MESSAGE, '']
         : []),
     callbackPromise(args.at ?? new Date(), Boolean(price)),
-    'Nothing is booked and nothing is charged until you agree to the price.',
+    args.payAtBooking
+      ? 'Your ride is booked at the price above, and you pay it when you book — the secure pay link follows with your confirmation.'
+      : 'Nothing is booked and nothing is charged until you agree to the price.',
     '',
     '— Tassy Transportation',
     `Reference: ${args.reference}`,
@@ -476,7 +485,9 @@ export function buildRequesterText(args: {
  *
  * It confirms what they asked for so they know a person read it, states the
  * callback window the /request page already commits to, gives the dispatch
- * number, and says pricing is quoted first. The callback promise is sized to
+ * number, and says how pricing works for this booking: quoted first on the
+ * review-first flows, paid at booking on the firm-price ones
+ * (lib/pay-at-booking.ts). The callback promise is sized to
  * the clock (see callbackPromise). It asserts nothing about tracking, and it
  * carries no marketing language.
  */
@@ -486,6 +497,7 @@ async function notifyRequester(
   tripNumber?: string | null,
   price?: QuotedPrice | null,
   priceUnavailable = false,
+  payAtBooking = false,
 ): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
@@ -500,6 +512,7 @@ async function notifyRequester(
     requestedAt: data.requestedAt,
     price,
     priceUnavailable,
+    payAtBooking,
     reference: tripNumber ?? shortRef(id),
     stopAddress: data.stopAddress,
     returnStopAddress: data.returnStopAddress,
@@ -552,6 +565,7 @@ export async function fireNotifications(
   facility?: FacilityAlertContext,
   price?: QuotedPrice | null,
   priceUnavailable = false,
+  payAtBooking = false,
 ): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
@@ -565,7 +579,7 @@ export async function fireNotifications(
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
     runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility, priceUnavailable)),
     data.contactEmail
-      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price, priceUnavailable))
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price, priceUnavailable, payAtBooking))
       : Promise.resolve<LegOutcome>('skipped'),
   ]);
 

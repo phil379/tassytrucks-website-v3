@@ -45,6 +45,7 @@ import {
 } from '@/lib/price-fallback';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema, isAccompaniedMinor } from '@/lib/care-intake';
+import { payAtBookingLine } from '@/lib/pay-at-booking';
 import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
 import {
   STOP_TERMS_LINE,
@@ -368,6 +369,13 @@ export default function RequestForm({
     price: { text: string; exact: boolean; range: boolean } | null;
     /** The server could not price the trip: say a dispatcher will, rather than show nothing. */
     priceUnavailable: boolean;
+    /**
+     * Pay at booking (lib/pay-at-booking.ts): the server confirmed the trip and
+     * minted its pay link, so the confirmation screen's next step is paying —
+     * the /pay address, which opens the branded Stripe checkout. Null on every
+     * dispatcher-flow booking, where the screen is unchanged.
+     */
+    payNow: { url: string; amountCents: number } | null;
   } | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
@@ -1204,11 +1212,16 @@ export default function RequestForm({
         json.price && typeof json.price.text === 'string'
           ? { text: String(json.price.text), exact: Boolean(json.price.exact), range: Boolean(json.price.range) }
           : null;
+      const payNow =
+        json.payNow && typeof json.payNow.url === 'string' && Number.isInteger(json.payNow.amountCents)
+          ? { url: String(json.payNow.url), amountCents: json.payNow.amountCents as number }
+          : null;
       setReceipt({
         tripNumber: typeof json.tripNumber === 'string' ? json.tripNumber : null,
         when,
         price,
         priceUnavailable: !price && json.priceUnavailable === true,
+        payNow,
       });
       setDone(json.id);
     } catch {
@@ -1219,10 +1232,16 @@ export default function RequestForm({
   }
 
   if (done) {
+    const payNow = receipt?.payNow ?? null;
+    const payAmount = payNow
+      ? payNow.amountCents % 100 === 0
+        ? `$${payNow.amountCents / 100}`
+        : `$${(payNow.amountCents / 100).toFixed(2)}`
+      : null;
     return (
       <div className="card-tile p-8 text-center" role="status" aria-live="polite">
         <CheckCircle2 className="mx-auto h-12 w-12 text-[color:var(--gold)]" aria-hidden="true" />
-        <h2 className="serif text-2xl font-semibold mt-4">Request received</h2>
+        <h2 className="serif text-2xl font-semibold mt-4">{payNow ? 'Your ride is booked' : 'Request received'}</h2>
         {receipt?.tripNumber || receipt?.when ? (
           <p className="ink-soft mt-3 text-sm">
             {receipt.tripNumber ? <>Reference <strong>{receipt.tripNumber}</strong></> : null}
@@ -1248,7 +1267,31 @@ export default function RequestForm({
             {PRICE_PENDING_MESSAGE}
           </p>
         ) : null}
-        <p className="ink-soft mt-3 max-w-md mx-auto">{COPY.confirmation}</p>
+        {payNow ? (
+          /* Pay at booking: the trip is confirmed and the price above is the price.
+             Paying is the step that holds the driver — say so, name the amount on
+             the button, and carry the cancellation terms the rider is agreeing to.
+             The same /pay address is in the confirmation email and stays valid
+             until the trip, so leaving this page loses nothing. */
+          <div className="mt-5" data-testid="pay-now">
+            <p className="text-sm max-w-md mx-auto">
+              One step left: pay {payAmount} now to hold your driver.
+            </p>
+            <a
+              href={payNow.url}
+              className="btn-gold mt-4 inline-flex min-h-[52px] items-center justify-center px-8 text-base"
+            >
+              Pay {payAmount} now
+            </a>
+            <p className="ink-soft mt-4 text-xs max-w-md mx-auto">
+              {freeCancellationSentence()} Inside 2 hours of pickup, the full price is charged.
+              If you leave this page, the same pay link is in your confirmation email — it stays
+              valid until your trip.
+            </p>
+          </div>
+        ) : (
+          <p className="ink-soft mt-3 max-w-md mx-auto">{COPY.confirmation}</p>
+        )}
         <p className="ink-soft text-sm mt-4">
           Need us sooner? Call{' '}
           <a className="underline tap-target" href="tel:+17049418508">
@@ -1536,6 +1579,7 @@ export default function RequestForm({
           values={care}
           errors={errors}
           onChange={(patch) => setCare((current) => ({ ...current, ...patch }))}
+          payNote={payAtBookingLine('care', mobility) ? COPY.howYouPayAtBooking : COPY.howYouPay}
         />
       ) : null}
 
@@ -1729,12 +1773,18 @@ export default function RequestForm({
       </fieldset>
 
             {/* How you pay, in the same words on every line. Care carries it inside its own payment
-          section (CareIntakeFields); a facility booking is invoiced to the facility. */}
+          section (CareIntakeFields); a facility booking is invoiced to the facility. The words
+          follow the flow the booking will actually take (lib/pay-at-booking.ts): firm-price
+          lines pay when they book; Scholar and the review-first lines are confirmed first. */}
       {!facility && service !== 'care' && (
         <div className="rounded-lg border border-line p-4" data-testid="how-you-pay">
           <p className="text-sm font-medium">How you pay</p>
           <p className="ink-soft mt-1 text-sm">
-            {service === 'scholar' ? COPY.howYouPayScholar : COPY.howYouPay}
+            {service === 'scholar'
+              ? COPY.howYouPayScholar
+              : payAtBookingLine(service, mobility)
+                ? COPY.howYouPayAtBooking
+                : COPY.howYouPay}
           </p>
         </div>
       )}
@@ -1881,7 +1931,9 @@ export default function RequestForm({
               )}
               <p className="ink-soft mt-2 text-xs" data-testid="price-note">
                 {estimateKind === 'firm'
-                  ? 'This is your price for the trip as entered. If a toll, a longer wait or a change to the trip moves it, we tell you the new price before you agree to anything.'
+                  ? payAtBookingLine(service, mobility)
+                    ? 'This is your price for the trip as entered, and you pay it when you book. If a toll, a longer wait or a change to the trip moves it, we tell you the new price before you agree to anything.'
+                    : 'This is your price for the trip as entered. If a toll, a longer wait or a change to the trip moves it, we tell you the new price before you agree to anything.'
                   : estimateKind === 'range'
                     ? PRICE_RANGE_NOTE
                     : 'An estimate, not a final price. A dispatcher confirms the exact figure before your trip is booked.'}
@@ -1955,7 +2007,9 @@ export default function RequestForm({
         )}
       </button>
 
-      <p className="ink-soft text-sm">{COPY.confirmation}</p>
+      <p className="ink-soft text-sm">
+        {payAtBookingLine(service, mobility) ? COPY.confirmationPayAtBooking : COPY.confirmation}
+      </p>
       <p className="ink-soft text-sm" data-testid="refund-note">
         {freeCancellationSentence()} Late cancellations and no-shows can carry a fee.{' '}
         <a href={REFUNDS_PATH} className="inline-flex min-h-[44px] items-center underline">Cancellations &amp; refunds</a>

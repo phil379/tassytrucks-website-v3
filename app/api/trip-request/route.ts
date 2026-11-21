@@ -30,6 +30,8 @@ import {
 import { buildSmsConsent } from '@/lib/sms-consent';
 import { buildFamilyPhones, rideTrackingEnabled, type FamilyPhoneValues } from '@/lib/ride-link';
 import { parseLocalDateTime } from '@/lib/time';
+import { sanitizeStaffMarker } from '@/lib/staff-booking.server';
+import { BOOKINGS_PAUSED_MESSAGE, bookingsPaused } from '@/lib/bookings-paused';
 import { currentFacilitySession } from '@/lib/facility-auth';
 import { resolvePayer } from '@/lib/facility.server';
 import {
@@ -107,6 +109,12 @@ export async function POST(request: Request) {
 
   const raw = (body ?? {}) as Record<string, unknown>;
 
+  // A staff marker is worth only what its signature proves. Verify it here,
+  // before anything reads it: an unverified staffMarker is deleted, and the
+  // booking is then judged by the public rules, 4-hour lead included. A
+  // verified one stays for the schema's lead check (lib/staff-booking.ts).
+  sanitizeStaffMarker(raw);
+
   // ───────────────────────────────────────────────────────────────────────────
   // Bot checks. Both answer 200 with a null id so a script learns nothing from
   // the status code — and the CLIENT treats a null id as a failure, because a
@@ -137,6 +145,17 @@ export async function POST(request: Request) {
   // Declared here rather than in the facility block below because the rate
   // limit has to know, and the rate limit runs first.
   const wantsFacilityBooking = raw.facilityBooking === true;
+
+  // The pause switch (Phil, 2026-11-20; lib/bookings-paused.ts): with
+  // BOOKINGS_PAUSED=1 a NEW public booking is refused at the door, with the
+  // reason stated, before any rate budget is spent or a row is written — the
+  // form's pages show the same sentence instead of the form. Facility
+  // bookings are a partner flow and are not paused; claiming to be one buys
+  // a script nothing, because the session check below still refuses it
+  // without writing a row (the same reasoning as the facility rate bucket).
+  if (bookingsPaused() && !wantsFacilityBooking) {
+    return NextResponse.json({ ok: false, error: BOOKINGS_PAUSED_MESSAGE }, { status: 503 });
+  }
 
   const ip = clientIp(request.headers);
   // Separate bucket, not just a bigger number: a shared office IP must not be

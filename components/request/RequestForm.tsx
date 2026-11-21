@@ -18,11 +18,13 @@ import {
   mobilityLabelFor,
   mobilityOptionsFor,
   maxPassengersFor,
+  MIN_LEAD_TIME_MS,
   passengerLabelFor,
   tripRequestSchema,
   type ServiceLine,
   serviceShortName,
 } from '@/lib/trip-request';
+import { STAFF_MARKER_PARAM, staffLeadExemption } from '@/lib/staff-booking';
 import AddressAutocomplete, { type ResolvedPlace } from '@/components/request/AddressAutocomplete';
 import DateTimeField from '@/components/request/DateTimeField';
 import { SCHOOL_PLANS, planBySlug } from '@/lib/school-plans';
@@ -210,6 +212,14 @@ export default function RequestForm({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // A signed staff link (TassyOps "book a ride for a caller") carries a
+  // marker that exempts this session from the 4-hour lead — dispatch books
+  // the ride it just agreed on the phone. Shape only here; the server
+  // verifies the signature and deletes a marker that does not prove itself,
+  // so a hand-typed parameter changes nothing (lib/staff-booking.ts).
+  const staffMarker = searchParams.get(STAFF_MARKER_PARAM);
+  const staffExempt = staffLeadExemption(staffMarker);
+
   const [service, setService] = useState<ServiceLine>(initialService);
   /**
    * Show the picker only when the choice has NOT already been made.
@@ -387,7 +397,10 @@ export default function RequestForm({
   }, [errors]);
 
   const [minDateTime, setMinDateTime] = useState('');
-  useEffect(() => setMinDateTime(minDateTimeLocal()), []);
+  useEffect(
+    () => setMinDateTime(minDateTimeLocal(new Date(), staffExempt ? 0 : MIN_LEAD_TIME_MS)),
+    [staffExempt],
+  );
   // The confirmation replaces a long form: bring it to the top so the heading is not hidden behind the sticky header.
   useEffect(() => {
     if (done) window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1054,6 +1067,10 @@ export default function RequestForm({
             }
           : null,
       source,
+      // Staff marker, sent only when this session arrived on a signed staff
+      // link. The server verifies the signature; a forged one is deleted
+      // there and the booking is judged by the public rules.
+      ...(staffExempt && staffMarker ? { staffMarker } : {}),
       // Facility extras. Sent ONLY on /facility/request. `facilityBooking` is
       // the explicit ask that makes the server read the session cookie — and if
       // that session has expired the server returns 401 rather than storing a
@@ -1446,7 +1463,9 @@ export default function RequestForm({
           required
         />
         <p id="requestedAt-help" className="ink-soft text-xs mt-1.5">
-          Type the date as month, day, year, or tap the calendar, then choose a time. Earliest pickup is 4 hours from now. All times are Charlotte (Eastern) time.
+          {staffExempt
+            ? 'Type the date as month, day, year, or tap the calendar, then choose a time. Staff booking — the 4-hour minimum does not apply. All times are Charlotte (Eastern) time.'
+            : 'Type the date as month, day, year, or tap the calendar, then choose a time. Earliest pickup is 4 hours from now. All times are Charlotte (Eastern) time.'}
         </p>
         <FieldError name="requestedAt" />
       </div>

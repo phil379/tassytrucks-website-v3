@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import RequestForm from '@/components/request/RequestForm';
+import { BOOKINGS_PAUSED_MESSAGE, bookingsPaused } from '@/lib/bookings-paused';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { textToBookActive } from '@/lib/text-to-book';
 import { rideTrackingEnabled } from '@/lib/ride-link';
@@ -124,8 +125,15 @@ export default async function RequestPage({
           </div>
 
           <div className="mt-8">
-            <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
-              <RequestForm
+            {bookingsPaused() ? (
+              // The pause switch (lib/bookings-paused.ts): the form is replaced
+              // by the notice, and the API refuses the booking to match.
+              <div className="card-tile p-6 sm:p-8">
+                <p className="text-lg">{BOOKINGS_PAUSED_MESSAGE}</p>
+              </div>
+            ) : (
+              <Suspense fallback={<p className="ink-mute">Loading the form…</p>}>
+                <RequestForm
                 initialService={initialService}
                 textLinkPrefill={textLinks}
                 /*
@@ -135,12 +143,13 @@ export default async function RequestPage({
                   from a default — and the difference decides whether the form
                   opens a picker or states the decision.
                 */
-                servicePreselected={serviceWasHonoured(searchParams.service)}
-                googleMapsApiKey={googleMapsApiKey}
-                rideTrackingEnabled={rideTrackingEnabled()}
-                withServicePanel
-              />
-            </Suspense>
+                  servicePreselected={serviceWasHonoured(searchParams.service)}
+                  googleMapsApiKey={googleMapsApiKey}
+                  rideTrackingEnabled={rideTrackingEnabled()}
+                  withServicePanel
+                />
+              </Suspense>
+            )}
           </div>
 
           <p className="ink-soft text-sm mt-6 text-center">

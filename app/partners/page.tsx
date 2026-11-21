@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description:
     'Facility medical transport partnerships in Charlotte NC. SDVOSB certified, facility portal with weekly invoicing. (704) 941-8508.',
   alternates: { canonical: '/partners' },
-  openGraph: { url: '/partners', images: ['/og-image/partners'] },
+  openGraph: { type: 'website', url: '/partners', images: ['/og-image/partners'] },
 };
 
 const CTA_HREF = partnerSignup({ source: 'partners-page' });
@@ -256,7 +256,7 @@ export default function PartnersPage() {
         },
         {
           q: 'Do you bill directly or through us?',
-          a: 'For facility agreements, we invoice the facility directly every week on 7-day terms, with every trip listed line by line. Riders who book on their own pay by card — at booking on most rides, or through a secure link once we confirm the price on rides a dispatcher prices.',
+          a: 'For facility agreements, we invoice the facility directly every week on 7-day terms, with every trip listed line by line. Riders who book on their own pay by card through a secure link after we confirm the price.',
         },
       ]}
       /* Credentials block, rendered directly above the FAQ whose first question

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Non-emergency medical transportation in Charlotte NC. Veteran-owned, ambulatory and wheelchair rides. Request online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/nemt-rides' },
-  openGraph: { url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
+  openGraph: { type: 'website', url: '/charlotte/nemt-rides', images: ['/og-image/nemt-rides'] },
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-nemt' });
@@ -147,7 +147,7 @@ export default function NemtRidesPage() {
         },
         {
           q: 'Does Tassy Transportation accept Medicaid for NEMT rides?',
-          a: 'Not at this time. Tassy Care is private pay: on most rides you pay by card when you book, at the price you saw; on rides a dispatcher prices, we confirm your price first, then you pay by card through a secure link — or your facility is invoiced under a direct agreement. We are not a Medicaid or Medicare provider today. Call us and we will tell you the price before you commit.',
+          a: 'Not at this time. Tassy Care is private pay: we confirm your price first, then you pay by card through a secure link, or your facility is invoiced under a direct agreement. We are not a Medicaid or Medicare provider today. Call us and we will tell you the price before you commit.',
         },
         {
           q: 'Will the driver help me to the door?',

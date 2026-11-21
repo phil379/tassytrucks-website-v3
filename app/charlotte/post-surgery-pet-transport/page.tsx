@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Post-surgery pet transport in Charlotte NC. Safe rides home after your dog or cat’s spay, neuter, or dental. Book online or call (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-pet-transport' },
-  openGraph: { url: '/charlotte/post-surgery-pet-transport', images: ['/og-image/post-surgery-pet-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/post-surgery-pet-transport', images: ['/og-image/post-surgery-pet-transport'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Stuck at work during clinic hours? Winnie Ride picks up your pet, gets them to the vet, and brings them home. Charlotte NC. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/vet-appointment-rides' },
-  openGraph: { url: '/charlotte/vet-appointment-rides', images: ['/og-image/vet-appointment-rides'] },
+  openGraph: { type: 'website', url: '/charlotte/vet-appointment-rides', images: ['/og-image/vet-appointment-rides'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,
@@ -44,7 +44,7 @@ export default function VetAppointmentRidesPage() {
                 your job. When the only open slot is Tuesday at 3 p.m., you are
                 left choosing between burning a half day of PTO, pushing the
                 appointment another two weeks, or asking someone for a favor they
-                can&rsquo;t really spare. Meanwhile, your dog still has the limp, or
+                can&rsquo;t really spare. Meanwhile your dog still has the limp, or
                 your cat is still due for that recheck.
               </p>
               <p>

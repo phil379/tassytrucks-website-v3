@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Pet boarding pickup service in Charlotte NC. We drop your dog at the kennel before your flight and bring them home when you land. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/pet-boarding-transport' },
-  openGraph: { url: '/charlotte/pet-boarding-transport', images: ['/og-image/pet-boarding-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/pet-boarding-transport', images: ['/og-image/pet-boarding-transport'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,
@@ -102,14 +102,10 @@ export default function PetBoardingTransportPage() {
                 direct to the facility with no pooled stops. Winnie Ride is a
                 direct relationship with one Charlotte company, not a marketplace
                 listing — and rides for nervous travelers are covered on our{' '}
-                <Link href="/charlotte/calm-pet-transport" className={linkCls}>
-                  calm pet transport page
-                </Link>
-                , and pre-boarding checkups on our{' '}
                 <Link href="/charlotte/vet-appointment-rides" className={linkCls}>
                   vet appointment rides page
-                </Link>
-                .
+                </Link>{' '}
+                too, if your trip includes a pre-boarding checkup.
               </p>
             </>
           ),

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Dog grooming pickup and drop-off in Charlotte NC. Same-day rides when available, recurring slots for standing appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/dog-grooming-pickup' },
-  openGraph: { url: '/charlotte/dog-grooming-pickup', images: ['/og-image/dog-grooming-pickup'] },
+  openGraph: { type: 'website', url: '/charlotte/dog-grooming-pickup', images: ['/og-image/dog-grooming-pickup'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Post-surgery transport in Charlotte NC. A driver who walks you in, waits through your procedure, and escorts you home. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/post-surgery-transport' },
-  openGraph: { url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/post-surgery-transport', images: ['/og-image/post-surgery-transport'] },
 };
 
 const CTA_HREF = seoRequest('recover', { source: 'seo-postop' });

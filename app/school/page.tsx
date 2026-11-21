@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Tassy Scholar, daily school transport for Charlotte families, is coming soon. Join the list and we will contact you when it opens.',
   alternates: { canonical: '/school' },
-  openGraph: { url: '/school', images: ['/og-image/school'] },
+  openGraph: { type: 'website', url: '/school', images: ['/og-image/school'] },
 };
 
 /**

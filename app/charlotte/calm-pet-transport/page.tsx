@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Calm pet transport in Charlotte NC for anxious, fearful, and senior pets. Drivers matched to temperament, quiet climate-controlled rides. (704) 941-8508.',
   alternates: { canonical: '/charlotte/calm-pet-transport' },
-  openGraph: { url: '/charlotte/calm-pet-transport', images: ['/og-image/calm-pet-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/calm-pet-transport', images: ['/og-image/calm-pet-transport'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,

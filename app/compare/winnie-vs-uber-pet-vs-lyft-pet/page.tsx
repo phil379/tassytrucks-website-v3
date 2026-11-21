@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Honest Charlotte pet transport comparison: rabies vaccination, sedated pets, unaccompanied rides. Where rideshare works and where it does not.',
   alternates: { canonical: '/compare/winnie-vs-uber-pet-vs-lyft-pet' },
-  openGraph: { url: '/compare/winnie-vs-uber-pet-vs-lyft-pet', images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
+  openGraph: { type: 'website', url: '/compare/winnie-vs-uber-pet-vs-lyft-pet', images: ['/og-image/winnie-vs-uber-pet-vs-lyft-pet'] },
 };
 
 // Winnie Ride is join-list only until its first driver is in place (Phil,

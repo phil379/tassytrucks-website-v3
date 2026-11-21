@@ -5,9 +5,9 @@ import { requestRenew } from '@/lib/request-links';
 export const metadata: Metadata = {
   title: 'IV therapy & med-spa rides in Charlotte',
   description:
-    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way — or from $129 both ways with the driver waiting, if the procedure leaves you unable to drive.',
+    'Rides to and from IV therapy, med-spa and aesthetic appointments in Charlotte. Flat rates from $89 one way, or $129 both ways with the driver waiting.',
   alternates: { canonical: '/renew' },
-  openGraph: { url: '/renew', images: ['/og-image/renew'] },
+  openGraph: { type: 'website', url: '/renew', images: ['/og-image/renew'] },
 };
 
 export default function RenewPage() {

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     'Winnie Ride, dedicated Charlotte pet transport to the vet, groomer, daycare or boarding, is coming soon. Join the list and we will contact you when it opens.',
   alternates: { canonical: '/winnie' },
-  openGraph: { url: '/winnie', images: ['/og-image/winnie'] },
+  openGraph: { type: 'website', url: '/winnie', images: ['/og-image/winnie'] },
 };
 
 /**

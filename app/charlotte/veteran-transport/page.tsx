@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Veteran medical transport in Charlotte NC from a Service-Disabled Veteran-Owned company. Rides to VA and community care appointments. Call (704) 941-8508.',
   alternates: { canonical: '/charlotte/veteran-transport' },
-  openGraph: { url: '/charlotte/veteran-transport', images: ['/og-image/veteran-transport'] },
+  openGraph: { type: 'website', url: '/charlotte/veteran-transport', images: ['/og-image/veteran-transport'] },
 };
 
 const CTA_HREF = seoRequest('nemt', { source: 'seo-veteran', payer: 'va' });
@@ -62,7 +62,7 @@ export default function VeteranTransportPage() {
                 provide scheduled, door-to-door transport to VA clinics and
                 medical centers serving the Charlotte area, including trips that
                 start early and run long. Your driver helps you from your front
-                door to the vehicle, gets you to check in with time to spare,
+                door to the vehicle, gets you to check-in with time to spare,
                 and confirms the return pickup before leaving.
               </p>
               <p>

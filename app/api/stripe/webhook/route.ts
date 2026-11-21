@@ -348,6 +348,22 @@ async function handleEvent(
         paidAt: (r.paid_at as string | null) ?? new Date().toISOString(),
         paymentMethodLabel: cardLabelText,
         receiptUrl: token ? receiptUrlFor(token) : null,
+        // The full journey + the stored price facts, so the emailed receipt
+        // matches the /r page exactly (lib/receipt-email.ts receiptJourney /
+        // receiptPriceLines read these).
+        returnTrip: Boolean(r.return_trip),
+        returnAt: (r.return_at as string | null) ?? null,
+        stopAddress: (r.stop_address as string | null) ?? null,
+        returnStopAddress: (r.return_stop_address as string | null) ?? null,
+        stopFeeCents: (r.stop_fee_cents as number | null) ?? null,
+        returnStopFeeCents: (r.return_stop_fee_cents as number | null) ?? null,
+        estimateLowCents: (r.estimate_low_cents as number | null) ?? null,
+        estimateHighCents: (r.estimate_high_cents as number | null) ?? null,
+        escort:
+          ((r.trip_details as Record<string, unknown> | null) ?? null)?.escort === 'yes',
+        discountLabel: (r.discount_label as string | null) ?? null,
+        discountCents: (r.discount_cents as number | null) ?? null,
+        hotelFlat: Boolean(r.hotel_slug),
       };
       await sendRichEmail({
         to: email,

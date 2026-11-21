@@ -44,6 +44,22 @@ function toReceipt(r: Row): ReceiptData {
     amountCents: (r.agreed_cents as number | null) ?? (r.quoted_cents as number | null) ?? 0,
     paidAt: (r.paid_at as string | null) ?? null,
     paymentMethodLabel: (r.payment_method_label as string | null) ?? null,
+    // The full journey + the stored price facts, so the receipt can show every
+    // point of the trip and itemise the charge (lib/receipt-email.ts). All
+    // read from the same row — nothing is recomputed or invented here.
+    returnTrip: Boolean(r.return_trip),
+    returnAt: (r.return_at as string | null) ?? null,
+    stopAddress: (r.stop_address as string | null) ?? null,
+    returnStopAddress: (r.return_stop_address as string | null) ?? null,
+    stopFeeCents: (r.stop_fee_cents as number | null) ?? null,
+    returnStopFeeCents: (r.return_stop_fee_cents as number | null) ?? null,
+    estimateLowCents: (r.estimate_low_cents as number | null) ?? null,
+    estimateHighCents: (r.estimate_high_cents as number | null) ?? null,
+    escort:
+      ((r.trip_details as Record<string, unknown> | null) ?? null)?.escort === 'yes',
+    discountLabel: (r.discount_label as string | null) ?? null,
+    discountCents: (r.discount_cents as number | null) ?? null,
+    hotelFlat: Boolean(r.hotel_slug),
   };
 }
 

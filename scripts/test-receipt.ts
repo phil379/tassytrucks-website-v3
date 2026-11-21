@@ -8,7 +8,10 @@ import {
   money,
   fmtPickup,
   receiptCardHtml,
+  receiptHasJourneyDetail,
   receiptHtml,
+  receiptJourney,
+  receiptPriceLines,
   receiptSubject,
   receiptText,
   type ReceiptData,
@@ -162,6 +165,125 @@ async function main() {
       globalThis.fetch = realFetch;
       delete process.env.STRIPE_SECRET_KEY;
     }
+  });
+
+  // ── Transparency (Phil, 2026-11-21): the full journey + itemised charges ──
+  // The Liz shape, from the live test receipt that prompted the change:
+  // round trip, PetSmart stop on the way back, Saturday, $160 paid.
+  const LIZ: ReceiptData = {
+    tripNumber: 'T-20261121-0036',
+    confirmationCode: 'TT-DE3QHT',
+    serviceLine: 'winnie',
+    contactFirstName: 'Liz',
+    contactName: 'Liz Tassy',
+    contactEmail: 'liz@example.com',
+    pickupAddress: '2513 Pruitt St, Charlotte, NC 28208',
+    dropoffAddress: '2523 South Blvd, Charlotte, NC 28203',
+    requestedAt: '2026-11-21T22:30:00Z', // Sat, Nov 21, 2026 · 5:30 p.m. EST
+    returnTrip: true,
+    returnAt: '2026-11-21T23:30:00Z', // 6:30 p.m. EST
+    returnStopAddress: '5401 South Blvd Ste 14, Charlotte, NC 28217',
+    returnStopFeeCents: 1000,
+    estimateLowCents: 16000,
+    estimateHighCents: 16000,
+    amountCents: 16000,
+    paidAt: '2026-11-21T18:25:00Z',
+    paymentMethodLabel: 'Visa •••• 4242',
+  };
+
+  await t('round trip with a return-leg stop: journey covers both legs and the stop, in order', () => {
+    const steps = receiptJourney(LIZ);
+    assert.deepEqual(
+      steps.map((s) => s.label),
+      ['Pickup', 'Drop-off', 'Return pickup', 'Stop on the way back', 'Final drop-off'],
+    );
+    assert.deepEqual(
+      steps.map((s) => s.address),
+      [
+        '2513 Pruitt St, Charlotte, NC 28208',
+        '2523 South Blvd, Charlotte, NC 28203',
+        '2523 South Blvd, Charlotte, NC 28203',
+        '5401 South Blvd Ste 14, Charlotte, NC 28217',
+        '2513 Pruitt St, Charlotte, NC 28208',
+      ],
+    );
+    assert.equal(steps[0]!.when, LIZ.requestedAt);
+    assert.equal(steps[2]!.when, LIZ.returnAt);
+    assert.equal(receiptHasJourneyDetail(LIZ), true);
+  });
+
+  await t('Liz price itemises to the stored components and foots to the $160 paid', () => {
+    const lines = receiptPriceLines(LIZ);
+    assert.ok(lines);
+    assert.deepEqual(
+      lines.map((l) => [l.label, l.cents]),
+      [
+        ['Winnie Ride ride', 13000],
+        ['Weekend', 2000],
+        ['Stop fee on the way back (15 min waiting included)', 1000],
+      ],
+    );
+    assert.equal(lines.reduce((sum, l) => sum + l.cents, 0), LIZ.amountCents);
+  });
+
+  await t('Liz receipt card + text show the journey and every charge line', () => {
+    const h = receiptCardHtml(LIZ);
+    for (const s of [
+      'YOUR TRIP', 'Return pickup', 'Stop on the way back', 'Final drop-off',
+      '5401 South Blvd Ste 14, Charlotte, NC 28217', 'Sat, Nov 21, 2026 · 6:30 p.m.',
+      '$130.00', 'Weekend', '$20.00', 'Stop fee on the way back (15 min waiting included)',
+      '$10.00', 'Total paid', '$160.00',
+    ]) {
+      assert.ok(h.includes(s), `missing: ${s}`);
+    }
+    const txt = receiptText(LIZ);
+    assert.ok(txt.includes('Stop on the way back: 5401 South Blvd Ste 14, Charlotte, NC 28217'));
+    assert.ok(txt.includes('Weekend: $20.00'));
+    assert.ok(txt.includes('Total paid: $160.00'));
+  });
+
+  await t('one-way trip with an outbound stop: journey and stop fee line, no return leg', () => {
+    const one: ReceiptData = {
+      ...R,
+      stopAddress: '800 Pharmacy Rd, Charlotte, NC',
+      stopFeeCents: 1000,
+      estimateLowCents: 5900,
+      estimateHighCents: 5900,
+      amountCents: 5900,
+    };
+    assert.deepEqual(
+      receiptJourney(one).map((s) => s.label),
+      ['Pickup', 'Stop on the way', 'Drop-off'],
+    );
+    const lines = receiptPriceLines(one);
+    assert.ok(lines);
+    assert.equal(lines.reduce((sum, l) => sum + l.cents, 0), 5900);
+    assert.ok(lines.some((l) => l.label.startsWith('Stop fee on the way (15 min')));
+  });
+
+  await t('one-way no-stop receipt is unchanged in substance', () => {
+    assert.equal(receiptHasJourneyDetail(R), false);
+    assert.equal(receiptPriceLines(R), null);
+    const h = receiptCardHtml(R);
+    assert.ok(!h.includes('YOUR TRIP'));
+    assert.ok(!receiptText(R).includes('Charges:'));
+  });
+
+  await t('a dispatcher-set price is never reverse-engineered, but its journey still prints', () => {
+    const manual: ReceiptData = { ...LIZ, estimateLowCents: 9000, estimateHighCents: 9000 };
+    assert.equal(receiptPriceLines(manual), null);
+    const h = receiptCardHtml(manual);
+    assert.ok(h.includes('YOUR TRIP'));
+    assert.ok(!h.includes('Stop fee on the way back (15 min waiting included)'));
+    assert.ok(h.includes('$160.00'));
+  });
+
+  await t('a hotel flat price stays one line and says so', () => {
+    const lines = receiptPriceLines({ ...R, hotelFlat: true, amountCents: 9900 });
+    assert.ok(lines);
+    assert.equal(lines.length, 1);
+    assert.equal(lines[0]!.cents, 9900);
+    assert.ok(lines[0]!.note?.includes('Flat hotel price'));
   });
 
   console.log(`\n${n} receipt tests passed`);

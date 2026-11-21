@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Car, HeartHandshake, Stethoscope, Briefcase } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
 import { CAREERS_OPEN } from '@/lib/careers-gate';
 import CareersInterestForm from '@/components/careers/CareersInterestForm';
@@ -57,9 +58,57 @@ export const metadata: Metadata = {
   robots: { index: CAREERS_OPEN, follow: CAREERS_OPEN },
 };
 
+/**
+ * THE LINE MARKS (Phil, 2026-11-21): the four role marks are drawn for this
+ * page — one family, one stroke, one 44-unit grid — replacing the stock
+ * lucide icons (Car, HeartHandshake, Stethoscope, Briefcase) Phil said
+ * looked AI-generated. Direction B from the mock board he approved:
+ * the wheel, the heart carried, the cross, the route.
+ */
+type MarkProps = { size?: number; style?: CSSProperties };
+
+function WheelMark({ size = 26, style }: MarkProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true" style={style}>
+      <circle cx="22" cy="22" r="16" />
+      <circle cx="22" cy="22" r="4" />
+      <path d="M6.5 22h11M26.5 22h11M22 26v11" />
+    </svg>
+  );
+}
+
+function HeartMark({ size = 26, style }: MarkProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={style}>
+      <path d="M22 33S10 25.5 10 16.8C10 12.9 13 10 16.6 10c2.2 0 4.2 1.2 5.4 3 1.2-1.8 3.2-3 5.4-3C31 10 34 12.9 34 16.8 34 25.5 22 33 22 33Z" />
+      <path d="M8 38c4.5 2 9.3 3 14 3s9.5-1 14-3" />
+    </svg>
+  );
+}
+
+function CrossMark({ size = 26, style }: MarkProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true" style={style}>
+      <circle cx="22" cy="22" r="16" />
+      <path d="M22 14v16M14 22h16" />
+    </svg>
+  );
+}
+
+function RouteMark({ size = 26, style }: MarkProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true" style={style}>
+      <circle cx="13" cy="31" r="4" />
+      <circle cx="31" cy="13" r="4" />
+      <path d="M16 28c6-2 4-9 9-11" strokeDasharray="3.5 3.5" />
+      <circle cx="31" cy="13" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 const ROLES = [
   {
-    icon: Car,
+    mark: WheelMark,
     title: 'Driver',
     href: apply.driver,
     line: 'Tassy Care, Scholar and Concierge',
@@ -68,7 +117,7 @@ const ROLES = [
     needs: ['Clean driving record', 'Own insurance if you drive your own car', 'Comfortable with a phone app'],
   },
   {
-    icon: HeartHandshake,
+    mark: HeartMark,
     title: 'Ride companion',
     href: apply.companion,
     line: 'Tassy Concierge',
@@ -77,7 +126,7 @@ const ROLES = [
     needs: ['Patient with older adults', 'Reliable to the minute', 'No medical licence required'],
   },
   {
-    icon: Stethoscope,
+    mark: CrossMark,
     title: 'CNA',
     href: apply.cna,
     line: 'Tassy Recovery and Care',
@@ -86,7 +135,7 @@ const ROLES = [
     needs: ['Current NC CNA listing', 'Transfer and securement experience', 'Clears a background check'],
   },
   {
-    icon: Briefcase,
+    mark: RouteMark,
     title: 'Sales rep',
     href: apply.salesRep,
     line: 'Facility accounts',
@@ -113,9 +162,9 @@ export default function CareersPage() {
         </p>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {ROLES.map(({ icon: Icon, title, href, line, body, needs }) => (
+          {ROLES.map(({ mark: Mark, title, href, line, body, needs }) => (
             <div key={title} className="card-tile flex flex-col p-6">
-              <Icon size={22} aria-hidden="true" style={{ color: 'var(--gold)' }} />
+              <Mark size={26} style={{ color: 'var(--gold)' }} />
               <h2 className="serif mt-4 text-2xl font-semibold">{title}</h2>
               <div className="eyebrow mt-1 opacity-70">{line}</div>
 
@@ -210,9 +259,9 @@ function CareersInterestPage() {
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {ROLES.map(({ icon: Icon, title, line, body, needs }) => (
+          {ROLES.map(({ mark: Mark, title, line, body, needs }) => (
             <div key={title} className="card-tile flex flex-col p-6">
-              <Icon size={22} aria-hidden="true" style={{ color: 'var(--gold)' }} />
+              <Mark size={26} style={{ color: 'var(--gold)' }} />
               <h2 className="serif mt-4 text-2xl font-semibold">{title}</h2>
               <div className="eyebrow mt-1 opacity-70">{line}</div>
 

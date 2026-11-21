@@ -92,7 +92,7 @@ export default function PricingPage() {
           <p className="ink-soft mt-5 max-w-2xl text-lg leading-relaxed">
             Flat rates by distance across Charlotte and Mecklenburg County. No meter
             running, no surge, no surprise at the end. Your exact price is shown
-            before you book, and it does not move afterwards.
+            before you book, and it does not move afterward.
           </p>
           <Link href={request.ride} className="btn-gold mt-7 inline-flex items-center gap-2">
             Get your price <ArrowRight size={16} aria-hidden="true" />

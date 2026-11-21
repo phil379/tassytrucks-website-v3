@@ -126,7 +126,7 @@ export default function HomePage() {
             <p className="mt-7 text-lg lg:text-xl ink-soft leading-relaxed max-w-xl">
               Medical, post-procedure, pet and school transport across Charlotte and
               Mecklenburg County. Flat rates by distance — you know the price before you
-              book, and it does not move afterwards.
+              book, and it does not move afterward.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-5">
@@ -346,12 +346,12 @@ export default function HomePage() {
               {
                 n: '02',
                 h: 'We confirm your price and driver',
-                b: `${CONFIRMATION_PROMISE} Nothing is charged, and nothing is booked, until you say yes.`,
+                b: `${CONFIRMATION_PROMISE} On most rides you pay the price you saw when you book — nothing is charged before you see it and agree to it.`,
               },
               {
                 n: '03',
                 h: 'The price does not move',
-                b: 'What you agreed is what you pay. Tolls and extra wait are quoted to you before they are charged — never added afterwards.',
+                b: 'What you agreed is what you pay. Tolls and extra wait are quoted to you before they are charged — never added afterward.',
               },
             ].map((t) => (
               <div key={t.n} className="card-tile">

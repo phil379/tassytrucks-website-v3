@@ -62,7 +62,7 @@ export default function VeteranTransportPage() {
                 provide scheduled, door-to-door transport to VA clinics and
                 medical centers serving the Charlotte area, including trips that
                 start early and run long. Your driver helps you from your front
-                door to the vehicle, gets you to check-in with time to spare,
+                door to the vehicle, gets you to check in with time to spare,
                 and confirms the return pickup before leaving.
               </p>
               <p>

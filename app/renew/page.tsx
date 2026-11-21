@@ -53,7 +53,7 @@ export default function RenewPage() {
           name: 'Tassy Recovery',
           price: 'From $129',
           cadence: 'there, the wait, and home',
-          features: ['Driver waits 20 minutes', 'Add a pharmacy stop for $10', 'Help to the car and to your door', 'Family text on the way home'],
+          features: ['Driver waits 20 minutes', 'Add a pharmacy stop for $10 — 15 minutes of waiting included', 'Help to the car and to your door', 'Family text on the way home'],
           cta: { label: 'Book the round trip', href: requestRenew.recovery },
           highlight: true,
         },

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
+import { staffLeadExemption } from '@/lib/staff-booking';
 import { addressesMatch, coordinatesMatch, stopAvailable } from '@/lib/stops';
 import { parseLocalDateTimeMs, toLocalDateTimeInput } from '@/lib/time';
 
@@ -356,15 +357,36 @@ const tripRequestObject = z
      * under a few seconds. Optional so an older cached client still submits.
      */
     elapsedMs: z.coerce.number().int().min(0).optional().nullable(),
+
+    /**
+     * Staff booking marker (lib/staff-booking.ts). Present only on a booking
+     * entered from a signed TassyOps staff link; it is what earns the
+     * lead-time exemption in the refine below. This schema reads the marker's
+     * SHAPE — the route verifies its signature server-side and deletes an
+     * unverified one before parsing — so a member of the public cannot claim
+     * the exemption by adding a parameter: an unsigned or expired marker is
+     * judged exactly as a public booking.
+     */
+    staffMarker: z.string().max(120).optional().nullable(),
   })
   .superRefine((data, ctx) => {
     // Charlotte wall-clock, not the server's zone. See lib/time.ts.
     const requested = parseLocalDateTimeMs(data.requestedAt);
-    if (!Number.isNaN(requested) && requested < Date.now() + MIN_LEAD_TIME_MS) {
+    // Staff entering a caller's booking are exempt from the 4-hour lead
+    // (Phil, 2026-11-20): dispatch books the ride it just agreed on the
+    // phone. Only the marker's shape is read here — the route has already
+    // verified the signature and deleted any marker that did not prove
+    // itself (lib/staff-booking.server.ts), so an exempt parse on the server
+    // is always a proven staff booking. A staff pickup still cannot be in
+    // the past.
+    const staffExempt = staffLeadExemption(data.staffMarker);
+    if (!Number.isNaN(requested) && requested < Date.now() + (staffExempt ? 0 : MIN_LEAD_TIME_MS)) {
       ctx.addIssue({
         code: 'custom',
         path: ['requestedAt'],
-        message: 'Please choose a time at least 4 hours from now.',
+        message: staffExempt
+          ? 'Please choose a pickup time in the future.'
+          : 'Please choose a time at least 4 hours from now.',
       });
     }
 
@@ -550,15 +572,16 @@ export function fullName(data: Pick<TripRequestInput, 'contactFirstName' | 'cont
 }
 
 /**
- * Round `now` up to the next 15 minutes, +4h, as a value for
- * <input type="datetime-local">.
+ * Round `now` up to the next 15 minutes, +lead, as a value for
+ * <input type="datetime-local">. The lead defaults to the public 4 hours;
+ * a proven staff session passes 0 (lib/staff-booking.ts).
  *
  * Rendered in Charlotte time, not the device's. A customer booking from a
  * phone still set to Pacific would otherwise see a floor three hours off the
  * one the server enforces and get rejected for a time the picker offered.
  */
-export function minDateTimeLocal(now = new Date()): string {
-  const floor = new Date(now.getTime() + MIN_LEAD_TIME_MS);
+export function minDateTimeLocal(now = new Date(), leadMs: number = MIN_LEAD_TIME_MS): string {
+  const floor = new Date(now.getTime() + leadMs);
   // Round up on the instant, so the 15-minute grid survives the zone change.
   const rounded = new Date(Math.ceil(floor.getTime() / 900_000) * 900_000);
   return toLocalDateTimeInput(rounded);

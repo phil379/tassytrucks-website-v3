@@ -70,7 +70,7 @@ t('item 25: the component asks the shared rule, not a suggestion count', () => {
   assert.ok(!src.includes("suggestions.length > 0))"), 'the count-based condition is gone');
 });
 
-/* ── Item 29: one payment sentence on all five flows ─────────────────── */
+/* ── Item 29: the payment sentence, per flow ─────────────────────────── */
 
 t('item 29: Scholar says it in the shared words, plus the monthly fact', () => {
   assert.equal(
@@ -83,6 +83,21 @@ t('item 29: Scholar says it in the shared words, plus the monthly fact', () => {
   );
   // Removing the monthly clause leaves the shared sentence, word for word.
   assert.equal(COPY.howYouPayScholar.replace(' Scholar is billed monthly.', ''), COPY.howYouPay);
+});
+
+t('pay at booking (Phil, 2026-11-20): the firm-price lines carry their own sentence', () => {
+  // Care / Recovery / Concierge / Winnie pay when they book; the sentence above
+  // stays for Scholar and the review-first lines. Both halves of the new
+  // sentence are load-bearing: the price is seen BEFORE paying, and the card
+  // still never touches this form.
+  assert.equal(
+    COPY.howYouPayAtBooking,
+    'Your price is shown before you book, and you pay it when you book, on a secure payment page. No card is taken on this form.',
+  );
+  assert.equal(
+    COPY.confirmationPayAtBooking,
+    'A dispatcher usually confirms your driver and your price within 2 hours during business hours. You see the price before you pay, and you pay it when you book. If anything about the trip changes, you hear the new price from us first.',
+  );
 });
 
 /* ── Household form: the plan-interest question ──────────────────────── */

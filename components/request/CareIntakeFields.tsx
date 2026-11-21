@@ -57,10 +57,18 @@ export default function CareIntakeFields({
   values,
   errors,
   onChange,
+  payNote = COPY.howYouPay,
 }: {
   values: CareIntakeValues;
   errors: Record<string, string>;
   onChange: (patch: Partial<CareIntakeValues>) => void;
+  /**
+   * The payment sentence under the payer question. The form passes the
+   * pay-at-booking words for an ordinary Care booking and the dispatcher
+   * words for a wheelchair booking (lib/pay-at-booking.ts) — the component
+   * just prints what it is given.
+   */
+  payNote?: string;
 }) {
   const medical = values.payer !== 'self';
   const err = (k: string) => errors[`careIntake.${k}`];
@@ -98,7 +106,7 @@ export default function CareIntakeFields({
             ))}
           </select>
           <p className="ink-soft mt-1.5 text-xs">
-            {COPY.howYouPay}
+            {payNote}
           </p>
         </div>
 

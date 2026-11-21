@@ -41,6 +41,7 @@ import {
   priceKind,
   priceLabel,
 } from '@/lib/price-fallback';
+import { OUT_OF_AREA_MESSAGE } from '@/lib/service-area';
 import CareIntakeFields, { EMPTY_CARE_INTAKE, type CareIntakeValues } from './CareIntakeFields';
 import { careIntakeSchema, isAccompaniedMinor } from '@/lib/care-intake';
 import { freeCancellationSentence, REFUNDS_PATH } from '@/lib/refund-policy';
@@ -358,6 +359,12 @@ export default function RequestForm({
     price: { text: string; exact: boolean; range: boolean } | null;
     /** The server could not price the trip: say a dispatcher will, rather than show nothing. */
     priceUnavailable: boolean;
+    /**
+     * The pickup is outside the Charlotte service area (lib/service-area.ts): not a
+     * confirmed booking, whatever the trip itself priced at — say so, and say a call
+     * with a quote is what happens next.
+     */
+    outOfArea: boolean;
   } | null>(null);
 
   const errorSummaryRef = useRef<HTMLDivElement>(null);
@@ -1192,6 +1199,7 @@ export default function RequestForm({
         when,
         price,
         priceUnavailable: !price && json.priceUnavailable === true,
+        outOfArea: json.outOfArea === true,
       });
       setDone(json.id);
     } catch {
@@ -1213,7 +1221,14 @@ export default function RequestForm({
             {receipt.when ? <>Pickup requested for <strong>{receipt.when}</strong> (Charlotte time)</> : null}
           </p>
         ) : null}
-        {receipt?.price ? (
+        {receipt?.outOfArea ? (
+          /* Out-of-area pickup: this is not a confirmed booking, whatever price the
+             trip itself worked out at — that number never included getting the car
+             to the pickup. Say so plainly, and say what happens next. */
+          <p className="mt-4 text-sm max-w-md mx-auto" data-testid="out-of-area">
+            {OUT_OF_AREA_MESSAGE}
+          </p>
+        ) : receipt?.price ? (
           <div className="mt-4" data-testid="confirmed-price">
             <p className="ink-soft text-sm">{priceLabel(priceKind(receipt.price))}</p>
             <p className="serif text-3xl font-semibold text-[color:var(--gold)]">{receipt.price.text}</p>

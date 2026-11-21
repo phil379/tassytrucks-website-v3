@@ -12,6 +12,7 @@ import { BUSINESS_MAILING_ADDRESS, emailFooterText, emailIdentityText } from './
 import { isSuppressed } from './email-suppression';
 import { unsubscribeUrl } from './unsubscribe-token';
 import { NEEDS_PRICE_MARKER, PRICE_PENDING_MESSAGE, PRICE_RANGE_NOTE, priceKind } from './price-fallback';
+import { OUT_OF_AREA_MARKER, OUT_OF_AREA_MESSAGE } from './service-area';
 import { logEmailSend } from './email-log';
 import { stopSummaryLine, tripStopSummaries } from './stops';
 
@@ -334,6 +335,7 @@ async function notifyOperatorEmail(
   data: TripRequestInput,
   facility?: FacilityAlertContext,
   priceUnavailable = false,
+  outOfArea = false,
 ): Promise<void> {
   const to = process.env.OPERATOR_EMAIL;
   if (!to) throw new Error('OPERATOR_EMAIL is not set');
@@ -361,6 +363,11 @@ async function notifyOperatorEmail(
     // Before anything else a dispatcher reads: this trip has no price on it.
     ...(priceUnavailable
       ? [`${NEEDS_PRICE_MARKER}      the system could not price this trip. Quote it before you confirm.`]
+      : []),
+    // And this one is not a booking at all until somebody calls with a quote:
+    // the pickup is outside the service area (lib/service-area.ts).
+    ...(outOfArea
+      ? [`${OUT_OF_AREA_MARKER}      the pickup is outside the Charlotte service area. Call the customer with a quote — this is not a confirmed booking.`]
       : []),
     '',
     ...(facility
@@ -396,7 +403,7 @@ async function notifyOperatorEmail(
 
   await sendResendEmail({
     to,
-    subject: `${priceUnavailable ? `${NEEDS_PRICE_MARKER} ` : ''}NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}${
+    subject: `${priceUnavailable ? `${NEEDS_PRICE_MARKER} ` : ''}${outOfArea ? `${OUT_OF_AREA_MARKER} ` : ''}NEW REQUEST — ${data.serviceLine} — ${datePart} ${timePart} — ${fullName(data)}${
       facility ? ` (${facility.facilityName}${facility.payer === 'facility' ? ', on account' : ''})` : ''
     }`,
     text: lines.join('\n'),
@@ -430,6 +437,13 @@ export function buildRequesterText(args: {
   requestedAt: string;
   price?: QuotedPrice | null;
   priceUnavailable?: boolean;
+  /**
+   * The pickup is outside the Charlotte service area (lib/service-area.ts): the
+   * email says so, says this is not a confirmed booking, and says we will call
+   * with a quote — INSTEAD of any price wording, because a price the form worked
+   * out for the trip itself never included getting the car to the pickup.
+   */
+  outOfArea?: boolean;
   reference: string;
   /** Booking-time stops (lib/stops.ts); a line is named only for a leg that has one. */
   stopAddress?: string | null;
@@ -447,20 +461,23 @@ export function buildRequesterText(args: {
     // The stops the rider booked, named back to them — one line per leg.
     // Absent entirely on a no-stop request, so that email is unchanged.
     ...(stopLines.length ? [...stopLines, ''] : []),
-    ...(price
-      ? priceKind(price) === 'range'
-        ? // A range is never "your price". One sentence, the same words as the confirmation screen.
-          [`Estimated price ${price.text}. ${PRICE_RANGE_NOTE}`, '']
-        : [
-            `${priceKind(price) === 'firm' ? 'Your price' : 'Estimated price'}: ${price.text}`,
-            priceKind(price) === 'firm'
-              ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
-              : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
-            '',
-          ]
-      : priceUnavailable
-        ? [PRICE_PENDING_MESSAGE, '']
-        : []),
+    ...(args.outOfArea
+      ? // Out of area replaces the price wording entirely (see the arg's note above).
+        [OUT_OF_AREA_MESSAGE, '']
+      : price
+        ? priceKind(price) === 'range'
+          ? // A range is never "your price". One sentence, the same words as the confirmation screen.
+            [`Estimated price ${price.text}. ${PRICE_RANGE_NOTE}`, '']
+          : [
+              `${priceKind(price) === 'firm' ? 'Your price' : 'Estimated price'}: ${price.text}`,
+              priceKind(price) === 'firm'
+                ? 'That is the price you saw when you booked. If anything about the trip changes, we tell you the new price before you agree to anything.'
+                : 'That is an estimate from the ZIP codes you entered. We confirm the exact price with you before anything is booked.',
+              '',
+            ]
+        : priceUnavailable
+          ? [PRICE_PENDING_MESSAGE, '']
+          : []),
     callbackPromise(args.at ?? new Date(), Boolean(price)),
     'Nothing is booked and nothing is charged until you agree to the price.',
     '',
@@ -486,6 +503,7 @@ async function notifyRequester(
   tripNumber?: string | null,
   price?: QuotedPrice | null,
   priceUnavailable = false,
+  outOfArea = false,
 ): Promise<void> {
   if (!data.contactEmail) return; // email is optional; nothing to reply to
 
@@ -500,6 +518,7 @@ async function notifyRequester(
     requestedAt: data.requestedAt,
     price,
     priceUnavailable,
+    outOfArea,
     reference: tripNumber ?? shortRef(id),
     stopAddress: data.stopAddress,
     returnStopAddress: data.returnStopAddress,
@@ -552,20 +571,21 @@ export async function fireNotifications(
   facility?: FacilityAlertContext,
   price?: QuotedPrice | null,
   priceUnavailable = false,
+  outOfArea = false,
 ): Promise<NotificationOutcome> {
   const ref = shortRef(id);
   const message: PushMessage = {
     title: `New ${serviceShortName(data.serviceLine)} request`,
-    body: `Ref ${ref} · pickup ${shortWhen(data.requestedAt)}${priceUnavailable ? ' · NEEDS PRICE' : ''}`,
+    body: `Ref ${ref} · pickup ${shortWhen(data.requestedAt)}${priceUnavailable ? ' · NEEDS PRICE' : ''}${outOfArea ? ' · OUT OF AREA' : ''}`,
     tags: ['bell'],
   };
 
   const [push, pushFallback, operatorEmail, requesterEmail] = await Promise.all([
     runLeg(id, 'ntfy', () => pushToNtfy(message)),
     runLeg(id, 'zapier', () => pushToZapier(ref, message)),
-    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility, priceUnavailable)),
+    runLeg(id, 'operator-email', () => notifyOperatorEmail(id, data, facility, priceUnavailable, outOfArea)),
     data.contactEmail
-      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price, priceUnavailable))
+      ? runLeg(id, 'requester-autoreply', () => notifyRequester(id, data, tripNumber, price, priceUnavailable, outOfArea))
       : Promise.resolve<LegOutcome>('skipped'),
   ]);
 

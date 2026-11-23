@@ -31,6 +31,10 @@ type Props = {
   path?: string;
   /** Overrides the default credential chips under the hero (see TRUST_CHIPS). */
   trustChips?: string[];
+  /** Optional 30-second line film (a YouTube Short) shown under the hero —
+   *  Phil, 2026-11-23: a visitor who lands on a line's page meets that line's
+   *  film before anything asks for their money. */
+  film?: { youtubeId: string; heading: string; body: string };
 };
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent A) — objection-preemption row on
@@ -43,7 +47,7 @@ export default function ServicePage({
   eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now', altCta,
   highlights, tiers, partnerCta,
   highlightsHeading = 'Why Charlotte families choose Tassy',
-  serviceName, path, trustChips = TRUST_CHIPS,
+  serviceName, path, trustChips = TRUST_CHIPS, film,
 }: Props) {
   const serviceLd =
     serviceName && path
@@ -112,6 +116,33 @@ export default function ServicePage({
           </p>
         </div>
       </section>
+
+      {/* FILM (optional) — the line's own 30-second spot, hosted on the
+          Tassy Transportation YouTube channel (@tassytrucks). The embed is
+          lazy-loaded and click-to-play, so the page stays fast. */}
+      {film && (
+        <section className="border-b border-charcoal/8">
+          <div className="container-x py-16 lg:py-20 grid gap-10 lg:grid-cols-[1fr_auto] items-center">
+            <div className="max-w-xl">
+              <div className="eyebrow">Watch · 30 seconds</div>
+              <h2 className="h-section mt-3">{film.heading}</h2>
+              <p className="mt-4 text-ink-muted leading-relaxed">{film.body}</p>
+            </div>
+            <div className="mx-auto w-[280px] sm:w-[320px]">
+              <div className="relative aspect-[9/16] overflow-hidden rounded-2xl border border-line shadow-xl">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${film.youtubeId}`}
+                  title={film.heading}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* HIGHLIGHTS */}
       <section className="bg-cream">
@@ -201,3 +232,4 @@ export default function ServicePage({
     </>
   );
 }
+

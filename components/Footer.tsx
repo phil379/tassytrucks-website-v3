@@ -20,10 +20,12 @@ export default function Footer() {
         className="container-x py-16 grid grid-cols-2 gap-10 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_max-content]"
       >
         {/* Brand. Phil, 2026-11-14: name and logo were too small. Logo 2x (80px; 64px on phones),
-            name 30px (24px on phones), tagline scaled to match. */}
+            name 30px (24px on phones), tagline scaled to match.
+            Phil, 2026-11-22: logo still too small in the footer — enlarged again
+            to 128px on desktop, 96px on phones. The asset is an SVG, so it stays sharp. */}
         <div className="col-span-2 lg:col-span-1">
           <div className="flex items-center gap-4">
-            <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-16 w-16 sm:h-20 sm:w-20 shrink-0" />
+            <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-24 w-24 sm:h-32 sm:w-32 shrink-0" />
             <div>
               <div className="serif text-2xl sm:text-3xl font-semibold leading-tight">Tassy Transportation</div>
               {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline */}

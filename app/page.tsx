@@ -10,6 +10,7 @@ import { contact } from '@/lib/saas-links';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { partnerSignup } from '@/lib/partner-links';
 import { request } from '@/lib/request-links';
+import { TGIGS_LOGO_DATA_URI } from './tgigs-logo-data';
 // Entry fares read from the rate cards, never typed. Three places said
 // "Wheelchair from $119" on 2026-10-02 while lib/quote.ts had been repriced to
 // $95 -- the same drift that had /pricing advertising $49 Winnie against a $69
@@ -516,6 +517,9 @@ export default function HomePage() {
         <div className="container-x pb-24">
           <div className="rounded-tile border border-line p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
             <div className="max-w-xl">
+              {/* T-Gigs logo (Phil, 2026-11-23): the sister service's own mark,
+                  above the eyebrow so the card reads as T-Gigs at a glance. */}
+              <img src={TGIGS_LOGO_DATA_URI} alt="T-Gigs" className="h-11 w-auto mb-4" />
               <div className="eyebrow gold-text">From our sister service · T-Gigs</div>
               <h3 className="serif text-2xl font-semibold mt-2">Need a car to drive for work?</h3>
               <p className="ink-soft text-sm leading-relaxed mt-2">

@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     siteName: 'Tassy',
     // Agent D — the site-wide `url` was making every sub-page OG resolve to the
     // homepage. Removed; each page sets its own openGraph.url.
-    images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }], // FIX_PROD_038 — real Tassy og-image
+    images: [{ url: '/opengraph-image', width: 1200, height: 630 }], // Logo-only share image (app/opengraph-image.tsx) — Phil, Nov 22, 2026
   },
-  twitter: { card: 'summary_large_image', images: ['/brand/og-image.png'] },
+  twitter: { card: 'summary_large_image', images: ['/opengraph-image'] },
   // FIX_PROD_038 — real Tassy favicons (public/brand/).
   icons: {
     icon: [
@@ -65,7 +65,7 @@ const localBusinessLd = {
   slogan: 'We Transport With Care',
   hasCredential: 'SDVOSB — Service-Disabled Veteran-Owned Small Business',
   priceRange: '$$',
-  image: 'https://www.tassytrucks.com/brand/og-image.png',
+  image: 'https://www.tassytrucks.com/opengraph-image',
   // The public profiles, so a reader can confirm this record and the social
   // pages are the same business. URLs as supplied by Phil, 2026-11-21.
   sameAs: [

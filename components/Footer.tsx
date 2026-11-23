@@ -84,6 +84,21 @@ export default function Footer() {
             <li><Link href="/winnie" className="hover:text-[color:var(--gold-warm)]">Winnie Ride</Link></li>
             <li><Link href="/school" className="hover:text-[color:var(--gold-warm)]">Tassy Scholar</Link></li>
             <li><Link href="/pricing" className="hover:text-[color:var(--gold-warm)]">Pricing</Link></li>
+            {/* Sister service (Phil, 2026-11-23): T-Gigs is the gig-driver weekly-rental arm of
+                the same company (Tassy Trucks LLC), and tgigs.app's footer already links back
+                here — this is the reciprocal link. Deep link to the weekly-rental page, not
+                the T-Gigs homepage, and no availability promise: that page shows live status. */}
+            <li className="pt-2 mt-1 border-t border-white/10">
+              <a
+                href="https://www.tgigs.app/rent/weekly-car-rental-charlotte"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[color:var(--gold-warm)]"
+              >
+                T-Gigs — Weekly car rentals
+              </a>
+              <div className="text-xs opacity-60 mt-0.5">For gig drivers · Our sister service</div>
+            </li>
           </ul>
         </div>
 

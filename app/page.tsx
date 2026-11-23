@@ -503,6 +503,37 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ───────────── SISTER SERVICE — T-GIGS (Phil, 2026-11-23) ─────────────
+          T-Gigs is the gig-driver weekly-rental arm of the same company (Tassy
+          Trucks LLC), and tgigs.app already links back here from its footer.
+          This strip lets tassytrucks.com traffic find it without confusing
+          riders: it sits below the final CTA, clearly labelled a sister
+          service — it is not a seventh Tassy service line. Deep link to the
+          weekly-rental page; copy invites drivers to look/apply and never
+          promises a car is available today (that page shows live status). */}
+      <section className="bg-cream">
+        <div className="container-x pb-24">
+          <div className="rounded-tile border border-line p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
+            <div className="max-w-xl">
+              <div className="eyebrow gold-text">From our sister service · T-Gigs</div>
+              <h3 className="serif text-2xl font-semibold mt-2">Need a car to drive for work?</h3>
+              <p className="ink-soft text-sm leading-relaxed mt-2">
+                Rent by the week for Uber, Lyft, DoorDash &amp; delivery — from $370/week,
+                maintenance included, no credit check.
+              </p>
+            </div>
+            <a
+              href="https://www.tgigs.app/rent/weekly-car-rental-charlotte"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary shrink-0 inline-flex items-center gap-1.5"
+            >
+              See weekly rentals <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

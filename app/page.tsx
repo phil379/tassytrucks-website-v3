@@ -433,7 +433,8 @@ export default function HomePage() {
             </p>
             <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
               Off duty, Phil is crazy about soccer, technology, and family &mdash; and he
-              loves to travel.
+              loves to travel. He also loves the company of Winnie, the family&rsquo;s
+              rescue French bulldog &mdash; the dog Winnie Ride is named after.
             </p>
             <p className="mt-5 serif italic text-lg max-w-2xl" style={{ color: 'var(--gold)' }}>
               Community-focused and here to serve those who need us most.

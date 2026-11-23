@@ -24,10 +24,16 @@ export default function Footer() {
             Phil, 2026-11-22: logo still too small in the footer — enlarged again
             to 128px on desktop, 96px on phones. The asset is an SVG, so it stays sharp. */}
         <div className="col-span-2 lg:col-span-1">
-          <div className="flex items-center gap-4">
+          {/* Lockup stacks in the lg band (Phil's iPad screenshot, 2026-11-23): beside
+              the 128px logo, the wordmark needs ~375px but the brand column has ~245px
+              at 1024 (~300px at 1180), so "Transportation" spilled into the Services
+              column and struck through "Tassy Recovery". Stacked — logo over a
+              one-size-down wordmark — until 1500px, where the column is wide enough
+              for the side-by-side lockup exactly as before. */}
+          <div className="flex items-center gap-4 lg:flex-col lg:items-start min-[1500px]:flex-row min-[1500px]:items-center">
             <img src="/brand/logo-cream.svg" alt="Tassy Transportation" className="h-24 w-24 sm:h-32 sm:w-32 shrink-0" />
             <div>
-              <div className="serif text-2xl sm:text-3xl font-semibold leading-tight">Tassy Transportation</div>
+              <div className="serif text-2xl sm:text-3xl lg:text-2xl min-[1500px]:text-3xl font-semibold leading-tight">Tassy Transportation</div>
               {/* FIX_PROD_131 — motto replaces the redundant "Premium Transport" tagline */}
               <div className="serif italic text-base sm:text-lg mt-1" style={{ color: 'var(--gold)' }}>
                 We Transport With Care.

@@ -146,7 +146,11 @@ export default function HomePage() {
             {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
                 removed from the hero (those specific claims are pending Phil's
                 verification, task #222); credentials shown here are all documentable. */}
-            <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
+            {/* 2×2 until xl (Phil's iPad screenshot, 2026-11-23): at sm the four-across
+                row squeezed into the hero's narrow left column at tablet widths and the
+                words collided (SDVOSB into MBE · DBE, Charlotte into Veteran). Four
+                across only where the column is genuinely wide. */}
+            <div className="mt-10 pt-8 hairline grid grid-cols-2 xl:grid-cols-4 gap-6">
               {[
                 ['SDVOSB',  'SBA-certified'],
                 ['MBE · DBE', 'SBE certified'],

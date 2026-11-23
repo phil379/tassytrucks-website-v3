@@ -357,6 +357,10 @@ export default function RequestForm({
    */
   const [whenDate, setWhenDate] = useState('');
   const [passengers, setPassengers] = useState(1);
+  // What the Passengers/Pets box actually shows while typing. Kept as raw
+  // text so the field can be emptied and retyped; `passengers` above stays
+  // the sanitized number every calculation reads.
+  const [passengersText, setPassengersText] = useState('1');
   const [notes, setNotes] = useState('');
   const [preferred, setPreferred] = useState<'phone' | 'text' | 'email'>('phone');
 
@@ -1032,7 +1036,7 @@ export default function RequestForm({
       requestedAt: String(fd.get('requestedAt') ?? ''),
       returnTrip: fd.get('returnTrip') === 'on',
       returnAt: String(fd.get('returnAt') ?? '') || null,
-      passengers: Number(fd.get('passengers') ?? 1),
+      passengers: Math.max(1, Math.min(maxPassengersFor(String(fd.get('serviceLine') ?? '')), Number(fd.get('passengers')) || 1)),
       mobility: String(fd.get('mobility') ?? '') || null,
       vehicleNotes: String(fd.get('vehicleNotes') ?? '') || null,
       pickupPlaceId: String(fd.get('pickupAddressPlaceId') ?? '') || null,
@@ -1549,10 +1553,25 @@ export default function RequestForm({
           <input
             {...fieldProps('passengers')}
             type="number"
+            inputMode="numeric"
             min={1}
             max={maxPassengersFor(service)}
-            value={Math.min(passengers, maxPassengersFor(service))}
-            onChange={(e) => setPassengers(Math.max(1, Math.min(maxPassengersFor(service), Number(e.target.value) || 1)))}
+            value={passengersText}
+            onChange={(e) => {
+              // The count is a single digit (max 8), so the digit just
+              // typed IS the new count — typing 3 over the standing 1 must
+              // give 3, not "13" clamped to the max. Clamping waits for
+              // blur; an emptied box simply stays empty until then.
+              const digit = e.target.value.replace(/\D/g, '').slice(-1);
+              setPassengersText(digit);
+              const n = Number(digit);
+              if (n >= 1) setPassengers(Math.min(n, maxPassengersFor(service)));
+            }}
+            onBlur={() => {
+              const n = Math.max(1, Math.min(maxPassengersFor(service), Number(passengersText) || 1));
+              setPassengers(n);
+              setPassengersText(String(n));
+            }}
           />
           <FieldError name="passengers" />
         </div>

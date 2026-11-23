@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { ArrowRight, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
 import { CAREERS_OPEN } from '@/lib/careers-gate';
 import { partnerSignup } from '@/lib/partner-links';
@@ -100,6 +100,15 @@ export default function Footer() {
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold-warm)]"
             >
               <Linkedin size={18} />
+            </a>
+            <a
+              href="https://www.youtube.com/@tassytrucks"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Tassy Transportation on YouTube"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold-warm)]"
+            >
+              <Youtube size={18} />
             </a>
           </div>
         </div>

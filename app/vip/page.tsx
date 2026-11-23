@@ -21,6 +21,7 @@ export default function VipPage() {
       bookHref={request.vip}
       bookLabel="Reserve a car"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
+      film={{ youtubeId: 'a2hUUQz_npg', heading: 'See Tassy Concierge', body: 'Thirty seconds: a black car, a professional driver, and a flat price that does not move.' }}
       serviceName="Private Car Service"
       path="/vip"
       highlightsHeading="Reserved private car service in Charlotte"

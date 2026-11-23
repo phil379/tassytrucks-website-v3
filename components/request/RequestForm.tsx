@@ -33,6 +33,7 @@ import ServiceSidePanel from '@/components/request/ServiceSidePanel';
 import { detailsFor, validateDetails } from '@/lib/trip-details';
 import { facilityTripExtrasSchema } from '@/lib/facility';
 import { CARE_WAV, SHOW_ESTIMATES, estimateTrip, formatRange, formatUsd, isQuoteOnly, surchargesFor } from '@/lib/quote';
+import { blackFridayActive, blackFridayDiscount } from '@/lib/promo';
 import { wavBookAndPayNote } from '@/lib/wav';
 import { quoteFromHotelPrice } from '@/lib/hotel-price';
 import {
@@ -769,6 +770,15 @@ export default function RequestForm({
         text: formatRange(estimate),
       })
     : null;
+
+  // BLACK FRIDAY (lib/promo.ts): the same offer the server applies at booking, shown on
+  // the price panel while the window is open — firm prices only, never a hotel flat price
+  // (flatLabel). Display only: the server recomputes from its own estimate and its own
+  // clock, and the price that is stored and charged is the server's.
+  const promo =
+    estimate && estimate.exact && !estimate.flatLabel && blackFridayActive(new Date())
+      ? blackFridayDiscount(estimate.lowCents)
+      : null;
 
   /**
    * On every PRICED line (not Scholar, not a wheelchair quote) the address must be picked
@@ -1913,9 +1923,23 @@ export default function RequestForm({
               <p className="text-sm">
                 <span className="ink-soft">{priceLabel(estimateKind!)}</span>{' '}
                 <span className="serif text-2xl font-semibold text-[color:var(--gold)]">
-                  {formatRange(estimate)}
+                  {promo ? formatUsd(promo.agreedCents) : formatRange(estimate)}
                 </span>
+                {promo && (
+                  <span className="ink-soft ml-2 align-middle text-base line-through">
+                    {formatUsd(estimate.lowCents)}
+                  </span>
+                )}
               </p>
+              {promo && (
+                <p
+                  className="mt-1.5 text-xs font-semibold text-[color:var(--gold)]"
+                  data-testid="promo-line"
+                >
+                  Black Friday — 10% off applied. You save {formatUsd(promo.discountCents)} when
+                  you book by Sunday, Nov 29.
+                </p>
+              )}
               <p className="ink-soft mt-1.5 text-xs">
                 {/* "11.1 miles" when Google measured the drive, "about 10.6"
                     when it is a straight line stretched by a factor. A

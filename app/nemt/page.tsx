@@ -28,6 +28,7 @@ export default function NemtPage() {
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
       film={{ youtubeId: 'BqD3xNlVhu4', heading: 'See how Tassy Care works', body: 'Thirty seconds: the car at your door, the price locked before you ride, and help at both ends of the trip.' }}
       serviceArea="Uptown · SouthPark · Ballantyne · Wilkinson Blvd & West Charlotte · Charlotte Douglas Airport (CLT)"
+      finePrint={<>If your driver is ever delayed, we call you before your pickup time — and if we can&rsquo;t get you there, the ride is free and the next one is on us.</>}
       serviceName="Non-Emergency Medical Transportation"
       path="/nemt"
       highlightsHeading="Private medical transport across Charlotte and Mecklenburg County"

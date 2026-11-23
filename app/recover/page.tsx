@@ -34,6 +34,7 @@ export default function RecoverPage() {
       bookLabel="Book your ride home"
       altCta={{ href: 'tel:+17049418508', label: 'Call (704) 941-8508' }}
       film={{ youtubeId: '9bq6IORwYBU', heading: 'See how Tassy Recovery works', body: 'Thirty seconds: we come inside, wait during your procedure, and take you home — one flat round-trip price.' }}
+      serviceArea="Uptown · SouthPark · Ballantyne · Wilkinson Blvd & West Charlotte · Charlotte Douglas Airport (CLT)"
       serviceName="Post-Procedure Transportation"
       path="/recover"
       highlightsHeading="Rides home after surgery and sedation in Charlotte"

@@ -779,6 +779,10 @@ export default function RequestForm({
     estimate && estimate.exact && !estimate.flatLabel && blackFridayActive(new Date())
       ? blackFridayDiscount(estimate.lowCents)
       : null;
+  // The promo amounts carry cents ($53.10, a $5.90 saving) where the panel's usual
+  // formatter rounds to whole dollars — the price on screen must be the price that
+  // gets charged, to the cent.
+  const promoPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
   /**
    * On every PRICED line (not Scholar, not a wheelchair quote) the address must be picked
@@ -1923,7 +1927,7 @@ export default function RequestForm({
               <p className="text-sm">
                 <span className="ink-soft">{priceLabel(estimateKind!)}</span>{' '}
                 <span className="serif text-2xl font-semibold text-[color:var(--gold)]">
-                  {promo ? formatUsd(promo.agreedCents) : formatRange(estimate)}
+                  {promo ? promoPrice(promo.agreedCents) : formatRange(estimate)}
                 </span>
                 {promo && (
                   <span className="ink-soft ml-2 align-middle text-base line-through">
@@ -1936,7 +1940,7 @@ export default function RequestForm({
                   className="mt-1.5 text-xs font-semibold text-[color:var(--gold)]"
                   data-testid="promo-line"
                 >
-                  Black Friday — 10% off applied. You save {formatUsd(promo.discountCents)} when
+                  Black Friday — 10% off applied. You save {promoPrice(promo.discountCents)} when
                   you book by Sunday, Nov 29.
                 </p>
               )}

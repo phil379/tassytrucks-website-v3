@@ -3,6 +3,7 @@ import './fonts.css';
 import './globals.css';
 import Header from '@/components/Header';
 import PromoBanner from '@/components/PromoBanner';
+import PromoPopup from '@/components/PromoPopup';
 import Footer from '@/components/Footer';
 import ConsentManager from '@/components/ConsentManager';
 
@@ -122,6 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <PromoBanner />
+        <PromoPopup />
         <Header />
         <main id="main">{children}</main>
         <Footer />

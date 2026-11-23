@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 
 type Tier = {
@@ -35,6 +36,11 @@ type Props = {
    *  Phil, 2026-11-23: a visitor who lands on a line's page meets that line's
    *  film before anything asks for their money. */
   film?: { youtubeId: string; heading: string; body: string };
+  /** Optional service-area line under the hero motto — the beachheads by name. */
+  serviceArea?: string;
+  /** Optional fine print directly under the booking buttons — settled policy
+   *  a customer should see before paying, surfaced from its policy page. */
+  finePrint?: ReactNode;
 };
 
 // MEGA_TASSY_MARKETING_LAUNCH_TEARDOWN (Agent A) — objection-preemption row on
@@ -47,7 +53,7 @@ export default function ServicePage({
   eyebrow, title, tagline, description, bookHref, bookLabel = 'Request now', altCta,
   highlights, tiers, partnerCta,
   highlightsHeading = 'Why Charlotte families choose Tassy',
-  serviceName, path, trustChips = TRUST_CHIPS, film,
+  serviceName, path, trustChips = TRUST_CHIPS, film, serviceArea, finePrint,
 }: Props) {
   const serviceLd =
     serviceName && path
@@ -100,6 +106,9 @@ export default function ServicePage({
             )}
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
+          {finePrint && (
+            <p className="mt-5 text-sm ink-soft">{finePrint}</p>
+          )}
           {/* FILM (optional) — the line's own 30-second spot, hosted on the
               Tassy Transportation YouTube channel (@tassytrucks), sitting
               inside the hero directly under the booking buttons so a visitor
@@ -139,6 +148,14 @@ export default function ServicePage({
           <p className="mt-8 serif italic text-lg ink-soft">
             We Transport With Care<span className="gold-text">.</span>
           </p>
+          {/* Service-area line (Claude council review, adopted Nov 23, 2026):
+              name the beachheads on the page itself, mirrored later on the
+              Google Business Profile. Renders only where a page passes it. */}
+          {serviceArea && (
+            <p className="mt-4 text-sm ink-soft">
+              Serving {serviceArea}
+            </p>
+          )}
         </div>
       </section>
 

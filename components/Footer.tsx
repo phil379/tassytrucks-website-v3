@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { apply, contact } from '@/lib/saas-links';
 import { CAREERS_OPEN } from '@/lib/careers-gate';
 import { partnerSignup } from '@/lib/partner-links';
@@ -67,6 +67,40 @@ export default function Footer() {
               loading="lazy"
               className="block h-auto w-[92px]"
             />
+          </div>
+
+          {/* Social (Phil, 2026-11-23): the relaunched Facebook Page plus the
+              Instagram and LinkedIn profiles, linked from every page's footer.
+              Icons are lucide's brand glyphs — the same stroke system as the
+              rest of the site. */}
+          <div className="mt-6 flex items-center gap-3">
+            <a
+              href="https://www.facebook.com/tassytrucks/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Tassy Transportation on Facebook"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold-warm)]"
+            >
+              <Facebook size={18} />
+            </a>
+            <a
+              href="https://www.instagram.com/tassytrucksofficial/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Tassy Transportation on Instagram"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold-warm)]"
+            >
+              <Instagram size={18} />
+            </a>
+            <a
+              href="https://www.linkedin.com/company/82484063"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Tassy Transportation on LinkedIn"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold-warm)]"
+            >
+              <Linkedin size={18} />
+            </a>
           </div>
         </div>
 

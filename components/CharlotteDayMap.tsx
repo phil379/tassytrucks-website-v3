@@ -234,6 +234,10 @@ const DAY_MAP_CSS = `
         .cdm-leg-item{background:${DAY_MAP_BG.legendCell};padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
              transition:background .4s ease}
         .cdm-leg-item[data-on="1"]{background:${DAY_MAP_BG.legendCellOn}}
+        .cdm-cta{text-decoration:none;cursor:pointer}
+        .cdm-cta:hover{background:${DAY_MAP_BG.legendCellOn}}
+        .cdm-cta .cdm-name{color:#F2EEE4}
+        .cdm-cta .cdm-swatch{opacity:1}
         .cdm-swatch{width:8px;height:8px;border-radius:99px;flex:none;margin-top:5px;opacity:.3;transition:opacity .4s ease}
         .cdm-leg-item[data-on="1"] .cdm-swatch{opacity:1}
         .cdm-text{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -449,6 +453,25 @@ export default function CharlotteDayMap() {
             </span>
           </div>
         ))}
+        {/* CTA cells (Phil, 2026-11-22): the legend's last row ran out of services
+            at wide widths and left dead slots. Fill them with the two ways to book —
+            online, or by phone for the phone-first audience. Always lit. */}
+        <a className="cdm-leg-item cdm-cta" data-on="1" href="/request">
+          <span className="cdm-swatch" style={{ background: 'var(--gold)' }} />
+          <span className="cdm-text">
+            <span className="cdm-name">Book a ride</span>
+            <span className="cdm-where">Online in minutes</span>
+            <span className="cdm-when">4-hour notice</span>
+          </span>
+        </a>
+        <a className="cdm-leg-item cdm-cta" data-on="1" href="tel:+17049418508">
+          <span className="cdm-swatch" style={{ background: '#F2EEE4' }} />
+          <span className="cdm-text">
+            <span className="cdm-name">Rather talk?</span>
+            <span className="cdm-where">(704) 941-8508</span>
+            <span className="cdm-when">Phone bookings</span>
+          </span>
+        </a>
       </div>
 
       <p className="cdm-cap">

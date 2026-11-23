@@ -100,6 +100,31 @@ export default function ServicePage({
             )}
             <Link href="/pricing" className="btn-ghost">See pricing</Link>
           </div>
+          {/* FILM (optional) — the line's own 30-second spot, hosted on the
+              Tassy Transportation YouTube channel (@tassytrucks), sitting
+              inside the hero directly under the booking buttons so a visitor
+              meets the film before anything else (Phil, 2026-11-23: it first
+              shipped as its own section under the hero and he could not find
+              it). Lazy-loaded and click-to-play, so the page stays fast. */}
+          {film && (
+            <div className="mt-12">
+              <div className="eyebrow">Watch · 30 seconds</div>
+              <h2 className="mt-3 font-serif text-2xl">{film.heading}</h2>
+              <div className="mt-4 w-[280px] sm:w-[320px]">
+                <div className="relative aspect-[9/16] overflow-hidden rounded-2xl border border-line shadow-xl">
+                  <iframe
+                    className="absolute inset-0 h-full w-full"
+                    src={`https://www.youtube-nocookie.com/embed/${film.youtubeId}`}
+                    title={film.heading}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+              <p className="mt-4 max-w-md text-sm ink-soft leading-relaxed">{film.body}</p>
+            </div>
+          )}
           <ul className="mt-8 flex flex-wrap gap-2" aria-label="Credentials">
             {trustChips.map((c) => (
               <li
@@ -116,33 +141,6 @@ export default function ServicePage({
           </p>
         </div>
       </section>
-
-      {/* FILM (optional) — the line's own 30-second spot, hosted on the
-          Tassy Transportation YouTube channel (@tassytrucks). The embed is
-          lazy-loaded and click-to-play, so the page stays fast. */}
-      {film && (
-        <section className="border-b border-charcoal/8">
-          <div className="container-x py-16 lg:py-20 grid gap-10 lg:grid-cols-[1fr_auto] items-center">
-            <div className="max-w-xl">
-              <div className="eyebrow">Watch · 30 seconds</div>
-              <h2 className="h-section mt-3">{film.heading}</h2>
-              <p className="mt-4 text-ink-muted leading-relaxed">{film.body}</p>
-            </div>
-            <div className="mx-auto w-[280px] sm:w-[320px]">
-              <div className="relative aspect-[9/16] overflow-hidden rounded-2xl border border-line shadow-xl">
-                <iframe
-                  className="absolute inset-0 h-full w-full"
-                  src={`https://www.youtube-nocookie.com/embed/${film.youtubeId}`}
-                  title={film.heading}
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* HIGHLIGHTS */}
       <section className="bg-cream">

@@ -229,10 +229,10 @@ const DAY_MAP_CSS = `
         .cdm-play{position:absolute;top:-4px;width:2px;height:14px;background:#F2EEE4;border-radius:2px}
         .cdm-ticks{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;
              color:${DAY_MAP_LABEL.ticks};letter-spacing:.04em;font-variant-numeric:tabular-nums}
-        .cdm-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+        .cdm-legend{display:flex;flex-wrap:wrap;
              gap:1px;background:var(--line);border-top:1px solid var(--line)}
         .cdm-leg-item{background:${DAY_MAP_BG.legendCell};padding:11px 14px;display:flex;align-items:flex-start;gap:9px;
-             transition:background .4s ease}
+             flex:1 1 168px;transition:background .4s ease}
         .cdm-leg-item[data-on="1"]{background:${DAY_MAP_BG.legendCellOn}}
         .cdm-cta{text-decoration:none;cursor:pointer}
         .cdm-cta:hover{background:${DAY_MAP_BG.legendCellOn}}
@@ -453,9 +453,21 @@ export default function CharlotteDayMap() {
             </span>
           </div>
         ))}
-        {/* CTA cells (Phil, 2026-11-22): the legend's last row ran out of services
-            at wide widths and left dead slots. Fill them with the two ways to book —
-            online, or by phone for the phone-first audience. Always lit. */}
+        {/* Fill cells (Phil, 2026-11-22 + 2026-11-23): the legend's last row ran out of
+            services at some widths and left a dead slot — on tablets (3 across) one cell
+            was left empty. Treatment Day takes the ninth slot (a real Care product that
+            was missing from the legend; Care-blue swatch), followed by the two ways to
+            book — online, or by phone for the phone-first audience. Always lit. The
+            legend is flex-wrap with growing items, so the last row always fills its
+            width: no empty portion at any screen size. */}
+        <a className="cdm-leg-item cdm-cta" data-on="1" href="/pricing">
+          <span className="cdm-swatch" style={{ background: '#5B9DD9' }} />
+          <span className="cdm-text">
+            <span className="cdm-name">Tassy Treatment Day</span>
+            <span className="cdm-where">Dialysis · chemo · recurring</span>
+            <span className="cdm-when">Flat round-trip rate</span>
+          </span>
+        </a>
         <a className="cdm-leg-item cdm-cta" data-on="1" href="/request">
           <span className="cdm-swatch" style={{ background: 'var(--gold)' }} />
           <span className="cdm-text">

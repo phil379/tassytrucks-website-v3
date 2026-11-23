@@ -81,7 +81,7 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
           {/* CSS-only hover dropdown — no client JS */}
           <div className="relative group">
             <Link href="/#services" className="nav-link inline-flex items-center gap-1">
@@ -123,9 +123,13 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Phone number from xl up only (Phil's iPad screenshot, 2026-11-23): in the
+              lg band the full nav + number + CTA overfill the row — About collided with
+              the number and the number wrapped. Below xl the number stays in the menu,
+              the footer and the day-map's Rather talk? cell. */}
           <a
             href={contact.phone}
-            className="nav-link hidden md:inline-flex items-center gap-1.5 text-sm"
+            className="nav-link hidden xl:inline-flex items-center gap-1.5 text-sm"
           >
             <Phone size={14} /> {contact.phoneDisplay}
           </a>

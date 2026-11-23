@@ -11,7 +11,13 @@ export const contentType = 'image/png';
 // y 226–752 (measured), so the img is scaled to 983px and positioned to
 // center that artwork in the 1200×630 frame; the frame clips the
 // master's black margins, leaving the logo seamless on black.
-export default function OpengraphImage() {
+// The master is loaded as a bundled asset (import.meta.url): fetching
+// it over HTTP from this same deployment returned an empty render.
+export default async function OpengraphImage() {
+  const logo = await fetch(
+    new URL('../public/brand/logo-master.png', import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     (
       <div
@@ -24,7 +30,8 @@ export default function OpengraphImage() {
         }}
       >
         <img
-          src="https://www.tassytrucks.com/brand/logo-master.png"
+          // @ts-expect-error — next/og accepts an ArrayBuffer image source
+          src={logo}
           width={983}
           height={983}
           style={{ position: 'absolute', left: 109, top: -155 }}

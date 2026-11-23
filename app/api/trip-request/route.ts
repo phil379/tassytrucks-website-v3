@@ -23,6 +23,7 @@ import { coerceLatLng, pricingPoint, roadDistance, roadDistanceVia } from '@/lib
 import { STOP_FEE_CENTS } from '@/lib/stops';
 import { entryPointFromSource, validateDetails, type DetailValidation } from '@/lib/trip-details';
 import { payAtBookingEligible } from '@/lib/pay-at-booking';
+import { BLACK_FRIDAY, blackFridayActive, blackFridayDiscount } from '@/lib/promo';
 import { confirmTrip } from '@/lib/ops-confirm';
 import { createHash } from 'node:crypto';
 import {
@@ -613,7 +614,29 @@ export async function POST(request: Request) {
   // Only a real estimate is stored as a number. A 'quote-only' answer (Scholar,
   // or a trip past the last band) is NOT a price and must not be written into
   // the estimate columns, where /ops would read it as one.
-  const estimate = hotel ? quoteFromHotel(hotel) : quoted?.kind === 'estimate' ? quoted : null;
+  let estimate = hotel ? quoteFromHotel(hotel) : quoted?.kind === 'estimate' ? quoted : null;
+
+  // BLACK FRIDAY (lib/promo.ts, Phil 2026-11-23): 10% off a firm online price booked
+  // inside the window. Applied HERE, on the server's own estimate, before anything
+  // downstream reads it — so the price text, the stored estimate, the pay-at-booking
+  // charge and the receipt all carry the same discounted figure, and the row records
+  // the discount itself (discount_label / discount_cents) for the receipt to itemise.
+  // Hotel flat prices (their own intro pricing + price guard) and facility bookings
+  // (their own volume ladder) are excluded; ranges and ZIP estimates have no firm
+  // price to discount. Driver pay stays on the list fare (lib/discounts.ts).
+  const promo =
+    !hotel &&
+    !wantsFacilityBooking &&
+    estimate &&
+    estimate.exact &&
+    estimate.lowCents === estimate.highCents &&
+    blackFridayActive(new Date())
+      ? { label: BLACK_FRIDAY.label, ...blackFridayDiscount(estimate.lowCents) }
+      : null;
+  if (promo && estimate) {
+    estimate = { ...estimate, lowCents: promo.agreedCents, highCents: promo.agreedCents };
+  }
+
   // What the confirmation screen and the auto-reply email tell the customer, so the price is
   // never first heard on a later phone call.
   // A range (low and high differ) is an estimate however it was measured, so it is never
@@ -740,6 +763,10 @@ export async function POST(request: Request) {
         // Only true when the range was on screen. An estimate computed for the
         // ops queue while the public display is off is not a promise.
         estimate_shown: Boolean(estimate && data.estimateShown),
+        // Black Friday only: every other insert leaves both columns null, exactly as
+        // before. The discounted estimate above plus these two columns are what let
+        // the receipt itemise the discount and still foot (lib/receipt-email.ts).
+        ...(promo ? { discount_label: promo.label, discount_cents: promo.discountCents } : {}),
         // Marks a row that has no price so /ops shows it as one that needs a price.
         ...(internalNotes ? { internal_notes: internalNotes } : {}),
         passengers: data.passengers ?? 1,

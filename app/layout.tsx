@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './fonts.css';
 import './globals.css';
 import Header from '@/components/Header';
+import PromoBanner from '@/components/PromoBanner';
 import Footer from '@/components/Footer';
 import ConsentManager from '@/components/ConsentManager';
 
@@ -120,6 +121,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to content
         </a>
+        <PromoBanner />
         <Header />
         <main id="main">{children}</main>
         <Footer />

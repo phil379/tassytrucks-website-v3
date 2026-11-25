@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import RequestForm from '@/components/request/RequestForm';
+import HowToBookVideo from '@/components/HowToBookVideo';
 import { BOOKINGS_PAUSED_MESSAGE, bookingsPaused } from '@/lib/bookings-paused';
 import { markTextLinkOpened } from '@/lib/text-to-book-db.server';
 import { textToBookActive } from '@/lib/text-to-book';
@@ -123,6 +124,13 @@ export default async function RequestPage({
               most rides you pay it when you book. A dispatcher reviews every request personally.
             </p>
           </div>
+
+          {/* The how-to-book walk-through (Phil, 2026-11-25): collapsed by
+              default above the form — a first-time rider can open it, a
+              returning one is never blocked, and a closed <details> cannot
+              intercept form interactions. Hidden while bookings are paused,
+              when there is no form to walk through. */}
+          {!bookingsPaused() && <HowToBookVideo variant="details" />}
 
           <div className="mt-8">
             {bookingsPaused() ? (

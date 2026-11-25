@@ -20,6 +20,7 @@ import { CARE as CARE_CARD, CARE_WAV, dollars } from '@/lib/quote';
 const CARE_FROM = dollars(CARE_CARD.bands[0].cents);
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 import CharlotteDayMap from '@/components/CharlotteDayMap';
+import HowToBookVideo from '@/components/HowToBookVideo';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
 export const metadata: Metadata = {
@@ -199,6 +200,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ───────────── HOW TO BOOK ─────────────
+          Phil, 2026-11-19 + 2026-11-25: the step-by-step booking video
+          sits right under the hero, beside the booking story the hero's
+          "Request a Ride" CTA starts — tight section, phone-width frame,
+          nothing loads until the visitor presses play. */}
+      <HowToBookVideo />
 
       {/* ───────────── SERVICES ───────────── */}
       <section id="services" className="bg-surface border-y border-line">

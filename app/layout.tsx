@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import PromoBanner from '@/components/PromoBanner';
 import PromoPopup from '@/components/PromoPopup';
+import ThanksgivingBanner from '@/components/ThanksgivingBanner';
 import Footer from '@/components/Footer';
 import ConsentManager from '@/components/ConsentManager';
 
@@ -122,6 +123,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to content
         </a>
+        <ThanksgivingBanner />
         <PromoBanner />
         <PromoPopup />
         <Header />

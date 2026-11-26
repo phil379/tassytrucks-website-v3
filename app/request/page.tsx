@@ -10,6 +10,8 @@ import { rideTrackingEnabled } from '@/lib/ride-link';
 import { COPY, coerceServiceLine,
   serviceWasHonoured,
 } from '@/lib/trip-request';
+import { STAFF_MARKER_PARAM } from '@/lib/staff-booking';
+import { verifyStaffMarker } from '@/lib/staff-booking.server';
 
 export const metadata: Metadata = {
   title: 'Request a ride in Charlotte NC',
@@ -73,7 +75,7 @@ export const dynamic = 'force-dynamic';
 export default async function RequestPage({
   searchParams,
 }: {
-  searchParams: { service?: string; ttb?: string };
+  searchParams: { service?: string; ttb?: string; [STAFF_MARKER_PARAM]?: string };
 }) {
   // A link from a text-to-book reply: note that it was opened, ONLY while TEXT_TO_BOOK_MODE is on.
   // With the mode off this page behaves exactly as before: no database write, no time prefill.
@@ -96,8 +98,20 @@ export default async function RequestPage({
   // above, rather than opening a booking form for a service that has not
   // opened. The legacy ?service=pet alias resolves to winnie in
   // coerceServiceLine and follows it here.
+  //
+  // The one exception is staff (Phil, 2026-11-25): the "Book a ride for a
+  // caller" link on the Winnie manager's page in TassyOps carries the signed
+  // staff marker (lib/staff-booking.ts), and a caller on the phone is booked
+  // by staff even while the public sits on the join list — Liz runs Winnie
+  // when dispatch is out, and her bookings must complete. The marker is
+  // verified in full here (signature + window, server-side): a forged,
+  // expired or absent marker changes nothing and the redirect stands, byte
+  // for byte. A verified marker falls through to the form, which carries
+  // the same marker into the booking, where the route verifies it again.
   if (serviceWasHonoured(searchParams.service) && coerceServiceLine(searchParams.service) === 'winnie') {
-    redirect('/winnie');
+    if (!verifyStaffMarker(searchParams[STAFF_MARKER_PARAM])) {
+      redirect('/winnie');
+    }
   }
 
   const initialService = coerceServiceLine(searchParams.service);

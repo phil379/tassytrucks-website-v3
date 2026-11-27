@@ -383,12 +383,16 @@ export default function HomePage() {
         {/* grid-cols-1 (a 0-minimum track) so the one-column phone layout can shrink to a 320px
             screen; an auto track grew to the widest line and scrolled sideways by 33px. */}
         <div className="container-x py-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-          <div className="aspect-square rounded-tile border border-line overflow-hidden">
-            {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png) */}
-            <img
+          <div className="relative aspect-square rounded-tile border border-line overflow-hidden">
+            {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png).
+                Served through next/image (Nov 27, 2026 speed pass): the raw PNG is 1.5 MB;
+                the optimizer serves a right-sized WebP instead (~90% lighter). */}
+            <Image
               src="/tassy-founder.png"
               alt="Phil Tassy · Founder · Tassy Transportation"
-              className="w-full h-full object-cover object-top"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-top"
             />
           </div>
           <div>

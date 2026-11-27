@@ -6,6 +6,8 @@ import {
   ANALYTICS_SCRIPT_SRC,
   CONSENT_STORAGE_KEY,
   OPEN_SETTINGS_EVENT,
+  UMAMI_SCRIPT_SRC,
+  UMAMI_WEBSITE_ID,
   parseConsent,
   serializeConsent,
 } from '@/lib/consent';
@@ -44,6 +46,16 @@ function loadAnalytics() {
   s.src = ANALYTICS_SCRIPT_SRC;
   s.setAttribute('data-tassy-analytics', '1');
   document.head.appendChild(s);
+  // Umami (Nov 27, 2026): Phil's visitor counter. Same gate as Vercel — it is
+  // injected here, after Accept, and only when a website ID is configured.
+  if (UMAMI_WEBSITE_ID && !document.querySelector('script[data-tassy-umami]')) {
+    const u = document.createElement('script');
+    u.defer = true;
+    u.src = UMAMI_SCRIPT_SRC;
+    u.setAttribute('data-website-id', UMAMI_WEBSITE_ID);
+    u.setAttribute('data-tassy-umami', '1');
+    document.head.appendChild(u);
+  }
 }
 
 export default function ConsentManager() {
@@ -141,8 +153,8 @@ export default function ConsentManager() {
         </p>
         <p id="consent-desc" className="ink-soft mt-2 hidden max-w-3xl text-sm leading-relaxed sm:block">
           Booking, payment and address suggestions work whatever you choose. If you accept, we also
-          use Vercel Web Analytics to count which pages are visited. If you reject, we do not load
-          it. Details are on our{' '}
+          use Vercel Web Analytics and Umami to count which pages are visited. If you reject, we do
+          not load them. Details are on our{' '}
           <Link href="/cookies" className="underline underline-offset-2">Cookies page</Link>.
         </p>
         {current !== null && (

@@ -35,10 +35,10 @@ export default function CookiesPage() {
           children: (
             <>
               <p>
-                If you press Accept, we load Vercel Web Analytics, which counts which pages are
-                visited, where visitors came from, and the type of device and browser, so we can fix
-                what is confusing. Vercel states that it does not use cookies for this. If you press
-                Reject non-essential, or you do nothing, the script is never loaded.
+                If you press Accept, we load two visitor counters: Vercel Web Analytics and
+                Umami. They count which pages are visited, where visitors came from, and the type
+                of device and browser, so we can fix what is confusing. Neither uses cookies. If
+                you press Reject non-essential, or you do nothing, neither script is ever loaded.
               </p>
               <p>
                 We remember your choice in your browser (one entry called{' '}

@@ -36,3 +36,12 @@ ok('Accept and Reject use one shared style; no pre-ticked box');
 assert.ok(read('components/Footer.tsx').includes('CookieSettingsButton'));
 assert.ok(read('components/Footer.tsx').includes('href="/cookies"'));
 ok('footer links Cookies and has Cookie settings');
+
+// 5. Umami (Nov 27, 2026) rides the same gate: injected only by the consent
+// manager, only after Accept, and only when a website ID is configured.
+assert.ok(!/<script[^>]*umami/.test(layout), 'app/layout.tsx must not contain a static Umami <script>');
+assert.ok(banner.includes('UMAMI_SCRIPT_SRC') && banner.includes('UMAMI_WEBSITE_ID'));
+assert.ok(banner.includes('if (UMAMI_WEBSITE_ID'), 'Umami injection must be gated on a configured website ID');
+assert.ok(banner.includes('Vercel Web Analytics and Umami'), 'banner copy must name both analytics tools');
+assert.ok(read('app/cookies/page.tsx').includes('Umami'), 'Cookies page must name Umami');
+ok('Umami is consent-gated, ID-gated, and named in the banner and Cookies page');

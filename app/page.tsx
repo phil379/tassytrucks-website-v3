@@ -10,7 +10,6 @@ import { contact } from '@/lib/saas-links';
 import { CONFIRMATION_PROMISE } from '@/lib/confirmation-promise';
 import { partnerSignup } from '@/lib/partner-links';
 import { request } from '@/lib/request-links';
-import { TGIGS_LOGO_DATA_URI } from './tgigs-logo-data';
 // Entry fares read from the rate cards, never typed. Three places said
 // "Wheelchair from $119" on 2026-10-02 while lib/quote.ts had been repriced to
 // $95 -- the same drift that had /pricing advertising $49 Winnie against a $69
@@ -20,15 +19,13 @@ import { CARE as CARE_CARD, CARE_WAV, dollars } from '@/lib/quote';
 const CARE_FROM = dollars(CARE_CARD.bands[0].cents);
 const WAV_FROM = dollars(CARE_WAV.bands[0].cents);
 import CharlotteDayMap from '@/components/CharlotteDayMap';
-import HowToBookVideo from '@/components/HowToBookVideo';
 
 // MEGA_TASSY_PUBLISH_READY — self-canonical + explicit OG for the home page.
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
   openGraph: {
-    type: 'website',
     url: '/',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
+    images: [{ url: '/brand/og-image.png', width: 1200, height: 630 }],
   },
 };
 
@@ -148,11 +145,7 @@ export default function HomePage() {
             {/* Trust strip — FIX_PROD_131: unverified "15,000+ rides" / "4.9★ Google"
                 removed from the hero (those specific claims are pending Phil's
                 verification, task #222); credentials shown here are all documentable. */}
-            {/* 2×2 until xl (Phil's iPad screenshot, 2026-11-23): at sm the four-across
-                row squeezed into the hero's narrow left column at tablet widths and the
-                words collided (SDVOSB into MBE · DBE, Charlotte into Veteran). Four
-                across only where the column is genuinely wide. */}
-            <div className="mt-10 pt-8 hairline grid grid-cols-2 xl:grid-cols-4 gap-6">
+            <div className="mt-10 pt-8 hairline grid grid-cols-2 sm:grid-cols-4 gap-6">
               {[
                 ['SDVOSB',  'SBA-certified'],
                 ['MBE · DBE', 'SBE certified'],
@@ -200,13 +193,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ───────────── HOW TO BOOK ─────────────
-          Phil, 2026-11-19 + 2026-11-25: the step-by-step booking video
-          sits right under the hero, beside the booking story the hero's
-          "Request a Ride" CTA starts — tight section, phone-width frame,
-          nothing loads until the visitor presses play. */}
-      <HowToBookVideo />
 
       {/* ───────────── SERVICES ───────────── */}
       <section id="services" className="bg-surface border-y border-line">
@@ -383,12 +369,16 @@ export default function HomePage() {
         {/* grid-cols-1 (a 0-minimum track) so the one-column phone layout can shrink to a 320px
             screen; an auto track grew to the widest line and scrolled sideways by 33px. */}
         <div className="container-x py-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-          <div className="aspect-square rounded-tile border border-line overflow-hidden">
-            {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png) */}
-            <img
+          <div className="relative aspect-square rounded-tile border border-line overflow-hidden">
+            {/* MEGA_TASSY_PUBLISH_READY — real founder portrait (public/tassy-founder.png).
+                Served through next/image (Nov 27, 2026 speed pass): the raw PNG is 1.5 MB;
+                the optimizer serves a right-sized WebP instead (~90% lighter). */}
+            <Image
               src="/tassy-founder.png"
               alt="Phil Tassy · Founder · Tassy Transportation"
-              className="w-full h-full object-cover object-top"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-top"
             />
           </div>
           <div>
@@ -396,54 +386,38 @@ export default function HomePage() {
             <h2 className="h-section">
               Built by a veteran.<br />Held to a higher standard.
             </h2>
-            {/* FOUNDER BIO — official version approved by Phil, 2026-11-22.
-                Source of truth: founder-bio-official-2026-11-22.md in the
-                launch files. Replaces the FIX_PROD_138 text at Phil's direct
-                instruction: corrected education arc (Cameroon master's in
-                finance and accounting, Penn State IEP, second master's at
-                UMGC), his units (4-27 FA Battalion; 15th Engineer Battalion,
-                Grafenwöhr 2016–2019, then under the 18th Military Police
-                Brigade; 86th ESB), the Army logistics foundation line, and
-                two years as a corporate material supervisor. The old closing
-                claim ("partner with hospitals, VA centers, and insurance
-                brokers to serve hundreds of clients monthly") was REMOVED
-                with Phil's approval of the new text — do not restore it
-                without his word. No total years of service is stated: the
-                FAQ says six, the host brochure says eight, Phil has not ruled. */}
+            {/* FIX_PROD_138 — authoritative founder bio (Phil-provided, verbatim).
+                Revised 2026-10-02 at Phil's instruction. His text, with four
+                mechanical corrections and nothing else: "1st armored Division"
+                -> "1st Armored Division" (proper noun); "He speaks fluently
+                French and English" -> "...French and English fluently" (English
+                word order); the dangling "earning his Master's ." joined to the
+                enlistment sentence; and the two new service sentences merged so
+                the paragraph does not read as three stubs.
+
+                SUBSTANCE IS HIS AND WAS NOT TOUCHED -- the unit, the posting,
+                the six years, the languages, "hundreds of clients monthly".
+                That last one is carried by the August 2026 Uber statement, 221
+                completed trips under TASSY TRUCKS LLC, which is why it stays. */}
             <p className="mt-6 ink-soft text-lg leading-relaxed max-w-2xl">
               Philippe &ldquo;Phil&rdquo; Tassy didn&rsquo;t take the easy road to get here &mdash; and that&rsquo;s
               exactly what makes Tassy Transportation different.
             </p>
             <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
-              Born and raised in Cameroon, Phil completed his education there in finance
-              and accounting, earning a master&rsquo;s degree, before coming to the United
-              States to study at Penn State through its Intensive English Program. He then
-              enlisted in the U.S. Army. His first duty station was Fort Bliss, Texas, with
-              the 4-27 FA Battalion, 2nd Brigade, 1st Armored Division. In Germany, he
-              served with the 15th Engineer Battalion in Grafenwöhr, then under the 18th
-              Military Police Brigade, and back at Fort Bliss he served as a supply
-              sergeant for 86th ESB. While still in uniform, he began a second
-              master&rsquo;s &mdash; and completed it after leaving the Army: a master&rsquo;s
-              in acquisition and supply chain management from the University of Maryland
-              Global Campus. He speaks French and English fluently. His story embodies
-              what America is built on.
-            </p>
-            <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
-              That Army service is where Phil built his strong foundation in
-              transportation, supply chain, and logistics. After the Army, he spent two
-              years in corporate America as a material supervisor before founding his
-              own company.
+              Born and raised in Cameroon, Phil came to the U.S. to pursue his education,
+              earning his Master&rsquo;s before enlisting in the U.S. Army. He served with the
+              1st Armored Division and was stationed in Germany, where he spent over six
+              years mastering logistics, strategic planning, and supply chain management.
+              He speaks French and English fluently. His story embodies what America is
+              built on.
             </p>
             <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
               Today, Phil leads Tassy Transportation in Charlotte, NC &mdash; a mission-driven
               company providing veterans, families, and those in need with dignified,
-              reliable medical transport, private rides, and specialized services. Every
-              ride reflects our Army values: on time, compliant, and caring.
-            </p>
-            <p className="mt-4 ink-soft text-lg leading-relaxed max-w-2xl">
-              Off duty, Phil is crazy about soccer, technology, and family &mdash; and he
-              loves to travel. He also loves the company of Winnie, the family&rsquo;s
-              rescue French bulldog &mdash; the dog Winnie Ride is named after.
+              reliable medical transport through NEMT, luxury private rides, and
+              specialized services. Every ride reflects our Army values: on time,
+              compliant, and caring. We partner with hospitals, VA centers, and insurance
+              brokers to serve hundreds of clients monthly.
             </p>
             <p className="mt-5 serif italic text-lg max-w-2xl" style={{ color: 'var(--gold)' }}>
               Community-focused and here to serve those who need us most.
@@ -509,40 +483,6 @@ export default function HomePage() {
             <Link href="/pricing" className="nav-link inline-flex items-center gap-1.5 text-base">
               See plans and pricing <ArrowRight size={15} />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── SISTER SERVICE — T-GIGS (Phil, 2026-11-23) ─────────────
-          T-Gigs is the gig-driver weekly-rental arm of the same company (Tassy
-          Trucks LLC), and tgigs.app already links back here from its footer.
-          This strip lets tassytrucks.com traffic find it without confusing
-          riders: it sits below the final CTA, clearly labelled a sister
-          service — it is not a seventh Tassy service line. Deep link to the
-          weekly-rental page; copy invites drivers to look/apply and never
-          promises a car is available today (that page shows live status). */}
-      <section className="bg-cream">
-        <div className="container-x pb-24">
-          <div className="rounded-tile border border-line p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
-            <div className="max-w-xl">
-              {/* T-Gigs logo (Phil, 2026-11-23): the sister service's own mark,
-                  above the eyebrow so the card reads as T-Gigs at a glance. */}
-              <img src={TGIGS_LOGO_DATA_URI} alt="T-Gigs" className="h-11 w-auto mb-4" />
-              <div className="eyebrow gold-text">From our sister service · T-Gigs</div>
-              <h3 className="serif text-2xl font-semibold mt-2">Need a car to drive for work?</h3>
-              <p className="ink-soft text-sm leading-relaxed mt-2">
-                Rent by the week for Uber, Lyft, DoorDash &amp; delivery — from $370/week,
-                maintenance included, no credit check.
-              </p>
-            </div>
-            <a
-              href="https://www.tgigs.app/rent/weekly-car-rental-charlotte"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary shrink-0 inline-flex items-center gap-1.5"
-            >
-              See weekly rentals <ArrowRight size={16} />
-            </a>
           </div>
         </div>
       </section>
